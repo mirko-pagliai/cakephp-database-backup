@@ -30,9 +30,18 @@ if (!Configure::check('MysqlBackup.connection')) {
     Configure::write('MysqlBackup.connection', 'default');
 }
 
+//Default backups directory
+if (!Configure::check('MysqlBackup.target')) {
+    Configure::write('MysqlBackup.target', TMP . 'backups');
+}
+
 //Checks for connection
 $connection = Configure::read('MysqlBackup.connection');
 
 if (empty(ConnectionManager::config($connection))) {
     throw new InternalErrorException(__d('mysql_backup', 'Invalid `{0}` connection', $connection));
+}
+
+if (!is_writeable(Configure::read('MysqlBackup.target'))) {
+    trigger_error(sprintf('Directory %s not writeable', Configure::read('MysqlBackup.target')), E_USER_ERROR);
 }
