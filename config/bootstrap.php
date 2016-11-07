@@ -20,3 +20,19 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
+
+use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
+use Cake\Network\Exception\InternalErrorException;
+
+//Database connection
+if (!Configure::check('MysqlBackup.connection')) {
+    Configure::write('MysqlBackup.connection', 'default');
+}
+
+//Checks for connection
+$connection = Configure::read('MysqlBackup.connection');
+
+if (empty(ConnectionManager::config($connection))) {
+    throw new InternalErrorException(__d('mysql_backup', 'Invalid `{0}` connection', $connection));
+}

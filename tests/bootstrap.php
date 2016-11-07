@@ -24,6 +24,7 @@
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
+use Cake\Datasource\ConnectionManager;
 use Cake\Routing\DispatcherFactory;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -98,6 +99,16 @@ Cache::config([
     ],
 ]);
 
+// Ensure default test connection is defined
+if (!getenv('db_dsn')) {
+    putenv('db_dsn=sqlite:///:memory:');
+}
+
+ConnectionManager::config('test', ['url' => getenv('db_dsn')]);
+ConnectionManager::config('test_custom_i18n_datasource', ['url' => getenv('db_dsn')]);
+
+Configure::write('MysqlBackup.connection', 'test');
+    
 Plugin::load('MysqlBackup', [
     'bootstrap' => true,
     'path' => ROOT,
