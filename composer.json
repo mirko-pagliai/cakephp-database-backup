@@ -18,7 +18,10 @@
     "autoload": {
         "psr-4": {
             "MysqlBackup\\": "src"
-        }
+        },
+        "files": [
+            "src/Core/global_functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
