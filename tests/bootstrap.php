@@ -108,7 +108,7 @@ ConnectionManager::config('test', ['url' => getenv('db_dsn')]);
 ConnectionManager::config('test_custom_i18n_datasource', ['url' => getenv('db_dsn')]);
 
 Configure::write('MysqlBackup.connection', 'test');
-    
+
 Plugin::load('MysqlBackup', [
     'bootstrap' => true,
     'path' => ROOT,
