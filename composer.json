@@ -1,0 +1,28 @@
+{
+    "name": "mirko-pagliai/cakephp-mysql-backup",
+    "description": "Mysql Backup plugin for CakePHP",
+    "homepage": "https://github.com/mirko-pagliai/cakephp-mysql-backup",
+    "type": "cakephp-plugin",
+    "license": "AGPL",
+    "authors": [{
+        "name": "Mirko Pagliai",
+        "email": "mirko.pagliai@gmail.com"
+    }],
+    "require": {
+        "php": ">=5.5.9",
+        "cakephp/cakephp": ">=3.2.0 <4.0"
+    },
+    "require-dev": {
+        "cakephp/cakephp-codesniffer": "2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "MysqlBackup\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MysqlBackup\\Test\\": "tests"
+        }
+    }
+}

@@ -1,0 +1,6 @@
+.directory
+*_old
+*.old.*
+composer.lock
+vendor/
+
