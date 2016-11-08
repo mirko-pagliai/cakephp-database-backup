@@ -59,15 +59,23 @@ class BackupExport extends BaseBackupExport
 class BackupExportTest extends TestCase
 {
     /**
-     * Test for `$connection` property
+     * Test for `construct()` method
      * @test
      */
-    public function testGetConnection()
+    public function testConstruct()
     {
-        $connection = (new BackupExport())->getConnection();
+        $instance = new BackupExport();
+
+        $connection = $instance->getConnection();
         $this->assertEquals($connection['scheme'], 'mysql');
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
+
+        $filename = $instance->getFilename();
+        $this->assertEquals(Configure::read('MysqlBackup.target'), dirname($filename));
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql/', basename($filename));
+
+        $this->assertFalse($instance->getCompression());
     }
 
     /**

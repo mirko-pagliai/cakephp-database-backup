@@ -40,7 +40,7 @@ class BackupExport
      * Compression type
      * @var bool|string
      */
-    protected $compression = false;
+    protected $compression;
 
     /**
      * Database connection
@@ -57,11 +57,15 @@ class BackupExport
 
     /**
      * Construct
+     * @uses filename()
      * @uses $connection
      */
     public function __construct()
     {
         $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
+
+        //This will set filename and compression
+        $this->filename('backup_{$DATABASE}_{$DATETIME}.sql');
     }
 
     /**
