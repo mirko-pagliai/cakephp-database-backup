@@ -1,9 +1,9 @@
-# MySqlBackup
+# MysqlBackup
 
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-mysql-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-mysql-backup)
 [![Coverage Status](https://img.shields.io/codecov/c/github/mirko-pagliai/cakephp-mysql-backup.svg?style=flat-square)](https://codecov.io/github/mirko-pagliai/cakephp-mysql-backup)
 
-*MySqlBackup* is a CakePHP plugin to export, import and manage database backups.
+*MysqlBackup* is a CakePHP plugin to export, import and manage database backups.
 
 ## Installation
 You can install the plugin via composer:
@@ -24,6 +24,9 @@ files. So you have to create the directory and make it writable:
 
 If you want to use a different directory, read below.
 
+## Requirements
+*MysqlBackup* requires `mysql` and `mysqldump`.
+
 ## Configuration
 The plugin uses some configuration parameters and you can set them using the 
 `\Cake\Core\Configure` class. It does not matter if you do it *before* loading 
@@ -33,6 +36,19 @@ For example, you can do this at the bottom of the file `APP/config/app.php`
 of your application.
 
 ### Configuration values
+    Configure::write('MysqlBackup.bin.mysql', '/full/path/to/mysql');
+
+By default, the `mysql` binary will be detected automatically, using the 
+Unix `which` command.  
+If the binary is not found or if you want to set a different path for the 
+bynary, you can use `MysqlBackup.bin.mysql`.
+
+    Configure::write('MysqlBackup.bin.mysqldump', '/full/path/to/mysqldump');
+
+By default, the `mysqldump` binary will be detected automatically, using the 
+Unix `which` command.  
+If the binary is not found or if you want to set a different path for the 
+bynary, you can use `MysqlBackup.bin.mysqldump`.
 
     Configure::write('MysqlBackup.connection', 'default');
     
