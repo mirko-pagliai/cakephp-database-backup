@@ -117,7 +117,6 @@ Configure::write('MysqlBackup.target', TMP . 'backups');
 Plugin::load('MysqlBackup', [
     'bootstrap' => true,
     'path' => ROOT,
-    'routes' => true,
 ]);
 
 DispatcherFactory::add('Routing');
