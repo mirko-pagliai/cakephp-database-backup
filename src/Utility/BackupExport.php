@@ -37,7 +37,7 @@ use Cake\Network\Exception\InternalErrorException;
 class BackupExport
 {
     /**
-     * Compression
+     * Compression type
      * @var bool|string
      */
     protected $compression = false;
@@ -47,6 +47,13 @@ class BackupExport
      * @var array
      */
     protected $connection;
+
+    /**
+     * Rotate limit. This is the number of backups you want to keep. So, it
+     *  will delete all backups that are older.
+     * @var int
+     */
+    protected $rotate;
 
     /**
      * Construct
@@ -110,6 +117,25 @@ class BackupExport
 
         //Sets the compression
         $this->compression(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false][$matches[1]]);
+
+        return $this;
+    }
+
+    /**
+     * Sets the number of backups you want to keep. So, it will delete all
+     * backups that are older
+     * @param int $rotate Number of backups you want to keep
+     * @return \MysqlBackup\Utility\BackupExport
+     * @throws InternalErrorException
+     * @uses $rotate
+     */
+    public function rotate($rotate)
+    {
+        if (!isPositive($rotate)) {
+            throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
+        }
+
+        $this->rotate = $rotate;
 
         return $this;
     }

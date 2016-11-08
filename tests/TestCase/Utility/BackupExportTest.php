@@ -46,6 +46,11 @@ class BackupExport extends BaseBackupExport
     {
         return $this->filename;
     }
+
+    public function getRotate()
+    {
+        return $this->rotate;
+    }
 }
 
 /**
@@ -174,5 +179,28 @@ class BackupExportTest extends TestCase
     public function testFilenameWithoutExtension()
     {
         (new BackupExport())->filename('/backup');
+    }
+
+    /**
+     * Test for `rotate()` method
+     * @test
+     */
+    public function testRotate()
+    {
+        $instance = new BackupExport();
+
+        $instance->rotate(10);
+        $this->assertEquals(10, $instance->getRotate());
+    }
+
+    /**
+     * Test for `rotate()` method, with an invalid value
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Invalid rotate value
+     * @test
+     */
+    public function testRotateWithInvalidValue()
+    {
+        (new BackupExport())->rotate(-1);
     }
 }

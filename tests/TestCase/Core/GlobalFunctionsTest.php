@@ -30,6 +30,19 @@ use Cake\TestSuite\TestCase;
 class GlobalFunctionsTest extends TestCase
 {
     /**
+     * Test for `isPositive()` global function
+     * @return void
+     * @test
+     */
+    public function testIsPositive()
+    {
+        $this->assertTrue(isPositive(1));
+        $this->assertFalse(isPositive(0));
+        $this->assertFalse(isPositive(-1));
+        $this->assertFalse(isPositive(1.1));
+    }
+
+    /**
      * Test for `which()` global function
      * @return void
      * @test

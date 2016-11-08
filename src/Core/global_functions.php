@@ -21,6 +21,18 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
 
+if (!function_exists('isPositive')) {
+    /**
+     * Checks if a string is a positive number
+     * @param string $string String
+     * @return bool
+     */
+    function isPositive($string)
+    {
+        return is_numeric($string) && $string > 0 && $string == round($string);
+    }
+}
+
 if (!function_exists('which')) {
     /**
      * Executes the `which` command and shows the full path of (shell) commands
