@@ -25,17 +25,38 @@ files. So you have to create the directory and make it writable:
 If you want to use a different directory, read below.
 
 ## Requirements
-*MysqlBackup* requires `mysql` and `mysqldump`.
+*MysqlBackup* requires `mysql` and `mysqldump`.  
+**Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are 
+also required.  
+The installation of these binaries may vary depending on your operating system.
 
 ## Configuration
 The plugin uses some configuration parameters and you can set them using the 
-`\Cake\Core\Configure` class. It does not matter if you do it *before* loading 
+`\Cake\Core\Configure` class. It does not matter if you do it **before** loading 
 the plugin.
 
 For example, you can do this at the bottom of the file `APP/config/app.php`
 of your application.
 
 ### Configuration values
+    Configure::write('MysqlBackup.bin.bzip2', '/full/path/to/bzip2');
+
+By default, the `bzip2` binary will be detected automatically, using the 
+Unix `which` command.  
+If the binary is not found or if you want to set a different path for the 
+bynary, you can use `MysqlBackup.bin.bzip2`.  
+Note that using `bzip2` is **optional**, but it's required if you want to handle 
+compressed backup.
+
+    Configure::write('MysqlBackup.bin.gzip', '/full/path/to/mysql');
+
+By default, the `gzip` binary will be detected automatically, using the 
+Unix `which` command.  
+If the binary is not found or if you want to set a different path for the 
+bynary, you can use `MysqlBackup.bin.gzip`.
+Note that using `gzip` is **optional**, but it's required if you want to handle 
+compressed backup.
+
     Configure::write('MysqlBackup.bin.mysql', '/full/path/to/mysql');
 
 By default, the `mysql` binary will be detected automatically, using the 

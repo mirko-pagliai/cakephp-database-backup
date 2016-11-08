@@ -23,6 +23,16 @@
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 
+//bzip2 binary
+if (!Configure::check('MysqlBackup.bin.bzip2')) {
+    Configure::write('MysqlBackup.bin.bzip2', which('bzip2'));
+}
+
+//gzip binary
+if (!Configure::check('MysqlBackup.bin.gzip')) {
+    Configure::write('MysqlBackup.bin.gzip', which('gzip'));
+}
+
 //mysql binary
 if (!Configure::check('MysqlBackup.bin.mysql')) {
     Configure::write('MysqlBackup.bin.mysql', which('mysql'));
