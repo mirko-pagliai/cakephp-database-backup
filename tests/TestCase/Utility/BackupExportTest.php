@@ -23,6 +23,34 @@
 
 namespace MysqlBackup\Test\TestCase\Utility;
 
-class BackupExportTest
+use Cake\TestSuite\TestCase;
+use MysqlBackup\Utility\BackupExport as BaseBackupExport;
+
+/**
+ * Makes public some protected methods/properties from `BackupExport`
+ */
+class BackupExport extends BaseBackupExport
 {
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+}
+
+/**
+ * BackupExportTest class
+ */
+class BackupExportTest extends TestCase
+{
+    /**
+     * Test for `$connection` property
+     * @test
+     */
+    public function testGetConnection()
+    {
+        $connection = (new BackupExport())->getConnection();
+        $this->assertEquals($connection['scheme'], 'mysql');
+        $this->assertEquals($connection['database'], 'test');
+        $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
+    }
 }
