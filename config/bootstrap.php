@@ -33,6 +33,16 @@ if (!Configure::check('MysqlBackup.target')) {
     Configure::write('MysqlBackup.target', ROOT . 'backups');
 }
 
+//mysql binary
+if (!Configure::check('MysqlBackup.bin.mysql')) {
+    Configure::write('MysqlBackup.bin.mysql', which('mysql'));
+}
+
+//mysqldump binary
+if (!Configure::check('MysqlBackup.bin.mysqldump')) {
+    Configure::write('MysqlBackup.bin.mysqldump', which('mysqldump'));
+}
+
 //Checks for connection
 $connection = Configure::read('MysqlBackup.connection');
 
@@ -42,4 +52,14 @@ if (empty(ConnectionManager::config($connection))) {
 
 if (!is_writeable(Configure::read('MysqlBackup.target'))) {
     trigger_error(sprintf('Directory %s not writeable', Configure::read('MysqlBackup.target')), E_USER_ERROR);
+}
+
+//Checks for mysql binary
+if (empty(Configure::read('MysqlBackup.bin.mysql'))) {
+    trigger_error(sprintf('The `%s` binary was not found', 'mysql'), E_USER_ERROR);
+}
+
+//Checks for mysqldump binary
+if (empty(Configure::read('MysqlBackup.bin.mysqldump'))) {
+    trigger_error(sprintf('The `%s` binary was not found', 'mysqldump'), E_USER_ERROR);
 }
