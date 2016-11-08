@@ -23,6 +23,9 @@
 
 namespace MysqlBackup\Utility;
 
+use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
+
 /**
  * Utility to export the database.
  *
@@ -31,4 +34,18 @@ namespace MysqlBackup\Utility;
  */
 class BackupExport
 {
+    /**
+     * Database connection
+     * @var array
+     */
+    protected $connection;
+
+    /**
+     * Construct
+     * @uses $connection
+     */
+    public function __construct()
+    {
+        $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
+    }
 }
