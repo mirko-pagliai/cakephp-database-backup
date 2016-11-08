@@ -30,7 +30,7 @@ if (!Configure::check('MysqlBackup.connection')) {
 
 //Default backups directory
 if (!Configure::check('MysqlBackup.target')) {
-    Configure::write('MysqlBackup.target', TMP . 'backups');
+    Configure::write('MysqlBackup.target', ROOT . 'backups');
 }
 
 //Checks for connection
