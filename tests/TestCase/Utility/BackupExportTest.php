@@ -31,6 +31,11 @@ use MysqlBackup\Utility\BackupExport as BaseBackupExport;
  */
 class BackupExport extends BaseBackupExport
 {
+    public function getCompression()
+    {
+        return $this->compression;
+    }
+
     public function getConnection()
     {
         return $this->connection;
@@ -52,5 +57,47 @@ class BackupExportTest extends TestCase
         $this->assertEquals($connection['scheme'], 'mysql');
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
+    }
+
+    /**
+     * Test for `compression()` method
+     * @test
+     */
+    public function testCompression()
+    {
+        $instance = new BackupExport();
+
+        $this->assertFalse($instance->getCompression());
+
+        $instance->compression('bzip2');
+        $this->assertEquals('bzip2', $instance->getCompression());
+
+        $instance->compression('gzip');
+        $this->assertEquals('gzip', $instance->getCompression());
+
+        $instance->compression(false);
+        $this->assertFalse($instance->getCompression());
+    }
+
+    /**
+     * Test for `compression()` method, with an invalid stringvalue
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Invalid compression type
+     * @test
+     */
+    public function testCompressionWithInvalidString()
+    {
+        (new BackupExport())->compression('invalidValue');
+    }
+
+    /**
+     * Test for `compression()` method, with an invalid boolean value
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Invalid compression type
+     * @test
+     */
+    public function testCompressionWithInvalidBool()
+    {
+        (new BackupExport())->compression(true);
     }
 }

@@ -25,6 +25,7 @@ namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use Cake\Network\Exception\InternalErrorException;
 
 /**
  * Utility to export the database.
@@ -34,6 +35,12 @@ use Cake\Datasource\ConnectionManager;
  */
 class BackupExport
 {
+    /**
+     * Compression
+     * @var bool|string
+     */
+    protected $compression = false;
+
     /**
      * Database connection
      * @var array
@@ -47,5 +54,23 @@ class BackupExport
     public function __construct()
     {
         $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
+    }
+
+    /**
+     * Sets the compression
+     * @param bool|string $compression Compression type or `false` to disable
+     * @return \MysqlBackup\Utility\BackupExport
+     * @throws InternalErrorException
+     * @uses $compression
+     */
+    public function compression($compression)
+    {
+        if (!in_array($compression, [false, 'bzip2', 'gzip'], true)) {
+            throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
+        }
+
+        $this->compression = $compression;
+
+        return $this;
     }
 }
