@@ -23,6 +23,7 @@
 
 namespace MysqlBackup\Test\TestCase\Utility;
 
+use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\Utility\BackupExport as BaseBackupExport;
 
@@ -39,6 +40,11 @@ class BackupExport extends BaseBackupExport
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    public function getFilename()
+    {
+        return $this->filename;
     }
 }
 
@@ -99,5 +105,74 @@ class BackupExportTest extends TestCase
     public function testCompressionWithInvalidBool()
     {
         (new BackupExport())->compression(true);
+    }
+
+    /**
+     * Test for `filename()` method
+     * @test
+     */
+    public function testFilename()
+    {
+        $instance = new BackupExport();
+
+        $instance->filename('/backup.sql');
+        $this->assertEquals('/backup.sql', $instance->getFilename());
+        $this->assertFalse($instance->getCompression());
+
+        $instance->filename('/backup.sql.gz');
+        $this->assertEquals('/backup.sql.gz', $instance->getFilename());
+        $this->assertEquals('gzip', $instance->getCompression());
+
+        $instance->filename('/backup.sql.bz2');
+        $this->assertEquals('/backup.sql.bz2', $instance->getFilename());
+        $this->assertEquals('bzip2', $instance->getCompression());
+
+        //Relative path
+        $instance->filename('backup.sql');
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql', $instance->getFilename());
+        $this->assertFalse($instance->getCompression());
+    }
+
+    /**
+     * Test for `filename()` method, with patterns
+     * @test
+     */
+    public function testFilenameWithPatterns()
+    {
+        $instance = new BackupExport();
+
+        $instance->filename('/{$DATABASE}.sql');
+        $this->assertEquals('/test.sql', $instance->getFilename());
+
+        $instance->filename('/{$DATETIME}.sql');
+        $this->assertEquals('/' . date('YmdHis') . '.sql', $instance->getFilename());
+
+        $instance->filename('/{$HOSTNAME}.sql');
+        $this->assertEquals('/localhost.sql', $instance->getFilename());
+
+        $instance->filename('/{$TIMESTAMP}.sql');
+        $this->assertEquals('/' . time() . '.sql', $instance->getFilename());
+    }
+
+    /**
+     * Test for `filename()` method, with invalid extension
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Invalid file extension
+     * @test
+     */
+    public function testFilenameWithInvalidExtension()
+    {
+        (new BackupExport())->filename('/backup.txt');
+    }
+
+    /**
+     * Test for `filename()` method, without extension
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Invalid file extension
+     * @test
+     */
+    public function testFilenameWithoutExtension()
+    {
+        (new BackupExport())->filename('/backup');
     }
 }

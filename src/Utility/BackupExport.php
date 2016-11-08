@@ -25,6 +25,7 @@ namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use Cake\Filesystem\Folder;
 use Cake\Network\Exception\InternalErrorException;
 
 /**
@@ -70,6 +71,45 @@ class BackupExport
         }
 
         $this->compression = $compression;
+
+        return $this;
+    }
+
+    /**
+     * Sets the filename.
+     *
+     * Using this method, the compression type will be automatically setted
+     * by the filename.
+     * @param string $filename Filename. It can be an absolute path and may
+     *  contain patterns
+     * @return \MysqlBackup\Utility\BackupExport
+     * @throws InternalErrorException
+     * @uses compression()
+     * @uses $connection
+     * @uses $filename
+     */
+    public function filename($filename)
+    {
+        //Replaces patterns
+        $filename = str_replace(
+            ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
+            [$this->connection['database'], date('YmdHis'), $this->connection['host'], time()],
+            $filename
+        );
+
+        if (!Folder::isAbsolute($filename)) {
+            $filename = Configure::read('MysqlBackup.target') . DS . $filename;
+        }
+
+        $this->filename = $filename;
+
+        //Checks for extension
+        if (!preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches)) {
+            throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
+        }
+
+        //Sets the compression
+        $this->compression(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false][$matches[1]]);
 
         return $this;
     }
