@@ -185,7 +185,7 @@ class BackupExport
         }
 
         if (!is_writable(dirname($filename))) {
-            throw new InternalErrorException(__d('mysql_backup', 'Directory `{0}` is not writable', dirname($filename)));
+            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not writable', dirname($filename)));
         }
 
         if (file_exists($filename)) {

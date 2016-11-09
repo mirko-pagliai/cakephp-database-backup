@@ -201,7 +201,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with invalid directory
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage Directory `/tmp/backups/noExistingDir` is not writable
+     * @expectedExceptionMessage File or directory `/tmp/backups/noExistingDir` not writable
      * @test
      */
     public function testFilenameWithInvalidDirectory()
