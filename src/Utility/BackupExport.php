@@ -154,8 +154,12 @@ class BackupExport
             $filename = Configure::read('MysqlBackup.target') . DS . $filename;
         }
 
+        if (!is_writable(dirname($filename))) {
+            throw new InternalErrorException(__d('mysql_backup', 'Directory `{0}` is not writable', dirname($filename)));
+        }
+
         if (file_exists($filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'File {0} already exists', $filename));
+            throw new InternalErrorException(__d('mysql_backup', 'File `{0}` already exists', $filename));
         }
 
         //Checks for extension

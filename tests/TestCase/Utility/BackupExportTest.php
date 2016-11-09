@@ -158,7 +158,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a file that already exists
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage File /tmp/backups/backup.sql already exists
+     * @expectedExceptionMessage File `/tmp/backups/backup.sql` already exists
      */
     public function testFilenameAlreadyExists()
     {
@@ -192,6 +192,17 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Test for `filename()` method, with invalid directory
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Directory `/tmp/backups/noExistingDir` is not writable
+     * @test
+     */
+    public function testFilenameWithInvalidDirectory()
+    {
+        (new BackupExport())->filename('noExistingDir' . DS . 'backup.sql');
+    }
+
+    /**
      * Test for `filename()` method, with invalid extension
      * @expectedException Cake\Network\Exception\InternalErrorException
      * @expectedExceptionMessage Invalid file extension
@@ -199,7 +210,7 @@ class BackupExportTest extends TestCase
      */
     public function testFilenameWithInvalidExtension()
     {
-        (new BackupExport())->filename('/backup.txt');
+        (new BackupExport())->filename('backup.txt');
     }
 
     /**
@@ -210,7 +221,7 @@ class BackupExportTest extends TestCase
      */
     public function testFilenameWithoutExtension()
     {
-        (new BackupExport())->filename('/backup');
+        (new BackupExport())->filename('backup');
     }
 
     /**
@@ -264,9 +275,7 @@ class BackupExportTest extends TestCase
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
         $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s', (new BackupExport())->getExecutable('bzip2'));
-
         $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s', (new BackupExport())->getExecutable('gzip'));
-
         $this->assertEquals($mysqldump . ' --defaults-file=%s %s > %s', (new BackupExport())->getExecutable(false));
     }
 
