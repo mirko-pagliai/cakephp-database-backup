@@ -24,43 +24,7 @@ namespace MysqlBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupExport as BaseBackupExport;
-
-/**
- * Makes public some protected methods/properties from `BackupExport`
- */
-class BackupExport extends BaseBackupExport
-{
-    public function getAuth()
-    {
-        return $this->_storeAuth();
-    }
-
-    public function getCompression()
-    {
-        return $this->compression;
-    }
-
-    public function getConnection()
-    {
-        return $this->connection;
-    }
-
-    public function getExecutable()
-    {
-        return $this->executable;
-    }
-
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-    public function getRotate()
-    {
-        return $this->rotate;
-    }
-}
+use MysqlBackup\Test\TestCase\Utility\BackupExport;
 
 /**
  * BackupExportTest class
