@@ -20,7 +20,6 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-
 namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
@@ -49,6 +48,12 @@ class BackupExport
     protected $connection;
 
     /**
+     * Executable command
+     * @var string
+     */
+    protected $executable;
+
+    /**
      * Rotate limit. This is the number of backups you want to keep. So, it
      *  will delete all backups that are older.
      * @var int
@@ -64,20 +69,33 @@ class BackupExport
     {
         $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
 
-        //This will set filename and compression
+        //This will set filename, compression and executable
         $this->filename('backup_{$DATABASE}_{$DATETIME}.sql');
     }
 
     /**
      * Sets the compression
-     * @param bool|string $compression Compression type or `false` to disable
+     *
+     * Using this method, the executable type will be automatically setted.
+     * @param bool|string $compression Compression or `false` to disable
      * @return \MysqlBackup\Utility\BackupExport
      * @throws InternalErrorException
      * @uses $compression
+     * @uses $executable
      */
     public function compression($compression)
     {
-        if (!in_array($compression, [false, 'bzip2', 'gzip'], true)) {
+        $mysqldump = Configure::read('MysqlBackup.bin.mysqldump');
+
+        if ($compression === 'bzip2') {
+            $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
+            $this->executable = sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $bzip2);
+        } elseif ($compression === 'gzip') {
+            $gzip = Configure::read('MysqlBackup.bin.gzip');
+            $this->executable = sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $gzip);
+        } elseif ($compression === false) {
+            $this->executable = sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldump);
+        } else {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
         }
 
@@ -142,5 +160,54 @@ class BackupExport
         $this->rotate = $rotate;
 
         return $this;
+    }
+
+    /**
+     * Stores the authentication data in a temporary file.
+     *
+     * For security reasons, it's recommended to specify the password in
+     *  a configuration file and not in the command (a user can execute
+     *  a `ps aux | grep mysqldump` and see the password).
+     *  So it creates a temporary file to store the configuration options
+     * @uses $connection
+     * @return string File path
+     */
+    protected function _storeAuth()
+    {
+        $auth = tempnam(sys_get_temp_dir(), 'auth');
+
+        file_put_contents($auth, sprintf(
+            "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
+            $this->connection['username'],
+            empty($this->connection['password']) ? null : $this->connection['password'],
+            $this->connection['host']
+        ));
+
+        return $auth;
+    }
+
+    /**
+     * Exports the database
+     * @return string Filename path
+     * @uses _storeAuth()
+     * @uses $connection
+     * @uses $executable
+     * @uses $filename
+     */
+    public function export()
+    {
+        //Stores the authentication data in a temporary file
+        $auth = $this->_storeAuth();
+
+        $this->executable = sprintf(
+            $this->executable,
+            $auth,
+            $this->connection['database'],
+            $this->filename
+        );
+
+        unlink($auth);
+
+        return $this->filename;
     }
 }

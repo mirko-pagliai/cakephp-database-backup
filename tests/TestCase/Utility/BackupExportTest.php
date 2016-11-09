@@ -20,7 +20,6 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-
 namespace MysqlBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
@@ -32,6 +31,11 @@ use MysqlBackup\Utility\BackupExport as BaseBackupExport;
  */
 class BackupExport extends BaseBackupExport
 {
+    public function getAuth()
+    {
+        return $this->_storeAuth();
+    }
+
     public function getCompression()
     {
         return $this->compression;
@@ -40,6 +44,11 @@ class BackupExport extends BaseBackupExport
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    public function getExecutable()
+    {
+        return $this->executable;
     }
 
     public function getFilename()
@@ -87,15 +96,19 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $this->assertFalse($instance->getCompression());
+        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s > %s', $instance->getExecutable());
 
         $instance->compression('bzip2');
         $this->assertEquals('bzip2', $instance->getCompression());
+        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s | /bin/bzip2 > %s', $instance->getExecutable());
 
         $instance->compression('gzip');
         $this->assertEquals('gzip', $instance->getCompression());
+        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s | /bin/gzip > %s', $instance->getExecutable());
 
         $instance->compression(false);
         $this->assertFalse($instance->getCompression());
+        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s > %s', $instance->getExecutable());
     }
 
     /**
@@ -210,5 +223,31 @@ class BackupExportTest extends TestCase
     public function testRotateWithInvalidValue()
     {
         (new BackupExport())->rotate(-1);
+    }
+
+    /**
+     * Test for `_storeAuth()` method
+     * @test
+     */
+    public function testStoreAuth()
+    {
+        $auth = (new BackupExport())->getAuth();
+
+        $this->assertFileExists($auth);
+
+        $result = file_get_contents($auth);
+        $expected = '[mysqldump]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
+        $this->assertEquals($expected, $result);
+
+        unlink($auth);
+    }
+
+    /**
+     * Test for `export()` method
+     * @test
+     */
+    public function testExport()
+    {
+        (new BackupExport())->export();
     }
 }
