@@ -68,6 +68,20 @@ class BackupExport extends BaseBackupExport
 class BackupExportTest extends TestCase
 {
     /**
+     * Setup the test case, backup the static object values so they can be
+     * restored. Specifically backs up the contents of Configure and paths in
+     *  App if they have not already been backed up
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        Configure::write('MysqlBackup.bin.bzip2', which('bzip2'));
+        Configure::write('MysqlBackup.bin.gzip', which('gzip'));
+    }
+
+    /**
      * Test for `construct()` method
      * @test
      */
@@ -109,6 +123,32 @@ class BackupExportTest extends TestCase
         $instance->compression(false);
         $this->assertFalse($instance->getCompression());
         $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s > %s', $instance->getExecutable());
+    }
+
+    /**
+     * Test for `compression()` method, with the `bzip2` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `bzip2` executable not available
+     * @test
+     */
+    public function testCompressionBzip2NotAvailable()
+    {
+        Configure::write('MysqlBackup.bin.bzip2', false);
+
+        (new BackupExport())->compression('bzip2');
+    }
+
+    /**
+     * Test for `compression()` method, with the `gzip` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `gzip` executable not available
+     * @test
+     */
+    public function testCompressionGzipNotAvailable()
+    {
+        Configure::write('MysqlBackup.bin.gzip', false);
+
+        (new BackupExport())->compression('gzip');
     }
 
     /**
