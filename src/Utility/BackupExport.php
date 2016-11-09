@@ -154,7 +154,9 @@ class BackupExport
             $filename = Configure::read('MysqlBackup.target') . DS . $filename;
         }
 
-        $this->filename = $filename;
+        if (file_exists($filename)) {
+            throw new InternalErrorException(__d('mysql_backup', 'File {0} already exists', $filename));
+        }
 
         //Checks for extension
         if (!preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches)) {
@@ -163,6 +165,8 @@ class BackupExport
 
         //Sets the compression
         $this->compression(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false][$matches[1]]);
+
+        $this->filename = $filename;
 
         return $this;
     }
@@ -235,12 +239,8 @@ class BackupExport
         //Stores the authentication data in a temporary file
         $auth = $this->_storeAuth();
 
-        $executable = sprintf(
-            $this->_getExecutable($this->compression),
-            $auth,
-            $this->connection['database'],
-            $filename
-        );
+        //Executes
+        exec(sprintf($this->_getExecutable($this->compression), $auth, $this->connection['database'], $filename));
 
         //Deletes the temporary file
         unlink($auth);

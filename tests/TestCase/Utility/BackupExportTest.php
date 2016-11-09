@@ -46,6 +46,20 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Teardown any static object changes and restore them
+     * @return void
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        //Deletes all backups
+        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
      * Test for `construct()` method
      * @test
      */
@@ -76,23 +90,17 @@ class BackupExportTest extends TestCase
         $instance->compression('bzip2');
         $this->assertEquals('bzip2', $instance->getCompression());
         $this->assertEquals('sql.bz2', $instance->getExtension());
-
-        $basename = basename($instance->export());
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', $basename);
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($instance->export()));
 
         $instance->compression('gzip');
         $this->assertEquals('gzip', $instance->getCompression());
         $this->assertEquals('sql.gz', $instance->getExtension());
-
-        $basename = basename($instance->export());
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', $basename);
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($instance->export()));
 
         $instance->compression(false);
         $this->assertFalse($instance->getCompression());
         $this->assertEquals('sql', $instance->getExtension());
-
-        $basename = basename($instance->export());
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', $basename);
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($instance->export()));
     }
 
     /**
@@ -125,34 +133,37 @@ class BackupExportTest extends TestCase
     {
         $instance = new BackupExport();
 
-        $instance->filename('/backup.sql');
-        $this->assertEquals('/backup.sql', $instance->getFilename());
-        $this->assertFalse($instance->getCompression());
-
-        $basename = basename($instance->export());
-        $this->assertEquals('backup.sql', $basename);
-
-        $instance->filename('/backup.sql.gz');
-        $this->assertEquals('/backup.sql.gz', $instance->getFilename());
-        $this->assertEquals('gzip', $instance->getCompression());
-
-        $basename = basename($instance->export());
-        $this->assertEquals('backup.sql.gz', $basename);
-
-        $instance->filename('/backup.sql.bz2');
-        $this->assertEquals('/backup.sql.bz2', $instance->getFilename());
-        $this->assertEquals('bzip2', $instance->getCompression());
-
-        $basename = basename($instance->export());
-        $this->assertEquals('backup.sql.bz2', $basename);
-
-        //Relative path
         $instance->filename('backup.sql');
         $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql', $instance->getFilename());
         $this->assertFalse($instance->getCompression());
+        $this->assertEquals('backup.sql', basename($instance->export()));
 
-        $basename = basename($instance->export());
-        $this->assertEquals('backup.sql', $basename);
+        $instance->filename('backup.sql.gz');
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.gz', $instance->getFilename());
+        $this->assertEquals('gzip', $instance->getCompression());
+        $this->assertEquals('backup.sql.gz', basename($instance->export()));
+
+        $instance->filename('backup.sql.bz2');
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.bz2', $instance->getFilename());
+        $this->assertEquals('bzip2', $instance->getCompression());
+        $this->assertEquals('backup.sql.bz2', basename($instance->export()));
+
+        //Absolute path
+        $instance->filename(Configure::read('MysqlBackup.target') . DS . 'other.sql');
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'other.sql', $instance->getFilename());
+        $this->assertFalse($instance->getCompression());
+        $this->assertEquals('other.sql', basename($instance->export()));
+    }
+
+    /**
+     * Test for `filename()` method, with a file that already exists
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage File /tmp/backups/backup.sql already exists
+     */
+    public function testFilenameAlreadyExists()
+    {
+        (new BackupExport())->filename('backup.sql')->export();
+        (new BackupExport())->filename('backup.sql')->export();
     }
 
     /**
@@ -163,29 +174,21 @@ class BackupExportTest extends TestCase
     {
         $instance = new BackupExport();
 
-        $instance->filename('/{$DATABASE}.sql');
-        $this->assertEquals('/test.sql', $instance->getFilename());
+        $instance->filename('{$DATABASE}.sql');
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'test.sql', $instance->getFilename());
+        $this->assertEquals('test.sql', basename($instance->export()));
 
-        $basename = basename($instance->export());
-        $this->assertEquals('test.sql', $basename);
+        $instance->filename('{$DATETIME}.sql');
+        $this->assertRegExp('/^[0-9]{14}\.sql$/', basename($instance->getFilename()));
+        $this->assertRegExp('/^[0-9]{14}\.sql$/', basename($instance->export()));
 
-        $instance->filename('/{$DATETIME}.sql');
-        $this->assertRegExp('/^\/[0-9]{14}\.sql$/', $instance->getFilename());
+        $instance->filename('{$HOSTNAME}.sql');
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'localhost.sql', $instance->getFilename());
+        $this->assertEquals('localhost.sql', basename($instance->export()));
 
-        $basename = basename($instance->export());
-        $this->assertRegExp('/^[0-9]{14}\.sql$/', $basename);
-
-        $instance->filename('/{$HOSTNAME}.sql');
-        $this->assertEquals('/localhost.sql', $instance->getFilename());
-
-        $basename = basename($instance->export());
-        $this->assertEquals('localhost.sql', $basename);
-
-        $instance->filename('/{$TIMESTAMP}.sql');
-        $this->assertRegExp('/^\/[0-9]{10}\.sql$/', $instance->getFilename());
-
-        $basename = basename($instance->export());
-        $this->assertRegExp('/^[0-9]{10}\.sql$/', $basename);
+        $instance->filename('{$TIMESTAMP}.sql');
+        $this->assertRegExp('/^[0-9]{10}\.sql$/', basename($instance->getFilename()));
+        $this->assertRegExp('/^[0-9]{10}\.sql$/', basename($instance->export()));
     }
 
     /**
