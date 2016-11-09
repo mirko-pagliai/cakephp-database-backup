@@ -44,9 +44,9 @@ class BackupExport extends BaseBackupExport
         return $this->connection;
     }
 
-    public function getExecutable()
+    public function getExecutable($compression)
     {
-        return $this->executable;
+        return $this->_getExecutable($compression);
     }
 
     public function getFilename()

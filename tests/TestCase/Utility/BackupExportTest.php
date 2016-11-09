@@ -74,45 +74,15 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $this->assertFalse($instance->getCompression());
-        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s > %s', $instance->getExecutable());
 
         $instance->compression('bzip2');
         $this->assertEquals('bzip2', $instance->getCompression());
-        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s | /bin/bzip2 > %s', $instance->getExecutable());
 
         $instance->compression('gzip');
         $this->assertEquals('gzip', $instance->getCompression());
-        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s | /bin/gzip > %s', $instance->getExecutable());
 
         $instance->compression(false);
         $this->assertFalse($instance->getCompression());
-        $this->assertEquals('/usr/bin/mysqldump --defaults-file=%s %s > %s', $instance->getExecutable());
-    }
-
-    /**
-     * Test for `compression()` method, with the `bzip2` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `bzip2` executable not available
-     * @test
-     */
-    public function testCompressionBzip2NotAvailable()
-    {
-        Configure::write('MysqlBackup.bin.bzip2', false);
-
-        (new BackupExport())->compression('bzip2');
-    }
-
-    /**
-     * Test for `compression()` method, with the `gzip` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `gzip` executable not available
-     * @test
-     */
-    public function testCompressionGzipNotAvailable()
-    {
-        Configure::write('MysqlBackup.bin.gzip', false);
-
-        (new BackupExport())->compression('gzip');
     }
 
     /**
@@ -244,6 +214,49 @@ class BackupExportTest extends TestCase
         $this->assertEquals($expected, $result);
 
         unlink($auth);
+    }
+
+    /**
+     * Test for `_getExecutable()` method
+     * @test
+     */
+    public function testExecutable()
+    {
+        $mysqldump = Configure::read('MysqlBackup.bin.mysqldump');
+        $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
+        $gzip = Configure::read('MysqlBackup.bin.gzip');
+
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s', (new BackupExport())->getExecutable('bzip2'));
+
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s', (new BackupExport())->getExecutable('gzip'));
+
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s > %s', (new BackupExport())->getExecutable(false));
+    }
+
+    /**
+     * Test for `_getExecutable()` method, with the `bzip2` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `bzip2` executable not available
+     * @test
+     */
+    public function testExecutableWithBzip2NotAvailable()
+    {
+        Configure::write('MysqlBackup.bin.bzip2', false);
+
+        (new BackupExport())->getExecutable('bzip2');
+    }
+
+    /**
+     * Test for `_getExecutable()` method, with the `gzip` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `gzip` executable not available
+     * @test
+     */
+    public function testExecutableWithGzipNotAvailable()
+    {
+        Configure::write('MysqlBackup.bin.gzip', false);
+
+        (new BackupExport())->getExecutable('gzip');
     }
 
     /**

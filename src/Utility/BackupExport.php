@@ -74,40 +74,41 @@ class BackupExport
     }
 
     /**
-     * Sets the compression
-     *
-     * Using this method, the executable type will be automatically setted.
-     * @param bool|string $compression Compression or `false` to disable
-     * @return \MysqlBackup\Utility\BackupExport
+     * Gets the executable command
+     * @param bool|string $compression Compression. Supported values are
+     *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
+     * @return string
      * @throws InternalErrorException
-     * @uses $compression
-     * @uses $executable
      */
-    public function compression($compression)
+    protected function _getExecutable($compression)
     {
         $mysqldump = Configure::read('MysqlBackup.bin.mysqldump');
 
-        if ($compression === 'bzip2') {
-            $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
+        if (in_array($compression, ['bzip2', 'gzip'])) {
+            $executable = Configure::read(sprintf('MysqlBackup.bin.%s', $compression));
 
-            //Checks for `bzip2` executable
-            if (empty($bzip2)) {
-                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', 'bzip2'));
+            if (empty($executable)) {
+                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
             }
 
-            $this->executable = sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $bzip2);
-        } elseif ($compression === 'gzip') {
-            $gzip = Configure::read('MysqlBackup.bin.gzip');
+            return sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $executable);
+        }
 
-            //Checks for `gzip executable`
-            if (empty($gzip)) {
-                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', 'gzip'));
-            }
+        //No compression
+        return sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldump);
+    }
 
-            $this->executable = sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $gzip);
-        } elseif ($compression === false) {
-            $this->executable = sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldump);
-        } else {
+    /**
+     * Sets the compression
+     * @param bool|string $compression Compression. Supported values are
+     *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
+     * @return \MysqlBackup\Utility\BackupExport
+     * @throws InternalErrorException
+     * @uses $compression
+     */
+    public function compression($compression)
+    {
+        if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
         }
 
@@ -201,9 +202,10 @@ class BackupExport
     /**
      * Exports the database
      * @return string Filename path
+     * @uses _getExecutable()
      * @uses _storeAuth()
+     * @uses $compression
      * @uses $connection
-     * @uses $executable
      * @uses $filename
      */
     public function export()
@@ -211,8 +213,8 @@ class BackupExport
         //Stores the authentication data in a temporary file
         $auth = $this->_storeAuth();
 
-        $this->executable = sprintf(
-            $this->executable,
+        $executable = sprintf(
+            $this->_getExecutable($this->compression),
             $auth,
             $this->connection['database'],
             $this->filename
