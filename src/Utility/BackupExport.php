@@ -39,7 +39,7 @@ class BackupExport
      * Compression type
      * @var bool|string
      */
-    protected $compression;
+    protected $compression = false;
 
     /**
      * Database connection
@@ -54,6 +54,18 @@ class BackupExport
     protected $executable;
 
     /**
+     * Filename extension
+     * @var string
+     */
+    protected $extension = 'sql';
+
+    /**
+     * Filename where to export the database
+     * @var string
+     */
+    protected $filename;
+
+    /**
      * Rotate limit. This is the number of backups you want to keep. So, it
      *  will delete all backups that are older.
      * @var int
@@ -62,15 +74,11 @@ class BackupExport
 
     /**
      * Construct
-     * @uses filename()
      * @uses $connection
      */
     public function __construct()
     {
         $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
-
-        //This will set filename, compression and executable
-        $this->filename('backup_{$DATABASE}_{$DATETIME}.sql');
     }
 
     /**
@@ -105,6 +113,8 @@ class BackupExport
      * @return \MysqlBackup\Utility\BackupExport
      * @throws InternalErrorException
      * @uses $compression
+     * @uses $extension
+     * @uses $filename
      */
     public function compression($compression)
     {
@@ -113,6 +123,7 @@ class BackupExport
         }
 
         $this->compression = $compression;
+        $this->extension = array_search($compression, ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false]);
 
         return $this;
     }
@@ -204,12 +215,23 @@ class BackupExport
      * @return string Filename path
      * @uses _getExecutable()
      * @uses _storeAuth()
+     * @uses filename()
      * @uses $compression
      * @uses $connection
+     * @uses $extension
      * @uses $filename
      */
     public function export()
     {
+        if (empty($this->filename)) {
+            $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
+        }
+
+        //This allows the filename to be set again with a next call of this
+        //  method
+        $filename = $this->filename;
+        unset($this->filename);
+
         //Stores the authentication data in a temporary file
         $auth = $this->_storeAuth();
 
@@ -217,11 +239,12 @@ class BackupExport
             $this->_getExecutable($this->compression),
             $auth,
             $this->connection['database'],
-            $this->filename
+            $filename
         );
 
+        //Deletes the temporary file
         unlink($auth);
 
-        return $this->filename;
+        return $filename;
     }
 }
