@@ -107,6 +107,30 @@ class BackupExport
     }
 
     /**
+     * Stores the authentication data in a temporary file.
+     *
+     * For security reasons, it's recommended to specify the password in
+     *  a configuration file and not in the command (a user can execute
+     *  a `ps aux | grep mysqldump` and see the password).
+     *  So it creates a temporary file to store the configuration options
+     * @uses $connection
+     * @return string File path
+     */
+    protected function _storeAuth()
+    {
+        $auth = tempnam(sys_get_temp_dir(), 'auth');
+
+        file_put_contents($auth, sprintf(
+            "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
+            $this->connection['username'],
+            empty($this->connection['password']) ? null : $this->connection['password'],
+            $this->connection['host']
+        ));
+
+        return $auth;
+    }
+
+    /**
      * Sets the compression
      * @param bool|string $compression Compression. Supported values are
      *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
@@ -144,11 +168,17 @@ class BackupExport
     public function filename($filename)
     {
         //Replaces patterns
-        $filename = str_replace(
-            ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
-            [$this->connection['database'], date('YmdHis'), $this->connection['host'], time()],
-            $filename
-        );
+        $filename = str_replace([
+            '{$DATABASE}',
+            '{$DATETIME}',
+            '{$HOSTNAME}',
+            '{$TIMESTAMP}'
+        ], [
+            $this->connection['database'],
+            date('YmdHis'),
+            $this->connection['host'],
+            time()
+        ], $filename);
 
         if (!Folder::isAbsolute($filename)) {
             $filename = Configure::read('MysqlBackup.target') . DS . $filename;
@@ -192,30 +222,6 @@ class BackupExport
         $this->rotate = $rotate;
 
         return $this;
-    }
-
-    /**
-     * Stores the authentication data in a temporary file.
-     *
-     * For security reasons, it's recommended to specify the password in
-     *  a configuration file and not in the command (a user can execute
-     *  a `ps aux | grep mysqldump` and see the password).
-     *  So it creates a temporary file to store the configuration options
-     * @uses $connection
-     * @return string File path
-     */
-    protected function _storeAuth()
-    {
-        $auth = tempnam(sys_get_temp_dir(), 'auth');
-
-        file_put_contents($auth, sprintf(
-            "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
-            $this->connection['username'],
-            empty($this->connection['password']) ? null : $this->connection['password'],
-            $this->connection['host']
-        ));
-
-        return $auth;
     }
 
     /**
