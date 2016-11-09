@@ -186,13 +186,13 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $instance->filename('{$DATABASE}.sql');
-        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'test.sql', $instance->getFilename());
+        $this->assertEquals('test.sql', basename($instance->getFilename()));
 
         $instance->filename('{$DATETIME}.sql');
         $this->assertRegExp('/^[0-9]{14}\.sql$/', basename($instance->getFilename()));
 
         $instance->filename('{$HOSTNAME}.sql');
-        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'localhost.sql', $instance->getFilename());
+        $this->assertEquals('localhost.sql', basename($instance->getFilename()));
 
         $instance->filename('{$TIMESTAMP}.sql');
         $this->assertRegExp('/^[0-9]{10}\.sql$/', basename($instance->getFilename()));
@@ -281,9 +281,11 @@ class BackupExportTest extends TestCase
         $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s', (new BackupExport())->getExecutable('bzip2'));
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s', (new BackupExport())->getExecutable('gzip'));
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s > %s', (new BackupExport())->getExecutable(false));
+        $instance = new BackupExport();
+
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s', $instance->getExecutable('bzip2'));
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s', $instance->getExecutable('gzip'));
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s > %s', $instance->getExecutable(false));
     }
 
     /**
