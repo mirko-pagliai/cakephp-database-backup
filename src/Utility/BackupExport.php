@@ -89,9 +89,21 @@ class BackupExport
 
         if ($compression === 'bzip2') {
             $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
+
+            //Checks for `bzip2` executable
+            if (empty($bzip2)) {
+                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', 'bzip2'));
+            }
+
             $this->executable = sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $bzip2);
         } elseif ($compression === 'gzip') {
             $gzip = Configure::read('MysqlBackup.bin.gzip');
+
+            //Checks for `gzip executable`
+            if (empty($gzip)) {
+                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', 'gzip'));
+            }
+
             $this->executable = sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $gzip);
         } elseif ($compression === false) {
             $this->executable = sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldump);
