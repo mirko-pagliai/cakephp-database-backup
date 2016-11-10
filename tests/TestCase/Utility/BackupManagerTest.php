@@ -133,8 +133,8 @@ class BackupManagerTest extends TestCase
             $this->assertTrue(property_exists($file, 'compression'));
             $this->assertTrue(in_array($file->compression, [false, 'bzip2', 'gzip']));
 
-            $this->assertTrue(property_exists($file, 'datetime'));
-            $this->assertEquals('Cake\I18n\FrozenTime', get_class($file->datetime));
+            $this->assertTrue(property_exists($file, 'time'));
+            $this->assertEquals('Cake\I18n\FrozenTime', get_class($file->time));
         }
     }
 
