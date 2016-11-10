@@ -30,11 +30,24 @@ use Cake\TestSuite\TestCase;
 class GlobalFunctionsTest extends TestCase
 {
     /**
+     * Test for `compressionFromFile()` global function
+     * @return void
+     * @test
+     */
+    public function testCompressionFromFile()
+    {
+        $this->assertFalse(compressionFromFile('backup.sql'));
+        $this->assertEquals('bzip2', compressionFromFile('backup.sql.bz2'));
+        $this->assertEquals('gzip', compressionFromFile('backup.sql.gz'));
+        $this->assertNull(compressionFromFile('text.txt'));
+    }
+
+    /**
      * Test for `extensionFromFile()` global function
      * @return void
      * @test
      */
-    public function testExtensionFromFilename()
+    public function testExtensionFromFile()
     {
         $this->assertEquals('sql', extensionFromFile('backup.sql'));
         $this->assertEquals('sql.bz2', extensionFromFile('backup.sql.bz2'));

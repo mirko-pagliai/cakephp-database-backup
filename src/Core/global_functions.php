@@ -21,17 +21,39 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
 
+if (!function_exists('compressionFromFile')) {
+    /**
+     * Returns the compression from a file
+     * @param string $filename Filename
+     * @return string|null
+     */
+    function compressionFromFile($filename)
+    {
+        //Gets extension
+        $extension = extensionFromFile($filename);
+
+        $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+
+        if (!array_key_exists($extension, $compressions)) {
+            return null;
+        }
+
+        return $compressions[$extension];
+    }
+}
+
 if (!function_exists('extensionFromFile')) {
     /**
      * Returns the extension from a file
      * @param string $filename Filename
      * @return string
      */
-    function extensionFromFile($filename) {
-        if(preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches)) {
+    function extensionFromFile($filename)
+    {
+        if (preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches) && !empty($matches[1])) {
             return $matches[1];
         }
-        
+
         return pathinfo($filename, PATHINFO_EXTENSION);
     }
 }
