@@ -58,4 +58,21 @@ class BackupImportTest extends TestCase
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
     }
+
+    /**
+     * Test for `_getExecutable()` method
+     * @test
+     */
+    public function testExecutable()
+    {
+        $mysql = Configure::read('MysqlBackup.bin.mysql');
+        $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
+        $gzip = Configure::read('MysqlBackup.bin.gzip');
+
+        $instance = new BackupImport();
+
+        $this->assertEquals($mysql . ' -dc %s | ' . $bzip2 . ' --defaults-extra-file=%s %s', $instance->getExecutable('bzip2'));
+        $this->assertEquals($mysql . ' -dc %s | ' . $gzip . ' --defaults-extra-file=%s %s', $instance->getExecutable('gzip'));
+        $this->assertEquals('cat %s | ' . $mysql . ' --defaults-extra-file=%s %s', $instance->getExecutable(false));
+    }
 }

@@ -24,6 +24,7 @@ namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use Cake\Network\Exception\InternalErrorException;
 
 /**
  * Utility to import the database
@@ -43,5 +44,30 @@ class BackupImport
     public function __construct()
     {
         $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
+    }
+
+    /**
+     * Gets the executable command
+     * @param bool|string $compression Compression. Supported values are
+     *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
+     * @return string
+     * @throws InternalErrorException
+     */
+    protected function _getExecutable($compression)
+    {
+        $mysql = Configure::read('MysqlBackup.bin.mysql');
+
+        if (in_array($compression, ['bzip2', 'gzip'])) {
+            $executable = Configure::read(sprintf('MysqlBackup.bin.%s', $compression));
+
+            if (empty($executable)) {
+                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
+            }
+
+            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $mysql, $executable);
+        }
+
+        //No compression
+        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s', $mysql);
     }
 }

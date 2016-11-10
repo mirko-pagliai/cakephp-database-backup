@@ -33,4 +33,9 @@ class BackupImport extends BaseBackupImport
     {
         return $this->connection;
     }
+
+    public function getExecutable($compression)
+    {
+        return $this->_getExecutable($compression);
+    }
 }
