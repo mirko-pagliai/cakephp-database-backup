@@ -33,6 +33,18 @@ use MysqlBackup\Utility\BackupManager;
 class BackupManagerTest extends TestCase
 {
     /**
+     * Creates some backups
+     * @return void
+     */
+    protected function _createSomeBackups()
+    {
+        $instance = new BackupExport();
+        $instance->export();
+        $instance->compression('bzip2')->export();
+        $instance->compression('gzip')->export();
+    }
+
+    /**
      * Teardown any static object changes and restore them
      * @return void
      */
@@ -80,6 +92,7 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `index()` method
      * @test
+     * @uses _createSomeBackups()
      */
     public function testIndex()
     {
@@ -90,12 +103,57 @@ class BackupManagerTest extends TestCase
 
         $this->assertEmpty(BackupManager::index());
 
-        $instance = new BackupExport();
+        //Creates some backups
+        $this->_createSomeBackups();
+        $this->assertEquals(3, count(BackupManager::index()));
+    }
 
+    /**
+     * Test for `index()` method, properties
+     * @test
+     * @uses _createSomeBackups()
+     */
+    public function testIndexProperties()
+    {
+        //Creates some backups
+        $this->_createSomeBackups();
+
+        foreach (BackupManager::index() as $file) {
+            $this->assertEquals('stdClass', get_class($file));
+
+            $this->assertTrue(property_exists($file, 'filename'));
+            $this->assertRegExp('/^backup_test_[0-9]{14}\.sql(\.(bz2|gz))?$/', $file->filename);
+
+            $this->assertTrue(property_exists($file, 'extension'));
+            $this->assertTrue(in_array($file->extension, ['sql', 'sql.bz2', 'sql.gz']));
+
+            $this->assertTrue(property_exists($file, 'size'));
+            $this->assertTrue(isPositive($file->size));
+
+            $this->assertTrue(property_exists($file, 'compression'));
+            $this->assertTrue(in_array($file->compression, [false, 'bzip2', 'gzip']));
+
+            $this->assertTrue(property_exists($file, 'datetime'));
+            $this->assertEquals('Cake\I18n\FrozenTime', get_class($file->datetime));
+        }
+    }
+
+    /**
+     * Test for `index()` method. This tests the backups order
+     * @test
+     */
+    public function testIndexOrder()
+    {
+        $instance = new BackupExport();
         $instance->export();
+        sleep(1);
         $instance->compression('bzip2')->export();
+        sleep(1);
         $instance->compression('gzip')->export();
 
-        BackupManager::index();
+        $files = BackupManager::index();
+        $this->assertEquals('gzip', $files[0]->compression);
+        $this->assertEquals('bzip2', $files[1]->compression);
+        $this->assertEquals(false, $files[2]->compression);
     }
 }
