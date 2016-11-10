@@ -80,10 +80,10 @@ class BackupImportTest extends TestCase
      */
     public function testFilename()
     {
+        $instance = new BackupImport();
+
         //Creates a `sql` backup
         $backup = (new BackupExport())->filename('backup.sql')->export();
-
-        $instance = new BackupImport();
 
         $instance->filename($backup);
         $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql', $instance->getFilename());
@@ -92,16 +92,12 @@ class BackupImportTest extends TestCase
         //Creates a `sql.bz2` backup
         $backup = (new BackupExport())->filename('backup.sql.bz2')->export();
 
-        $instance = new BackupImport();
-
         $instance->filename($backup);
         $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.bz2', $instance->getFilename());
         $this->assertEquals('bzip2', $instance->getCompression());
 
         //Creates a `sql.gz` backup
         $backup = (new BackupExport())->filename('backup.sql.gz')->export();
-
-        $instance = new BackupImport();
 
         $instance->filename($backup);
         $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.gz', $instance->getFilename());
@@ -163,11 +159,9 @@ class BackupImportTest extends TestCase
         $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
-        $instance = new BackupImport();
-
-        $this->assertEquals($mysql . ' -dc %s | ' . $bzip2 . ' --defaults-extra-file=%s %s', $instance->getExecutable('bzip2'));
-        $this->assertEquals($mysql . ' -dc %s | ' . $gzip . ' --defaults-extra-file=%s %s', $instance->getExecutable('gzip'));
-        $this->assertEquals('cat %s | ' . $mysql . ' --defaults-extra-file=%s %s', $instance->getExecutable(false));
+        $this->assertEquals($mysql . ' -dc %s | ' . $bzip2 . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable('bzip2'));
+        $this->assertEquals($mysql . ' -dc %s | ' . $gzip . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable('gzip'));
+        $this->assertEquals('cat %s | ' . $mysql . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable(false));
     }
 
     /**
@@ -202,10 +196,11 @@ class BackupImportTest extends TestCase
      */
     public function testImport()
     {
+        $instance = new BackupImport();
+
         //Creates a `sql` backup
         $backup = (new BackupExport())->export();
 
-        $instance = new BackupImport();
         $instance->filename($backup);
         $filename = $instance->import();
 

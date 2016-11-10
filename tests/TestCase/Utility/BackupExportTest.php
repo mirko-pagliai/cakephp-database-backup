@@ -72,7 +72,7 @@ class BackupExportTest extends TestCase
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
 
-        $this->assertFalse($instance->getCompression());
+        $this->assertNull($instance->getCompression());
         $this->assertEquals('sql', $instance->getExtension());
         $this->assertNull($instance->getFilename());
         $this->assertNull($instance->getRotate());
@@ -96,7 +96,7 @@ class BackupExportTest extends TestCase
         $this->assertEquals('sql.gz', $instance->getExtension());
 
         $instance->compression(false);
-        $this->assertFalse($instance->getCompression());
+        $this->assertEquals(false, $instance->getCompression());
         $this->assertEquals('sql', $instance->getExtension());
     }
 
@@ -174,6 +174,8 @@ class BackupExportTest extends TestCase
     public function testFilenameAlreadyExists()
     {
         (new BackupExport())->filename('backup.sql')->export();
+
+        //Again, same filename
         (new BackupExport())->filename('backup.sql')->export();
     }
 
@@ -270,11 +272,9 @@ class BackupExportTest extends TestCase
         $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
-        $instance = new BackupExport();
-
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s', $instance->getExecutable('bzip2'));
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s', $instance->getExecutable('gzip'));
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s > %s', $instance->getExecutable(false));
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s', (new BackupExport())->getExecutable('bzip2'));
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s', (new BackupExport())->getExecutable('gzip'));
+        $this->assertEquals($mysqldump . ' --defaults-file=%s %s > %s', (new BackupExport())->getExecutable(false));
     }
 
     /**

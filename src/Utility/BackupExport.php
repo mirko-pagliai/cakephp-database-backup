@@ -35,9 +35,9 @@ class BackupExport
 {
     /**
      * Compression type
-     * @var bool|string
+     * @var bool|string|null
      */
-    protected $compression = false;
+    protected $compression = null;
 
     /**
      * Database connection

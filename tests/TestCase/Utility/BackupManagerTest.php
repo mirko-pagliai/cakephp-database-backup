@@ -82,17 +82,17 @@ class BackupManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $filename = (new BackupExport())->export('backup.sql');
+        $filename = (new BackupExport())->export();
 
         $this->assertFileExists($filename);
         $this->assertTrue(BackupManager::delete($filename));
         $this->assertFileNotExists($filename);
 
-        //Absolute path
-        $filename = (new BackupExport())->export(Configure::read('MysqlBackup.target') . DS . 'backup.sql');
+        //Relative path
+        $filename = (new BackupExport())->export();
 
         $this->assertFileExists($filename);
-        $this->assertTrue(BackupManager::delete($filename));
+        $this->assertTrue(BackupManager::delete(basename($filename)));
         $this->assertFileNotExists($filename);
     }
 
@@ -134,6 +134,7 @@ class BackupManagerTest extends TestCase
     public function testIndexOrder()
     {
         $files = $this->_createSomeBackupsWithSleep();
+
         $this->assertEquals('gzip', $files[0]->compression);
         $this->assertEquals('bzip2', $files[1]->compression);
         $this->assertEquals(false, $files[2]->compression);
