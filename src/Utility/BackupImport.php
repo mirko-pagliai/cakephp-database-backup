@@ -73,7 +73,7 @@ class BackupImport
         if (empty(extensionFromFile($filename))) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
         }
-        
+
         $compression = compressionFromFile($filename);
 
         if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
