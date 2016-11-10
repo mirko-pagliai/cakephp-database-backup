@@ -147,7 +147,7 @@ class BackupExport
         }
 
         $this->compression = $compression;
-        $this->extension = array_search($compression, ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false]);
+        $this->extension = extensionFromCompression($compression);
 
         return $this;
     }
@@ -193,12 +193,12 @@ class BackupExport
         }
 
         //Checks for extension
-        if (!preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches)) {
+        if (empty(extensionFromFile($filename))) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
         }
 
         //Sets the compression
-        $this->compression(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false][$matches[1]]);
+        $this->compression(compressionFromFile($filename));
 
         $this->filename = $filename;
 
