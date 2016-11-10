@@ -39,7 +39,21 @@ class GlobalFunctionsTest extends TestCase
         $this->assertFalse(compressionFromFile('backup.sql'));
         $this->assertEquals('bzip2', compressionFromFile('backup.sql.bz2'));
         $this->assertEquals('gzip', compressionFromFile('backup.sql.gz'));
-        $this->assertNull(compressionFromFile('text.txt'));
+        $this->assertFalse(compressionFromFile('text.txt'));
+    }
+
+    /**
+     * Test for `extensionFromCompression()` global function
+     * @return void
+     * @test
+     */
+    public function testExtensionFromCompression()
+    {
+        $this->assertEquals('sql', extensionFromCompression(false));
+        $this->assertEquals('sql.bz2', extensionFromCompression('bzip2'));
+        $this->assertEquals('sql.gz', extensionFromCompression('gzip'));
+
+        $this->assertFalse(extensionFromCompression('noExisting'));
     }
 
     /**

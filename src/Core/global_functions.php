@@ -25,7 +25,7 @@ if (!function_exists('compressionFromFile')) {
     /**
      * Returns the compression from a file
      * @param string $filename Filename
-     * @return string|null
+     * @return string|false
      */
     function compressionFromFile($filename)
     {
@@ -35,10 +35,24 @@ if (!function_exists('compressionFromFile')) {
         $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
         if (!array_key_exists($extension, $compressions)) {
-            return null;
+            return false;
         }
 
         return $compressions[$extension];
+    }
+}
+
+if (!function_exists('extensionFromCompression')) {
+    /**
+     * Returns the extension from a compression
+     * @param string $compression Compression
+     * @return string|bool
+     */
+    function extensionFromCompression($compression)
+    {
+        $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+
+        return array_search($compression, $compressions, true);
     }
 }
 
@@ -53,7 +67,7 @@ if (!function_exists('extensionFromFile')) {
         if (!preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches) || empty($matches[1])) {
             return null;
         }
-        
+
         return $matches[1];
     }
 }
