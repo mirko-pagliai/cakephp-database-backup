@@ -52,31 +52,11 @@ class BackupImport
 
     /**
      * Construct
-     * @param string $filename Filename. It can be an absolute path
-     * @uses $compression
      * @uses $connection
-     * @uses $filename
      */
-    public function __construct($filename)
+    public function __construct()
     {
         $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
-
-        if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read('MysqlBackup.target') . DS . $filename;
-        }
-
-        if (!is_readable($filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));
-        }
-
-        $compression = compressionFromFile($filename);
-
-        if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
-            throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
-        }
-
-        $this->compression = $compression;
-        $this->filename = $filename;
     }
 
     /**
@@ -102,5 +82,35 @@ class BackupImport
 
         //No compression
         return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s', $mysql);
+    }
+
+    /**
+     * Sets the filename
+     * @param string $filename Filename. It can be an absolute path
+     * @return \MysqlBackup\Utility\BackupImport
+     * @throws InternalErrorException
+     * @uses $compression
+     * @uses $filename
+     */
+    public function filename($filename)
+    {
+        if (!Folder::isAbsolute($filename)) {
+            $filename = Configure::read('MysqlBackup.target') . DS . $filename;
+        }
+
+        if (!is_readable($filename)) {
+            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));
+        }
+
+        $compression = compressionFromFile($filename);
+
+        if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
+            throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
+        }
+
+        $this->compression = $compression;
+        $this->filename = $filename;
+
+        return $this;
     }
 }

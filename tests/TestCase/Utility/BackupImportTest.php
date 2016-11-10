@@ -66,10 +66,7 @@ class BackupImportTest extends TestCase
      */
     public function testConstruct()
     {
-        //Creates a backup
-        $backup = (new BackupExport())->export();
-
-        $instance = new BackupImport($backup);
+        $instance = new BackupImport();
 
         $connection = $instance->getConnection();
         $this->assertEquals($connection['scheme'], 'mysql');
@@ -78,33 +75,40 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `construct()` method. This tests `$compression` and `$filename`
-     *  properties
+     * Test for `filename()` method. This tests also `$compression` property
      * @test
      */
-    public function testConstructCompressionAndFilename()
+    public function testFilename()
     {
         //Creates a `sql` backup
         $backup = (new BackupExport())->filename('backup.sql')->export();
 
-        $instance = new BackupImport($backup);
+        $instance = new BackupImport();
 
+        $instance->filename($backup);
         $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql', $instance->getFilename());
         $this->assertFalse($instance->getCompression());
 
         //Creates a `sql.bz2` backup
         $backup = (new BackupExport())->filename('backup.sql.bz2')->export();
 
-        $instance = new BackupImport($backup);
+        $instance = new BackupImport();
 
+        $instance->filename($backup);
         $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.bz2', $instance->getFilename());
         $this->assertEquals('bzip2', $instance->getCompression());
 
         //Creates a `sql.gz` backup
         $backup = (new BackupExport())->filename('backup.sql.gz')->export();
 
-        $instance = new BackupImport($backup);
+        $instance = new BackupImport();
 
+        $instance->filename($backup);
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.gz', $instance->getFilename());
+        $this->assertEquals('gzip', $instance->getCompression());
+
+        //Relative path
+        $instance->filename(basename($backup));
         $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.gz', $instance->getFilename());
         $this->assertEquals('gzip', $instance->getCompression());
     }
