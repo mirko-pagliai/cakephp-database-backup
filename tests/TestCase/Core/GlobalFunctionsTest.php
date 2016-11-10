@@ -30,6 +30,19 @@ use Cake\TestSuite\TestCase;
 class GlobalFunctionsTest extends TestCase
 {
     /**
+     * Test for `extensionFromFile()` global function
+     * @return void
+     * @test
+     */
+    public function testExtensionFromFilename()
+    {
+        $this->assertEquals('sql', extensionFromFile('backup.sql'));
+        $this->assertEquals('sql.bz2', extensionFromFile('backup.sql.bz2'));
+        $this->assertEquals('sql.gz', extensionFromFile('backup.sql.gz'));
+        $this->assertEquals('txt', extensionFromFile('text.txt'));
+    }
+
+    /**
      * Test for `isPositive()` global function
      * @return void
      * @test

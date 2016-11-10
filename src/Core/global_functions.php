@@ -21,6 +21,21 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
 
+if (!function_exists('extensionFromFile')) {
+    /**
+     * Returns the extension from a file
+     * @param string $filename Filename
+     * @return string
+     */
+    function extensionFromFile($filename) {
+        if(preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches)) {
+            return $matches[1];
+        }
+        
+        return pathinfo($filename, PATHINFO_EXTENSION);
+    }
+}
+
 if (!function_exists('isPositive')) {
     /**
      * Checks if a string is a positive number
