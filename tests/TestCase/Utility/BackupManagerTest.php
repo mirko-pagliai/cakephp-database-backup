@@ -196,7 +196,9 @@ class BackupManagerTest extends TestCase
 
         //Again, only 1 backup was deleted
         $this->assertEquals(1, count($diff));
-        $this->assertEquals(array_values($diff)[0]->filename, array_values($rotate)[0]);
+
+        //The difference is the same
+        $this->assertEquals(array_values($diff)[0], array_values($rotate)[0]);
     }
 
     /**

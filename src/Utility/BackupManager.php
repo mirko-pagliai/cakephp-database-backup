@@ -115,12 +115,12 @@ class BackupManager
 
         //Files that will be deleted
         $files = array_map(function ($file) {
-            return $file->filename;
+            return $file;
         }, array_slice($files, -$diff, $diff));
 
         //Deletes
         foreach ($files as $file) {
-            self::delete($file);
+            self::delete($file->filename);
         }
 
         return $files;
