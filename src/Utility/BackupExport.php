@@ -210,15 +210,10 @@ class BackupExport
      * backups that are older
      * @param int $rotate Number of backups you want to keep
      * @return \MysqlBackup\Utility\BackupExport
-     * @throws InternalErrorException
      * @uses $rotate
      */
     public function rotate($rotate)
     {
-        if (!isPositive($rotate)) {
-            throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
-        }
-
         $this->rotate = $rotate;
 
         return $this;
@@ -227,6 +222,7 @@ class BackupExport
     /**
      * Exports the database
      * @return string Filename path
+     * @uses MysqlBackup\Utility\BackupManager::rotate()
      * @uses _getExecutable()
      * @uses _storeAuth()
      * @uses filename()
@@ -234,6 +230,7 @@ class BackupExport
      * @uses $connection
      * @uses $extension
      * @uses $filename
+     * @uses $rotate
      */
     public function export()
     {
@@ -254,6 +251,11 @@ class BackupExport
 
         //Deletes the temporary file
         unlink($auth);
+
+        //Rotates backups
+        if (!empty($this->rotate)) {
+            BackupManager::rotate($this->rotate);
+        }
 
         return $filename;
     }

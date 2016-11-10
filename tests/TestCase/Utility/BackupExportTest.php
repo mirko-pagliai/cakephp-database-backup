@@ -251,7 +251,7 @@ class BackupExportTest extends TestCase
      */
     public function testRotateWithInvalidValue()
     {
-        (new BackupExport())->rotate(-1);
+        (new BackupExport())->rotate(-1)->export();
     }
 
     /**
