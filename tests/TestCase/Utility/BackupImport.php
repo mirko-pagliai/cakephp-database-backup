@@ -29,6 +29,11 @@ use MysqlBackup\Utility\BackupImport as BaseBackupImport;
  */
 class BackupImport extends BaseBackupImport
 {
+    public function getAuth()
+    {
+        return $this->_storeAuth();
+    }
+
     public function getCompression()
     {
         return $this->compression;

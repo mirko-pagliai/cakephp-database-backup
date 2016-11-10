@@ -137,6 +137,23 @@ class BackupImportTest extends TestCase
     }
 
     /**
+     * Test for `_storeAuth()` method
+     * @test
+     */
+    public function testStoreAuth()
+    {
+        $auth = (new BackupImport())->getAuth();
+
+        $this->assertFileExists($auth);
+
+        $result = file_get_contents($auth);
+        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
+        $this->assertEquals($expected, $result);
+
+        unlink($auth);
+    }
+
+    /**
      * Test for `_getExecutable()` method
      * @test
      */
@@ -146,10 +163,7 @@ class BackupImportTest extends TestCase
         $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
-        //Creates a backup
-        $backup = (new BackupExport())->export();
-
-        $instance = new BackupImport($backup);
+        $instance = new BackupImport();
 
         $this->assertEquals($mysql . ' -dc %s | ' . $bzip2 . ' --defaults-extra-file=%s %s', $instance->getExecutable('bzip2'));
         $this->assertEquals($mysql . ' -dc %s | ' . $gzip . ' --defaults-extra-file=%s %s', $instance->getExecutable('gzip'));
@@ -166,10 +180,7 @@ class BackupImportTest extends TestCase
     {
         Configure::write('MysqlBackup.bin.bzip2', false);
 
-        //Creates a backup
-        $backup = (new BackupExport())->export();
-
-        (new BackupImport($backup))->getExecutable('bzip2');
+        (new BackupImport())->getExecutable('bzip2');
     }
 
     /**
@@ -182,9 +193,33 @@ class BackupImportTest extends TestCase
     {
         Configure::write('MysqlBackup.bin.gzip', false);
 
-        //Creates a backup
+        (new BackupImport())->getExecutable('gzip');
+    }
+
+    /**
+     * Test for `import()` method
+     * @test
+     */
+    public function testImport()
+    {
+        //Creates a `sql` backup
         $backup = (new BackupExport())->export();
 
-        (new BackupImport($backup))->getExecutable('gzip');
+        $instance = new BackupImport();
+        $instance->filename($backup);
+        $filename = $instance->import();
+
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
+    }
+
+    /**
+     * Test for `import()` method, without a filename
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Before you import a database, you have to set the filename
+     * @test
+     */
+    public function testImportWithoutFilename()
+    {
+        (new BackupImport())->import();
     }
 }

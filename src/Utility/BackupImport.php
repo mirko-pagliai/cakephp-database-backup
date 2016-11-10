@@ -85,6 +85,30 @@ class BackupImport
     }
 
     /**
+     * Stores the authentication data in a temporary file.
+     *
+     * For security reasons, it's recommended to specify the password in
+     *  a configuration file and not in the command (a user can execute
+     *  a `ps aux | grep mysqldump` and see the password).
+     *  So it creates a temporary file to store the configuration options
+     * @uses $connection
+     * @return string File path
+     */
+    protected function _storeAuth()
+    {
+        $auth = tempnam(sys_get_temp_dir(), 'auth');
+
+        file_put_contents($auth, sprintf(
+            "[client]\nuser=%s\npassword=\"%s\"\nhost=%s",
+            $this->connection['username'],
+            empty($this->connection['password']) ? null : $this->connection['password'],
+            $this->connection['host']
+        ));
+
+        return $auth;
+    }
+
+    /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
      * @return \MysqlBackup\Utility\BackupImport
@@ -112,5 +136,38 @@ class BackupImport
         $this->filename = $filename;
 
         return $this;
+    }
+
+    /**
+     * Imports the database
+     * @return string Filename path
+     * @throws InternalErrorException
+     * @uses _getExecutable()
+     * @uses _storeAuth()
+     * @uses $compression
+     * @uses $connection
+     * @uses $filename
+     */
+    public function import()
+    {
+        if (empty($this->filename)) {
+            throw new InternalErrorException(__d('mysql_backup', 'Before you import a database, you have to set the filename'));
+        }
+
+        //This allows the filename to be set again with a next call of this
+        //  method
+        $filename = $this->filename;
+        unset($this->filename);
+
+        //Stores the authentication data in a temporary file
+        $auth = $this->_storeAuth();
+
+        //Executes
+        exec(sprintf($this->_getExecutable($this->compression), $filename, $auth, $this->connection['database']));
+
+        //Deletes the temporary file
+        unlink($auth);
+
+        return $filename;
     }
 }
