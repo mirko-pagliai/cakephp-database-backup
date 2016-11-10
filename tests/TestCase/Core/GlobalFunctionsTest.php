@@ -52,7 +52,8 @@ class GlobalFunctionsTest extends TestCase
         $this->assertEquals('sql', extensionFromFile('backup.sql'));
         $this->assertEquals('sql.bz2', extensionFromFile('backup.sql.bz2'));
         $this->assertEquals('sql.gz', extensionFromFile('backup.sql.gz'));
-        $this->assertEquals('txt', extensionFromFile('text.txt'));
+
+        $this->assertNull(extensionFromFile('text.txt'));
     }
 
     /**

@@ -46,15 +46,15 @@ if (!function_exists('extensionFromFile')) {
     /**
      * Returns the extension from a file
      * @param string $filename Filename
-     * @return string
+     * @return string|null
      */
     function extensionFromFile($filename)
     {
-        if (preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches) && !empty($matches[1])) {
-            return $matches[1];
+        if (!preg_match('/\.(sql(\.(gz|bz2))?)$/', $filename, $matches) || empty($matches[1])) {
+            return null;
         }
-
-        return pathinfo($filename, PATHINFO_EXTENSION);
+        
+        return $matches[1];
     }
 }
 
