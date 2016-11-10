@@ -40,7 +40,7 @@ class BackupManager
      * @return string
      * @throws InternalErrorException
      */
-    public function delete($filename)
+    public static function delete($filename)
     {
         if (!Folder::isAbsolute($filename)) {
             $filename = Configure::read('MysqlBackup.target') . DS . $filename;
