@@ -114,6 +114,29 @@ class BackupImportTest extends TestCase
     }
 
     /**
+     * Test for `filename()` method, with invalid directory
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage File or directory `/tmp/backups/noExistingDir/backup.sql` not readable
+     * @test
+     */
+    public function testFilenameWithInvalidDirectory()
+    {
+        (new BackupImport())->filename('noExistingDir' . DS . 'backup.sql');
+    }
+
+    /**
+     * Test for `filename()` method, with invalid extension
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Invalid compression type
+     * @test
+     */
+    public function testFilenameWithInvalidExtension()
+    {
+        file_put_contents(Configure::read('MysqlBackup.target') . DS . 'backup.txt', null);
+        (new BackupImport())->filename('backup.txt');
+    }
+
+    /**
      * Test for `_getExecutable()` method
      * @test
      */
