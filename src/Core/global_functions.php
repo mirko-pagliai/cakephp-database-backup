@@ -35,7 +35,7 @@ if (!function_exists('compressionFromFile')) {
         $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
         if (!array_key_exists($extension, $compressions)) {
-            return false;
+            return null;
         }
 
         return $compressions[$extension];

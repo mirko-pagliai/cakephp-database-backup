@@ -36,10 +36,10 @@ class GlobalFunctionsTest extends TestCase
      */
     public function testCompressionFromFile()
     {
-        $this->assertFalse(compressionFromFile('backup.sql'));
+        $this->assertEquals(false, compressionFromFile('backup.sql'));
         $this->assertEquals('bzip2', compressionFromFile('backup.sql.bz2'));
         $this->assertEquals('gzip', compressionFromFile('backup.sql.gz'));
-        $this->assertFalse(compressionFromFile('text.txt'));
+        $this->assertNull(compressionFromFile('text.txt'));
     }
 
     /**
