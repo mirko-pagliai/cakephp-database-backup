@@ -77,6 +77,11 @@ class BackupManager
             ];
         }, $files);
 
+        //Re-orders, using the datetime value
+        usort($files, function ($a, $b) {
+            return $b->datetime >= $a->datetime;
+        });
+
         return $files;
     }
 }
