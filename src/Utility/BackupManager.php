@@ -24,6 +24,7 @@ namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
+use Cake\I18n\FrozenTime;
 use Cake\Network\Exception\InternalErrorException;
 
 /**
@@ -40,7 +41,7 @@ class BackupManager
      * @return string
      * @throws InternalErrorException
      */
-    public function delete($filename)
+    public static function delete($filename)
     {
         if (!Folder::isAbsolute($filename)) {
             $filename = Configure::read('MysqlBackup.target') . DS . $filename;
@@ -51,5 +52,31 @@ class BackupManager
         }
 
         return unlink($filename);
+    }
+
+    /**
+     * Gets a list of database backups
+     * @return array Objects of backups
+     */
+    public static function index()
+    {
+        //Gets all files
+        $files = array_values((new Folder(Configure::read('MysqlBackup.target')))->read(false, false, true))[1];
+
+        //Keeps only files with a valid extension
+        $files = preg_grep('/\.sql(\.(gz|bz2))?$/', $files);
+
+        //Parses files
+        $files = array_map(function ($file) {
+            return (object)[
+                'filename' => basename($file),
+                'extension' => extensionFromFile($file),
+                'size' => filesize($file),
+                'compression' => compressionFromFile($file),
+                'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($file))),
+            ];
+        }, $files);
+
+        return $files;
     }
 }

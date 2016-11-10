@@ -76,4 +76,22 @@ class BackupManagerTest extends TestCase
     {
         BackupManager::delete('noExistingFile.sql');
     }
+
+    /**
+     * Test for `index()` method
+     * @test
+     */
+    public function testIndex()
+    {
+        $instance = new BackupExport();
+
+        $instance->export();
+        $instance->compression('bzip2')->export();
+        $instance->compression('gzip')->export();
+
+        //Creates also a text file. This file should be ignored
+        file_put_contents(Configure::read('MysqlBackup.target') . DS . 'text.txt', null);
+
+        BackupManager::index();
+    }
 }
