@@ -34,7 +34,7 @@ class BackupManagerTest extends TestCase
 {
     /**
      * Creates some backups
-     * @return void
+     * @return array
      */
     protected function _createSomeBackups()
     {
@@ -42,6 +42,24 @@ class BackupManagerTest extends TestCase
         $instance->export();
         $instance->compression('bzip2')->export();
         $instance->compression('gzip')->export();
+
+        return BackupManager::index();
+    }
+
+    /**
+     * Creates some backups, waiting a second for each
+     * @return array
+     */
+    protected function _createSomeBackupsWithSleep()
+    {
+        $instance = new BackupExport();
+        $instance->export();
+        sleep(1);
+        $instance->compression('bzip2')->export();
+        sleep(1);
+        $instance->compression('gzip')->export();
+
+        return BackupManager::index();
     }
 
     /**
@@ -109,6 +127,19 @@ class BackupManagerTest extends TestCase
     }
 
     /**
+     * Test for `index()` method. This tests the backups order
+     * @test
+     * @uses _createSomeBackupsWithSleep()
+     */
+    public function testIndexOrder()
+    {
+        $files = $this->_createSomeBackupsWithSleep();
+        $this->assertEquals('gzip', $files[0]->compression);
+        $this->assertEquals('bzip2', $files[1]->compression);
+        $this->assertEquals(false, $files[2]->compression);
+    }
+
+    /**
      * Test for `index()` method, properties
      * @test
      * @uses _createSomeBackups()
@@ -116,9 +147,7 @@ class BackupManagerTest extends TestCase
     public function testIndexProperties()
     {
         //Creates some backups
-        $this->_createSomeBackups();
-
-        foreach (BackupManager::index() as $file) {
+        foreach ($this->_createSomeBackups() as $file) {
             $this->assertEquals('stdClass', get_class($file));
 
             $this->assertTrue(property_exists($file, 'filename'));
@@ -139,21 +168,45 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `index()` method. This tests the backups order
+     * Test for `rotate()` method
      * @test
+     * @uses _createSomeBackupsWithSleep()
      */
-    public function testIndexOrder()
+    public function testRotate()
     {
-        $instance = new BackupExport();
-        $instance->export();
-        sleep(1);
-        $instance->compression('bzip2')->export();
-        sleep(1);
-        $instance->compression('gzip')->export();
+        $this->assertEquals([], BackupManager::rotate(1));
 
-        $files = BackupManager::index();
-        $this->assertEquals('gzip', $files[0]->compression);
-        $this->assertEquals('bzip2', $files[1]->compression);
-        $this->assertEquals(false, $files[2]->compression);
+        //Creates some backups
+        $files = $this->_createSomeBackupsWithSleep();
+
+        //Keeps 2 backups. Only 1 backup was deleted
+        $rotate = BackupManager::rotate(2);
+        $this->assertEquals(1, count($rotate));
+
+        //Now there are two files. Only uncompressed file was deleted
+        $filesAfterRotate = BackupManager::index();
+        $this->assertEquals(2, count($filesAfterRotate));
+        $this->assertEquals('gzip', $filesAfterRotate[0]->compression);
+        $this->assertEquals('bzip2', $filesAfterRotate[1]->compression);
+
+        //Gets the difference
+        $diff = array_udiff($files, $filesAfterRotate, function ($a, $b) {
+            return strcmp($a->filename, $b->filename);
+        });
+
+        //Again, only 1 backup was deleted
+        $this->assertEquals(1, count($diff));
+        $this->assertEquals(array_values($diff)[0]->filename, array_values($rotate)[0]);
+    }
+
+    /**
+     * Test for `rotate()` method, with an invalid value
+     * @test
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage Invalid rotate value
+     */
+    public function testRotateWithInvalidValue()
+    {
+        BackupManager::rotate(-1);
     }
 }

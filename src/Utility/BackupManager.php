@@ -84,4 +84,45 @@ class BackupManager
 
         return $files;
     }
+
+    /**
+     * Rotates backups.
+     *
+     * You must indicate the number of backups you want to keep. So, it will
+     *  delete all backups that are older.
+     * @param int $rotate Number of files that you want to keep
+     * @return array Array of deleted files
+     * @throws InternalErrorException
+     */
+    public static function rotate($rotate)
+    {
+        if (!isPositive($rotate)) {
+            throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
+        }
+
+        //Gets all files
+        $files = self::index();
+
+        //Returns, if the number of files to keep is larger than the number of
+        //  files that are present
+        if ($rotate >= count($files)) {
+            return [];
+        }
+
+        //The number of files to be deleted is equal to the number of files
+        //  that are present less the number of files that you want to keep
+        $diff = count($files) - $rotate;
+
+        //Files that will be deleted
+        $files = array_map(function ($file) {
+            return $file->filename;
+        }, array_slice($files, -$diff, $diff));
+
+        //Deletes
+        foreach ($files as $file) {
+            self::delete($file);
+        }
+
+        return $files;
+    }
 }
