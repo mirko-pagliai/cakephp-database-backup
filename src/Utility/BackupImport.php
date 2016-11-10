@@ -24,6 +24,7 @@ namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use Cake\Filesystem\Folder;
 use Cake\Network\Exception\InternalErrorException;
 
 /**
@@ -32,18 +33,55 @@ use Cake\Network\Exception\InternalErrorException;
 class BackupImport
 {
     /**
+     * Compression type
+     * @var bool|string
+     */
+    protected $compression = false;
+
+    /**
      * Database connection
      * @var array
      */
     protected $connection;
 
     /**
-     * Construct
-     * @uses $connection
+     * Filename where to import the database
+     * @var string
      */
-    public function __construct()
+    protected $filename;
+
+    /**
+     * Construct
+     * @param string $filename Filename. It can be an absolute path
+     * @uses $compression
+     * @uses $connection
+     * @uses $filename
+     */
+    public function __construct($filename)
     {
         $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
+
+        if (!Folder::isAbsolute($filename)) {
+            $filename = Configure::read('MysqlBackup.target') . DS . $filename;
+        }
+
+        if (!is_readable($filename)) {
+            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));
+        }
+
+        //Checks for extension
+        if (empty(extensionFromFile($filename))) {
+            throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
+        }
+        
+        $compression = compressionFromFile($filename);
+
+        if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
+            throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
+        }
+
+        $this->compression = $compression;
+        $this->filename = $filename;
     }
 
     /**

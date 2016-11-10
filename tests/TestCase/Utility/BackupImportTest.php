@@ -25,6 +25,7 @@ namespace MysqlBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\Test\TestCase\Utility\BackupImport;
+use MysqlBackup\Utility\BackupExport;
 
 /**
  * BackupImportTest class
@@ -65,7 +66,10 @@ class BackupImportTest extends TestCase
      */
     public function testConstruct()
     {
-        $instance = new BackupImport();
+        //Creates a backup
+        $backup = (new BackupExport())->export();
+
+        $instance = new BackupImport($backup);
 
         $connection = $instance->getConnection();
         $this->assertEquals($connection['scheme'], 'mysql');
@@ -83,7 +87,10 @@ class BackupImportTest extends TestCase
         $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
-        $instance = new BackupImport();
+        //Creates a backup
+        $backup = (new BackupExport())->export();
+
+        $instance = new BackupImport($backup);
 
         $this->assertEquals($mysql . ' -dc %s | ' . $bzip2 . ' --defaults-extra-file=%s %s', $instance->getExecutable('bzip2'));
         $this->assertEquals($mysql . ' -dc %s | ' . $gzip . ' --defaults-extra-file=%s %s', $instance->getExecutable('gzip'));
@@ -100,7 +107,10 @@ class BackupImportTest extends TestCase
     {
         Configure::write('MysqlBackup.bin.bzip2', false);
 
-        (new BackupImport())->getExecutable('bzip2');
+        //Creates a backup
+        $backup = (new BackupExport())->export();
+
+        (new BackupImport($backup))->getExecutable('bzip2');
     }
 
     /**
@@ -113,6 +123,9 @@ class BackupImportTest extends TestCase
     {
         Configure::write('MysqlBackup.bin.gzip', false);
 
-        (new BackupImport())->getExecutable('gzip');
+        //Creates a backup
+        $backup = (new BackupExport())->export();
+
+        (new BackupImport($backup))->getExecutable('gzip');
     }
 }
