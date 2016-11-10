@@ -221,17 +221,6 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method, without extension
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage Invalid file extension
-     * @test
-     */
-    public function testFilenameWithoutExtension()
-    {
-        (new BackupExport())->filename('backup');
-    }
-
-    /**
      * Test for `rotate()` method
      * @test
      */
