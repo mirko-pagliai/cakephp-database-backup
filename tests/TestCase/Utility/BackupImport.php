@@ -29,6 +29,11 @@ use MysqlBackup\Utility\BackupImport as BaseBackupImport;
  */
 class BackupImport extends BaseBackupImport
 {
+    public function getCompression()
+    {
+        return $this->compression;
+    }
+
     public function getConnection()
     {
         return $this->connection;
@@ -37,5 +42,10 @@ class BackupImport extends BaseBackupImport
     public function getExecutable($compression)
     {
         return $this->_getExecutable($compression);
+    }
+
+    public function getFilename()
+    {
+        return $this->filename;
     }
 }

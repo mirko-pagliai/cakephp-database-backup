@@ -78,6 +78,38 @@ class BackupImportTest extends TestCase
     }
 
     /**
+     * Test for `construct()` method. This tests `$compression` and `$filename`
+     *  properties
+     * @test
+     */
+    public function testConstructCompressionAndFilename()
+    {
+        //Creates a `sql` backup
+        $backup = (new BackupExport())->filename('backup.sql')->export();
+
+        $instance = new BackupImport($backup);
+
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql', $instance->getFilename());
+        $this->assertFalse($instance->getCompression());
+
+        //Creates a `sql.bz2` backup
+        $backup = (new BackupExport())->filename('backup.sql.bz2')->export();
+
+        $instance = new BackupImport($backup);
+
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.bz2', $instance->getFilename());
+        $this->assertEquals('bzip2', $instance->getCompression());
+
+        //Creates a `sql.gz` backup
+        $backup = (new BackupExport())->filename('backup.sql.gz')->export();
+
+        $instance = new BackupImport($backup);
+
+        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.gz', $instance->getFilename());
+        $this->assertEquals('gzip', $instance->getCompression());
+    }
+
+    /**
      * Test for `_getExecutable()` method
      * @test
      */
