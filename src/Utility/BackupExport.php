@@ -236,7 +236,7 @@ class BackupExport
      */
     public function export()
     {
-        if (empty($this->filename) || empty($this->compression)) {
+        if (empty($this->filename)) {
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 
