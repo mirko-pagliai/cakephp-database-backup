@@ -32,6 +32,20 @@ use MysqlBackup\Test\TestCase\Utility\BackupImport;
 class BackupImportTest extends TestCase
 {
     /**
+     * Setup the test case, backup the static object values so they can be
+     * restored. Specifically backs up the contents of Configure and paths in
+     *  App if they have not already been backed up
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        Configure::write('MysqlBackup.bin.bzip2', which('bzip2'));
+        Configure::write('MysqlBackup.bin.gzip', which('gzip'));
+    }
+
+    /**
      * Teardown any static object changes and restore them
      * @return void
      */
@@ -74,5 +88,31 @@ class BackupImportTest extends TestCase
         $this->assertEquals($mysql . ' -dc %s | ' . $bzip2 . ' --defaults-extra-file=%s %s', $instance->getExecutable('bzip2'));
         $this->assertEquals($mysql . ' -dc %s | ' . $gzip . ' --defaults-extra-file=%s %s', $instance->getExecutable('gzip'));
         $this->assertEquals('cat %s | ' . $mysql . ' --defaults-extra-file=%s %s', $instance->getExecutable(false));
+    }
+
+    /**
+     * Test for `_getExecutable()` method, with the `bzip2` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `bzip2` executable not available
+     * @test
+     */
+    public function testExecutableWithBzip2NotAvailable()
+    {
+        Configure::write('MysqlBackup.bin.bzip2', false);
+
+        (new BackupImport())->getExecutable('bzip2');
+    }
+
+    /**
+     * Test for `_getExecutable()` method, with the `gzip` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `gzip` executable not available
+     * @test
+     */
+    public function testExecutableWithGzipNotAvailable()
+    {
+        Configure::write('MysqlBackup.bin.gzip', false);
+
+        (new BackupImport())->getExecutable('gzip');
     }
 }
