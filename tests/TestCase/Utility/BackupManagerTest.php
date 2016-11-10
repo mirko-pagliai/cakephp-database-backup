@@ -83,14 +83,18 @@ class BackupManagerTest extends TestCase
      */
     public function testIndex()
     {
+        $this->assertEmpty(BackupManager::index());
+
+        //Creates a text file. This file should be ignored
+        file_put_contents(Configure::read('MysqlBackup.target') . DS . 'text.txt', null);
+
+        $this->assertEmpty(BackupManager::index());
+
         $instance = new BackupExport();
 
         $instance->export();
         $instance->compression('bzip2')->export();
         $instance->compression('gzip')->export();
-
-        //Creates also a text file. This file should be ignored
-        file_put_contents(Configure::read('MysqlBackup.target') . DS . 'text.txt', null);
 
         BackupManager::index();
     }
