@@ -304,32 +304,50 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method
+     * Test for `export()` method, without compression
      * @test
      */
     public function testExport()
     {
         $instance = new BackupExport();
 
-        $filename = $instance->export();
+        $filename = $instance->compression(false)->export();
         $this->assertFileExists($filename);
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
+
+        $filename = $instance->filename('backup.sql')->export();
+        $this->assertFileExists($filename);
+        $this->assertEquals('backup.sql', basename($filename));
+    }
+
+    /**
+     * Test for `export()` method, with `bzip2` compression
+     * @test
+     */
+    public function testExportBzip2()
+    {
+        $instance = new BackupExport();
 
         $filename = $instance->compression('bzip2')->export();
         $this->assertFileExists($filename);
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
 
-        $filename = $instance->compression('gzip')->export();
-        $this->assertFileExists($filename);
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
-
-        $filename = $instance->filename('backup.sql')->export();
-        $this->assertFileExists($filename);
-        $this->assertEquals('backup.sql', basename($filename));
-
         $filename = $instance->filename('backup.sql.bz2')->export();
         $this->assertFileExists($filename);
         $this->assertEquals('backup.sql.bz2', basename($filename));
+    }
+
+    /**
+     * Test for `export()` method, with `gzip2` compression
+     * @test
+     */
+    public function testExportGzip()
+    {
+        $instance = new BackupExport();
+
+        $filename = $instance->compression('gzip')->export();
+        $this->assertFileExists($filename);
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
 
         $filename = $instance->filename('backup.sql.gz')->export();
         $this->assertFileExists($filename);
