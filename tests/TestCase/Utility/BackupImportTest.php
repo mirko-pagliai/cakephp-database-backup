@@ -213,7 +213,7 @@ class BackupImportTest extends TestCase
         $backup = (new BackupExport())->compression('bzip2')->export();
         $filename = (new BackupImport())->filename($backup)->import();
 
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
     }
 
     /**
