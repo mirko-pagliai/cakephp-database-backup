@@ -159,8 +159,8 @@ class BackupImportTest extends TestCase
         $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
-        $this->assertEquals($mysql . ' -dc %s | ' . $bzip2 . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable('bzip2'));
-        $this->assertEquals($mysql . ' -dc %s | ' . $gzip . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable('gzip'));
+        $this->assertEquals($bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable('bzip2'));
+        $this->assertEquals($gzip . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable('gzip'));
         $this->assertEquals('cat %s | ' . $mysql . ' --defaults-extra-file=%s %s', (new BackupImport())->getExecutable(false));
     }
 
@@ -191,20 +191,42 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `import()` method
+     * Test for `import()` method, without compression
      * @test
      */
     public function testImport()
     {
-        $instance = new BackupImport();
-
-        //Creates a `sql` backup
-        $backup = (new BackupExport())->export();
-
-        $instance->filename($backup);
-        $filename = $instance->import();
+        //Exports and imports a `sql` backup
+        $backup = (new BackupExport())->compression(false)->export();
+        $filename = (new BackupImport())->filename($backup)->import();
 
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
+    }
+
+    /**
+     * Test for `import()` method, with `bzip2` compression
+     * @test
+     */
+    public function testImportBzip2()
+    {
+        //Exports and imports a `sql` backup
+        $backup = (new BackupExport())->compression('bzip2')->export();
+        $filename = (new BackupImport())->filename($backup)->import();
+
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
+    }
+
+    /**
+     * Test for `import()` method, with `gzip` compression
+     * @test
+     */
+    public function testImportGzip()
+    {
+        //Exports and imports a `sql` backup
+        $backup = (new BackupExport())->compression('gzip')->export();
+        $filename = (new BackupImport())->filename($backup)->import();
+
+        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
     }
 
     /**
