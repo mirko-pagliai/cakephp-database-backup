@@ -77,7 +77,7 @@ class BackupImport
                 throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
             }
 
-            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $mysql, $executable);
+            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $executable, $mysql);
         }
 
         //No compression
