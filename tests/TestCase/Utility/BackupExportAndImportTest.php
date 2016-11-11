@@ -33,6 +33,10 @@ use MysqlBackup\Utility\BackupImport;
  */
 class BackupExportAndImportTest extends TestCase
 {
+    /**
+     * Fixtures
+     * @var array
+     */
     public $fixtures = ['core.articles', 'core.comments'];
 
     /**
@@ -63,8 +67,101 @@ class BackupExportAndImportTest extends TestCase
         }
     }
 
-    public function testExport()
+    /**
+     * Internal method to get all records from the database
+     * @return array
+     */
+    protected function _allRecords()
     {
-        $records = $this->Articles->find()->hydrate(false)->toArray();
+        return [
+            'Articles' => $this->Articles->find('all')->hydrate(false)->toArray(),
+            'Comments' => $this->Comments->find('all')->hydrate(false)->toArray(),
+        ];
+    }
+
+    /**
+     * Internal method. Test for `export()` and `import()` methods
+     * @param bool|string $compression Compression
+     * @uses _allRecords()
+     */
+    protected function _testExportAndImport($compression)
+    {
+        //Initial records. 3 articles and 6 comments
+        $initial = $this->_allRecords();
+        $this->assertEquals(['Articles', 'Comments'], array_keys($initial));
+        $this->assertEquals(3, count($initial['Articles']));
+        $this->assertEquals(6, count($initial['Comments']));
+
+        //Exports backup
+        $backup = (new BackupExport())->compression($compression)->export();
+
+        //Deletes article with ID 2 and comment with ID 4
+        $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
+        $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);
+
+        //Records after delete. 2 articles and 5 comments
+        $deleted = $this->_allRecords();
+        $this->assertEquals(['Articles', 'Comments'], array_keys($deleted));
+        $this->assertEquals(2, count($deleted['Articles']));
+        $this->assertEquals(5, count($deleted['Comments']));
+
+        //Imports backup
+        (new BackupImport())->filename($backup)->import();
+
+        //Now initial records are the same of final records
+        $final = $this->_allRecords();
+        $this->assertEquals($initial, $final);
+
+        //Gets the difference (`$diff`) between records after delete
+        //  (`$deleted`)and records after import (`$final`)
+        $diff = $final;
+
+        foreach ($final as $model => $finalValues) {
+            foreach ($finalValues as $finalKey => $finalValue) {
+                foreach ($deleted[$model] as $deletedValue) {
+                    if ($finalValue == $deletedValue) {
+                        unset($diff[$model][$finalKey]);
+                    }
+                }
+            }
+        }
+
+        $this->assertEquals(['Articles', 'Comments'], array_keys($diff));
+        $this->assertEquals(1, count($diff['Articles']));
+        $this->assertEquals(1, count($diff['Comments']));
+
+        //Difference is article with ID 2 and comment with ID 4
+        $this->assertEquals(2, array_values($diff['Articles'])[0]['id']);
+        $this->assertEquals(4, array_values($diff['Comments'])[0]['id']);
+    }
+
+    /**
+     * Test for `export()` and `import()` methods, without compression
+     * @test
+     * @uses _testExportAndImport()
+     */
+    public function testExportAndImport()
+    {
+        $this->_testExportAndImport(false);
+    }
+
+    /**
+     * Test for `export()` and `import()` methods, with `bzip2` compression
+     * @test
+     * @uses _testExportAndImport()
+     */
+    public function testExportAndImportBzip2()
+    {
+        $this->_testExportAndImport('bzip2');
+    }
+
+    /**
+     * Test for `export()` and `import()` methods, with `gzip` compression
+     * @test
+     * @uses _testExportAndImport()
+     */
+    public function testExportAndImportGzip()
+    {
+        $this->_testExportAndImport('gzip');
     }
 }
