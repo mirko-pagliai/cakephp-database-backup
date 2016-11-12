@@ -130,7 +130,7 @@ class BackupExport
 
     /**
      * Sets the compression
-     * @param bool|string $compression Compression. Supported values are
+     * @param bool|string $compression Compression type. Supported values are
      *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
      * @return \MysqlBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-uses-the-BackupExport-utility#compression
