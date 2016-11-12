@@ -81,6 +81,44 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Test for `export()` method, with the `compression` option
+     * @test
+     */
+    public function testExportWithCompression()
+    {
+        $this->io->expects($this->once())
+            ->method('out')
+            ->with($this->callback(function ($output) {
+                $pattern = '/^\<success\>Backup `%sbackup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/';
+                $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+
+                return preg_match($pattern, $output);
+            }));
+            
+        $this->BackupShell->params = ['compression' => 'none'];
+        $this->BackupShell->export();
+    }
+
+    /**
+     * Test for `export()` method, with the `filename` option
+     * @test
+     */
+    public function testExportWithFilename()
+    {
+        $this->io->expects($this->once())
+            ->method('out')
+            ->with($this->callback(function ($output) {
+                $pattern = '/^\<success\>Backup `%sbackup\.sql` has been exported\<\/success\>$/';
+                $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+
+                return preg_match($pattern, $output);
+            }));
+            
+        $this->BackupShell->params = ['filename' => 'backup.sql'];
+        $this->BackupShell->export();
+    }
+
+    /**
      * Test for `export()` method, with an invalid option value
      * @expectedException Cake\Console\Exception\StopException
      * @test
