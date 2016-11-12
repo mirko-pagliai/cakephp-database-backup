@@ -1,0 +1,151 @@
+<?php
+/**
+ * This file is part of cakephp-mysql-backup.
+ *
+ * cakephp-mysql-backup is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * cakephp-mysql-backup is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with cakephp-mysql-backup.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author      Mirko Pagliai <mirko.pagliai@gmail.com>
+ * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
+ * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
+ * @link        http://git.novatlantis.it Nova Atlantis Ltd
+ */
+namespace MysqlBackup\Shell;
+
+use Cake\Console\Shell;
+use Cake\I18n\Number;
+use MysqlBackup\Utility\BackupExport;
+use MysqlBackup\Utility\BackupManager;
+
+/**
+ * Shell to handle database backups
+ */
+class BackupShell extends Shell
+{
+    /**
+     * Exports a database
+     * @return void
+     * @uses MysqlBackup\Utility\BackupExport::compression()
+     * @uses MysqlBackup\Utility\BackupExport::export()
+     * @uses MysqlBackup\Utility\BackupExport::filename()
+     */
+    public function export()
+    {
+        try {
+            $instance = new BackupExport();
+
+            //Sets the output filename or the compression type
+            if ($this->param('filename')) {
+                $instance->filename($this->param('filename'));
+            } elseif ($this->param('compression')) {
+                //The `compression` option takes the value `none`, while the
+                //  `BackupExport::compression` method takes the argument `false`
+                if ($this->param('compression') === 'none') {
+                    $this->params['compression'] = false;
+                }
+
+                $instance->compression($this->param('compression'));
+            }
+
+            //Exports
+            $backup = $instance->export();
+
+            $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', $backup));
+        } catch (\Exception $e) {
+            $this->abort($e->getMessage());
+        }
+    }
+
+    /**
+     * Lists database backups
+     * @return void
+     * @uses DatabaseBackup\Utility\BackupManager::index()
+     */
+    public function index()
+    {
+        //Gets alla files
+        $files = BackupManager::index();
+
+        $this->out(__d('mysql_backup', 'Backup files found: {0}', count($files)));
+
+        if (!empty($files)) {
+            //Parses files
+            $files = array_map(function ($file) {
+                if (isset($file->compression) && !$file->compression) {
+                    $file->compression = __d('mysql_backup', 'none');
+                }
+
+                $file->size = Number::toReadableSize($file->size);
+
+                return array_values((array)$file);
+            }, $files);
+
+            //Table headers
+            $headers = [
+                __d('mysql_backup', 'Filename'),
+                __d('mysql_backup', 'Extension'),
+                __d('mysql_backup', 'Compression'),
+                __d('mysql_backup', 'Size'),
+                __d('mysql_backup', 'Datetime'),
+            ];
+
+            $this->helper('table')->output(array_merge([$headers], $files));
+        }
+    }
+
+    /**
+     * Main command. Alias for `index()`
+     * @return void
+     * @uses index()
+     */
+    public function main()
+    {
+        $this->index();
+    }
+
+    /**
+     * Gets the option parser instance and configures it
+     * @return ConsoleOptionParser
+     */
+    public function getOptionParser()
+    {
+        $parser = parent::getOptionParser();
+
+        $parser->addSubcommand('export', [
+            'help' => __d('mysql_backup', 'Exports a database backup'),
+            'parser' => [
+                'options' => [
+                    'filename' => [
+                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path and may contain ' .
+                            'patterns. The compression type will be automatically setted'),
+                        'short' => 'f',
+                    ],
+                    'compression' => [
+                        'choices' => ['gzip', 'bzip2', 'none'],
+                        'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
+                        'short' => 'c'
+                    ],
+                    'rotate' => [
+                        'help' => __d('mysql_backup', 'Rotates backups, number of backups you want to keep. ' .
+                            'So, it will delete all backups that are older. By default, no backup will be deleted'),
+                        'short' => 'r'
+                    ]
+                ],
+            ],
+        ]);
+
+        $parser->addSubcommand('index', ['help' => __d('mysql_backup', 'Lists database backups')]);
+
+        return $parser;
+    }
+}
