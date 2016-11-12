@@ -144,9 +144,9 @@ class BackupShellTest extends TestCase
     {
         //Creates some backups, waiting a second for each
         $this->_createSomeBackupsWithSleep();
-        
+
         sleep(1);
-        
+
         $this->io->expects($this->at(0))
             ->method('out')
             ->with($this->callback(function ($output) {
