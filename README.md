@@ -78,7 +78,7 @@ want to use.
 For more information about database connections, please refer to the 
 [Cookbook](http://book.cakephp.org/3.0/en/orm/database-basics.html#configuration).
 
-    Configure::write('MysqlBackup.target', ROOT . 'backups');
+    Configure::write('MysqlBackup.target', ROOT . DS . 'backups');
     
 Setting `MysqlBackup.target', you can use another directory where the plugin will 
 save backup files.
