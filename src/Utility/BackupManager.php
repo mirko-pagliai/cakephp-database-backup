@@ -73,13 +73,13 @@ class BackupManager
                 'extension' => extensionFromFile($file),
                 'size' => filesize($file),
                 'compression' => compressionFromFile($file),
-                'time' => new FrozenTime(date('Y-m-d H:i:s', filemtime($file))),
+                'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($file))),
             ];
         }, $files);
 
         //Re-orders, using the datetime value
         usort($files, function ($a, $b) {
-            return $b->time >= $a->time;
+            return $b->datetime >= $a->datetime;
         });
 
         return $files;
