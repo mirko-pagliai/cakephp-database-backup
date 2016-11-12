@@ -71,8 +71,8 @@ class BackupManager
             return (object)[
                 'filename' => basename($file),
                 'extension' => extensionFromFile($file),
-                'size' => filesize($file),
                 'compression' => compressionFromFile($file),
+                'size' => filesize($file),
                 'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($file))),
             ];
         }, $files);
