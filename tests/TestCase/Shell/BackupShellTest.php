@@ -26,6 +26,7 @@ use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\Shell\BackupShell;
 use MysqlBackup\Utility\BackupExport;
+use MysqlBackup\Utility\BackupManager;
 
 /**
  * BackupShellTest class
@@ -63,6 +64,22 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Creates some backups, waiting a second for each
+     * @return array
+     */
+    protected function _createSomeBackupsWithSleep()
+    {
+        $instance = new BackupExport();
+        $instance->filename('backup.sql')->export();
+        sleep(1);
+        $instance->filename('backup.sql.bz2')->export();
+        sleep(1);
+        $instance->filename('backup.sql.gz')->export();
+
+        return BackupManager::index();
+    }
+
+    /**
      * Test for `export()` method
      * @test
      */
@@ -94,7 +111,7 @@ class BackupShellTest extends TestCase
 
                 return preg_match($pattern, $output);
             }));
-            
+
         $this->BackupShell->params = ['compression' => 'none'];
         $this->BackupShell->export();
     }
@@ -113,7 +130,7 @@ class BackupShellTest extends TestCase
 
                 return preg_match($pattern, $output);
             }));
-            
+
         $this->BackupShell->params = ['filename' => 'backup.sql'];
         $this->BackupShell->export();
     }
@@ -153,6 +170,44 @@ class BackupShellTest extends TestCase
             ->with('Backup files found: 0', 1);
 
         $this->BackupShell->main();
+    }
+
+    /**
+     * Test for `rotate()` method
+     * @test
+     * @uses _createSomeBackupsWithSleep()
+     */
+    public function testRotate()
+    {
+        //Creates some backups, waiting a second for each
+        $this->_createSomeBackupsWithSleep();
+
+        $this->io->expects($this->at(0))
+            ->method('verbose')
+            ->with('File `backup.sql.bz2` has been deleted', 1);
+
+        $this->io->expects($this->at(1))
+            ->method('verbose')
+            ->with('File `backup.sql` has been deleted', 1);
+
+        $this->io->expects($this->once())
+            ->method('out')
+            ->with('<success>Deleted backup files: 2</success>', 1);
+
+        $this->BackupShell->rotate(1);
+    }
+
+    /**
+     * Test for `rotate()` method, with no backups to be deleted
+     * @test
+     */
+    public function testRotateNoBackupsToBeDeleted()
+    {
+        $this->io->expects($this->once())
+            ->method('verbose')
+            ->with('No file has been deleted', 1);
+
+        $this->BackupShell->rotate(1);
     }
 
     /**

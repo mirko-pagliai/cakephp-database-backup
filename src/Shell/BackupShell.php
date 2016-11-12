@@ -114,6 +114,33 @@ class BackupShell extends Shell
     }
 
     /**
+     * Rotates backups.
+     *
+     * You have to indicate the number of backups you want to keep. So, it will
+     *  delete all backups that are older. By default, no backup will be deleted
+     * @param int $keep Number of backups you want to keep
+     * @return void
+     * @uses DatabaseBackup\Utility\BackupManager::rotate()
+     */
+    public function rotate($keep)
+    {
+        //Gets deleted files
+        $deleted = BackupManager::rotate($keep);
+
+        if (empty($deleted)) {
+            $this->verbose(__d('mysql_backup', 'No file has been deleted'));
+
+            return;
+        }
+
+        foreach ($deleted as $file) {
+            $this->verbose(__d('mysql_backup', 'File `{0}` has been deleted', $file->filename));
+        }
+
+        $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+    }
+
+    /**
      * Gets the option parser instance and configures it
      * @return ConsoleOptionParser
      */
@@ -136,8 +163,8 @@ class BackupShell extends Shell
                         'short' => 'c'
                     ],
                     'rotate' => [
-                        'help' => __d('mysql_backup', 'Rotates backups, number of backups you want to keep. ' .
-                            'So, it will delete all backups that are older. By default, no backup will be deleted'),
+                        'help' => __d('mysql_backup', 'Rotates backups. You have to indicate the number of backups you ' .
+                            'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
                         'short' => 'r'
                     ]
                 ],
@@ -145,6 +172,19 @@ class BackupShell extends Shell
         ]);
 
         $parser->addSubcommand('index', ['help' => __d('mysql_backup', 'Lists database backups')]);
+
+        $parser->addSubcommand('rotate', [
+            'help' => __d('mysql_backup', 'Rotates backups'),
+            'parser' => [
+                'arguments' => [
+                    'keep' => [
+                        'help' => __d('mysql_backup', 'Number of backups you want to keep. So, it ' .
+                            'will delete all backups that are older'),
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ]);
 
         return $parser;
     }
