@@ -38,13 +38,16 @@ class BackupShell extends Shell
      * @uses MysqlBackup\Utility\BackupExport::compression()
      * @uses MysqlBackup\Utility\BackupExport::export()
      * @uses MysqlBackup\Utility\BackupExport::filename()
+     * @uses rotate()
      */
     public function export()
     {
         try {
             $instance = new BackupExport();
 
-            //Sets the output filename or the compression type
+            //Sets the output filename or the compression type.
+            //Regarding the `rotate` option, the `BackupShell::rotate()` method
+            //  will be called at the end, instead of `BackupExport::rotate()`
             if ($this->param('filename')) {
                 $instance->filename($this->param('filename'));
             } elseif ($this->param('compression')) {
@@ -61,6 +64,11 @@ class BackupShell extends Shell
             $backup = $instance->export();
 
             $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', $backup));
+
+            //Rotates
+            if ($this->param('rotate')) {
+                $this->rotate($this->param('rotate'));
+            }
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -124,20 +132,24 @@ class BackupShell extends Shell
      */
     public function rotate($keep)
     {
-        //Gets deleted files
-        $deleted = BackupManager::rotate($keep);
+        try {
+            //Gets deleted files
+            $deleted = BackupManager::rotate($keep);
 
-        if (empty($deleted)) {
-            $this->verbose(__d('mysql_backup', 'No file has been deleted'));
+            if (empty($deleted)) {
+                $this->verbose(__d('mysql_backup', 'No file has been deleted'));
 
-            return;
+                return;
+            }
+
+            foreach ($deleted as $file) {
+                $this->verbose(__d('mysql_backup', 'File `{0}` has been deleted', $file->filename));
+            }
+
+            $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+        } catch (\Exception $e) {
+            $this->abort($e->getMessage());
         }
-
-        foreach ($deleted as $file) {
-            $this->verbose(__d('mysql_backup', 'File `{0}` has been deleted', $file->filename));
-        }
-
-        $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
     }
 
     /**

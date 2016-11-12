@@ -136,6 +136,39 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Test for `export()` method, with the `rotate` option
+     * @test
+     * @uses _createSomeBackupsWithSleep()
+     */
+    public function testExportWithRotate()
+    {
+        //Creates some backups, waiting a second for each
+        $this->_createSomeBackupsWithSleep();
+        
+        sleep(1);
+        
+        $this->io->expects($this->at(0))
+            ->method('out')
+            ->with($this->callback(function ($output) {
+                $pattern = '/^\<success\>Backup `%slast\.sql` has been exported\<\/success\>$/';
+                $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+
+                return preg_match($pattern, $output);
+            }));
+
+        $this->io->expects($this->at(1))
+            ->method('verbose')
+            ->with('File `backup.sql` has been deleted', 1);
+
+        $this->io->expects($this->at(2))
+            ->method('out')
+            ->with('<success>Deleted backup files: 1</success>', 1);
+
+        $this->BackupShell->params = ['rotate' => 3, 'filename' => 'last.sql'];
+        $this->BackupShell->export();
+    }
+
+    /**
      * Test for `export()` method, with an invalid option value
      * @expectedException Cake\Console\Exception\StopException
      * @test
@@ -190,11 +223,21 @@ class BackupShellTest extends TestCase
             ->method('verbose')
             ->with('File `backup.sql` has been deleted', 1);
 
-        $this->io->expects($this->once())
+        $this->io->expects($this->at(2))
             ->method('out')
             ->with('<success>Deleted backup files: 2</success>', 1);
 
         $this->BackupShell->rotate(1);
+    }
+
+    /**
+     * Test for `rotate()` method, with an invalid value
+     * @expectedException Cake\Console\Exception\StopException
+     * @test
+     */
+    public function testRotateInvalidValue()
+    {
+        $this->BackupShell->rotate(-1);
     }
 
     /**
