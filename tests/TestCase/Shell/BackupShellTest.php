@@ -103,4 +103,28 @@ class BackupShellTest extends TestCase
 
         $this->BackupShell->index();
     }
+
+    /**
+     * Test for `main()` method. As for `index()` with no backups
+     * @test
+     */
+    public function testMain()
+    {
+        $this->io->expects($this->once())
+            ->method('out')
+            ->with('Backup files found: 0', 1);
+
+        $this->BackupShell->main();
+    }
+
+    /**
+     * Test for `getOptionParser()` method
+     * @test
+     */
+    public function testGetOptionParser()
+    {
+        $result = $this->BackupShell->getOptionParser();
+
+        $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($result));
+    }
 }
