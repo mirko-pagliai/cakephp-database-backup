@@ -154,8 +154,7 @@ class BackupExport
     /**
      * Sets the filename.
      *
-     * Using this method, the compression type will be automatically setted
-     * by the filename.
+     * The compression type will be automatically setted by the filename.
      * @param string $filename Filename. It can be an absolute path and may
      *  contain patterns
      * @return \MysqlBackup\Utility\BackupExport
