@@ -158,7 +158,7 @@ class BackupShellTest extends TestCase
 
         $this->io->expects($this->at(1))
             ->method('verbose')
-            ->with('File `backup.sql` has been deleted', 1);
+            ->with('Backup `backup.sql` has been deleted', 1);
 
         $this->io->expects($this->at(2))
             ->method('out')
@@ -243,11 +243,11 @@ class BackupShellTest extends TestCase
 
         $this->io->expects($this->at(0))
             ->method('verbose')
-            ->with('File `backup.sql.bz2` has been deleted', 1);
+            ->with('Backup `backup.sql.bz2` has been deleted', 1);
 
         $this->io->expects($this->at(1))
             ->method('verbose')
-            ->with('File `backup.sql` has been deleted', 1);
+            ->with('Backup `backup.sql` has been deleted', 1);
 
         $this->io->expects($this->at(2))
             ->method('out')
@@ -274,7 +274,7 @@ class BackupShellTest extends TestCase
     {
         $this->io->expects($this->once())
             ->method('verbose')
-            ->with('No file has been deleted', 1);
+            ->with('No backup has been deleted', 1);
 
         $this->BackupShell->rotate(1);
     }
