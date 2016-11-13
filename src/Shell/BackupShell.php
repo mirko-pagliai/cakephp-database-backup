@@ -179,6 +179,8 @@ class BackupShell extends Shell
     {
         $parser = parent::getOptionParser();
 
+        $parser->description(__d('mysql_backup', 'Shell to handle database backups'));
+
         $parser->addSubcommand('export', [
             'help' => __d('mysql_backup', 'Exports a database backup'),
             'parser' => [
