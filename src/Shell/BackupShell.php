@@ -161,13 +161,13 @@ class BackupShell extends Shell
             $deleted = BackupManager::rotate($keep);
 
             if (empty($deleted)) {
-                $this->verbose(__d('mysql_backup', 'No file has been deleted'));
+                $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
 
                 return;
             }
 
             foreach ($deleted as $file) {
-                $this->verbose(__d('mysql_backup', 'File `{0}` has been deleted', $file->filename));
+                $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file->filename));
             }
 
             $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));

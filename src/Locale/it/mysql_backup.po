@@ -3,8 +3,8 @@
 #
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2016-11-13 18:10+0100\n"
-"PO-Revision-Date: 2016-11-13 19:12+0100\n"
+"POT-Creation-Date: 2016-11-13 19:13+0100\n"
+"PO-Revision-Date: 2016-11-13 19:14+0100\n"
 "Last-Translator: Mirko Pagliai <mirko.pagliai@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -51,12 +51,12 @@ msgid "Datetime"
 msgstr "Data e orario"
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:164
-msgid "No file has been deleted"
-msgstr "Nessun file è stato cancellato"
+msgid "No backup has been deleted"
+msgstr "Nessun backup è stato cancellato"
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:170
-msgid "File `{0}` has been deleted"
-msgstr ""
+msgid "Backup `{0}` has been deleted"
+msgstr "Il backup `{0}` è stato cancellato"
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:173
 msgid "Deleted backup files: {0}"

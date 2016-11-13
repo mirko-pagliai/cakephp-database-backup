@@ -4,7 +4,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2016-11-13 18:10+0100\n"
+"POT-Creation-Date: 2016-11-13 19:13+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -49,11 +49,11 @@ msgid "Datetime"
 msgstr ""
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:164
-msgid "No file has been deleted"
+msgid "No backup has been deleted"
 msgstr ""
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:170
-msgid "File `{0}` has been deleted"
+msgid "Backup `{0}` has been deleted"
 msgstr ""
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:173
