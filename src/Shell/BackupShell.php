@@ -25,6 +25,7 @@ namespace MysqlBackup\Shell;
 use Cake\Console\Shell;
 use Cake\I18n\Number;
 use MysqlBackup\Utility\BackupExport;
+use MysqlBackup\Utility\BackupImport;
 use MysqlBackup\Utility\BackupManager;
 
 /**
@@ -69,6 +70,24 @@ class BackupShell extends Shell
             if ($this->param('rotate')) {
                 $this->rotate($this->param('rotate'));
             }
+        } catch (\Exception $e) {
+            $this->abort($e->getMessage());
+        }
+    }
+
+    /**
+     * Imports a database
+     * @param string $filename Filename. It can be an absolute path
+     * @return void
+     * @uses MysqlBackup\Utility\BackupImport::filename()
+     * @uses MysqlBackup\Utility\BackupImport::import()
+     */
+    public function import($filename)
+    {
+        try {
+            $backup = (new BackupImport())->filename($filename)->import();
+
+            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', $backup));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -184,6 +203,18 @@ class BackupShell extends Shell
         ]);
 
         $parser->addSubcommand('index', ['help' => __d('mysql_backup', 'Lists database backups')]);
+
+        $parser->addSubcommand('import', [
+            'help' => __d('mysql_backup', 'Imports a database backup'),
+            'parser' => [
+                'arguments' => [
+                    'filename' => [
+                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ]);
 
         $parser->addSubcommand('rotate', [
             'help' => __d('mysql_backup', 'Rotates backups'),
