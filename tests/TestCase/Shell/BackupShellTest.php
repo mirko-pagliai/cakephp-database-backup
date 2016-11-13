@@ -285,8 +285,9 @@ class BackupShellTest extends TestCase
      */
     public function testGetOptionParser()
     {
-        $result = $this->BackupShell->getOptionParser();
+        $parser = $this->BackupShell->getOptionParser();
 
-        $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($result));
+        $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($parser));
+        $this->assertEquals(['export', 'import', 'index', 'rotate'], array_keys($parser->subcommands()));
     }
 }
