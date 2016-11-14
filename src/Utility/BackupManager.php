@@ -19,7 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
- * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-uses-the-BackupManager-utility
+ * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility
  */
 namespace MysqlBackup\Utility;
 
@@ -37,7 +37,7 @@ class BackupManager
      * Deletes a backup file
      * @param string $filename Filename
      * @return bool
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-uses-the-BackupManager-utility#delete
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws InternalErrorException
      */
     public static function delete($filename)
@@ -56,7 +56,7 @@ class BackupManager
     /**
      * Returns a list of database backups
      * @return array Objects of backups
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-uses-the-BackupManager-utility#index
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index()
     {
@@ -92,7 +92,7 @@ class BackupManager
      *  delete all backups that are older.
      * @param int $rotate Number of backups that you want to keep
      * @return array Array of deleted files
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-uses-the-BackupManager-utility#rotate
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws InternalErrorException
      */
     public static function rotate($rotate)

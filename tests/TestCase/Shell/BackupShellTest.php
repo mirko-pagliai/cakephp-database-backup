@@ -158,7 +158,7 @@ class BackupShellTest extends TestCase
 
         $this->io->expects($this->at(1))
             ->method('verbose')
-            ->with('File `backup.sql` has been deleted', 1);
+            ->with('Backup `backup.sql` has been deleted', 1);
 
         $this->io->expects($this->at(2))
             ->method('out')
@@ -193,6 +193,32 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Test for `import()` method
+     * @test
+     */
+    public function testImport()
+    {
+        //Exports a database
+        $backup = (new BackupExport())->filename('backup.sql')->export();
+
+        $this->io->expects($this->once())
+            ->method('out')
+            ->with('<success>Backup `' . $backup . '` has been imported</success>', 1);
+
+        $this->BackupShell->import($backup);
+    }
+
+    /**
+     * Test for `import()` method, with a no existing filename
+     * @expectedException Cake\Console\Exception\StopException
+     * @test
+     */
+    public function testImportWithNoExistingFilename()
+    {
+        $this->BackupShell->import('/noExistingDir/backup.sql');
+    }
+
+    /**
      * Test for `main()` method. As for `index()` with no backups
      * @test
      */
@@ -217,11 +243,11 @@ class BackupShellTest extends TestCase
 
         $this->io->expects($this->at(0))
             ->method('verbose')
-            ->with('File `backup.sql.bz2` has been deleted', 1);
+            ->with('Backup `backup.sql.bz2` has been deleted', 1);
 
         $this->io->expects($this->at(1))
             ->method('verbose')
-            ->with('File `backup.sql` has been deleted', 1);
+            ->with('Backup `backup.sql` has been deleted', 1);
 
         $this->io->expects($this->at(2))
             ->method('out')
@@ -248,7 +274,7 @@ class BackupShellTest extends TestCase
     {
         $this->io->expects($this->once())
             ->method('verbose')
-            ->with('No file has been deleted', 1);
+            ->with('No backup has been deleted', 1);
 
         $this->BackupShell->rotate(1);
     }
@@ -259,8 +285,9 @@ class BackupShellTest extends TestCase
      */
     public function testGetOptionParser()
     {
-        $result = $this->BackupShell->getOptionParser();
+        $parser = $this->BackupShell->getOptionParser();
 
-        $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($result));
+        $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($parser));
+        $this->assertEquals(['export', 'import', 'index', 'rotate'], array_keys($parser->subcommands()));
     }
 }

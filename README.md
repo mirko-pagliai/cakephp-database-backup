@@ -80,8 +80,15 @@ For more information about database connections, please refer to the
 
     Configure::write('MysqlBackup.target', ROOT . DS . 'backups');
     
-Setting `MysqlBackup.target', you can use another directory where the plugin will 
-save backup files.
+Setting `MysqlBackup.target', you can use another directory where the plugin
+will save backup files.
+
+## How to use
+See our wiki:
+* [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility)
+* [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility)
+* [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility)
+* [How to use the BackupShell](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell)
 
 ## Versioning
 For transparency and insight into our release cycle and to maintain backward 

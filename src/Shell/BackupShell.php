@@ -19,12 +19,14 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
+ * @use         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell
  */
 namespace MysqlBackup\Shell;
 
 use Cake\Console\Shell;
 use Cake\I18n\Number;
 use MysqlBackup\Utility\BackupExport;
+use MysqlBackup\Utility\BackupImport;
 use MysqlBackup\Utility\BackupManager;
 
 /**
@@ -35,6 +37,7 @@ class BackupShell extends Shell
     /**
      * Exports a database
      * @return void
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#export
      * @uses MysqlBackup\Utility\BackupExport::compression()
      * @uses MysqlBackup\Utility\BackupExport::export()
      * @uses MysqlBackup\Utility\BackupExport::filename()
@@ -75,8 +78,28 @@ class BackupShell extends Shell
     }
 
     /**
+     * Imports a database
+     * @param string $filename Filename. It can be an absolute path
+     * @return void
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#import
+     * @uses MysqlBackup\Utility\BackupImport::filename()
+     * @uses MysqlBackup\Utility\BackupImport::import()
+     */
+    public function import($filename)
+    {
+        try {
+            $backup = (new BackupImport())->filename($filename)->import();
+
+            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', $backup));
+        } catch (\Exception $e) {
+            $this->abort($e->getMessage());
+        }
+    }
+
+    /**
      * Lists database backups
      * @return void
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#index
      * @uses DatabaseBackup\Utility\BackupManager::index()
      */
     public function index()
@@ -128,6 +151,7 @@ class BackupShell extends Shell
      *  delete all backups that are older. By default, no backup will be deleted
      * @param int $keep Number of backups you want to keep
      * @return void
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#rotate
      * @uses DatabaseBackup\Utility\BackupManager::rotate()
      */
     public function rotate($keep)
@@ -137,13 +161,13 @@ class BackupShell extends Shell
             $deleted = BackupManager::rotate($keep);
 
             if (empty($deleted)) {
-                $this->verbose(__d('mysql_backup', 'No file has been deleted'));
+                $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
 
                 return;
             }
 
             foreach ($deleted as $file) {
-                $this->verbose(__d('mysql_backup', 'File `{0}` has been deleted', $file->filename));
+                $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file->filename));
             }
 
             $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
@@ -159,6 +183,8 @@ class BackupShell extends Shell
     public function getOptionParser()
     {
         $parser = parent::getOptionParser();
+
+        $parser->description(__d('mysql_backup', 'Shell to handle database backups'));
 
         $parser->addSubcommand('export', [
             'help' => __d('mysql_backup', 'Exports a database backup'),
@@ -184,6 +210,18 @@ class BackupShell extends Shell
         ]);
 
         $parser->addSubcommand('index', ['help' => __d('mysql_backup', 'Lists database backups')]);
+
+        $parser->addSubcommand('import', [
+            'help' => __d('mysql_backup', 'Imports a database backup'),
+            'parser' => [
+                'arguments' => [
+                    'filename' => [
+                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ]);
 
         $parser->addSubcommand('rotate', [
             'help' => __d('mysql_backup', 'Rotates backups'),

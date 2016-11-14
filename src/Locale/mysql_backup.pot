@@ -1,0 +1,137 @@
+# LANGUAGE translation of cakephp-mysql-backup plugin
+# Copyright 2016 Mirko Pagliai <mirko.pagliai@gmail.com>
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2016-11-13 19:13+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:69
+msgid "Backup `{0}` has been exported"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:93
+msgid "Backup `{0}` has been imported"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:110
+msgid "Backup files found: {0}"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:116
+msgid "none"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:126
+msgid "Filename"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:127
+msgid "Extension"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:128
+msgid "Compression"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:129
+msgid "Size"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:130
+msgid "Datetime"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:164
+msgid "No backup has been deleted"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:170
+msgid "Backup `{0}` has been deleted"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:173
+msgid "Deleted backup files: {0}"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:187
+msgid "Shell to handle database backups"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:190
+msgid "Exports a database backup"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:194
+msgid "Filename. It can be an absolute path and may contain patterns. The compression type will be automatically setted"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:200
+msgid "Compression type. By default, no compression will be used"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:204
+msgid "Rotates backups. You have to indicate the number of backups you want to keep. So, it will delete all backups that are older. By default, no backup will be deleted"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:212
+msgid "Lists database backups"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:215
+msgid "Imports a database backup"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:219
+msgid "Filename. It can be an absolute path"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:227
+msgid "Rotates backups"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:231
+msgid "Number of backups you want to keep. So, it will delete all backups that are older"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupExport.php:97
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupImport.php:78
+msgid "`{0}` executable not available"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupExport.php:145
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupImport.php:134
+msgid "Invalid compression type"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupExport.php:187
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupManager.php:50
+msgid "File or directory `{0}` not writable"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupExport.php:191
+msgid "File `{0}` already exists"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupExport.php:196
+msgid "Invalid file extension"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupImport.php:128
+msgid "File or directory `{0}` not readable"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupImport.php:157
+msgid "Before you import a database, you have to set the filename"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Utility/BackupManager.php:101
+msgid "Invalid rotate value"
+msgstr ""
+
