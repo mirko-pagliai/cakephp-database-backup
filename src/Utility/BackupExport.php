@@ -253,6 +253,8 @@ class BackupExport
         //Deletes the temporary file
         unlink($auth);
 
+        chmod($filename, Configure::read('MysqlBackup.chmod'));
+
         //Rotates backups
         if (!empty($this->rotate)) {
             BackupManager::rotate($this->rotate);

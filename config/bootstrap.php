@@ -19,6 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
+ * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/Configuration
  */
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
@@ -41,6 +42,11 @@ if (!Configure::check('MysqlBackup.bin.mysql')) {
 //mysqldump binary
 if (!Configure::check('MysqlBackup.bin.mysqldump')) {
     Configure::write('MysqlBackup.bin.mysqldump', which('mysqldump'));
+}
+
+//Chmod for backups
+if (!Configure::check('MysqlBackup.chmod')) {
+    Configure::write('MysqlBackup.chmod', 0664);
 }
 
 //Database connection
