@@ -33,20 +33,6 @@ use MysqlBackup\Utility\BackupExport;
 class BackupImportTest extends TestCase
 {
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
-     * @return void
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        Configure::write('MysqlBackup.bin.bzip2', which('bzip2'));
-        Configure::write('MysqlBackup.bin.gzip', which('gzip'));
-    }
-
-    /**
      * Teardown any static object changes and restore them
      * @return void
      */
