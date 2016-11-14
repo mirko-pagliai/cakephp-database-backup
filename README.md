@@ -31,57 +31,8 @@ also required.
 The installation of these binaries may vary depending on your operating system.
 
 ## Configuration
-The plugin uses some configuration parameters and you can set them using the 
-`\Cake\Core\Configure` class. It does not matter if you do it **before** loading 
-the plugin.
-
-For example, you can do this at the bottom of the file `APP/config/app.php`
-of your application.
-
-### Configuration values
-    Configure::write('MysqlBackup.bin.bzip2', '/full/path/to/bzip2');
-
-By default, the `bzip2` binary will be detected automatically, using the 
-Unix `which` command.  
-If the binary is not found or if you want to set a different path for the 
-bynary, you can use `MysqlBackup.bin.bzip2`.  
-Note that using `bzip2` is **optional**, but it's required if you want to handle 
-compressed backup.
-
-    Configure::write('MysqlBackup.bin.gzip', '/full/path/to/mysql');
-
-By default, the `gzip` binary will be detected automatically, using the 
-Unix `which` command.  
-If the binary is not found or if you want to set a different path for the 
-bynary, you can use `MysqlBackup.bin.gzip`.
-Note that using `gzip` is **optional**, but it's required if you want to handle 
-compressed backup.
-
-    Configure::write('MysqlBackup.bin.mysql', '/full/path/to/mysql');
-
-By default, the `mysql` binary will be detected automatically, using the 
-Unix `which` command.  
-If the binary is not found or if you want to set a different path for the 
-bynary, you can use `MysqlBackup.bin.mysql`.
-
-    Configure::write('MysqlBackup.bin.mysqldump', '/full/path/to/mysqldump');
-
-By default, the `mysqldump` binary will be detected automatically, using the 
-Unix `which` command.  
-If the binary is not found or if you want to set a different path for the 
-bynary, you can use `MysqlBackup.bin.mysqldump`.
-
-    Configure::write('MysqlBackup.connection', 'default');
-    
-Setting `MysqlBackup.connection`, you can choose which database connection you
-want to use.  
-For more information about database connections, please refer to the 
-[Cookbook](http://book.cakephp.org/3.0/en/orm/database-basics.html#configuration).
-
-    Configure::write('MysqlBackup.target', ROOT . DS . 'backups');
-    
-Setting `MysqlBackup.target', you can use another directory where the plugin
-will save backup files.
+The plugin uses some configuration parameters. See our wiki:
+* [Configuration](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/Configuration)
 
 ## How to use
 See our wiki:
