@@ -100,7 +100,7 @@ class BackupShell extends Shell
      * Lists database backups
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#index
-     * @uses DatabaseBackup\Utility\BackupManager::index()
+     * @uses MysqlBackup\Utility\BackupManager::index()
      */
     public function index()
     {
@@ -152,7 +152,7 @@ class BackupShell extends Shell
      * @param int $keep Number of backups you want to keep
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#rotate
-     * @uses DatabaseBackup\Utility\BackupManager::rotate()
+     * @uses MysqlBackup\Utility\BackupManager::rotate()
      */
     public function rotate($keep)
     {
