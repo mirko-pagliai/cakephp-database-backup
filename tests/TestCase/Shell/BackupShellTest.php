@@ -22,9 +22,11 @@
  */
 namespace MysqlBackup\Test\TestCase\Shell;
 
+use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
+use Cake\I18n\Number;
+use Cake\TestSuite\Stub\ConsoleOutput;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Shell\BackupShell;
 use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupManager;
 
@@ -33,6 +35,21 @@ use MysqlBackup\Utility\BackupManager;
  */
 class BackupShellTest extends TestCase
 {
+    /**
+     * @var \MysqlBackup\Shell\BackupShell
+     */
+    protected $Shell;
+
+    /**
+     * @var \Cake\Console\ConsoleIo
+     */
+    protected $in;
+
+    /**
+     * @var \Cake\TestSuite\Stub\ConsoleOutput
+     */
+    protected $out;
+
     /**
      * Setup the test case, backup the static object values so they can be
      * restored. Specifically backs up the contents of Configure and paths in
@@ -43,10 +60,13 @@ class BackupShellTest extends TestCase
     {
         parent::setUp();
 
-        $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')
-            ->disableOriginalConstructor()
+        $this->out = new ConsoleOutput();
+        $this->io = new ConsoleIo($this->out);
+
+        $this->Shell = $this->getMockBuilder('MysqlBackup\Shell\BackupShell')
+            ->setMethods(['in', 'err', '_stop'])
+            ->setConstructorArgs([$this->io])
             ->getMock();
-        $this->BackupShell = new BackupShell($this->io);
     }
 
     /**
@@ -64,16 +84,25 @@ class BackupShellTest extends TestCase
     }
 
     /**
-     * Creates some backups, waiting a second for each
+     * Creates some backups
+     * @param bool $sleep If `true`, waits a second for each backup
      * @return array
      */
-    protected function _createSomeBackupsWithSleep()
+    protected function _createSomeBackups($sleep = false)
     {
         $instance = new BackupExport();
         $instance->filename('backup.sql')->export();
-        sleep(1);
+
+        if ($sleep) {
+            sleep(1);
+        }
+
         $instance->filename('backup.sql.bz2')->export();
-        sleep(1);
+
+        if ($sleep) {
+            sleep(1);
+        }
+
         $instance->filename('backup.sql.gz')->export();
 
         return BackupManager::index();
@@ -85,16 +114,15 @@ class BackupShellTest extends TestCase
      */
     public function testExport()
     {
-        $this->io->expects($this->once())
-            ->method('out')
-            ->with($this->callback(function ($output) {
-                $pattern = '/^\<success\>Backup `%sbackup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/';
-                $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+        $this->Shell->export();
+        $output = $this->out->messages();
 
-                return preg_match($pattern, $output);
-            }));
+        $this->assertEquals(1, count($output));
 
-        $this->BackupShell->export();
+        $pattern = '/^\<success\>Backup `%sbackup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/';
+        $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+
+        $this->assertRegExp($pattern, $output[0]);
     }
 
     /**
@@ -103,17 +131,16 @@ class BackupShellTest extends TestCase
      */
     public function testExportWithCompression()
     {
-        $this->io->expects($this->once())
-            ->method('out')
-            ->with($this->callback(function ($output) {
-                $pattern = '/^\<success\>Backup `%sbackup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/';
-                $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+        $this->Shell->params['compression'] = 'none';
+        $this->Shell->export();
+        $output = $this->out->messages();
 
-                return preg_match($pattern, $output);
-            }));
+        $this->assertEquals(1, count($output));
 
-        $this->BackupShell->params = ['compression' => 'none'];
-        $this->BackupShell->export();
+        $pattern = '/^\<success\>Backup `%sbackup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/';
+        $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+
+        $this->assertRegExp($pattern, $output[0]);
     }
 
     /**
@@ -122,50 +149,42 @@ class BackupShellTest extends TestCase
      */
     public function testExportWithFilename()
     {
-        $this->io->expects($this->once())
-            ->method('out')
-            ->with($this->callback(function ($output) {
-                $pattern = '/^\<success\>Backup `%sbackup\.sql` has been exported\<\/success\>$/';
-                $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+        $this->Shell->params['filename'] = 'backup.sql';
+        $this->Shell->export();
+        $output = $this->out->messages();
 
-                return preg_match($pattern, $output);
-            }));
+        $this->assertEquals(1, count($output));
 
-        $this->BackupShell->params = ['filename' => 'backup.sql'];
-        $this->BackupShell->export();
+        $pattern = '/^\<success\>Backup `%sbackup\.sql` has been exported\<\/success\>$/';
+        $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+
+        $this->assertRegExp($pattern, $output[0]);
     }
 
     /**
      * Test for `export()` method, with the `rotate` option
      * @test
-     * @uses _createSomeBackupsWithSleep()
+     * @uses _createSomeBackups()
      */
     public function testExportWithRotate()
     {
-        //Creates some backups, waiting a second for each
-        $this->_createSomeBackupsWithSleep();
+        //Creates some backups
+        $this->_createSomeBackups(true);
 
         sleep(1);
 
-        $this->io->expects($this->at(0))
-            ->method('out')
-            ->with($this->callback(function ($output) {
-                $pattern = '/^\<success\>Backup `%slast\.sql` has been exported\<\/success\>$/';
-                $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
+        $this->Shell->params['rotate'] = 3;
+        $this->Shell->params['filename'] = 'last.sql';
+        $this->Shell->export();
+        $output = $this->out->messages();
 
-                return preg_match($pattern, $output);
-            }));
+        $this->assertEquals(2, count($output));
 
-        $this->io->expects($this->at(1))
-            ->method('verbose')
-            ->with('Backup `backup.sql` has been deleted', 1);
+        $pattern = '/^\<success\>Backup `%slast\.sql` has been exported\<\/success\>$/';
+        $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
 
-        $this->io->expects($this->at(2))
-            ->method('out')
-            ->with('<success>Deleted backup files: 1</success>', 1);
-
-        $this->BackupShell->params = ['rotate' => 3, 'filename' => 'last.sql'];
-        $this->BackupShell->export();
+        $this->assertRegExp($pattern, $output[0]);
+        $this->assertEquals('<success>Deleted backup files: 1</success>', $output[1]);
     }
 
     /**
@@ -175,8 +194,62 @@ class BackupShellTest extends TestCase
      */
     public function testExportInvalidOptionValue()
     {
-        $this->BackupShell->params = ['filename' => '/noExistingDir/backup.sql'];
-        $this->BackupShell->export();
+        $this->Shell->params['filename'] = '/noExistingDir/backup.sql';
+        $this->Shell->export();
+    }
+
+    /**
+     * Test for `index()` method
+     * @uses _createSomeBackups()
+     * @test
+     */
+    public function testIndex()
+    {
+        //Creates some backups
+        $backups = $this->_createSomeBackups(true);
+
+        $this->Shell->index();
+        $output = $this->out->messages();
+
+        $this->assertEquals(8, count($output));
+
+        //Splits some output rows
+        foreach ([2, 4, 5, 6] as $key) {
+            $output[$key] = array_values(array_filter(preg_split('/\s*\|\s*/', $output[$key])));
+        }
+
+        $this->assertEquals('Backup files found: 3', $output[0]);
+        $this->assertRegExp('/^[+\-]+$/', $output[1]);
+        $this->assertEquals([
+            '<info>Filename</info>',
+            '<info>Extension</info>',
+            '<info>Compression</info>',
+            '<info>Size</info>',
+            '<info>Datetime</info>',
+        ], $output[2]);
+        $this->assertRegExp('/^[+\-]+$/', $output[3]);
+        $this->assertEquals([
+            'backup.sql.gz',
+            'sql.gz',
+            'gzip',
+            Number::toReadableSize($backups[0]->size),
+            (string)$backups[0]->datetime,
+        ], $output[4]);
+        $this->assertEquals([
+            'backup.sql.bz2',
+            'sql.bz2',
+            'bzip2',
+            Number::toReadableSize($backups[1]->size),
+            (string)$backups[1]->datetime,
+        ], $output[5]);
+        $this->assertEquals([
+            'backup.sql',
+            'sql',
+            'none',
+            Number::toReadableSize($backups[2]->size),
+            (string)$backups[2]->datetime,
+        ], $output[6]);
+        $this->assertRegExp('/^[+\-]+$/', $output[7]);
     }
 
     /**
@@ -185,11 +258,11 @@ class BackupShellTest extends TestCase
      */
     public function testIndexNoBackups()
     {
-        $this->io->expects($this->once())
-            ->method('out')
-            ->with('Backup files found: 0', 1);
+        $this->Shell->index();
+        $output = $this->out->messages();
 
-        $this->BackupShell->index();
+        $this->assertEquals(1, count($output));
+        $this->assertEquals('Backup files found: 0', $output[0]);
     }
 
     /**
@@ -201,11 +274,11 @@ class BackupShellTest extends TestCase
         //Exports a database
         $backup = (new BackupExport())->filename('backup.sql')->export();
 
-        $this->io->expects($this->once())
-            ->method('out')
-            ->with('<success>Backup `' . $backup . '` has been imported</success>', 1);
+        $this->Shell->import($backup);
+        $output = $this->out->messages();
 
-        $this->BackupShell->import($backup);
+        $this->assertEquals(1, count($output));
+        $this->assertEquals('<success>Backup `' . $backup . '` has been imported</success>', $output[0]);
     }
 
     /**
@@ -215,7 +288,7 @@ class BackupShellTest extends TestCase
      */
     public function testImportWithNoExistingFilename()
     {
-        $this->BackupShell->import('/noExistingDir/backup.sql');
+        $this->Shell->import('/noExistingDir/backup.sql');
     }
 
     /**
@@ -224,36 +297,48 @@ class BackupShellTest extends TestCase
      */
     public function testMain()
     {
-        $this->io->expects($this->once())
-            ->method('out')
-            ->with('Backup files found: 0', 1);
+        $this->Shell->main();
+        $output = $this->out->messages();
 
-        $this->BackupShell->main();
+        $this->assertEquals(1, count($output));
+        $this->assertEquals('Backup files found: 0', $output[0]);
     }
 
     /**
      * Test for `rotate()` method
      * @test
-     * @uses _createSomeBackupsWithSleep()
+     * @uses _createSomeBackups()
      */
     public function testRotate()
     {
-        //Creates some backups, waiting a second for each
-        $this->_createSomeBackupsWithSleep();
+        //Creates some backups
+        $this->_createSomeBackups(true);
 
-        $this->io->expects($this->at(0))
-            ->method('verbose')
-            ->with('Backup `backup.sql.bz2` has been deleted', 1);
+        $this->Shell->rotate(1);
+        $output = $this->out->messages();
 
-        $this->io->expects($this->at(1))
-            ->method('verbose')
-            ->with('Backup `backup.sql` has been deleted', 1);
+        $this->assertEquals(1, count($output));
+        $this->assertEquals('<success>Deleted backup files: 2</success>', $output[0]);
+    }
 
-        $this->io->expects($this->at(2))
-            ->method('out')
-            ->with('<success>Deleted backup files: 2</success>', 1);
+    /**
+     * Test for `rotate()` method. Verbose level
+     * @test
+     * @uses _createSomeBackups()
+     */
+    public function testRotateVerboseLevel()
+    {
+        //Creates some backups
+        $this->_createSomeBackups(true);
 
-        $this->BackupShell->rotate(1);
+        $this->io->level(2);
+        $this->Shell->rotate(1);
+        $output = $this->out->messages();
+
+        $this->assertEquals(3, count($output));
+        $this->assertEquals('Backup `backup.sql.bz2` has been deleted', $output[0]);
+        $this->assertEquals('Backup `backup.sql` has been deleted', $output[1]);
+        $this->assertEquals('<success>Deleted backup files: 2</success>', $output[2]);
     }
 
     /**
@@ -263,7 +348,7 @@ class BackupShellTest extends TestCase
      */
     public function testRotateInvalidValue()
     {
-        $this->BackupShell->rotate(-1);
+        $this->Shell->rotate(-1);
     }
 
     /**
@@ -272,11 +357,12 @@ class BackupShellTest extends TestCase
      */
     public function testRotateNoBackupsToBeDeleted()
     {
-        $this->io->expects($this->once())
-            ->method('verbose')
-            ->with('No backup has been deleted', 1);
+        $this->io->level(2);
+        $this->Shell->rotate(1);
+        $output = $this->out->messages();
 
-        $this->BackupShell->rotate(1);
+        $this->assertEquals(1, count($output));
+        $this->assertEquals('No backup has been deleted', $output[0]);
     }
 
     /**
@@ -285,7 +371,7 @@ class BackupShellTest extends TestCase
      */
     public function testGetOptionParser()
     {
-        $parser = $this->BackupShell->getOptionParser();
+        $parser = $this->Shell->getOptionParser();
 
         $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($parser));
         $this->assertEquals(['export', 'import', 'index', 'rotate'], array_keys($parser->subcommands()));
