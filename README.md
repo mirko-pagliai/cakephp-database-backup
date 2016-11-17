@@ -1,9 +1,9 @@
-# MysqlBackup
+# MySQLBackup
 
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-mysql-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-mysql-backup)
 [![Coverage Status](https://img.shields.io/codecov/c/github/mirko-pagliai/cakephp-mysql-backup.svg?style=flat-square)](https://codecov.io/github/mirko-pagliai/cakephp-mysql-backup)
 
-*MysqlBackup* is a CakePHP plugin to export, import and manage database backups.
+*MySQLBackup* is a CakePHP plugin to export, import and manage database backups.
 
 ## Installation
 You can install the plugin via composer:
@@ -25,7 +25,7 @@ files. So you have to create the directory and make it writable:
 If you want to use a different directory, read below.
 
 ## Requirements
-*MysqlBackup* requires `mysql` and `mysqldump`.  
+*MySQLBackup* requires `mysql` and `mysqldump`.  
 **Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are 
 also required.  
 The installation of these binaries may vary depending on your operating system.
@@ -43,5 +43,5 @@ See our wiki:
 
 ## Versioning
 For transparency and insight into our release cycle and to maintain backward 
-compatibility, *Thumbs* will be maintained under the 
+compatibility, *MySQLBackup* will be maintained under the 
 [Semantic Versioning guidelines](http://semver.org).
