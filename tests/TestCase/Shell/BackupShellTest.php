@@ -43,7 +43,7 @@ class BackupShellTest extends TestCase
     /**
      * @var \Cake\Console\ConsoleIo
      */
-    protected $in;
+    protected $io;
 
     /**
      * @var \Cake\TestSuite\Stub\ConsoleOutput
@@ -64,7 +64,7 @@ class BackupShellTest extends TestCase
         $this->io = new ConsoleIo($this->out);
 
         $this->Shell = $this->getMockBuilder('MysqlBackup\Shell\BackupShell')
-            ->setMethods(['in', 'err', '_stop'])
+            ->setMethods(['in', '_stop'])
             ->setConstructorArgs([$this->io])
             ->getMock();
     }
