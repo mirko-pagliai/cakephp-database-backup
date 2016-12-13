@@ -27,6 +27,7 @@ use Cake\Core\Configure;
 use Cake\I18n\Number;
 use Cake\TestSuite\Stub\ConsoleOutput;
 use Cake\TestSuite\TestCase;
+use MysqlBackup\Shell\BackupShell;
 use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupManager;
 
@@ -41,9 +42,9 @@ class BackupShellTest extends TestCase
     protected $Shell;
 
     /**
-     * @var \Cake\Console\ConsoleIo
+     * @var \Cake\TestSuite\Stub\ConsoleOutput
      */
-    protected $io;
+    protected $err;
 
     /**
      * @var \Cake\TestSuite\Stub\ConsoleOutput
@@ -61,11 +62,13 @@ class BackupShellTest extends TestCase
         parent::setUp();
 
         $this->out = new ConsoleOutput();
-        $this->io = new ConsoleIo($this->out);
+        $this->err = new ConsoleOutput();
+        $io = new ConsoleIo($this->out, $this->err);
+        $io->level(2);
 
-        $this->Shell = $this->getMockBuilder('MysqlBackup\Shell\BackupShell')
+        $this->Shell = $this->getMockBuilder(BackupShell::class)
             ->setMethods(['in', '_stop'])
-            ->setConstructorArgs([$this->io])
+            ->setConstructorArgs([$io])
             ->getMock();
     }
 
@@ -176,15 +179,12 @@ class BackupShellTest extends TestCase
         $this->Shell->params['rotate'] = 3;
         $this->Shell->params['filename'] = 'last.sql';
         $this->Shell->export();
-        $output = $this->out->messages();
 
-        $this->assertEquals(2, count($output));
-
-        $pattern = '/^\<success\>Backup `%slast\.sql` has been exported\<\/success\>$/';
-        $pattern = sprintf($pattern, preg_quote(Configure::read('MysqlBackup.target') . DS, '/'));
-
-        $this->assertRegExp($pattern, $output[0]);
-        $this->assertEquals('<success>Deleted backup files: 1</success>', $output[1]);
+        $this->assertEquals([
+            '<success>Backup `/tmp/backups/last.sql` has been exported</success>',
+            'Backup `backup.sql` has been deleted',
+            '<success>Deleted backup files: 1</success>',
+        ], $this->out->messages());
     }
 
     /**
@@ -315,10 +315,12 @@ class BackupShellTest extends TestCase
         $this->_createSomeBackups(true);
 
         $this->Shell->rotate(1);
-        $output = $this->out->messages();
 
-        $this->assertEquals(1, count($output));
-        $this->assertEquals('<success>Deleted backup files: 2</success>', $output[0]);
+        $this->assertEquals([
+            'Backup `backup.sql.bz2` has been deleted',
+            'Backup `backup.sql` has been deleted',
+            '<success>Deleted backup files: 2</success>',
+        ], $this->out->messages());
     }
 
     /**
@@ -331,7 +333,6 @@ class BackupShellTest extends TestCase
         //Creates some backups
         $this->_createSomeBackups(true);
 
-        $this->io->level(2);
         $this->Shell->rotate(1);
         $output = $this->out->messages();
 
@@ -357,7 +358,6 @@ class BackupShellTest extends TestCase
      */
     public function testRotateNoBackupsToBeDeleted()
     {
-        $this->io->level(2);
         $this->Shell->rotate(1);
         $output = $this->out->messages();
 
