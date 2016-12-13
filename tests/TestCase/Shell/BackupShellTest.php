@@ -84,6 +84,8 @@ class BackupShellTest extends TestCase
         foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
             unlink($file);
         }
+
+        unset($this->Shell, $this->err, $this->out);
     }
 
     /**
