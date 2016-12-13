@@ -39,7 +39,7 @@ class BackupShellTest extends TestCase
     /**
      * @var \MysqlBackup\Shell\BackupShell
      */
-    protected $Shell;
+    protected $BackupShell;
 
     /**
      * @var \Cake\TestSuite\Stub\ConsoleOutput
@@ -66,7 +66,7 @@ class BackupShellTest extends TestCase
         $io = new ConsoleIo($this->out, $this->err);
         $io->level(2);
 
-        $this->Shell = $this->getMockBuilder(BackupShell::class)
+        $this->BackupShell = $this->getMockBuilder(BackupShell::class)
             ->setMethods(['in', '_stop'])
             ->setConstructorArgs([$io])
             ->getMock();
@@ -85,7 +85,7 @@ class BackupShellTest extends TestCase
             unlink($file);
         }
 
-        unset($this->Shell, $this->err, $this->out);
+        unset($this->BackupShell, $this->err, $this->out);
     }
 
     /**
@@ -119,7 +119,7 @@ class BackupShellTest extends TestCase
      */
     public function testExport()
     {
-        $this->Shell->export();
+        $this->BackupShell->export();
         $output = $this->out->messages();
 
         $this->assertEquals(1, count($output));
@@ -136,8 +136,8 @@ class BackupShellTest extends TestCase
      */
     public function testExportWithCompression()
     {
-        $this->Shell->params['compression'] = 'none';
-        $this->Shell->export();
+        $this->BackupShell->params['compression'] = 'none';
+        $this->BackupShell->export();
         $output = $this->out->messages();
 
         $this->assertEquals(1, count($output));
@@ -154,8 +154,8 @@ class BackupShellTest extends TestCase
      */
     public function testExportWithFilename()
     {
-        $this->Shell->params['filename'] = 'backup.sql';
-        $this->Shell->export();
+        $this->BackupShell->params['filename'] = 'backup.sql';
+        $this->BackupShell->export();
         $output = $this->out->messages();
 
         $this->assertEquals(1, count($output));
@@ -178,9 +178,9 @@ class BackupShellTest extends TestCase
 
         sleep(1);
 
-        $this->Shell->params['rotate'] = 3;
-        $this->Shell->params['filename'] = 'last.sql';
-        $this->Shell->export();
+        $this->BackupShell->params['rotate'] = 3;
+        $this->BackupShell->params['filename'] = 'last.sql';
+        $this->BackupShell->export();
 
         $this->assertEquals([
             '<success>Backup `/tmp/backups/last.sql` has been exported</success>',
@@ -196,8 +196,8 @@ class BackupShellTest extends TestCase
      */
     public function testExportInvalidOptionValue()
     {
-        $this->Shell->params['filename'] = '/noExistingDir/backup.sql';
-        $this->Shell->export();
+        $this->BackupShell->params['filename'] = '/noExistingDir/backup.sql';
+        $this->BackupShell->export();
     }
 
     /**
@@ -210,7 +210,7 @@ class BackupShellTest extends TestCase
         //Creates some backups
         $backups = $this->_createSomeBackups(true);
 
-        $this->Shell->index();
+        $this->BackupShell->index();
         $output = $this->out->messages();
 
         $this->assertEquals(8, count($output));
@@ -260,7 +260,7 @@ class BackupShellTest extends TestCase
      */
     public function testIndexNoBackups()
     {
-        $this->Shell->index();
+        $this->BackupShell->index();
         $output = $this->out->messages();
 
         $this->assertEquals(1, count($output));
@@ -276,7 +276,7 @@ class BackupShellTest extends TestCase
         //Exports a database
         $backup = (new BackupExport())->filename('backup.sql')->export();
 
-        $this->Shell->import($backup);
+        $this->BackupShell->import($backup);
         $output = $this->out->messages();
 
         $this->assertEquals(1, count($output));
@@ -290,7 +290,7 @@ class BackupShellTest extends TestCase
      */
     public function testImportWithNoExistingFilename()
     {
-        $this->Shell->import('/noExistingDir/backup.sql');
+        $this->BackupShell->import('/noExistingDir/backup.sql');
     }
 
     /**
@@ -299,7 +299,7 @@ class BackupShellTest extends TestCase
      */
     public function testMain()
     {
-        $this->Shell->main();
+        $this->BackupShell->main();
         $output = $this->out->messages();
 
         $this->assertEquals(1, count($output));
@@ -316,7 +316,7 @@ class BackupShellTest extends TestCase
         //Creates some backups
         $this->_createSomeBackups(true);
 
-        $this->Shell->rotate(1);
+        $this->BackupShell->rotate(1);
 
         $this->assertEquals([
             'Backup `backup.sql.bz2` has been deleted',
@@ -335,7 +335,7 @@ class BackupShellTest extends TestCase
         //Creates some backups
         $this->_createSomeBackups(true);
 
-        $this->Shell->rotate(1);
+        $this->BackupShell->rotate(1);
         $output = $this->out->messages();
 
         $this->assertEquals(3, count($output));
@@ -351,7 +351,7 @@ class BackupShellTest extends TestCase
      */
     public function testRotateInvalidValue()
     {
-        $this->Shell->rotate(-1);
+        $this->BackupShell->rotate(-1);
     }
 
     /**
@@ -360,7 +360,7 @@ class BackupShellTest extends TestCase
      */
     public function testRotateNoBackupsToBeDeleted()
     {
-        $this->Shell->rotate(1);
+        $this->BackupShell->rotate(1);
         $output = $this->out->messages();
 
         $this->assertEquals(1, count($output));
@@ -373,7 +373,7 @@ class BackupShellTest extends TestCase
      */
     public function testGetOptionParser()
     {
-        $parser = $this->Shell->getOptionParser();
+        $parser = $this->BackupShell->getOptionParser();
 
         $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($parser));
         $this->assertEquals(['export', 'import', 'index', 'rotate'], array_keys($parser->subcommands()));
