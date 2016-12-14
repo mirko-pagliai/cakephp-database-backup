@@ -155,7 +155,7 @@ class BackupShellTest extends TestCase
         sleep(1);
 
         //Exports, with `compression` param
-        $this->BackupShell->params['compression'] = 'gzip';
+        $this->BackupShell->params['compression'] = 'none';
         $this->BackupShell->export();
 
         sleep(1);
@@ -181,7 +181,7 @@ class BackupShellTest extends TestCase
             current($output)
         );
         $this->assertRegExp(
-            '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql\.gz` has been exported\<\/success\>$/',
+            '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/',
             next($output)
         );
         $this->assertEquals('<success>Backup `/tmp/backups/backup.sql` has been exported</success>', next($output));
