@@ -107,7 +107,6 @@ class BackupExportAndImportTest extends TestCase
     /**
      * Internal method. Test for `export()` and `import()` methods
      * @param bool|string $compression Compression
-     * @uses _allRecords()
      */
     protected function _testExportAndImport($compression)
     {
@@ -163,7 +162,6 @@ class BackupExportAndImportTest extends TestCase
     /**
      * Test for `export()` and `import()` methods, without compression
      * @test
-     * @uses _testExportAndImport()
      */
     public function testExportAndImport()
     {
@@ -173,7 +171,6 @@ class BackupExportAndImportTest extends TestCase
     /**
      * Test for `export()` and `import()` methods, with `bzip2` compression
      * @test
-     * @uses _testExportAndImport()
      */
     public function testExportAndImportBzip2()
     {
@@ -183,7 +180,6 @@ class BackupExportAndImportTest extends TestCase
     /**
      * Test for `export()` and `import()` methods, with `gzip` compression
      * @test
-     * @uses _testExportAndImport()
      */
     public function testExportAndImportGzip()
     {

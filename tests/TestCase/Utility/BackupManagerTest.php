@@ -146,7 +146,6 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `index()` method
      * @test
-     * @uses _createSomeBackups()
      */
     public function testIndex()
     {
@@ -165,7 +164,6 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `index()` method. This tests the backups order
      * @test
-     * @uses _createSomeBackupsWithSleep()
      */
     public function testIndexOrder()
     {
@@ -179,7 +177,6 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `index()` method, properties
      * @test
-     * @uses _createSomeBackups()
      */
     public function testIndexProperties()
     {
@@ -207,7 +204,6 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `rotate()` method
      * @test
-     * @uses _createSomeBackupsWithSleep()
      */
     public function testRotate()
     {

@@ -172,7 +172,6 @@ class BackupShellTest extends TestCase
     /**
      * Test for `export()` method, with the `rotate` option
      * @test
-     * @uses _createSomeBackups()
      */
     public function testExportWithRotate()
     {
@@ -206,7 +205,6 @@ class BackupShellTest extends TestCase
 
     /**
      * Test for `index()` method
-     * @uses _createSomeBackups()
      * @test
      */
     public function testIndex()
@@ -319,7 +317,6 @@ class BackupShellTest extends TestCase
     /**
      * Test for `rotate()` method
      * @test
-     * @uses _createSomeBackups()
      */
     public function testRotate()
     {
@@ -339,7 +336,6 @@ class BackupShellTest extends TestCase
     /**
      * Test for `rotate()` method. Verbose level
      * @test
-     * @uses _createSomeBackups()
      */
     public function testRotateVerboseLevel()
     {

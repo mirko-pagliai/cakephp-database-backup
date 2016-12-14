@@ -56,6 +56,8 @@ class BackupManager
     /**
      * Deletes all backup files
      * @return bool
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
+     * @since 1.0.1
      * @uses delete()
      * @uses index()
      */
@@ -113,6 +115,8 @@ class BackupManager
      * @return array Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws InternalErrorException
+     * @uses delete()
+     * @uses index()
      */
     public static function rotate($rotate)
     {
