@@ -155,7 +155,7 @@ class BackupShellTest extends TestCase
         sleep(1);
 
         //Exports, with `compression` param
-        $this->BackupShell->params['compression'] = 'gzip';
+        $this->BackupShell->params['compression'] = 'none';
         $this->BackupShell->export();
 
         sleep(1);
