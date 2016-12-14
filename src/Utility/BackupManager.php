@@ -54,6 +54,25 @@ class BackupManager
     }
 
     /**
+     * Deletes all backup files
+     * @return bool
+     * @uses delete()
+     * @uses index()
+     */
+    public static function deleteAll()
+    {
+        $success = true;
+
+        foreach (self::index() as $file) {
+            if (!self::delete($file->filename)) {
+                $success = false;
+            }
+        }
+
+        return $success;
+    }
+
+    /**
      * Returns a list of database backups
      * @return array Objects of backups
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index

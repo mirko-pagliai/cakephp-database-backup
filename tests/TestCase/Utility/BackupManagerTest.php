@@ -119,6 +119,20 @@ class BackupManagerTest extends TestCase
     }
 
     /**
+     * Test for `deleteAll()` method
+     * @test
+     */
+    public function testDeleteAll()
+    {
+        //Creates some backups
+        $this->_createSomeBackups();
+
+        $this->assertNotEmpty(BackupManager::index());
+        $this->assertTrue(BackupManager::deleteAll());
+        $this->assertEmpty(BackupManager::index());
+    }
+
+    /**
      * Test for `delete()` method, with a no existing file
      * @test
      * @expectedException Cake\Network\Exception\InternalErrorException
