@@ -55,7 +55,7 @@ class BackupManager
 
     /**
      * Deletes all backup files
-     * @return bool
+     * @return array List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
      * @uses delete()
@@ -63,15 +63,15 @@ class BackupManager
      */
     public static function deleteAll()
     {
-        $success = true;
+        $deleted = [];
 
         foreach (self::index() as $file) {
-            if (!self::delete($file->filename)) {
-                $success = false;
-            }
+            self::delete($file->filename);
+
+            $deleted[] = $file->filename;
         }
 
-        return $success;
+        return $deleted;
     }
 
     /**

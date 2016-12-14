@@ -114,6 +114,40 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Test for `deleteAll()` method
+     * @test
+     */
+    public function testDeleteAll()
+    {
+        //Creates some backups
+        $this->_createSomeBackups(true);
+
+        $this->BackupShell->deleteAll();
+
+        $this->assertEquals([
+            'Backup `backup.sql.gz` has been deleted',
+            'Backup `backup.sql.bz2` has been deleted',
+            'Backup `backup.sql` has been deleted',
+            '<success>Deleted backup files: 3</success>',
+        ], $this->out->messages());
+        $this->assertEmpty($this->err->messages());
+    }
+
+    /**
+     * Test for `deleteAll()` method, with no backups to be deleted
+     * @test
+     */
+    public function testDeleteAllNoBackupsToBeDeleted()
+    {
+        $this->BackupShell->deleteAll();
+
+        $this->assertEquals([
+            'No backup has been deleted',
+        ], $this->out->messages());
+        $this->assertEmpty($this->err->messages());
+    }
+
+    /**
      * Test for `export()` method
      * @test
      */
@@ -385,6 +419,12 @@ class BackupShellTest extends TestCase
         $parser = $this->BackupShell->getOptionParser();
 
         $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($parser));
-        $this->assertEquals(['export', 'import', 'index', 'rotate'], array_keys($parser->subcommands()));
+        $this->assertEquals([
+            'deleteAll',
+            'export',
+            'import',
+            'index',
+            'rotate',
+        ], array_keys($parser->subcommands()));
     }
 }

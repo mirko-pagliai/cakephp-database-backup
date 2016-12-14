@@ -35,6 +35,29 @@ use MysqlBackup\Utility\BackupManager;
 class BackupShell extends Shell
 {
     /**
+     * Deletes all backup files
+     * @return void
+     * @since 1.0.1
+     * @uses MysqlBackup\Utility\BackupManager::deleteAll()
+     */
+    public function deleteAll()
+    {
+        $deleted = BackupManager::deleteAll();
+
+        if (!$deleted) {
+            $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
+
+            return;
+        }
+
+        foreach ($deleted as $file) {
+            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file));
+        }
+
+        $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+    }
+
+    /**
      * Exports a database
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#export
@@ -185,6 +208,8 @@ class BackupShell extends Shell
         $parser = parent::getOptionParser();
 
         $parser->description(__d('mysql_backup', 'Shell to handle database backups'));
+
+        $parser->addSubcommand('deleteAll', ['help' => __d('mysql_backup', 'Deletes all database backups')]);
 
         $parser->addSubcommand('export', [
             'help' => __d('mysql_backup', 'Exports a database backup'),
