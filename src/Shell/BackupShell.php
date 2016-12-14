@@ -35,7 +35,31 @@ use MysqlBackup\Utility\BackupManager;
 class BackupShell extends Shell
 {
     /**
-     * Exports a database
+     * Deletes all backup files
+     * @return void
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#deleteAll
+     * @since 1.0.1
+     * @uses MysqlBackup\Utility\BackupManager::deleteAll()
+     */
+    public function deleteAll()
+    {
+        $deleted = BackupManager::deleteAll();
+
+        if (!$deleted) {
+            $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
+
+            return;
+        }
+
+        foreach ($deleted as $file) {
+            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file));
+        }
+
+        $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+    }
+
+    /**
+     * Exports a database backup
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#export
      * @uses MysqlBackup\Utility\BackupExport::compression()
@@ -78,7 +102,7 @@ class BackupShell extends Shell
     }
 
     /**
-     * Imports a database
+     * Imports a database backup
      * @param string $filename Filename. It can be an absolute path
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#import
@@ -104,7 +128,7 @@ class BackupShell extends Shell
      */
     public function index()
     {
-        //Gets alla files
+        //Gets all files
         $files = BackupManager::index();
 
         $this->out(__d('mysql_backup', 'Backup files found: {0}', count($files)));
@@ -185,6 +209,8 @@ class BackupShell extends Shell
         $parser = parent::getOptionParser();
 
         $parser->description(__d('mysql_backup', 'Shell to handle database backups'));
+
+        $parser->addSubcommand('deleteAll', ['help' => __d('mysql_backup', 'Deletes all database backups')]);
 
         $parser->addSubcommand('export', [
             'help' => __d('mysql_backup', 'Exports a database backup'),

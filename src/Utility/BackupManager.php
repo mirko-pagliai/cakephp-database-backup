@@ -54,6 +54,27 @@ class BackupManager
     }
 
     /**
+     * Deletes all backup files
+     * @return array List of deleted backup files
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
+     * @since 1.0.1
+     * @uses delete()
+     * @uses index()
+     */
+    public static function deleteAll()
+    {
+        $deleted = [];
+
+        foreach (self::index() as $file) {
+            self::delete($file->filename);
+
+            $deleted[] = $file->filename;
+        }
+
+        return $deleted;
+    }
+
+    /**
      * Returns a list of database backups
      * @return array Objects of backups
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index
@@ -94,6 +115,8 @@ class BackupManager
      * @return array Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws InternalErrorException
+     * @uses delete()
+     * @uses index()
      */
     public static function rotate($rotate)
     {

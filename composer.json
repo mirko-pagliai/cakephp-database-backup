@@ -13,7 +13,8 @@
         "cakephp/cakephp": ">=3.2.0 <4.0"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "2.*"
+        "cakephp/cakephp-codesniffer": "2.*",
+        "mirko-pagliai/reflection": "^1.0"
     },
     "autoload": {
         "psr-4": {

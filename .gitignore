@@ -2,5 +2,6 @@
 *_old
 *.old.*
 composer.lock
+coverage/
 vendor/
 

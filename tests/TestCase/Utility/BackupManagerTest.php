@@ -33,33 +33,45 @@ use MysqlBackup\Utility\BackupManager;
 class BackupManagerTest extends TestCase
 {
     /**
+     * @var \MysqlBackup\Utility\BackupExport
+     */
+    protected $BackupExport;
+
+    /**
      * Creates some backups
+     * @param bool $sleep If `true`, waits a second for each backup
      * @return array
      */
-    protected function _createSomeBackups()
+    protected function _createSomeBackups($sleep = false)
     {
-        $instance = new BackupExport();
-        $instance->export();
-        $instance->compression('bzip2')->export();
-        $instance->compression('gzip')->export();
+        $this->BackupExport->filename('backup.sql')->export();
+
+        if ($sleep) {
+            sleep(1);
+        }
+
+        $this->BackupExport->filename('backup.sql.bz2')->export();
+
+        if ($sleep) {
+            sleep(1);
+        }
+
+        $this->BackupExport->filename('backup.sql.gz')->export();
 
         return BackupManager::index();
     }
 
     /**
-     * Creates some backups, waiting a second for each
-     * @return array
+     * Setup the test case, backup the static object values so they can be
+     * restored. Specifically backs up the contents of Configure and paths in
+     *  App if they have not already been backed up
+     * @return void
      */
-    protected function _createSomeBackupsWithSleep()
+    public function setUp()
     {
-        $instance = new BackupExport();
-        $instance->export();
-        sleep(1);
-        $instance->compression('bzip2')->export();
-        sleep(1);
-        $instance->compression('gzip')->export();
+        parent::setUp();
 
-        return BackupManager::index();
+        $this->BackupExport = new BackupExport;
     }
 
     /**
@@ -69,6 +81,8 @@ class BackupManagerTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
+
+        unset($this->BackupExport);
 
         //Deletes all backups
         foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
@@ -82,18 +96,36 @@ class BackupManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $filename = (new BackupExport())->export();
+        $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
         $this->assertTrue(BackupManager::delete($filename));
         $this->assertFileNotExists($filename);
 
         //Relative path
-        $filename = (new BackupExport())->export();
+        $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
         $this->assertTrue(BackupManager::delete(basename($filename)));
         $this->assertFileNotExists($filename);
+    }
+
+    /**
+     * Test for `deleteAll()` method
+     * @test
+     */
+    public function testDeleteAll()
+    {
+        //Creates some backups
+        $this->_createSomeBackups(true);
+
+        $this->assertNotEmpty(BackupManager::index());
+        $this->assertEquals([
+            'backup.sql.gz',
+            'backup.sql.bz2',
+            'backup.sql',
+        ], BackupManager::deleteAll());
+        $this->assertEmpty(BackupManager::index());
     }
 
     /**
@@ -110,7 +142,6 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `index()` method
      * @test
-     * @uses _createSomeBackups()
      */
     public function testIndex()
     {
@@ -122,37 +153,19 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty(BackupManager::index());
 
         //Creates some backups
-        $this->_createSomeBackups();
+        $files = $this->_createSomeBackups(true);
         $this->assertEquals(3, count(BackupManager::index()));
-    }
-
-    /**
-     * Test for `index()` method. This tests the backups order
-     * @test
-     * @uses _createSomeBackupsWithSleep()
-     */
-    public function testIndexOrder()
-    {
-        $files = $this->_createSomeBackupsWithSleep();
 
         $this->assertEquals('gzip', $files[0]->compression);
         $this->assertEquals('bzip2', $files[1]->compression);
         $this->assertEquals(false, $files[2]->compression);
-    }
 
-    /**
-     * Test for `index()` method, properties
-     * @test
-     * @uses _createSomeBackups()
-     */
-    public function testIndexProperties()
-    {
-        //Creates some backups
-        foreach ($this->_createSomeBackups() as $file) {
+        //Checks for properties of each backup object
+        foreach ($files as $file) {
             $this->assertEquals('stdClass', get_class($file));
 
             $this->assertTrue(property_exists($file, 'filename'));
-            $this->assertRegExp('/^backup_test_[0-9]{14}\.sql(\.(bz2|gz))?$/', $file->filename);
+            $this->assertRegExp('/^backup\.sql(\.(bz2|gz))?$/', $file->filename);
 
             $this->assertTrue(property_exists($file, 'extension'));
             $this->assertTrue(in_array($file->extension, ['sql', 'sql.bz2', 'sql.gz']));
@@ -171,14 +184,13 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `rotate()` method
      * @test
-     * @uses _createSomeBackupsWithSleep()
      */
     public function testRotate()
     {
         $this->assertEquals([], BackupManager::rotate(1));
 
         //Creates some backups
-        $files = $this->_createSomeBackupsWithSleep();
+        $files = $this->_createSomeBackups(true);
 
         //Keeps 2 backups. Only 1 backup was deleted
         $rotate = BackupManager::rotate(2);
