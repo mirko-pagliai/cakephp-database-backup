@@ -37,6 +37,7 @@ class BackupShell extends Shell
     /**
      * Deletes all backup files
      * @return void
+     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#deleteAll
      * @since 1.0.1
      * @uses MysqlBackup\Utility\BackupManager::deleteAll()
      */
@@ -58,7 +59,7 @@ class BackupShell extends Shell
     }
 
     /**
-     * Exports a database
+     * Exports a database backup
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#export
      * @uses MysqlBackup\Utility\BackupExport::compression()
@@ -101,7 +102,7 @@ class BackupShell extends Shell
     }
 
     /**
-     * Imports a database
+     * Imports a database backup
      * @param string $filename Filename. It can be an absolute path
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#import
@@ -127,7 +128,7 @@ class BackupShell extends Shell
      */
     public function index()
     {
-        //Gets alla files
+        //Gets all files
         $files = BackupManager::index();
 
         $this->out(__d('mysql_backup', 'Backup files found: {0}', count($files)));
