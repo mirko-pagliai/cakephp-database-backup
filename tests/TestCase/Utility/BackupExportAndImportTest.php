@@ -160,29 +160,13 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * Test for `export()` and `import()` methods, without compression
+     * Test for `export()` and `import()` methods
      * @test
      */
     public function testExportAndImport()
     {
         $this->_testExportAndImport(false);
-    }
-
-    /**
-     * Test for `export()` and `import()` methods, with `bzip2` compression
-     * @test
-     */
-    public function testExportAndImportBzip2()
-    {
         $this->_testExportAndImport('bzip2');
-    }
-
-    /**
-     * Test for `export()` and `import()` methods, with `gzip` compression
-     * @test
-     */
-    public function testExportAndImportGzip()
-    {
         $this->_testExportAndImport('gzip');
     }
 }

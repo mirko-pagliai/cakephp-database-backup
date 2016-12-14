@@ -153,32 +153,14 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty(BackupManager::index());
 
         //Creates some backups
-        $this->_createSomeBackups();
-        $this->assertEquals(3, count(BackupManager::index()));
-    }
-
-    /**
-     * Test for `index()` method. This tests the backups order
-     * @test
-     */
-    public function testIndexOrder()
-    {
         $files = $this->_createSomeBackups(true);
+        $this->assertEquals(3, count(BackupManager::index()));
 
         $this->assertEquals('gzip', $files[0]->compression);
         $this->assertEquals('bzip2', $files[1]->compression);
         $this->assertEquals(false, $files[2]->compression);
-    }
 
-    /**
-     * Test for `index()` method, properties
-     * @test
-     */
-    public function testIndexProperties()
-    {
-        //Creates some backups
-        $files = $this->_createSomeBackups();
-
+        //Checks for properties of each backup object
         foreach ($files as $file) {
             $this->assertEquals('stdClass', get_class($file));
 

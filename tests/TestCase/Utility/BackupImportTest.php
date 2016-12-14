@@ -217,33 +217,19 @@ class BackupImportTest extends TestCase
      */
     public function testImport()
     {
-        //Exports and imports a `sql` backup
+        //Exports and imports with no compression
         $backup = $this->BackupExport->compression(false)->export();
         $filename = $this->BackupImport->filename($backup)->import();
 
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
-    }
 
-    /**
-     * Test for `import()` method, with `bzip2` compression
-     * @test
-     */
-    public function testImportBzip2()
-    {
-        //Exports and imports a `sql` backup
+        //Exports and imports with `bzip2` compression
         $backup = $this->BackupExport->compression('bzip2')->export();
         $filename = $this->BackupImport->filename($backup)->import();
 
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
-    }
 
-    /**
-     * Test for `import()` method, with `gzip` compression
-     * @test
-     */
-    public function testImportGzip()
-    {
-        //Exports and imports a `sql` backup
+        //Exports and imports with `gzip` compression
         $backup = $this->BackupExport->compression('gzip')->export();
         $filename = $this->BackupImport->filename($backup)->import();
 
