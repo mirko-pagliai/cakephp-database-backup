@@ -24,13 +24,16 @@ namespace MysqlBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Test\TestCase\Utility\BackupExport;
+use MysqlBackup\Utility\BackupExport;
+use Reflection\ReflectionTrait;
 
 /**
  * BackupExportTest class
  */
 class BackupExportTest extends TestCase
 {
+    use ReflectionTrait;
+
     /**
      * Teardown any static object changes and restore them
      * @return void
@@ -53,15 +56,15 @@ class BackupExportTest extends TestCase
     {
         $instance = new BackupExport();
 
-        $connection = $instance->getConnection();
+        $connection = $this->getProperty($instance, 'connection');
         $this->assertEquals($connection['scheme'], 'mysql');
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
 
-        $this->assertNull($instance->getCompression());
-        $this->assertEquals('sql', $instance->getExtension());
-        $this->assertNull($instance->getFilename());
-        $this->assertNull($instance->getRotate());
+        $this->assertNull($this->getProperty($instance, 'compression'));
+        $this->assertEquals('sql', $this->getProperty($instance, 'extension'));
+        $this->assertNull($this->getProperty($instance, 'filename'));
+        $this->assertNull($this->getProperty($instance, 'rotate'));
     }
 
     /**
@@ -74,16 +77,16 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $instance->compression('bzip2');
-        $this->assertEquals('bzip2', $instance->getCompression());
-        $this->assertEquals('sql.bz2', $instance->getExtension());
+        $this->assertEquals('bzip2', $this->getProperty($instance, 'compression'));
+        $this->assertEquals('sql.bz2', $this->getProperty($instance, 'extension'));
 
         $instance->compression('gzip');
-        $this->assertEquals('gzip', $instance->getCompression());
-        $this->assertEquals('sql.gz', $instance->getExtension());
+        $this->assertEquals('gzip', $this->getProperty($instance, 'compression'));
+        $this->assertEquals('sql.gz', $this->getProperty($instance, 'extension'));
 
         $instance->compression(false);
-        $this->assertEquals(false, $instance->getCompression());
-        $this->assertEquals('sql', $instance->getExtension());
+        $this->assertEquals(false, $this->getProperty($instance, 'compression'));
+        $this->assertEquals('sql', $this->getProperty($instance, 'extension'));
     }
 
     /**
@@ -117,21 +120,21 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $instance->filename('backup.sql');
-        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql', $instance->getFilename());
-        $this->assertFalse($instance->getCompression());
+        $this->assertEquals('/tmp/backups/backup.sql', $this->getProperty($instance, 'filename'));
+        $this->assertFalse($this->getProperty($instance, 'compression'));
 
         $instance->filename('backup.sql.gz');
-        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.gz', $instance->getFilename());
-        $this->assertEquals('gzip', $instance->getCompression());
+        $this->assertEquals('/tmp/backups/backup.sql.gz', $this->getProperty($instance, 'filename'));
+        $this->assertEquals('gzip', $this->getProperty($instance, 'compression'));
 
         $instance->filename('backup.sql.bz2');
-        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'backup.sql.bz2', $instance->getFilename());
-        $this->assertEquals('bzip2', $instance->getCompression());
+        $this->assertEquals('/tmp/backups/backup.sql.bz2', $this->getProperty($instance, 'filename'));
+        $this->assertEquals('bzip2', $this->getProperty($instance, 'compression'));
 
         //Absolute path
-        $instance->filename(Configure::read('MysqlBackup.target') . DS . 'other.sql');
-        $this->assertEquals(Configure::read('MysqlBackup.target') . DS . 'other.sql', $instance->getFilename());
-        $this->assertFalse($instance->getCompression());
+        $instance->filename('/tmp/backups/other.sql');
+        $this->assertEquals('/tmp/backups/other.sql', $this->getProperty($instance, 'filename'));
+        $this->assertFalse($this->getProperty($instance, 'compression'));
     }
 
     /**
@@ -144,12 +147,12 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $instance->compression('gzip')->filename('backup.sql.bz2');
-        $this->assertEquals('backup.sql.bz2', basename($instance->getFilename()));
-        $this->assertEquals('bzip2', $instance->getCompression());
+        $this->assertEquals('backup.sql.bz2', basename($this->getProperty($instance, 'filename')));
+        $this->assertEquals('bzip2', $this->getProperty($instance, 'compression'));
 
         $instance->compression('bzip2')->filename('backup.sql');
-        $this->assertEquals('backup.sql', basename($instance->getFilename()));
-        $this->assertFalse($instance->getCompression());
+        $this->assertEquals('backup.sql', basename($this->getProperty($instance, 'filename')));
+        $this->assertFalse($this->getProperty($instance, 'compression'));
     }
 
     /**
@@ -174,16 +177,16 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $instance->filename('{$DATABASE}.sql');
-        $this->assertEquals('test.sql', basename($instance->getFilename()));
+        $this->assertEquals('test.sql', basename($this->getProperty($instance, 'filename')));
 
         $instance->filename('{$DATETIME}.sql');
-        $this->assertRegExp('/^[0-9]{14}\.sql$/', basename($instance->getFilename()));
+        $this->assertRegExp('/^[0-9]{14}\.sql$/', basename($this->getProperty($instance, 'filename')));
 
         $instance->filename('{$HOSTNAME}.sql');
-        $this->assertEquals('localhost.sql', basename($instance->getFilename()));
+        $this->assertEquals('localhost.sql', basename($this->getProperty($instance, 'filename')));
 
         $instance->filename('{$TIMESTAMP}.sql');
-        $this->assertRegExp('/^[0-9]{10}\.sql$/', basename($instance->getFilename()));
+        $this->assertRegExp('/^[0-9]{10}\.sql$/', basename($this->getProperty($instance, 'filename')));
     }
 
     /**
@@ -217,7 +220,7 @@ class BackupExportTest extends TestCase
         $instance = new BackupExport();
 
         $instance->rotate(10);
-        $this->assertEquals(10, $instance->getRotate());
+        $this->assertEquals(10, $this->getProperty($instance, 'rotate'));
     }
 
     /**
@@ -237,7 +240,9 @@ class BackupExportTest extends TestCase
      */
     public function testStoreAuth()
     {
-        $auth = (new BackupExport())->getAuth();
+        $instance = new BackupExport();
+
+        $auth = $this->invokeMethod($instance, '_storeAuth');
 
         $this->assertFileExists($auth);
 
@@ -258,9 +263,20 @@ class BackupExportTest extends TestCase
         $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
         $gzip = Configure::read('MysqlBackup.bin.gzip');
 
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s', (new BackupExport())->getExecutable('bzip2'));
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s', (new BackupExport())->getExecutable('gzip'));
-        $this->assertEquals($mysqldump . ' --defaults-file=%s %s > %s', (new BackupExport())->getExecutable(false));
+        $instance = new BackupExport();
+
+        $this->assertEquals(
+            $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
+            $this->invokeMethod($instance, '_getExecutable', ['bzip2'])
+        );
+        $this->assertEquals(
+            $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s',
+            $this->invokeMethod($instance, '_getExecutable', ['gzip'])
+        );
+        $this->assertEquals(
+            $mysqldump . ' --defaults-file=%s %s > %s',
+            $this->invokeMethod($instance, '_getExecutable', [false])
+        );
     }
 
     /**
@@ -273,7 +289,9 @@ class BackupExportTest extends TestCase
     {
         Configure::write('MysqlBackup.bin.bzip2', false);
 
-        (new BackupExport())->getExecutable('bzip2');
+        $instance = new BackupExport();
+
+        $this->invokeMethod($instance, '_getExecutable', ['bzip2']);
     }
 
     /**
@@ -286,7 +304,9 @@ class BackupExportTest extends TestCase
     {
         Configure::write('MysqlBackup.bin.gzip', false);
 
-        (new BackupExport())->getExecutable('gzip');
+        $instance = new BackupExport();
+
+        $this->invokeMethod($instance, '_getExecutable', ['gzip']);
     }
 
     /**
