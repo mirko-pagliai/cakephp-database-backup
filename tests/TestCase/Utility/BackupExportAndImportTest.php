@@ -34,6 +34,26 @@ use MysqlBackup\Utility\BackupImport;
 class BackupExportAndImportTest extends TestCase
 {
     /**
+     * @var \Cake\ORM\Table
+     */
+    protected $Articles;
+
+    /**
+     * @var \MysqlBackup\Utility\BackupExport
+     */
+    protected $BackupExport;
+
+    /**
+     * @var \MysqlBackup\Utility\$BackupImport
+     */
+    protected $BackupImport;
+
+    /**
+     * @var \Cake\ORM\Table
+     */
+    protected $Comments;
+
+    /**
      * Fixtures
      * @var array
      */
@@ -49,6 +69,9 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::setUp();
 
+        $this->BackupExport = new BackupExport;
+        $this->BackupImport = new BackupImport;
+
         $this->Articles = TableRegistry::get('Articles');
         $this->Comments = TableRegistry::get('Comments');
     }
@@ -60,6 +83,8 @@ class BackupExportAndImportTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
+
+        unset($this->Articles, $this->BackupExport, $this->BackupImport, $this->Comments);
 
         //Deletes all backups
         foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
@@ -93,7 +118,7 @@ class BackupExportAndImportTest extends TestCase
         $this->assertEquals(6, count($initial['Comments']));
 
         //Exports backup
-        $backup = (new BackupExport())->compression($compression)->export();
+        $backup = $this->BackupExport->compression($compression)->export();
 
         //Deletes article with ID 2 and comment with ID 4
         $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
@@ -106,7 +131,7 @@ class BackupExportAndImportTest extends TestCase
         $this->assertEquals(5, count($deleted['Comments']));
 
         //Imports backup
-        (new BackupImport())->filename($backup)->import();
+        $this->BackupImport->filename($backup)->import();
 
         //Now initial records are the same of final records
         $final = $this->_allRecords();

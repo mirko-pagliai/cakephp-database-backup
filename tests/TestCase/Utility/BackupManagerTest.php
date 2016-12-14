@@ -33,15 +33,19 @@ use MysqlBackup\Utility\BackupManager;
 class BackupManagerTest extends TestCase
 {
     /**
+     * @var \MysqlBackup\Utility\BackupExport
+     */
+    protected $BackupExport;
+
+    /**
      * Creates some backups
      * @return array
      */
     protected function _createSomeBackups()
     {
-        $instance = new BackupExport();
-        $instance->export();
-        $instance->compression('bzip2')->export();
-        $instance->compression('gzip')->export();
+        $this->BackupExport->export();
+        $this->BackupExport->compression('bzip2')->export();
+        $this->BackupExport->compression('gzip')->export();
 
         return BackupManager::index();
     }
@@ -52,14 +56,30 @@ class BackupManagerTest extends TestCase
      */
     protected function _createSomeBackupsWithSleep()
     {
-        $instance = new BackupExport();
-        $instance->export();
+        $this->BackupExport->export();
+
         sleep(1);
-        $instance->compression('bzip2')->export();
+
+        $this->BackupExport->compression('bzip2')->export();
+
         sleep(1);
-        $instance->compression('gzip')->export();
+
+        $this->BackupExport->compression('gzip')->export();
 
         return BackupManager::index();
+    }
+
+    /**
+     * Setup the test case, backup the static object values so they can be
+     * restored. Specifically backs up the contents of Configure and paths in
+     *  App if they have not already been backed up
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->BackupExport = new BackupExport;
     }
 
     /**
@@ -69,6 +89,8 @@ class BackupManagerTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
+
+        unset($this->BackupExport);
 
         //Deletes all backups
         foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
@@ -82,14 +104,14 @@ class BackupManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $filename = (new BackupExport())->export();
+        $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
         $this->assertTrue(BackupManager::delete($filename));
         $this->assertFileNotExists($filename);
 
         //Relative path
-        $filename = (new BackupExport())->export();
+        $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
         $this->assertTrue(BackupManager::delete(basename($filename)));
