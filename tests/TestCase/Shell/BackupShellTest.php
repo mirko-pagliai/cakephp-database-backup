@@ -350,7 +350,7 @@ class BackupShellTest extends TestCase
     {
         $parser = $this->BackupShell->getOptionParser();
 
-        $this->assertEquals('Cake\Console\ConsoleOptionParser', get_class($parser));
+        $this->assertInstanceOf('Cake\Console\ConsoleOptionParser', $parser);
         $this->assertEquals([
             'deleteAll',
             'export',

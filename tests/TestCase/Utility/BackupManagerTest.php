@@ -162,7 +162,7 @@ class BackupManagerTest extends TestCase
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
-            $this->assertEquals('stdClass', get_class($file));
+            $this->assertInstanceOf('stdClass', $file);
 
             $this->assertTrue(property_exists($file, 'filename'));
             $this->assertRegExp('/^backup\.sql(\.(bz2|gz))?$/', $file->filename);
@@ -177,7 +177,7 @@ class BackupManagerTest extends TestCase
             $this->assertTrue(in_array($file->compression, [false, 'bzip2', 'gzip']));
 
             $this->assertTrue(property_exists($file, 'datetime'));
-            $this->assertEquals('Cake\I18n\FrozenTime', get_class($file->datetime));
+            $this->assertInstanceOf('Cake\I18n\FrozenTime', $file->datetime);
         }
     }
 
