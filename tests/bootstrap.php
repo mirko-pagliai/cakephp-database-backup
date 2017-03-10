@@ -110,9 +110,8 @@ ConnectionManager::config('test_custom_i18n_datasource', ['url' => getenv('db_ds
 Configure::write('MysqlBackup.connection', 'test');
 Configure::write('MysqlBackup.target', TMP . 'backups');
 
-//@codingStandardsIgnoreStart
+//@codingStandardsIgnoreLine
 @mkdir(Configure::read('MysqlBackup.target'));
-//@codingStandardsIgnoreEnd
 
 Plugin::load('MysqlBackup', [
     'bootstrap' => true,
