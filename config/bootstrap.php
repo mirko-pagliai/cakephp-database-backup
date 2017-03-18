@@ -72,7 +72,7 @@ if (empty(Configure::read('MysqlBackup.bin.mysqldump'))) {
 //Checks for connection
 $connection = Configure::read('MysqlBackup.connection');
 
-if (empty(ConnectionManager::config($connection))) {
+if (empty(ConnectionManager::getConfig($connection))) {
     trigger_error(sprintf('Invalid `%s` connection', $connection), E_USER_ERROR);
 }
 

@@ -57,7 +57,7 @@ class BackupImport
      */
     public function __construct()
     {
-        $this->connection = ConnectionManager::config(Configure::read('MysqlBackup.connection'));
+        $this->connection = ConnectionManager::getConfig(Configure::read('MysqlBackup.connection'));
     }
 
     /**
