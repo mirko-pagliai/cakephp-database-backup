@@ -358,5 +358,7 @@ class BackupShellTest extends TestCase
             'index',
             'rotate',
         ], array_keys($parser->subcommands()));
+        $this->assertEquals('Shell to handle database backups', $parser->getDescription());
+        $this->assertEquals(['help', 'quiet', 'verbose'], array_keys($parser->options()));
     }
 }
