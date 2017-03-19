@@ -99,8 +99,8 @@ class BackupExportAndImportTest extends TestCase
     protected function _allRecords()
     {
         return [
-            'Articles' => $this->Articles->find('all')->hydrate(false)->toArray(),
-            'Comments' => $this->Comments->find('all')->hydrate(false)->toArray(),
+            'Articles' => $this->Articles->find('all')->enableHydration(false)->toArray(),
+            'Comments' => $this->Comments->find('all')->enableHydration(false)->toArray(),
         ];
     }
 
