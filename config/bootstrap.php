@@ -56,7 +56,7 @@ if (!Configure::check('MysqlBackup.connection')) {
 
 //Default backups directory
 if (!Configure::check('MysqlBackup.target')) {
-    Configure::write('MysqlBackup.target', ROOT . DS . 'backups');
+    Configure::write('MysqlBackup.target', ROOT . 'backups');
 }
 
 //Checks for mysql binary
