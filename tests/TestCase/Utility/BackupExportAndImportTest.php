@@ -87,7 +87,7 @@ class BackupExportAndImportTest extends TestCase
         unset($this->Articles, $this->BackupExport, $this->BackupImport, $this->Comments);
 
         //Deletes all backups
-        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }

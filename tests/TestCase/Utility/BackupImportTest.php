@@ -70,7 +70,7 @@ class BackupImportTest extends TestCase
         unset($this->BackupExport, $this->BackupImport);
 
         //Deletes all backups
-        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -139,7 +139,7 @@ class BackupImportTest extends TestCase
      */
     public function testFilenameWithInvalidExtension()
     {
-        file_put_contents(Configure::read('MysqlBackup.target') . DS . 'backup.txt', null);
+        file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'backup.txt', null);
 
         $this->BackupImport->filename('backup.txt');
     }
@@ -167,9 +167,9 @@ class BackupImportTest extends TestCase
      */
     public function testExecutable()
     {
-        $mysql = Configure::read('MysqlBackup.bin.mysql');
-        $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
-        $gzip = Configure::read('MysqlBackup.bin.gzip');
+        $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
+        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
+        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
 
         $this->assertEquals(
             $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
@@ -193,7 +193,7 @@ class BackupImportTest extends TestCase
      */
     public function testExecutableWithBzip2NotAvailable()
     {
-        Configure::write('MysqlBackup.bin.bzip2', false);
+        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
 
         $this->invokeMethod($this->BackupImport, '_getExecutable', ['bzip2']);
     }
@@ -206,7 +206,7 @@ class BackupImportTest extends TestCase
      */
     public function testExecutableWithGzipNotAvailable()
     {
-        Configure::write('MysqlBackup.bin.gzip', false);
+        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
 
         $this->invokeMethod($this->BackupImport, '_getExecutable', ['gzip']);
     }

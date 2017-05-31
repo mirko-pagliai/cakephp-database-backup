@@ -43,7 +43,7 @@ class BackupManager
     public static function delete($filename)
     {
         if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read('MysqlBackup.target') . DS . $filename;
+            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
         }
 
         if (!is_writable($filename)) {
@@ -82,7 +82,7 @@ class BackupManager
     public static function index()
     {
         //Gets all files
-        $files = array_values((new Folder(Configure::read('MysqlBackup.target')))->read(false, false, true))[1];
+        $files = array_values((new Folder(Configure::read(MYSQL_BACKUP . '.target')))->read(false, false, true))[1];
 
         //Keeps only files with a valid extension
         $files = preg_grep('/\.sql(\.(gz|bz2))?$/', $files);

@@ -85,7 +85,7 @@ class BackupManagerTest extends TestCase
         unset($this->BackupExport);
 
         //Deletes all backups
-        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -148,7 +148,7 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty(BackupManager::index());
 
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read('MysqlBackup.target') . DS . 'text.txt', null);
+        file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'text.txt', null);
 
         $this->assertEmpty(BackupManager::index());
 

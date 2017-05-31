@@ -88,7 +88,7 @@ class BackupShellTest extends TestCase
         parent::tearDown();
 
         //Deletes all backups
-        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
 
