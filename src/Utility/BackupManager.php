@@ -64,12 +64,10 @@ class BackupManager
      */
     public static function deleteAll()
     {
-        $deleted = [];
-
         foreach (self::index() as $file) {
-            self::delete($file->filename);
-
-            $deleted[] = $file->filename;
+            if (self::delete($file->filename)) {
+                $deleted[] = $file->filename;
+            }
         }
 
         return $deleted;
@@ -116,29 +114,13 @@ class BackupManager
             throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
         }
 
-        //Gets all files
-        $files = self::index();
-
-        //Returns, if the number of files to keep is larger than the number of
-        //  files that are present
-        if ($rotate >= count($files)) {
-            return [];
-        }
-
-        //The number of files to be deleted is equal to the number of files
-        //  that are present less the number of files that you want to keep
-        $diff = count($files) - $rotate;
-
-        //Files that will be deleted
-        $files = array_map(function ($file) {
-            return $file;
-        }, array_slice($files, -$diff, $diff));
+        $backupsToBeDeleted = array_slice(self::index(), $rotate);
 
         //Deletes
-        foreach ($files as $file) {
-            self::delete($file->filename);
+        foreach ($backupsToBeDeleted as $backup) {
+            self::delete($backup->filename);
         }
 
-        return $files;
+        return $backupsToBeDeleted;
     }
 }
