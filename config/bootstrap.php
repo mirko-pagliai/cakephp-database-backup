@@ -59,7 +59,7 @@ if (!Configure::check(MYSQL_BACKUP . '.connection')) {
     Configure::write(MYSQL_BACKUP . '.connection', 'default');
 }
 
-//Default backups directory
+//Default target directory
 if (!Configure::check(MYSQL_BACKUP . '.target')) {
     Configure::write(MYSQL_BACKUP . '.target', ROOT . DS . 'backups');
 }
@@ -81,6 +81,14 @@ if (empty(ConnectionManager::getConfig($connection))) {
     trigger_error(sprintf('Invalid `%s` connection', $connection), E_USER_ERROR);
 }
 
-if (!is_writeable(Configure::read(MYSQL_BACKUP . '.target'))) {
-    trigger_error(sprintf('Directory %s not writeable', Configure::read(MYSQL_BACKUP . '.target')), E_USER_ERROR);
+//Checks for the target directory
+$target = Configure::read(MYSQL_BACKUP . '.target');
+
+if (!file_exists($target)) {
+    //@codingStandardsIgnoreLine
+    @mkdir($target);
+}
+
+if (!is_writeable($target)) {
+    trigger_error(sprintf('Directory %s not writeable', $target), E_USER_ERROR);
 }
