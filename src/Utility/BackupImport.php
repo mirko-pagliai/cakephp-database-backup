@@ -74,7 +74,7 @@ class BackupImport
         if (in_array($compression, ['bzip2', 'gzip'])) {
             $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
 
-            if (empty($executable)) {
+            if (!$executable) {
                 throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
             }
 

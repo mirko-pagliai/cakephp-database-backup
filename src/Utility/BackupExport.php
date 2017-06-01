@@ -93,7 +93,7 @@ class BackupExport
         if (in_array($compression, ['bzip2', 'gzip'])) {
             $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
 
-            if (empty($executable)) {
+            if (!$executable) {
                 throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
             }
 
@@ -192,7 +192,7 @@ class BackupExport
         }
 
         //Checks for extension
-        if (empty(extensionFromFile($filename))) {
+        if (!extensionFromFile($filename)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
         }
 
@@ -256,7 +256,7 @@ class BackupExport
         chmod($filename, Configure::read(MYSQL_BACKUP . '.chmod'));
 
         //Rotates backups
-        if (!empty($this->rotate)) {
+        if ($this->rotate) {
             BackupManager::rotate($this->rotate);
         }
 
