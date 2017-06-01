@@ -64,6 +64,8 @@ class BackupManager
      */
     public static function deleteAll()
     {
+        $deleted = [];
+
         foreach (self::index() as $file) {
             if (self::delete($file->filename)) {
                 $deleted[] = $file->filename;

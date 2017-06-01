@@ -62,6 +62,16 @@ class BackupManagerTest extends TestCase
     }
 
     /**
+     * Internal method to delete all backups
+     */
+    protected function _deleteAllBackups()
+    {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
      * Setup the test case, backup the static object values so they can be
      * restored. Specifically backs up the contents of Configure and paths in
      *  App if they have not already been backed up
@@ -72,6 +82,8 @@ class BackupManagerTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport;
+
+        $this->_deleteAllBackups();
     }
 
     /**
@@ -84,10 +96,7 @@ class BackupManagerTest extends TestCase
 
         unset($this->BackupExport);
 
-        //Deletes all backups
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
+        $this->_deleteAllBackups();
     }
 
     /**
