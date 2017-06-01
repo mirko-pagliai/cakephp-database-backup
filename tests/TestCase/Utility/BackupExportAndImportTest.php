@@ -87,7 +87,7 @@ class BackupExportAndImportTest extends TestCase
         unset($this->Articles, $this->BackupExport, $this->BackupImport, $this->Comments);
 
         //Deletes all backups
-        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -99,8 +99,8 @@ class BackupExportAndImportTest extends TestCase
     protected function _allRecords()
     {
         return [
-            'Articles' => $this->Articles->find('all')->enableHydration(false)->toArray(),
-            'Comments' => $this->Comments->find('all')->enableHydration(false)->toArray(),
+            'Articles' => $this->Articles->find()->enableHydration(false)->toArray(),
+            'Comments' => $this->Comments->find()->enableHydration(false)->toArray(),
         ];
     }
 
@@ -155,8 +155,8 @@ class BackupExportAndImportTest extends TestCase
         $this->assertEquals(1, count($diff['Comments']));
 
         //Difference is article with ID 2 and comment with ID 4
-        $this->assertEquals(2, array_values($diff['Articles'])[0]['id']);
-        $this->assertEquals(4, array_values($diff['Comments'])[0]['id']);
+        $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
+        $this->assertEquals(4, collection($diff['Comments'])->extract('id')->first());
     }
 
     /**

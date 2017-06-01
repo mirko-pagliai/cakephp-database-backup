@@ -27,6 +27,7 @@ use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\I18n\FrozenTime;
 use Cake\Network\Exception\InternalErrorException;
+use Cake\ORM\Entity;
 
 /**
  * Utility to manage database backups
@@ -43,7 +44,7 @@ class BackupManager
     public static function delete($filename)
     {
         if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read('MysqlBackup.target') . DS . $filename;
+            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
         }
 
         if (!is_writable($filename)) {
@@ -66,9 +67,9 @@ class BackupManager
         $deleted = [];
 
         foreach (self::index() as $file) {
-            self::delete($file->filename);
-
-            $deleted[] = $file->filename;
+            if (self::delete($file->filename)) {
+                $deleted[] = $file->filename;
+            }
         }
 
         return $deleted;
@@ -76,34 +77,25 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return array Objects of backups
+     * @return array Backups as entities
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index()
     {
-        //Gets all files
-        $files = array_values((new Folder(Configure::read('MysqlBackup.target')))->read(false, false, true))[1];
+        $dir = Configure::read(MYSQL_BACKUP . '.target');
 
-        //Keeps only files with a valid extension
-        $files = preg_grep('/\.sql(\.(gz|bz2))?$/', $files);
-
-        //Parses files
-        $files = array_map(function ($file) {
-            return (object)[
-                'filename' => basename($file),
-                'extension' => extensionFromFile($file),
-                'compression' => compressionFromFile($file),
-                'size' => filesize($file),
-                'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($file))),
-            ];
-        }, $files);
-
-        //Re-orders, using the datetime value
-        usort($files, function ($a, $b) {
-            return $b->datetime >= $a->datetime;
-        });
-
-        return $files;
+        return collection((new Folder($dir))->find('.+\.sql(\.(gz|bz2))?'))
+            ->map(function ($file) use ($dir) {
+                return new Entity([
+                    'filename' => $file,
+                    'extension' => extensionFromFile($file),
+                    'compression' => compressionFromFile($file),
+                    'size' => filesize($dir . DS . $file),
+                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($dir . DS . $file))),
+                ]);
+            })
+            ->sortBy('datetime')
+            ->toList();
     }
 
     /**
@@ -124,29 +116,13 @@ class BackupManager
             throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
         }
 
-        //Gets all files
-        $files = self::index();
-
-        //Returns, if the number of files to keep is larger than the number of
-        //  files that are present
-        if ($rotate >= count($files)) {
-            return [];
-        }
-
-        //The number of files to be deleted is equal to the number of files
-        //  that are present less the number of files that you want to keep
-        $diff = count($files) - $rotate;
-
-        //Files that will be deleted
-        $files = array_map(function ($file) {
-            return $file;
-        }, array_slice($files, -$diff, $diff));
+        $backupsToBeDeleted = array_slice(self::index(), $rotate);
 
         //Deletes
-        foreach ($files as $file) {
-            self::delete($file->filename);
+        foreach ($backupsToBeDeleted as $backup) {
+            self::delete($backup->filename);
         }
 
-        return $files;
+        return $backupsToBeDeleted;
     }
 }

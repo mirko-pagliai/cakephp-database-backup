@@ -24,58 +24,71 @@
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 
+//Sets the default MysqlBackup name
+if (!defined('MYSQL_BACKUP')) {
+    define('MYSQL_BACKUP', 'MysqlBackup');
+}
+
 //bzip2 binary
-if (!Configure::check('MysqlBackup.bin.bzip2')) {
-    Configure::write('MysqlBackup.bin.bzip2', which('bzip2'));
+if (!Configure::check(MYSQL_BACKUP . '.bin.bzip2')) {
+    Configure::write(MYSQL_BACKUP . '.bin.bzip2', which('bzip2'));
 }
 
 //gzip binary
-if (!Configure::check('MysqlBackup.bin.gzip')) {
-    Configure::write('MysqlBackup.bin.gzip', which('gzip'));
+if (!Configure::check(MYSQL_BACKUP . '.bin.gzip')) {
+    Configure::write(MYSQL_BACKUP . '.bin.gzip', which('gzip'));
 }
 
 //mysql binary
-if (!Configure::check('MysqlBackup.bin.mysql')) {
-    Configure::write('MysqlBackup.bin.mysql', which('mysql'));
+if (!Configure::check(MYSQL_BACKUP . '.bin.mysql')) {
+    Configure::write(MYSQL_BACKUP . '.bin.mysql', which('mysql'));
 }
 
 //mysqldump binary
-if (!Configure::check('MysqlBackup.bin.mysqldump')) {
-    Configure::write('MysqlBackup.bin.mysqldump', which('mysqldump'));
+if (!Configure::check(MYSQL_BACKUP . '.bin.mysqldump')) {
+    Configure::write(MYSQL_BACKUP . '.bin.mysqldump', which('mysqldump'));
 }
 
 //Chmod for backups
-if (!Configure::check('MysqlBackup.chmod')) {
-    Configure::write('MysqlBackup.chmod', 0664);
+if (!Configure::check(MYSQL_BACKUP . '.chmod')) {
+    Configure::write(MYSQL_BACKUP . '.chmod', 0664);
 }
 
 //Database connection
-if (!Configure::check('MysqlBackup.connection')) {
-    Configure::write('MysqlBackup.connection', 'default');
+if (!Configure::check(MYSQL_BACKUP . '.connection')) {
+    Configure::write(MYSQL_BACKUP . '.connection', 'default');
 }
 
-//Default backups directory
-if (!Configure::check('MysqlBackup.target')) {
-    Configure::write('MysqlBackup.target', ROOT . DS . 'backups');
+//Default target directory
+if (!Configure::check(MYSQL_BACKUP . '.target')) {
+    Configure::write(MYSQL_BACKUP . '.target', ROOT . DS . 'backups');
 }
 
 //Checks for mysql binary
-if (empty(Configure::read('MysqlBackup.bin.mysql'))) {
+if (empty(Configure::read(MYSQL_BACKUP . '.bin.mysql'))) {
     trigger_error(sprintf('The `%s` binary was not found', 'mysql'), E_USER_ERROR);
 }
 
 //Checks for mysqldump binary
-if (empty(Configure::read('MysqlBackup.bin.mysqldump'))) {
+if (empty(Configure::read(MYSQL_BACKUP . '.bin.mysqldump'))) {
     trigger_error(sprintf('The `%s` binary was not found', 'mysqldump'), E_USER_ERROR);
 }
 
 //Checks for connection
-$connection = Configure::read('MysqlBackup.connection');
+$connection = Configure::read(MYSQL_BACKUP . '.connection');
 
 if (empty(ConnectionManager::getConfig($connection))) {
     trigger_error(sprintf('Invalid `%s` connection', $connection), E_USER_ERROR);
 }
 
-if (!is_writeable(Configure::read('MysqlBackup.target'))) {
-    trigger_error(sprintf('Directory %s not writeable', Configure::read('MysqlBackup.target')), E_USER_ERROR);
+//Checks for the target directory
+$target = Configure::read(MYSQL_BACKUP . '.target');
+
+if (!file_exists($target)) {
+    //@codingStandardsIgnoreLine
+    @mkdir($target);
+}
+
+if (!is_writeable($target)) {
+    trigger_error(sprintf('Directory %s not writeable', $target), E_USER_ERROR);
 }

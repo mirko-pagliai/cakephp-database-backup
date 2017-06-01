@@ -63,7 +63,7 @@ class BackupExportTest extends TestCase
         unset($this->BackupExport);
 
         //Deletes all backups
-        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -261,9 +261,9 @@ class BackupExportTest extends TestCase
      */
     public function testExecutable()
     {
-        $mysqldump = Configure::read('MysqlBackup.bin.mysqldump');
-        $bzip2 = Configure::read('MysqlBackup.bin.bzip2');
-        $gzip = Configure::read('MysqlBackup.bin.gzip');
+        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
+        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
+        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
 
         $this->assertEquals(
             $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
@@ -287,7 +287,7 @@ class BackupExportTest extends TestCase
      */
     public function testExecutableWithBzip2NotAvailable()
     {
-        Configure::write('MysqlBackup.bin.bzip2', false);
+        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
 
         $this->invokeMethod($this->BackupExport, '_getExecutable', ['bzip2']);
     }
@@ -300,7 +300,7 @@ class BackupExportTest extends TestCase
      */
     public function testExecutableWithGzipNotAvailable()
     {
-        Configure::write('MysqlBackup.bin.gzip', false);
+        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
 
         $this->invokeMethod($this->BackupExport, '_getExecutable', ['gzip']);
     }
@@ -342,7 +342,7 @@ class BackupExportTest extends TestCase
         $this->assertEquals('backup.sql.gz', basename($filename));
 
         //Changes chmod
-        Configure::write('MysqlBackup.chmod', 0777);
+        Configure::write(MYSQL_BACKUP . '.chmod', 0777);
 
         //Exports with a different chmod
         $filename = $this->BackupExport->filename('backup2.sql')->export();

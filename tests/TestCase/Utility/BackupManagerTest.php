@@ -62,6 +62,16 @@ class BackupManagerTest extends TestCase
     }
 
     /**
+     * Internal method to delete all backups
+     */
+    protected function _deleteAllBackups()
+    {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
      * Setup the test case, backup the static object values so they can be
      * restored. Specifically backs up the contents of Configure and paths in
      *  App if they have not already been backed up
@@ -72,6 +82,8 @@ class BackupManagerTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport;
+
+        $this->_deleteAllBackups();
     }
 
     /**
@@ -84,10 +96,7 @@ class BackupManagerTest extends TestCase
 
         unset($this->BackupExport);
 
-        //Deletes all backups
-        foreach (glob(Configure::read('MysqlBackup.target') . DS . '*') as $file) {
-            unlink($file);
-        }
+        $this->_deleteAllBackups();
     }
 
     /**
@@ -148,7 +157,7 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty(BackupManager::index());
 
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read('MysqlBackup.target') . DS . 'text.txt', null);
+        file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'text.txt', null);
 
         $this->assertEmpty(BackupManager::index());
 
@@ -156,27 +165,26 @@ class BackupManagerTest extends TestCase
         $files = $this->_createSomeBackups(true);
         $this->assertEquals(3, count(BackupManager::index()));
 
-        $this->assertEquals('gzip', $files[0]->compression);
-        $this->assertEquals('bzip2', $files[1]->compression);
-        $this->assertEquals(false, $files[2]->compression);
+        //Checks compressions
+        $compressions = collection($files)->extract('compression')->toArray();
+        $this->assertEquals(['gzip', 'bzip2', false], $compressions);
+
+        //Checks filenames
+        $filenames = collection($files)->extract('filename')->toArray();
+        $this->assertEquals([
+            'backup.sql.gz',
+            'backup.sql.bz2',
+            'backup.sql',
+        ], $filenames);
+
+        //Checks extensions
+        $extensions = collection($files)->extract('extension')->toArray();
+        $this->assertEquals(['sql.gz', 'sql.bz2', 'sql'], $extensions);
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
-            $this->assertInstanceOf('stdClass', $file);
-
-            $this->assertTrue(property_exists($file, 'filename'));
-            $this->assertRegExp('/^backup\.sql(\.(bz2|gz))?$/', $file->filename);
-
-            $this->assertTrue(property_exists($file, 'extension'));
-            $this->assertTrue(in_array($file->extension, ['sql', 'sql.bz2', 'sql.gz']));
-
-            $this->assertTrue(property_exists($file, 'size'));
+            $this->assertInstanceOf('Cake\ORM\Entity', $file);
             $this->assertTrue(isPositive($file->size));
-
-            $this->assertTrue(property_exists($file, 'compression'));
-            $this->assertTrue(in_array($file->compression, [false, 'bzip2', 'gzip']));
-
-            $this->assertTrue(property_exists($file, 'datetime'));
             $this->assertInstanceOf('Cake\I18n\FrozenTime', $file->datetime);
         }
     }
@@ -211,7 +219,7 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(1, count($diff));
 
         //The difference is the same
-        $this->assertEquals(array_values($diff)[0], array_values($rotate)[0]);
+        $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
     }
 
     /**

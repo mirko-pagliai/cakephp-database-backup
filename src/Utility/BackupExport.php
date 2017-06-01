@@ -76,7 +76,7 @@ class BackupExport
      */
     public function __construct()
     {
-        $this->connection = ConnectionManager::getConfig(Configure::read('MysqlBackup.connection'));
+        $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
     }
 
     /**
@@ -88,12 +88,12 @@ class BackupExport
      */
     protected function _getExecutable($compression)
     {
-        $mysqldump = Configure::read('MysqlBackup.bin.mysqldump');
+        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
 
         if (in_array($compression, ['bzip2', 'gzip'])) {
-            $executable = Configure::read(sprintf('MysqlBackup.bin.%s', $compression));
+            $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
 
-            if (empty($executable)) {
+            if (!$executable) {
                 throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
             }
 
@@ -180,7 +180,7 @@ class BackupExport
         ], $filename);
 
         if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read('MysqlBackup.target') . DS . $filename;
+            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
         }
 
         if (!is_writable(dirname($filename))) {
@@ -192,7 +192,7 @@ class BackupExport
         }
 
         //Checks for extension
-        if (empty(extensionFromFile($filename))) {
+        if (!extensionFromFile($filename)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
         }
 
@@ -253,10 +253,10 @@ class BackupExport
         //Deletes the temporary file
         unlink($auth);
 
-        chmod($filename, Configure::read('MysqlBackup.chmod'));
+        chmod($filename, Configure::read(MYSQL_BACKUP . '.chmod'));
 
         //Rotates backups
-        if (!empty($this->rotate)) {
+        if ($this->rotate) {
             BackupManager::rotate($this->rotate);
         }
 
