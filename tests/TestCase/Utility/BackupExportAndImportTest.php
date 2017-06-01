@@ -155,8 +155,8 @@ class BackupExportAndImportTest extends TestCase
         $this->assertEquals(1, count($diff['Comments']));
 
         //Difference is article with ID 2 and comment with ID 4
-        $this->assertEquals(2, array_values($diff['Articles'])[0]['id']);
-        $this->assertEquals(4, array_values($diff['Comments'])[0]['id']);
+        $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
+        $this->assertEquals(4, collection($diff['Comments'])->extract('id')->first());
     }
 
     /**

@@ -219,7 +219,7 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(1, count($diff));
 
         //The difference is the same
-        $this->assertEquals(array_values($diff)[0], array_values($rotate)[0]);
+        $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
     }
 
     /**

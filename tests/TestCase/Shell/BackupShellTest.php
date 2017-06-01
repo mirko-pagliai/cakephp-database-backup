@@ -57,6 +57,16 @@ class BackupShellTest extends TestCase
     protected $out;
 
     /**
+     * Internal method to delete all backups
+     */
+    protected function _deleteAllBackups()
+    {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
      * Setup the test case, backup the static object values so they can be
      * restored. Specifically backs up the contents of Configure and paths in
      *  App if they have not already been backed up
@@ -77,6 +87,8 @@ class BackupShellTest extends TestCase
             ->setMethods(['in', '_stop'])
             ->setConstructorArgs([$io])
             ->getMock();
+
+        $this->_deleteAllBackups();
     }
 
     /**
@@ -87,12 +99,9 @@ class BackupShellTest extends TestCase
     {
         parent::tearDown();
 
-        //Deletes all backups
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
-
         unset($this->BackupExport, $this->BackupShell, $this->err, $this->out);
+
+        $this->_deleteAllBackups();
     }
 
     /**
@@ -223,13 +232,14 @@ class BackupShellTest extends TestCase
         $output = $this->out->messages();
 
         $this->assertEquals(9, count($output));
-
         //Splits some output rows
-        foreach ($output as $k => $v) {
-            if (preg_match('/\s*\|\s*/', $v)) {
-                $output[$k] = array_values(array_filter(preg_split('/\s*\|\s*/', $v)));
+        $output = collection($output)->map(function ($row) {
+            if (preg_match('/\s*\|\s*/', $row)) {
+                return array_values(array_filter(preg_split('/\s*\|\s*/', $row)));
             }
-        }
+
+            return $row;
+        })->toArray();
 
         $this->assertEquals('Backup files found: 0', current($output));
         $this->assertEquals('Backup files found: 3', next($output));
