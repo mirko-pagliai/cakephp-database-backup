@@ -156,27 +156,26 @@ class BackupManagerTest extends TestCase
         $files = $this->_createSomeBackups(true);
         $this->assertEquals(3, count(BackupManager::index()));
 
-        $this->assertEquals('gzip', $files[0]->compression);
-        $this->assertEquals('bzip2', $files[1]->compression);
-        $this->assertEquals(false, $files[2]->compression);
+        //Checks compressions
+        $compressions = collection($files)->extract('compression')->toArray();
+        $this->assertEquals(['gzip', 'bzip2', false], $compressions);
+
+        //Checks filenames
+        $filenames = collection($files)->extract('filename')->toArray();
+        $this->assertEquals([
+            'backup.sql.gz',
+            'backup.sql.bz2',
+            'backup.sql',
+        ], $filenames);
+
+        //Checks extensions
+        $extensions = collection($files)->extract('extension')->toArray();
+        $this->assertEquals(['sql.gz', 'sql.bz2', 'sql'], $extensions);
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
-            $this->assertInstanceOf('stdClass', $file);
-
-            $this->assertTrue(property_exists($file, 'filename'));
-            $this->assertRegExp('/^backup\.sql(\.(bz2|gz))?$/', $file->filename);
-
-            $this->assertTrue(property_exists($file, 'extension'));
-            $this->assertTrue(in_array($file->extension, ['sql', 'sql.bz2', 'sql.gz']));
-
-            $this->assertTrue(property_exists($file, 'size'));
+            $this->assertInstanceOf('Cake\ORM\Entity', $file);
             $this->assertTrue(isPositive($file->size));
-
-            $this->assertTrue(property_exists($file, 'compression'));
-            $this->assertTrue(in_array($file->compression, [false, 'bzip2', 'gzip']));
-
-            $this->assertTrue(property_exists($file, 'datetime'));
             $this->assertInstanceOf('Cake\I18n\FrozenTime', $file->datetime);
         }
     }

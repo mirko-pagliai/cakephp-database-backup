@@ -1,6 +1,7 @@
 # 1.x branch
 ## 1.0 branch
 ### 1.0.3
+* `BackupManager::index()` returns an array of entities;
 * added `MYSQL_BACKUP` constant.
 
 ### 1.0.2

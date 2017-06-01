@@ -128,22 +128,24 @@ class BackupShell extends Shell
      */
     public function index()
     {
-        //Gets all files
-        $files = BackupManager::index();
+        //Gets all backups
+        $backups = BackupManager::index();
 
-        $this->out(__d('mysql_backup', 'Backup files found: {0}', count($files)));
+        $this->out(__d('mysql_backup', 'Backup files found: {0}', count($backups)));
 
-        if (!empty($files)) {
-            //Parses files
-            $files = array_map(function ($file) {
-                if (isset($file->compression) && !$file->compression) {
-                    $file->compression = __d('mysql_backup', 'none');
-                }
+        if ($backups) {
+            //Parses backups
+            $backups = collection($backups)
+                ->map(function ($backup) {
+                    if (isset($backup->compression) && !$backup->compression) {
+                        $backup->compression = __d('mysql_backup', 'none');
+                    }
 
-                $file->size = Number::toReadableSize($file->size);
+                    $backup->size = Number::toReadableSize($backup->size);
 
-                return array_values((array)$file);
-            }, $files);
+                    return $backup->toArray();
+                })
+                ->toArray();
 
             //Table headers
             $headers = [
@@ -154,7 +156,7 @@ class BackupShell extends Shell
                 __d('mysql_backup', 'Datetime'),
             ];
 
-            $this->helper('table')->output(array_merge([$headers], $files));
+            $this->helper('table')->output(array_merge([$headers], $backups));
         }
     }
 
