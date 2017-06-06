@@ -26,6 +26,7 @@ namespace MysqlBackup\Utility;
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\I18n\FrozenTime;
+use Cake\Mailer\Email;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\Entity;
 
@@ -124,5 +125,45 @@ class BackupManager
         }
 
         return $backupsToBeDeleted;
+    }
+
+    /**
+     * Internal method to send a backup file via email
+     * @param string $filename Filename
+     * @param string $to Recipient of the email
+     * @return \Cake\Mailer\Email
+     * @since 1.1.0
+     * @throws InternalErrorException
+     */
+    protected static function _send($filename, $to)
+    {
+        $sender = Configure::read(MYSQL_BACKUP . '.mailSender');
+
+        if (!$sender) {
+            throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender in the configuration'));
+        }
+
+        if (!Folder::isAbsolute($filename)) {
+            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
+        }
+
+        return (new Email)
+            ->setFrom($sender)
+            ->setTo($to)
+            ->setSubject(__d('mysql_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
+            ->setAttachments($filename);
+    }
+
+    /**
+     * Sends a backup file via email
+     * @param string $filename Filename
+     * @param string $to Recipient of the email
+     * @return array
+     * @since 1.1.0
+     * @uses _send()
+     */
+    public static function send($filename, $to)
+    {
+        return self::_send($filename, $to)->send();
     }
 }

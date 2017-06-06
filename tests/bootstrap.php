@@ -20,11 +20,11 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
+use Cake\Mailer\Email;
 use Cake\Routing\DispatcherFactory;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -109,6 +109,7 @@ ConnectionManager::setConfig('test_custom_i18n_datasource', ['url' => getenv('db
 
 Configure::write('MysqlBackup.connection', 'test');
 Configure::write('MysqlBackup.target', TMP . 'backups');
+Configure::write('MysqlBackup.mailSender', 'sender@example.com');
 
 Plugin::load('MysqlBackup', [
     'bootstrap' => true,
@@ -117,5 +118,8 @@ Plugin::load('MysqlBackup', [
 
 DispatcherFactory::add('Routing');
 DispatcherFactory::add('ControllerFactory');
+
+Email::setConfigTransport('debug', ['className' => 'Debug']);
+Email::setConfig('default', ['transport' => 'debug', 'log' => true]);
 
 ini_set('intl.default_locale', 'en_US');

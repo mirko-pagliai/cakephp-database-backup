@@ -23,15 +23,20 @@
 namespace MysqlBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\TestSuite\EmailAssertTrait;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupManager;
+use Reflection\ReflectionTrait;
 
 /**
  * BackupManagerTest class
  */
 class BackupManagerTest extends TestCase
 {
+    use EmailAssertTrait;
+    use ReflectionTrait;
+
     /**
      * @var \MysqlBackup\Utility\BackupExport
      */
@@ -231,5 +236,47 @@ class BackupManagerTest extends TestCase
     public function testRotateWithInvalidValue()
     {
         BackupManager::rotate(-1);
+    }
+
+    /**
+     * Test for `send()` and `_send()` methods
+     * @test
+     */
+    public function testSend()
+    {
+        $to = 'recipient@example.com';
+
+        //Get a backup file
+        $file = collection($this->_createSomeBackups())->extract('filename')->first();
+        $path = Configure::read(MYSQL_BACKUP . '.target') . DS . $file;
+
+        $instance = new BackupManager;
+        $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
+        $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
+
+        $this->assertEmailFrom(Configure::read(MYSQL_BACKUP . '.mailSender'));
+        $this->assertEmailTo($to);
+        $this->assertEmailSubject('Database backup backup.sql.gz from localhost');
+        $this->assertEmailAttachmentsContains(basename($file), [
+            'file' => $path,
+            'mimetype' => mime_content_type($path),
+        ]);
+
+        $send = BackupManager::send($file, $to);
+        $this->assertNotEmpty($send);
+        $this->assertEquals(['headers', 'message'], array_keys($send));
+    }
+
+    /**
+     * Test for `send()` method, without a sender in the configuration
+     * @test
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage You must first set the mail sender in the configuration
+     */
+    public function testSendWithoutSenderInConfiguration()
+    {
+        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+
+        BackupManager::send('file.sql', 'recipient@example.com');
     }
 }
