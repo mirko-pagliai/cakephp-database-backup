@@ -85,6 +85,7 @@ class BackupShell extends Shell
      * @uses MysqlBackup\Utility\BackupExport::export()
      * @uses MysqlBackup\Utility\BackupExport::filename()
      * @uses rotate()
+     * @uses send()
      */
     public function export()
     {
@@ -110,6 +111,11 @@ class BackupShell extends Shell
             $file = $instance->export();
 
             $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', rtr($file)));
+
+            //Sends via email
+            if ($this->param('send')) {
+                $this->send($file, $this->param('send'));
+            }
 
             //Rotates
             if ($this->param('rotate')) {
@@ -260,21 +266,26 @@ class BackupShell extends Shell
             'help' => __d('mysql_backup', 'Exports a database backup'),
             'parser' => [
                 'options' => [
+                    'compression' => [
+                        'choices' => ['gzip', 'bzip2', 'none'],
+                        'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
+                        'short' => 'c',
+                    ],
                     'filename' => [
                         'help' => __d('mysql_backup', 'Filename. It can be an absolute path and may contain ' .
                             'patterns. The compression type will be automatically setted'),
                         'short' => 'f',
                     ],
-                    'compression' => [
-                        'choices' => ['gzip', 'bzip2', 'none'],
-                        'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
-                        'short' => 'c'
-                    ],
                     'rotate' => [
                         'help' => __d('mysql_backup', 'Rotates backups. You have to indicate the number of backups you ' .
                             'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
-                        'short' => 'r'
-                    ]
+                        'short' => 'r',
+                    ],
+                    'send' => [
+                        'help' => __d('mysql_backup', 'Sends the backup file via email. You have ' .
+                            'to indicate the recipient\'s email address'),
+                        'short' => 's',
+                    ],
                 ],
             ],
         ]);

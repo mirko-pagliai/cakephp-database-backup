@@ -196,9 +196,16 @@ class BackupShellTest extends TestCase
         $this->BackupShell->params['rotate'] = 3;
         $this->BackupShell->export();
 
+        sleep(1);
+
+        //Exports, with `rotate` param
+        unset($this->BackupShell->params['rotate']);
+        $this->BackupShell->params['send'] = 'mymail@example.com';
+        $this->BackupShell->export();
+
         $output = $this->out->messages();
 
-        $this->assertEquals(6, count($output));
+        $this->assertEquals(8, count($output));
 
         $this->assertRegExp(
             '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/',
@@ -215,6 +222,14 @@ class BackupShellTest extends TestCase
         );
         $this->assertRegExp('/^Backup `backup_test_[0-9]{14}\.sql` has been deleted$/', next($output));
         $this->assertEquals('<success>Deleted backup files: 1</success>', next($output));
+        $this->assertRegExp(
+            '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/',
+            next($output)
+        );
+        $this->assertRegExp(
+            '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql` was sent via mail\<\/success\>$/',
+            next($output)
+        );
 
         $this->assertEmpty($this->err->messages());
     }
