@@ -40,6 +40,7 @@ your application, see the [Cookbook](https://book.cakephp.org/3.0/en/core-librar
 
 ## How to use
 See our wiki:
+* [Export backups as cron jobs](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/Export-backups-as-cron-jobs)
 * [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility)
 * [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility)
 * [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility)
