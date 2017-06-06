@@ -6,6 +6,8 @@
 * added `BackupExport::send()` to set up the email recipient, so by calling the
     `export()` method the backup file will be sent via email;
 * added `BackupTrait`,  that provides some methods used by all other classes;
+* added `rtr()` (relative to root) global function. This simplifies the output
+    of some methods provided by `BackupShell`;
 * global functions `compressionFromFile()`, `extensionFromCompression()` and
     `extensionFromFile()` have been replaced with the `getCompression()` and
     `getExtension()` methods provided by the `BackupTrait`;

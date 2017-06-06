@@ -52,7 +52,7 @@ class BackupShell extends Shell
         }
 
         foreach ($deleted as $file) {
-            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file));
+            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', rtr($file)));
         }
 
         $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
@@ -88,9 +88,9 @@ class BackupShell extends Shell
             }
 
             //Exports
-            $backup = $instance->export();
+            $file = $instance->export();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', $backup));
+            $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', rtr($file)));
 
             //Rotates
             if ($this->param('rotate')) {
@@ -112,9 +112,9 @@ class BackupShell extends Shell
     public function import($filename)
     {
         try {
-            $backup = (new BackupImport())->filename($filename)->import();
+            $file = (new BackupImport())->filename($filename)->import();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', $backup));
+            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -216,7 +216,7 @@ class BackupShell extends Shell
         try {
             (new BackupManager)->send($filename, $recipient);
 
-            $this->success(__d('mysql_backup', 'The backup file was sent via mail'));
+            $this->success(__d('mysql_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }

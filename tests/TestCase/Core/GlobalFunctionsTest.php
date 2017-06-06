@@ -43,6 +43,26 @@ class GlobalFunctionsTest extends TestCase
     }
 
     /**
+     * Test for `rtr()` global function
+     * @return void
+     * @test
+     */
+    public function testRtr()
+    {
+        $result = rtr(ROOT . 'my' . DS . 'folder');
+        $expected = 'my' . DS . 'folder';
+        $this->assertEquals($expected, $result);
+
+        $result = rtr('my' . DS . 'folder');
+        $expected = 'my' . DS . 'folder';
+
+        $this->assertEquals($expected, $result);
+        $result = rtr(DS . 'my' . DS . 'folder');
+        $expected = DS . 'my' . DS . 'folder';
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * Test for `which()` global function
      * @return void
      * @test

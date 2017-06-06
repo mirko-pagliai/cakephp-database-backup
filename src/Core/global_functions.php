@@ -32,6 +32,18 @@ if (!function_exists('isPositive')) {
     }
 }
 
+if (!function_exists('rtr')) {
+    /**
+     * Returns the relative path (to the APP root) of an absolute path
+     * @param string $path Absolute path
+     * @return string Relativa path
+     */
+    function rtr($path)
+    {
+        return preg_replace(sprintf('/^%s/', preg_quote(Folder::slashTerm(ROOT), DS)), null, $path);
+    }
+}
+
 if (!function_exists('which')) {
     /**
      * Executes the `which` command and shows the full path of (shell) commands
