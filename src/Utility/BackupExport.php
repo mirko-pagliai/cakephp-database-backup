@@ -160,7 +160,7 @@ class BackupExport
         }
 
         $this->compression = $compression;
-        $this->extension = extensionFromCompression($compression);
+        $this->extension = $this->getExtension($compression);
 
         return $this;
     }
@@ -204,12 +204,12 @@ class BackupExport
         }
 
         //Checks for extension
-        if (!extensionFromFile($filename)) {
+        if (!$this->getExtension($filename)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
         }
 
         //Sets the compression
-        $this->compression(compressionFromFile($filename));
+        $this->compression($this->getCompression($filename));
 
         $this->filename = $filename;
 

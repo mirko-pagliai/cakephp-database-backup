@@ -30,47 +30,6 @@ use Cake\TestSuite\TestCase;
 class GlobalFunctionsTest extends TestCase
 {
     /**
-     * Test for `compressionFromFile()` global function
-     * @return void
-     * @test
-     */
-    public function testCompressionFromFile()
-    {
-        $this->assertEquals(false, compressionFromFile('backup.sql'));
-        $this->assertEquals('bzip2', compressionFromFile('backup.sql.bz2'));
-        $this->assertEquals('gzip', compressionFromFile('backup.sql.gz'));
-        $this->assertNull(compressionFromFile('text.txt'));
-    }
-
-    /**
-     * Test for `extensionFromCompression()` global function
-     * @return void
-     * @test
-     */
-    public function testExtensionFromCompression()
-    {
-        $this->assertEquals('sql', extensionFromCompression(false));
-        $this->assertEquals('sql.bz2', extensionFromCompression('bzip2'));
-        $this->assertEquals('sql.gz', extensionFromCompression('gzip'));
-
-        $this->assertFalse(extensionFromCompression('noExisting'));
-    }
-
-    /**
-     * Test for `extensionFromFile()` global function
-     * @return void
-     * @test
-     */
-    public function testExtensionFromFile()
-    {
-        $this->assertEquals('sql', extensionFromFile('backup.sql'));
-        $this->assertEquals('sql.bz2', extensionFromFile('backup.sql.bz2'));
-        $this->assertEquals('sql.gz', extensionFromFile('backup.sql.gz'));
-
-        $this->assertNull(extensionFromFile('text.txt'));
-    }
-
-    /**
      * Test for `isPositive()` global function
      * @return void
      * @test

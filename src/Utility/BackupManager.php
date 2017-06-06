@@ -90,8 +90,8 @@ class BackupManager
             ->map(function ($file) use ($target) {
                 return new Entity([
                     'filename' => $file,
-                    'extension' => extensionFromFile($file),
-                    'compression' => compressionFromFile($file),
+                    'extension' => $this->getExtension($file),
+                    'compression' => $this->getCompression($file),
                     'size' => filesize($target . DS . $file),
                     'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $file))),
                 ]);

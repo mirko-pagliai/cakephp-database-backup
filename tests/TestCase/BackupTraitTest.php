@@ -72,6 +72,36 @@ class BackupTraitTest extends TestCase
         $result = $this->Trait->getAbsolutePath(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt');
         $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt', $result);
     }
+    /**
+     * Test for `getCompression()` method
+     * @test
+     */
+    public function testGetCompression()
+    {
+        $this->assertEquals(false, $this->Trait->getCompression('backup.sql'));
+        $this->assertEquals('bzip2', $this->Trait->getCompression('backup.sql.bz2'));
+        $this->assertEquals('gzip', $this->Trait->getCompression('backup.sql.gz'));
+        $this->assertNull($this->Trait->getCompression('text.txt'));
+    }
+
+    /**
+     * Test for `getExtension()` method
+     * @test
+     */
+    public function testGetExtension()
+    {
+        //Using compression types
+        $this->assertEquals('sql', $this->Trait->getExtension(false));
+        $this->assertEquals('sql.bz2', $this->Trait->getExtension('bzip2'));
+        $this->assertEquals('sql.gz', $this->Trait->getExtension('gzip'));
+        $this->assertNull($this->Trait->getExtension('noExisting'));
+
+        //Using filenames
+        $this->assertEquals('sql', $this->Trait->getExtension('backup.sql'));
+        $this->assertEquals('sql.bz2', $this->Trait->getExtension('backup.sql.bz2'));
+        $this->assertEquals('sql.gz', $this->Trait->getExtension('backup.sql.gz'));
+        $this->assertNull($this->Trait->getExtension('text.txt'));
+    }
 
     /**
      * Test for `getTarget()` method

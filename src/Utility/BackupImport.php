@@ -128,7 +128,7 @@ class BackupImport
             throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));
         }
 
-        $compression = compressionFromFile($filename);
+        $compression = $this->getCompression($filename);
 
         if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));

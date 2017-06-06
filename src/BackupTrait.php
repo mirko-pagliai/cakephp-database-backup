@@ -46,6 +46,49 @@ trait BackupTrait
     }
 
     /**
+     * Returns the compression starting from a filename
+     * @param string $filename Filename
+     * @return string|bool|null Compression type or `null` on failure. `false`
+     *  means no compression (a simple sql file)
+     * @uses getExtension()
+     */
+    public function getCompression($filename)
+    {
+        //Gets the extension
+        $extension = $this->getExtension($filename);
+
+        $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+
+        if (!array_key_exists($extension, $compressions)) {
+            return null;
+        }
+
+        return $compressions[$extension];
+    }
+
+    /**
+     * Returns the extension starting from a compression type or a filename
+     * @param string $compressionOrFilename Compression type or filename
+     * @return string|null Extension or `null` on failure
+     */
+    public function getExtension($compressionOrFilename)
+    {
+        $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+
+        $extension = array_search($compressionOrFilename, $compressions, true);
+
+        if ($extension) {
+            return $extension;
+        }
+
+        if (preg_match('/\.(sql(\.(gz|bz2))?)$/', $compressionOrFilename, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
      * Returns the target path
      * @return string
      */
