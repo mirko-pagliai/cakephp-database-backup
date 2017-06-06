@@ -4,7 +4,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2017-06-06 15:30+0200\n"
+"POT-Creation-Date: 2017-06-06 15:55+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -61,7 +61,7 @@ msgid "Datetime"
 msgstr ""
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:219
-msgid "The backup file was sent via mail"
+msgid "Backup `{0}` was sent via mail"
 msgstr ""
 
 #: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:233
