@@ -253,22 +253,22 @@ class BackupManagerTest extends TestCase
         $to = 'recipient@example.com';
 
         //Get a backup file
-        $file = collection($this->_createSomeBackups())->extract('filename')->first();
-        $path = Configure::read(MYSQL_BACKUP . '.target') . DS . $file;
+        $filename = collection($this->_createSomeBackups())->extract('filename')->first();
+        $path = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
 
         $instance = new BackupManager;
-        $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
+        $this->_email = $this->invokeMethod($instance, '_send', [$filename, $to]);
         $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
 
         $this->assertEmailFrom(Configure::read(MYSQL_BACKUP . '.mailSender'));
         $this->assertEmailTo($to);
-        $this->assertEmailSubject('Database backup backup.sql.gz from localhost');
-        $this->assertEmailAttachmentsContains(basename($file), [
+        $this->assertEmailSubject('Database backup ' . $filename . ' from localhost');
+        $this->assertEmailAttachmentsContains(basename($filename), [
             'file' => $path,
             'mimetype' => mime_content_type($path),
         ]);
 
-        $send = $this->BackupManager->send($file, $to);
+        $send = $this->BackupManager->send($filename, $to);
         $this->assertNotEmpty($send);
         $this->assertEquals(['headers', 'message'], array_keys($send));
     }
