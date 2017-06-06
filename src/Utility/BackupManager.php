@@ -40,7 +40,8 @@ class BackupManager
 
     /**
      * Deletes a backup file
-     * @param string $filename Filename
+     * @param string $filename Filename of the backup that you want to delete.
+     *  The path can be relative to the backup directory
      * @return bool
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws InternalErrorException
@@ -131,12 +132,12 @@ class BackupManager
     /**
      * Internal method to send a backup file via email
      * @param string $filename Filename
-     * @param string $to Recipient of the email
+     * @param string $recipient Recipient's email address
      * @return \Cake\Mailer\Email
      * @since 1.1.0
      * @throws InternalErrorException
      */
-    protected function _send($filename, $to)
+    protected function _send($filename, $recipient)
     {
         $sender = Configure::read(MYSQL_BACKUP . '.mailSender');
 
@@ -148,21 +149,22 @@ class BackupManager
 
         return (new Email)
             ->setFrom($sender)
-            ->setTo($to)
+            ->setTo($recipient)
             ->setSubject(__d('mysql_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
             ->setAttachments($filename);
     }
 
     /**
      * Sends a backup file via email
-     * @param string $filename Filename
-     * @param string $to Recipient of the email
+     * @param string $filename Filename of the backup that you want to send via
+     *  email. The path can be relative to the backup directory
+     * @param string $recipient Recipient's email address
      * @return array
      * @since 1.1.0
      * @uses _send()
      */
-    public function send($filename, $to)
+    public function send($filename, $recipient)
     {
-        return $this->_send($filename, $to)->send();
+        return $this->_send($filename, $recipient)->send();
     }
 }

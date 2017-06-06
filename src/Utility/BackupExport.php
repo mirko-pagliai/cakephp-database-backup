@@ -232,8 +232,8 @@ class BackupExport
     }
 
     /**
-     * Sets the recipient to send the backup file via mail
-     * @param bool|string $recipient Email recipient. `false` to disable
+     * Sets the recipient's email address to send the backup file via mail
+     * @param bool|string $recipient Recipient's email address or `false` to disable
      * @return \MysqlBackup\Utility\BackupExport
      * @since 1.1.0
      * @uses $emailRecipient

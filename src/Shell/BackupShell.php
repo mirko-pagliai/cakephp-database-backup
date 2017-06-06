@@ -204,16 +204,17 @@ class BackupShell extends Shell
 
     /**
      * Sends a backup file via email
-     * @param string $filename Filename
-     * @param string $to Recipient of the email
+     * @param string $filename Filename of the backup that you want to send via
+     *  email. The path can be relative to the backup directory
+     * @param string $recipient Recipient's email address
      * @return void
      * @since 1.1.0
      * @uses MysqlBackup\Utility\BackupManager::send()
      */
-    public function send($filename, $to)
+    public function send($filename, $recipient)
     {
         try {
-            (new BackupManager)->send($filename, $to);
+            (new BackupManager)->send($filename, $recipient);
 
             $this->success(__d('mysql_backup', 'The backup file was sent via mail'));
         } catch (\Exception $e) {
@@ -291,8 +292,8 @@ class BackupShell extends Shell
                         'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
                         'required' => true,
                     ],
-                    'to' => [
-                        'help' => __d('mysql_backup', 'Recipient of the email'),
+                    'recipient' => [
+                        'help' => __d('mysql_backup', 'Recipient\'s email address'),
                         'required' => true,
                     ],
                 ],
