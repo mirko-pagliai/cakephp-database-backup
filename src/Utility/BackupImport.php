@@ -25,14 +25,16 @@ namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\Filesystem\Folder;
 use Cake\Network\Exception\InternalErrorException;
+use MysqlBackup\BackupTrait;
 
 /**
  * Utility to import databases
  */
 class BackupImport
 {
+    use BackupTrait;
+
     /**
      * Compression type
      * @var bool|string|null
@@ -120,9 +122,7 @@ class BackupImport
      */
     public function filename($filename)
     {
-        if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
-        }
+        $filename = $this->getAbsolutePath($filename);
 
         if (!is_readable($filename)) {
             throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));

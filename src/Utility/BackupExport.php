@@ -25,14 +25,16 @@ namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\Filesystem\Folder;
 use Cake\Network\Exception\InternalErrorException;
+use MysqlBackup\BackupTrait;
 
 /**
  * Utility to export databases
  */
 class BackupExport
 {
+    use BackupTrait;
+
     /**
      * @var \MysqlBackup\Utility\BackupManager
      */
@@ -183,17 +185,15 @@ class BackupExport
             '{$DATABASE}',
             '{$DATETIME}',
             '{$HOSTNAME}',
-            '{$TIMESTAMP}'
+            '{$TIMESTAMP}',
         ], [
             $this->connection['database'],
             date('YmdHis'),
             $this->connection['host'],
-            time()
+            time(),
         ], $filename);
 
-        if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
-        }
+        $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable(dirname($filename))) {
             throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not writable', dirname($filename)));

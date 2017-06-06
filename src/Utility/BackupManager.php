@@ -29,12 +29,15 @@ use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\Entity;
+use MysqlBackup\BackupTrait;
 
 /**
  * Utility to manage database backups
  */
 class BackupManager
 {
+    use BackupTrait;
+
     /**
      * Deletes a backup file
      * @param string $filename Filename
@@ -44,9 +47,7 @@ class BackupManager
      */
     public function delete($filename)
     {
-        if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
-        }
+        $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable($filename)) {
             throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not writable', $filename));
@@ -83,16 +84,16 @@ class BackupManager
      */
     public function index()
     {
-        $dir = Configure::read(MYSQL_BACKUP . '.target');
+        $target = $this->getTarget();
 
-        return collection((new Folder($dir))->find('.+\.sql(\.(gz|bz2))?'))
-            ->map(function ($file) use ($dir) {
+        return collection((new Folder($target))->find('.+\.sql(\.(gz|bz2))?'))
+            ->map(function ($file) use ($target) {
                 return new Entity([
                     'filename' => $file,
                     'extension' => extensionFromFile($file),
                     'compression' => compressionFromFile($file),
-                    'size' => filesize($dir . DS . $file),
-                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($dir . DS . $file))),
+                    'size' => filesize($target . DS . $file),
+                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $file))),
                 ]);
             })
             ->sortBy('datetime')
@@ -143,9 +144,7 @@ class BackupManager
             throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender in the configuration'));
         }
 
-        if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
-        }
+        $filename = $this->getAbsolutePath($filename);
 
         return (new Email)
             ->setFrom($sender)

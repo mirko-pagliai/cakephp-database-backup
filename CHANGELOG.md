@@ -5,6 +5,7 @@
     files via mail;
 * added `BackupExport::send()` to set up the email recipient, so by calling the
     `export()` method the backup file will be sent via email;
+* added `BackupTrait`,  that provides some methods used by all other classes;
 * all methods belonging to the `BackupManager` class are no longer static.
 
 ## 1.0 branch
