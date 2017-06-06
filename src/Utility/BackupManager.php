@@ -26,26 +26,29 @@ namespace MysqlBackup\Utility;
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\I18n\FrozenTime;
+use Cake\Mailer\Email;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\Entity;
+use MysqlBackup\BackupTrait;
 
 /**
  * Utility to manage database backups
  */
 class BackupManager
 {
+    use BackupTrait;
+
     /**
      * Deletes a backup file
-     * @param string $filename Filename
+     * @param string $filename Filename of the backup that you want to delete.
+     *  The path can be relative to the backup directory
      * @return bool
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws InternalErrorException
      */
-    public static function delete($filename)
+    public function delete($filename)
     {
-        if (!Folder::isAbsolute($filename)) {
-            $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
-        }
+        $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable($filename)) {
             throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not writable', $filename));
@@ -62,12 +65,12 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public static function deleteAll()
+    public function deleteAll()
     {
         $deleted = [];
 
-        foreach (self::index() as $file) {
-            if (self::delete($file->filename)) {
+        foreach ($this->index() as $file) {
+            if ($this->delete($file->filename)) {
                 $deleted[] = $file->filename;
             }
         }
@@ -80,18 +83,18 @@ class BackupManager
      * @return array Backups as entities
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public static function index()
+    public function index()
     {
-        $dir = Configure::read(MYSQL_BACKUP . '.target');
+        $target = $this->getTarget();
 
-        return collection((new Folder($dir))->find('.+\.sql(\.(gz|bz2))?'))
-            ->map(function ($file) use ($dir) {
+        return collection((new Folder($target))->find('.+\.sql(\.(gz|bz2))?'))
+            ->map(function ($file) use ($target) {
                 return new Entity([
                     'filename' => $file,
-                    'extension' => extensionFromFile($file),
-                    'compression' => compressionFromFile($file),
-                    'size' => filesize($dir . DS . $file),
-                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($dir . DS . $file))),
+                    'extension' => $this->getExtension($file),
+                    'compression' => $this->getCompression($file),
+                    'size' => filesize($target . DS . $file),
+                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $file))),
                 ]);
             })
             ->sortBy('datetime')
@@ -110,19 +113,58 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public static function rotate($rotate)
+    public function rotate($rotate)
     {
         if (!isPositive($rotate)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
         }
 
-        $backupsToBeDeleted = array_slice(self::index(), $rotate);
+        $backupsToBeDeleted = array_slice($this->index(), $rotate);
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
-            self::delete($backup->filename);
+            $this->delete($backup->filename);
         }
 
         return $backupsToBeDeleted;
+    }
+
+    /**
+     * Internal method to send a backup file via email
+     * @param string $filename Filename
+     * @param string $recipient Recipient's email address
+     * @return \Cake\Mailer\Email
+     * @since 1.1.0
+     * @throws InternalErrorException
+     */
+    protected function _send($filename, $recipient)
+    {
+        $sender = Configure::read(MYSQL_BACKUP . '.mailSender');
+
+        if (!$sender) {
+            throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender in the configuration'));
+        }
+
+        $filename = $this->getAbsolutePath($filename);
+
+        return (new Email)
+            ->setFrom($sender)
+            ->setTo($recipient)
+            ->setSubject(__d('mysql_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
+            ->setAttachments($filename);
+    }
+
+    /**
+     * Sends a backup file via email
+     * @param string $filename Filename of the backup that you want to send via
+     *  email. The path can be relative to the backup directory
+     * @param string $recipient Recipient's email address
+     * @return array
+     * @since 1.1.0
+     * @uses _send()
+     */
+    public function send($filename, $recipient)
+    {
+        return $this->_send($filename, $recipient)->send();
     }
 }

@@ -23,6 +23,7 @@
  */
 namespace MysqlBackup\Shell;
 
+use Cake\Console\ConsoleIo;
 use Cake\Console\Shell;
 use Cake\I18n\Number;
 use MysqlBackup\Utility\BackupExport;
@@ -35,15 +36,33 @@ use MysqlBackup\Utility\BackupManager;
 class BackupShell extends Shell
 {
     /**
+     * @var \MysqlBackup\Utility\BackupManager
+     */
+    protected $BackupManager;
+
+    /**
+     * Constructor
+     * @param \Cake\Console\ConsoleIo|null $io An io instance
+     * @uses $BackupManager
+     */
+    public function __construct(ConsoleIo $io = null)
+    {
+        parent::__construct($io);
+
+        $this->BackupManager = new BackupManager;
+    }
+
+    /**
      * Deletes all backup files
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#deleteAll
      * @since 1.0.1
      * @uses MysqlBackup\Utility\BackupManager::deleteAll()
+     * @uses $BackupManager
      */
     public function deleteAll()
     {
-        $deleted = BackupManager::deleteAll();
+        $deleted = $this->BackupManager->deleteAll();
 
         if (!$deleted) {
             $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
@@ -52,7 +71,7 @@ class BackupShell extends Shell
         }
 
         foreach ($deleted as $file) {
-            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file));
+            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', rtr($file)));
         }
 
         $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
@@ -66,11 +85,12 @@ class BackupShell extends Shell
      * @uses MysqlBackup\Utility\BackupExport::export()
      * @uses MysqlBackup\Utility\BackupExport::filename()
      * @uses rotate()
+     * @uses send()
      */
     public function export()
     {
         try {
-            $instance = new BackupExport();
+            $instance = new BackupExport;
 
             //Sets the output filename or the compression type.
             //Regarding the `rotate` option, the `BackupShell::rotate()` method
@@ -88,9 +108,14 @@ class BackupShell extends Shell
             }
 
             //Exports
-            $backup = $instance->export();
+            $file = $instance->export();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', $backup));
+            $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', rtr($file)));
+
+            //Sends via email
+            if ($this->param('send')) {
+                $this->send($file, $this->param('send'));
+            }
 
             //Rotates
             if ($this->param('rotate')) {
@@ -112,9 +137,9 @@ class BackupShell extends Shell
     public function import($filename)
     {
         try {
-            $backup = (new BackupImport())->filename($filename)->import();
+            $file = (new BackupImport)->filename($filename)->import();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', $backup));
+            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -125,11 +150,12 @@ class BackupShell extends Shell
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#index
      * @uses MysqlBackup\Utility\BackupManager::index()
+     * @uses $BackupManager
      */
     public function index()
     {
         //Gets all backups
-        $backups = BackupManager::index();
+        $backups = $this->BackupManager->index();
 
         $this->out(__d('mysql_backup', 'Backup files found: {0}', count($backups)));
 
@@ -179,12 +205,13 @@ class BackupShell extends Shell
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#rotate
      * @uses MysqlBackup\Utility\BackupManager::rotate()
+     * @uses $BackupManager
      */
     public function rotate($keep)
     {
         try {
             //Gets deleted files
-            $deleted = BackupManager::rotate($keep);
+            $deleted = $this->BackupManager->rotate($keep);
 
             if (empty($deleted)) {
                 $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
@@ -197,6 +224,27 @@ class BackupShell extends Shell
             }
 
             $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+        } catch (\Exception $e) {
+            $this->abort($e->getMessage());
+        }
+    }
+
+    /**
+     * Sends a backup file via email
+     * @param string $filename Filename of the backup that you want to send via
+     *  email. The path can be relative to the backup directory
+     * @param string $recipient Recipient's email address
+     * @return void
+     * @since 1.1.0
+     * @uses MysqlBackup\Utility\BackupManager::send()
+     * @uses $BackupManager
+     */
+    public function send($filename, $recipient)
+    {
+        try {
+            $this->BackupManager->send($filename, $recipient);
+
+            $this->success(__d('mysql_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -218,21 +266,26 @@ class BackupShell extends Shell
             'help' => __d('mysql_backup', 'Exports a database backup'),
             'parser' => [
                 'options' => [
+                    'compression' => [
+                        'choices' => ['gzip', 'bzip2', 'none'],
+                        'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
+                        'short' => 'c',
+                    ],
                     'filename' => [
                         'help' => __d('mysql_backup', 'Filename. It can be an absolute path and may contain ' .
                             'patterns. The compression type will be automatically setted'),
                         'short' => 'f',
                     ],
-                    'compression' => [
-                        'choices' => ['gzip', 'bzip2', 'none'],
-                        'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
-                        'short' => 'c'
-                    ],
                     'rotate' => [
                         'help' => __d('mysql_backup', 'Rotates backups. You have to indicate the number of backups you ' .
                             'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
-                        'short' => 'r'
-                    ]
+                        'short' => 'r',
+                    ],
+                    'send' => [
+                        'help' => __d('mysql_backup', 'Sends the backup file via email. You have ' .
+                            'to indicate the recipient\'s email address'),
+                        'short' => 's',
+                    ],
                 ],
             ],
         ]);
@@ -258,6 +311,22 @@ class BackupShell extends Shell
                     'keep' => [
                         'help' => __d('mysql_backup', 'Number of backups you want to keep. So, it ' .
                             'will delete all backups that are older'),
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $parser->addSubcommand('send', [
+            'help' => __d('mysql_backup', 'Send a database backup via mail'),
+            'parser' => [
+                'arguments' => [
+                    'filename' => [
+                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'required' => true,
+                    ],
+                    'recipient' => [
+                        'help' => __d('mysql_backup', 'Recipient\'s email address'),
                         'required' => true,
                     ],
                 ],

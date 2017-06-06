@@ -1,4 +1,19 @@
 # 1.x branch
+## 1.1 branch
+### 1.1.0
+* added `BackupShell::send()` and `BackupManager::send()` methods to send backup
+    files via mail;
+* added `--send` option to `BackupShell::export()`;
+* added `BackupExport::send()` to set up the email recipient, so by calling the
+    `export()` method the backup file will be sent via email;
+* added `BackupTrait`,  that provides some methods used by all other classes;
+* added `rtr()` (relative to root) global function. This simplifies the output
+    of some methods provided by `BackupShell`;
+* global functions `compressionFromFile()`, `extensionFromCompression()` and
+    `extensionFromFile()` have been replaced with the `getCompression()` and
+    `getExtension()` methods provided by the `BackupTrait`;
+* all methods belonging to the `BackupManager` class are no longer static.
+
 ## 1.0 branch
 ### 1.0.3
 * the target directory is created automatically, if it does not exist;

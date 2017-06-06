@@ -23,42 +23,61 @@
 namespace MysqlBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\TestSuite\EmailAssertTrait;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupManager;
+use Reflection\ReflectionTrait;
 
 /**
  * BackupManagerTest class
  */
 class BackupManagerTest extends TestCase
 {
+    use EmailAssertTrait;
+    use ReflectionTrait;
+
     /**
      * @var \MysqlBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
     /**
-     * Creates some backups
+     * @var \MysqlBackup\Utility\BackupManager
+     */
+    protected $BackupManager;
+
+    /**
+     * Internal method to create a backup file
+     * @return string
+     */
+    protected function _createBackup()
+    {
+        return $this->BackupExport->filename('backup.sql')->export();
+    }
+
+    /**
+     * Internal method to create some backup files
      * @param bool $sleep If `true`, waits a second for each backup
      * @return array
      */
     protected function _createSomeBackups($sleep = false)
     {
-        $this->BackupExport->filename('backup.sql')->export();
+        $files[] = $this->BackupExport->filename('backup.sql')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.bz2')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.gz')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
-        return BackupManager::index();
+        return $files;
     }
 
     /**
@@ -82,6 +101,7 @@ class BackupManagerTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport;
+        $this->BackupManager = new BackupManager;
 
         $this->_deleteAllBackups();
     }
@@ -108,14 +128,14 @@ class BackupManagerTest extends TestCase
         $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
-        $this->assertTrue(BackupManager::delete($filename));
+        $this->assertTrue($this->BackupManager->delete($filename));
         $this->assertFileNotExists($filename);
 
         //Relative path
         $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
-        $this->assertTrue(BackupManager::delete(basename($filename)));
+        $this->assertTrue($this->BackupManager->delete(basename($filename)));
         $this->assertFileNotExists($filename);
     }
 
@@ -128,13 +148,13 @@ class BackupManagerTest extends TestCase
         //Creates some backups
         $this->_createSomeBackups(true);
 
-        $this->assertNotEmpty(BackupManager::index());
+        $this->assertNotEmpty($this->BackupManager->index());
         $this->assertEquals([
             'backup.sql.gz',
             'backup.sql.bz2',
             'backup.sql',
-        ], BackupManager::deleteAll());
-        $this->assertEmpty(BackupManager::index());
+        ], $this->BackupManager->deleteAll());
+        $this->assertEmpty($this->BackupManager->index());
     }
 
     /**
@@ -145,7 +165,7 @@ class BackupManagerTest extends TestCase
      */
     public function testDeleteNoExistingFile()
     {
-        BackupManager::delete('noExistingFile.sql');
+        $this->BackupManager->delete('noExistingFile.sql');
     }
 
     /**
@@ -154,16 +174,17 @@ class BackupManagerTest extends TestCase
      */
     public function testIndex()
     {
-        $this->assertEmpty(BackupManager::index());
+        $this->assertEmpty($this->BackupManager->index());
 
         //Creates a text file. This file should be ignored
         file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'text.txt', null);
 
-        $this->assertEmpty(BackupManager::index());
+        $this->assertEmpty($this->BackupManager->index());
 
         //Creates some backups
-        $files = $this->_createSomeBackups(true);
-        $this->assertEquals(3, count(BackupManager::index()));
+        $this->_createSomeBackups(true);
+        $files = $this->BackupManager->index();
+        $this->assertEquals(3, count($files));
 
         //Checks compressions
         $compressions = collection($files)->extract('compression')->toArray();
@@ -195,23 +216,24 @@ class BackupManagerTest extends TestCase
      */
     public function testRotate()
     {
-        $this->assertEquals([], BackupManager::rotate(1));
+        $this->assertEquals([], $this->BackupManager->rotate(1));
 
         //Creates some backups
-        $files = $this->_createSomeBackups(true);
+        $this->_createSomeBackups(true);
+        $initialFiles = $this->BackupManager->index();
 
         //Keeps 2 backups. Only 1 backup was deleted
-        $rotate = BackupManager::rotate(2);
+        $rotate = $this->BackupManager->rotate(2);
         $this->assertEquals(1, count($rotate));
 
         //Now there are two files. Only uncompressed file was deleted
-        $filesAfterRotate = BackupManager::index();
+        $filesAfterRotate = $this->BackupManager->index();
         $this->assertEquals(2, count($filesAfterRotate));
         $this->assertEquals('gzip', $filesAfterRotate[0]->compression);
         $this->assertEquals('bzip2', $filesAfterRotate[1]->compression);
 
         //Gets the difference
-        $diff = array_udiff($files, $filesAfterRotate, function ($a, $b) {
+        $diff = array_udiff($initialFiles, $filesAfterRotate, function ($a, $b) {
             return strcmp($a->filename, $b->filename);
         });
 
@@ -230,6 +252,47 @@ class BackupManagerTest extends TestCase
      */
     public function testRotateWithInvalidValue()
     {
-        BackupManager::rotate(-1);
+        $this->BackupManager->rotate(-1);
+    }
+
+    /**
+     * Test for `send()` and `_send()` methods
+     * @test
+     */
+    public function testSend()
+    {
+        $to = 'recipient@example.com';
+
+        //Get a backup file
+        $file = $this->_createBackup();
+
+        $instance = new BackupManager;
+        $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
+        $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
+
+        $this->assertEmailFrom(Configure::read(MYSQL_BACKUP . '.mailSender'));
+        $this->assertEmailTo($to);
+        $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
+        $this->assertEmailAttachmentsContains(basename($file), [
+            'file' => $file,
+            'mimetype' => mime_content_type($file),
+        ]);
+
+        $send = $this->BackupManager->send($file, $to);
+        $this->assertNotEmpty($send);
+        $this->assertEquals(['headers', 'message'], array_keys($send));
+    }
+
+    /**
+     * Test for `send()` method, without a sender in the configuration
+     * @test
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage You must first set the mail sender in the configuration
+     */
+    public function testSendWithoutSenderInConfiguration()
+    {
+        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+
+        $this->BackupManager->send('file.sql', 'recipient@example.com');
     }
 }

@@ -42,6 +42,11 @@ class BackupShellTest extends TestCase
     protected $BackupExport;
 
     /**
+     * @var \MysqlBackup\Utility\BackupManager
+     */
+    protected $BackupManager;
+
+    /**
      * @var \MysqlBackup\Shell\BackupShell
      */
     protected $BackupShell;
@@ -77,6 +82,7 @@ class BackupShellTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport;
+        $this->BackupManager = new BackupManager;
 
         $this->out = new ConsoleOutput();
         $this->err = new ConsoleOutput();
@@ -99,33 +105,42 @@ class BackupShellTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->BackupExport, $this->BackupShell, $this->err, $this->out);
+        unset($this->BackupExport, $this->BackupManager, $this->BackupShell, $this->err, $this->out);
 
         $this->_deleteAllBackups();
     }
 
     /**
-     * Creates some backups
+     * Internal method to create a backup file
+     * @return string
+     */
+    protected function _createBackup()
+    {
+        return $this->BackupExport->filename('backup.sql')->export();
+    }
+
+    /**
+     * Internal method to creates some backup files
      * @param bool $sleep If `true`, waits a second for each backup
      * @return array
      */
     protected function _createSomeBackups($sleep = false)
     {
-        $this->BackupExport->filename('backup.sql')->export();
+        $files[] = $this->BackupExport->filename('backup.sql')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.bz2')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.gz')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
-        return BackupManager::index();
+        return $files;
     }
 
     /**
@@ -181,9 +196,16 @@ class BackupShellTest extends TestCase
         $this->BackupShell->params['rotate'] = 3;
         $this->BackupShell->export();
 
+        sleep(1);
+
+        //Exports, with `rotate` param
+        unset($this->BackupShell->params['rotate']);
+        $this->BackupShell->params['send'] = 'mymail@example.com';
+        $this->BackupShell->export();
+
         $output = $this->out->messages();
 
-        $this->assertEquals(6, count($output));
+        $this->assertEquals(8, count($output));
 
         $this->assertRegExp(
             '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/',
@@ -200,6 +222,14 @@ class BackupShellTest extends TestCase
         );
         $this->assertRegExp('/^Backup `backup_test_[0-9]{14}\.sql` has been deleted$/', next($output));
         $this->assertEquals('<success>Deleted backup files: 1</success>', next($output));
+        $this->assertRegExp(
+            '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql` has been exported\<\/success\>$/',
+            next($output)
+        );
+        $this->assertRegExp(
+            '/^\<success\>Backup `\/tmp\/backups\/backup_test_[0-9]{14}\.sql` was sent via mail\<\/success\>$/',
+            next($output)
+        );
 
         $this->assertEmpty($this->err->messages());
     }
@@ -225,7 +255,8 @@ class BackupShellTest extends TestCase
         $this->BackupShell->index();
 
         //Creates some backups
-        $backups = $this->_createSomeBackups(true);
+        $this->_createSomeBackups(true);
+        $backups = $this->BackupManager->index();
 
         $this->BackupShell->index();
 
@@ -353,6 +384,35 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Test for `send()` method
+     * @test
+     */
+    public function testSend()
+    {
+        //Gets a backup file
+        $file = $this->_createBackup();
+
+        $this->BackupShell->send($file, 'recipient@example.com');
+
+        $this->assertEquals([
+            '<success>Backup `/tmp/backups/backup.sql` was sent via mail</success>',
+        ], $this->out->messages());
+        $this->assertEmpty($this->err->messages());
+    }
+
+    /**
+     * Test for `send()` method, without a sender in the configuration
+     * @test
+     * @expectedException Cake\Console\Exception\StopException
+     */
+    public function testSendWithoutSenderInConfiguration()
+    {
+        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+
+        $this->BackupShell->send('file.sql', 'recipient@example.com');
+    }
+
+    /**
      * Test for `getOptionParser()` method
      * @test
      */
@@ -367,6 +427,7 @@ class BackupShellTest extends TestCase
             'import',
             'index',
             'rotate',
+            'send',
         ], array_keys($parser->subcommands()));
         $this->assertEquals('Shell to handle database backups', $parser->getDescription());
         $this->assertEquals(['help', 'quiet', 'verbose'], array_keys($parser->options()));
