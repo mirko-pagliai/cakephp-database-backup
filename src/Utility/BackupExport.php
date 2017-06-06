@@ -34,6 +34,11 @@ use Cake\Network\Exception\InternalErrorException;
 class BackupExport
 {
     /**
+     * @var \MysqlBackup\Utility\BackupManager
+     */
+    public $BackupManager;
+
+    /**
      * Compression type
      * @var bool|string|null
      */
@@ -46,10 +51,10 @@ class BackupExport
     protected $connection;
 
     /**
-     * Deletes the backup after sending via email
-     * @var bool
+     * Recipient of the email, if you want to send the backup via mail
+     * @var bool|string
      */
-    protected $deleteAfterSending = false;
+    protected $emailRecipient = false;
 
     /**
      * Executable command
@@ -77,18 +82,13 @@ class BackupExport
     protected $rotate;
 
     /**
-     * Sets that the backup is sent via email
-     * @var bool
-     */
-    protected $send = false;
-
-    /**
      * Construct
      * @uses $connection
      */
     public function __construct()
     {
         $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
+        $this->BackupManager = new BackupManager;
     }
 
     /**
@@ -232,25 +232,15 @@ class BackupExport
     }
 
     /**
-     * Sets that the backup is sent via email.
-     *
-     * If `$deleteAfterSending` is `true` the backup file will be deleted after
-     *  sending.
-     * @param bool $enable Enable/disable sending the backup
-     * @param bool $deleteAfterSending Deletes the backup after sending
+     * Sets the recipient to send the backup file via mail
+     * @param bool|string $recipient Email recipient. `false` to disable
      * @return \MysqlBackup\Utility\BackupExport
      * @since 1.1.0
-     * @uses $deleteAfterSending
-     * @uses $send
+     * @uses $emailRecipient
      */
-    public function send($enable = true, $deleteAfterSending = false)
+    public function send($recipient = false)
     {
-        if (!$enable) {
-            $deleteAfterSending = false;
-        }
-
-        $this->send = $enable;
-        $this->deleteAfterSending = $deleteAfterSending;
+        $this->emailRecipient = $recipient;
 
         return $this;
     }
@@ -260,9 +250,11 @@ class BackupExport
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#export
      * @uses MysqlBackup\Utility\BackupManager::rotate()
+     * @uses MysqlBackup\Utility\BackupManager::send()
      * @uses _getExecutable()
      * @uses _storeAuth()
      * @uses filename()
+     * @uses $BackupManager;
      * @uses $compression
      * @uses $connection
      * @uses $extension
@@ -291,9 +283,13 @@ class BackupExport
 
         chmod($filename, Configure::read(MYSQL_BACKUP . '.chmod'));
 
+        if ($this->emailRecipient) {
+            $this->BackupManager->send($filename, $this->emailRecipient);
+        }
+
         //Rotates backups
         if ($this->rotate) {
-            BackupManager::rotate($this->rotate);
+            $this->BackupManager->rotate($this->rotate);
         }
 
         return $filename;

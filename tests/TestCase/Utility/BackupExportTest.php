@@ -23,8 +23,10 @@
 namespace MysqlBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Log\Log;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\Utility\BackupExport;
+use MysqlBackup\Utility\BackupManager;
 use Reflection\ReflectionTrait;
 
 /**
@@ -50,6 +52,21 @@ class BackupExportTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport;
+
+        //Mocks the `send()` method of `BackupManager` class, so that it writes
+        //  on the debug log instead of sending a real mail
+        $this->BackupExport->BackupManager = $this->getMockBuilder(BackupManager::class)
+            ->setMethods(['send'])
+            ->getMock();
+
+        $this->BackupExport->BackupManager->method('send')
+            ->will($this->returnCallback(function () {
+                $args = implode(', ', array_map(function ($arg) {
+                    return '`' . $arg . '`';
+                }, func_get_args()));
+
+                return Log::write('debug', 'Called `send()` with args: ' . $args);
+            }));
     }
 
     /**
@@ -62,9 +79,14 @@ class BackupExportTest extends TestCase
 
         unset($this->BackupExport);
 
+        //Deletes debug log
+        //@codingStandardsIgnoreLine
+        @unlink(LOGS . 'debug.log');
+
         //Deletes all backups
         foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
+            //@codingStandardsIgnoreLine
+            @unlink($file);
         }
     }
 
@@ -74,6 +96,7 @@ class BackupExportTest extends TestCase
      */
     public function testConstruct()
     {
+        $this->assertInstanceof('MysqlBackup\Utility\BackupManager', $this->BackupExport->BackupManager);
         $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
 
         $connection = $this->getProperty($this->BackupExport, 'connection');
@@ -81,12 +104,11 @@ class BackupExportTest extends TestCase
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
 
-        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
         $this->assertNull($this->getProperty($this->BackupExport, 'executable'));
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
         $this->assertNull($this->getProperty($this->BackupExport, 'rotate'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'send'));
     }
 
     /**
@@ -248,25 +270,13 @@ class BackupExportTest extends TestCase
      */
     public function testSend()
     {
+        $recipient = 'recipient@example.com';
+
         $this->BackupExport->send();
-        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
 
-        $this->BackupExport->send(true);
-        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
-
-        $this->BackupExport->send(true, false);
-        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
-
-        $this->BackupExport->send(true, true);
-        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
-        $this->assertTrue($this->getProperty($this->BackupExport, 'deleteAfterSending'));
-
-        $this->BackupExport->send(false);
-        $this->assertFalse($this->getProperty($this->BackupExport, 'send'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+        $this->BackupExport->send($recipient);
+        $this->assertEquals($recipient, $this->getProperty($this->BackupExport, 'emailRecipient'));
     }
 
     /**
@@ -378,5 +388,18 @@ class BackupExportTest extends TestCase
         //Exports with a different chmod
         $filename = $this->BackupExport->filename('backup2.sql')->export();
         $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
+    }
+
+    /**
+     * Test for `export()` method, after calling the `send()` method
+     * @test
+     */
+    public function testExportWithSend()
+    {
+        $recipient = 'recipient@example.com';
+        $filename = $this->BackupExport->send($recipient)->export();
+
+        $log = file_get_contents(LOGS . 'debug.log');
+        $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
     }
 }

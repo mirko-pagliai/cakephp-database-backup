@@ -24,6 +24,7 @@ use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
+use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Routing\DispatcherFactory;
 
@@ -114,6 +115,14 @@ Configure::write('MysqlBackup.mailSender', 'sender@example.com');
 Plugin::load('MysqlBackup', [
     'bootstrap' => true,
     'path' => ROOT,
+]);
+
+//Sets debug log
+Log::config('debug', [
+    'className' => 'File',
+    'path' => LOGS,
+    'levels' => ['notice', 'info', 'debug'],
+    'file' => 'debug',
 ]);
 
 DispatcherFactory::add('Routing');
