@@ -239,6 +239,7 @@ class BackupExport
      * @param bool $enable Enable/disable sending the backup
      * @param bool $deleteAfterSending Deletes the backup after sending
      * @return \MysqlBackup\Utility\BackupExport
+     * @since 1.1.0
      * @uses $deleteAfterSending
      * @uses $send
      */
