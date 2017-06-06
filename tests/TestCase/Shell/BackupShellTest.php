@@ -42,6 +42,11 @@ class BackupShellTest extends TestCase
     protected $BackupExport;
 
     /**
+     * @var \MysqlBackup\Utility\BackupManager
+     */
+    protected $BackupManager;
+
+    /**
      * @var \MysqlBackup\Shell\BackupShell
      */
     protected $BackupShell;
@@ -77,6 +82,7 @@ class BackupShellTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport;
+        $this->BackupManager = new BackupManager;
 
         $this->out = new ConsoleOutput();
         $this->err = new ConsoleOutput();
@@ -99,33 +105,42 @@ class BackupShellTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->BackupExport, $this->BackupShell, $this->err, $this->out);
+        unset($this->BackupExport, $this->BackupManager, $this->BackupShell, $this->err, $this->out);
 
         $this->_deleteAllBackups();
     }
 
     /**
-     * Creates some backups
+     * Internal method to create a backup file
+     * @return string
+     */
+    protected function _createBackup()
+    {
+        return $this->BackupExport->filename('backup.sql')->export();
+    }
+
+    /**
+     * Internal method to creates some backup files
      * @param bool $sleep If `true`, waits a second for each backup
      * @return array
      */
     protected function _createSomeBackups($sleep = false)
     {
-        $this->BackupExport->filename('backup.sql')->export();
+        $files[] = $this->BackupExport->filename('backup.sql')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.bz2')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.gz')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
-        return (new BackupManager)->index();
+        return $files;
     }
 
     /**
@@ -225,7 +240,8 @@ class BackupShellTest extends TestCase
         $this->BackupShell->index();
 
         //Creates some backups
-        $backups = $this->_createSomeBackups(true);
+        $this->_createSomeBackups(true);
+        $backups = $this->BackupManager->index();
 
         $this->BackupShell->index();
 
@@ -359,7 +375,7 @@ class BackupShellTest extends TestCase
     public function testSend()
     {
         //Gets a backup file
-        $file = collection($this->_createSomeBackups())->extract('filename')->first();
+        $file = $this->_createBackup();
 
         $this->BackupShell->send($file, 'recipient@example.com');
 

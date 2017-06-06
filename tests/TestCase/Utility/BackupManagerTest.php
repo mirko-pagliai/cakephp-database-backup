@@ -48,27 +48,36 @@ class BackupManagerTest extends TestCase
     protected $BackupManager;
 
     /**
-     * Creates some backups
+     * Internal method to create a backup file
+     * @return string
+     */
+    protected function _createBackup()
+    {
+        return $this->BackupExport->filename('backup.sql')->export();
+    }
+
+    /**
+     * Internal method to create some backup files
      * @param bool $sleep If `true`, waits a second for each backup
      * @return array
      */
     protected function _createSomeBackups($sleep = false)
     {
-        $this->BackupExport->filename('backup.sql')->export();
+        $files[] = $this->BackupExport->filename('backup.sql')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.bz2')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
 
         if ($sleep) {
             sleep(1);
         }
 
-        $this->BackupExport->filename('backup.sql.gz')->export();
+        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
-        return $this->BackupManager->index();
+        return $files;
     }
 
     /**
@@ -173,8 +182,9 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty($this->BackupManager->index());
 
         //Creates some backups
-        $files = $this->_createSomeBackups(true);
-        $this->assertEquals(3, count($this->BackupManager->index()));
+        $this->_createSomeBackups(true);
+        $files = $this->BackupManager->index();
+        $this->assertEquals(3, count($files));
 
         //Checks compressions
         $compressions = collection($files)->extract('compression')->toArray();
@@ -209,7 +219,8 @@ class BackupManagerTest extends TestCase
         $this->assertEquals([], $this->BackupManager->rotate(1));
 
         //Creates some backups
-        $files = $this->_createSomeBackups(true);
+        $this->_createSomeBackups(true);
+        $initialFiles = $this->BackupManager->index();
 
         //Keeps 2 backups. Only 1 backup was deleted
         $rotate = $this->BackupManager->rotate(2);
@@ -222,7 +233,7 @@ class BackupManagerTest extends TestCase
         $this->assertEquals('bzip2', $filesAfterRotate[1]->compression);
 
         //Gets the difference
-        $diff = array_udiff($files, $filesAfterRotate, function ($a, $b) {
+        $diff = array_udiff($initialFiles, $filesAfterRotate, function ($a, $b) {
             return strcmp($a->filename, $b->filename);
         });
 
@@ -253,22 +264,21 @@ class BackupManagerTest extends TestCase
         $to = 'recipient@example.com';
 
         //Get a backup file
-        $filename = collection($this->_createSomeBackups())->extract('filename')->first();
-        $path = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
+        $file = $this->_createBackup();
 
         $instance = new BackupManager;
-        $this->_email = $this->invokeMethod($instance, '_send', [$filename, $to]);
+        $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
         $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
 
         $this->assertEmailFrom(Configure::read(MYSQL_BACKUP . '.mailSender'));
         $this->assertEmailTo($to);
-        $this->assertEmailSubject('Database backup ' . $filename . ' from localhost');
-        $this->assertEmailAttachmentsContains(basename($filename), [
-            'file' => $path,
-            'mimetype' => mime_content_type($path),
+        $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
+        $this->assertEmailAttachmentsContains(basename($file), [
+            'file' => $file,
+            'mimetype' => mime_content_type($file),
         ]);
 
-        $send = $this->BackupManager->send($filename, $to);
+        $send = $this->BackupManager->send($file, $to);
         $this->assertNotEmpty($send);
         $this->assertEquals(['headers', 'message'], array_keys($send));
     }
