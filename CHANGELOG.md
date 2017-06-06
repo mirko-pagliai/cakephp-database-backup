@@ -1,6 +1,10 @@
 # 1.x branch
 ## 1.1 branch
 ### 1.1.0
+* added `BackupShell::send()` and `BackupManager::send()` methods to send backup
+    files via mail;
+* added `BackupExport::send()` to set up the email recipient, so by calling the
+    `export()` method the backup file will be sent via email;
 * all methods belonging to the `BackupManager` class are no longer static.
 
 ## 1.0 branch

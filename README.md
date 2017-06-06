@@ -34,6 +34,10 @@ The installation of these binaries may vary depending on your operating system.
 The plugin uses some configuration parameters. See our wiki:
 * [Configuration](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/Configuration)
 
+If you want to send backup files by email, remember to set up your application
+correctly so that it can send emails. For more information on how to configure
+your application, see the [Cookbook](https://book.cakephp.org/3.0/en/core-libraries/email.html#configuring-transports).
+
 ## How to use
 See our wiki:
 * [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility)
