@@ -4,7 +4,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2017-06-06 15:55+0200\n"
+"POT-Creation-Date: 2017-06-06 16:15+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -12,107 +12,111 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:49;190
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:68;217
 msgid "No backup has been deleted"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:55;196
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:74;223
 msgid "Backup `{0}` has been deleted"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:58;199
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:77;226
 msgid "Deleted backup files: {0}"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:93
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:113
 msgid "Backup `{0}` has been exported"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:117
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:142
 msgid "Backup `{0}` has been imported"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:134
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:160
 msgid "Backup files found: {0}"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:141
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:167
 msgid "none"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:152
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:178
 msgid "Filename"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:153
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:179
 msgid "Extension"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:154
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:180
 msgid "Compression"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:155
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:181
 msgid "Size"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:156
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:182
 msgid "Datetime"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:219
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:247
 msgid "Backup `{0}` was sent via mail"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:233
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:261
 msgid "Shell to handle database backups"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:235
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:263
 msgid "Deletes all database backups"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:238
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:266
 msgid "Exports a database backup"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:242
-msgid "Filename. It can be an absolute path and may contain patterns. The compression type will be automatically setted"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:248
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:271
 msgid "Compression type. By default, no compression will be used"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:252
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:275
+msgid "Filename. It can be an absolute path and may contain patterns. The compression type will be automatically setted"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:280
 msgid "Rotates backups. You have to indicate the number of backups you want to keep. So, it will delete all backups that are older. By default, no backup will be deleted"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:260
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:285
+msgid "Sends the backup file via email. You have to indicate the recipient's email address"
+msgstr ""
+
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:293
 msgid "Lists database backups"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:263
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:296
 msgid "Imports a database backup"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:267;292
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:300;325
 msgid "Filename. It can be an absolute path"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:275
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:308
 msgid "Rotates backups"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:279
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:312
 msgid "Number of backups you want to keep. So, it will delete all backups that are older"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:288
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:321
 msgid "Send a database backup via mail"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:296
+#: /home/mirko/Libs/Plugins/cakephp-mysql-backup/src/Shell/BackupShell.php:329
 msgid "Recipient's email address"
 msgstr ""
 
