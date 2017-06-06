@@ -46,6 +46,12 @@ class BackupExport
     protected $connection;
 
     /**
+     * Deletes the backup after sending via email
+     * @var bool
+     */
+    protected $deleteAfterSending = false;
+
+    /**
      * Executable command
      * @var string
      */
@@ -69,6 +75,12 @@ class BackupExport
      * @var int
      */
     protected $rotate;
+
+    /**
+     * Sets that the backup is sent via email
+     * @var bool
+     */
+    protected $send = false;
 
     /**
      * Construct
@@ -215,6 +227,29 @@ class BackupExport
     public function rotate($rotate)
     {
         $this->rotate = $rotate;
+
+        return $this;
+    }
+
+    /**
+     * Sets that the backup is sent via email.
+     *
+     * If `$deleteAfterSending` is `true` the backup file will be deleted after
+     *  sending.
+     * @param bool $enable Enable/disable sending the backup
+     * @param bool $deleteAfterSending Deletes the backup after sending
+     * @return \MysqlBackup\Utility\BackupExport
+     * @uses $deleteAfterSending
+     * @uses $send
+     */
+    public function send($enable = true, $deleteAfterSending = false)
+    {
+        if (!$enable) {
+            $deleteAfterSending = false;
+        }
+
+        $this->send = $enable;
+        $this->deleteAfterSending = $deleteAfterSending;
 
         return $this;
     }

@@ -74,15 +74,19 @@ class BackupExportTest extends TestCase
      */
     public function testConstruct()
     {
+        $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
+
         $connection = $this->getProperty($this->BackupExport, 'connection');
         $this->assertEquals($connection['scheme'], 'mysql');
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
 
-        $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+        $this->assertNull($this->getProperty($this->BackupExport, 'executable'));
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
         $this->assertNull($this->getProperty($this->BackupExport, 'rotate'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'send'));
     }
 
     /**
@@ -236,6 +240,33 @@ class BackupExportTest extends TestCase
     public function testRotateWithInvalidValue()
     {
         $this->BackupExport->rotate(-1)->export();
+    }
+
+    /**
+     * Test for `send()` method
+     * @test
+     */
+    public function testSend()
+    {
+        $this->BackupExport->send();
+        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+
+        $this->BackupExport->send(true);
+        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+
+        $this->BackupExport->send(true, false);
+        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+
+        $this->BackupExport->send(true, true);
+        $this->assertTrue($this->getProperty($this->BackupExport, 'send'));
+        $this->assertTrue($this->getProperty($this->BackupExport, 'deleteAfterSending'));
+
+        $this->BackupExport->send(false);
+        $this->assertFalse($this->getProperty($this->BackupExport, 'send'));
+        $this->assertFalse($this->getProperty($this->BackupExport, 'deleteAfterSending'));
     }
 
     /**
