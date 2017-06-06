@@ -380,7 +380,7 @@ class BackupShellTest extends TestCase
         $this->BackupShell->send($file, 'recipient@example.com');
 
         $this->assertEquals([
-            '<success>The backup file was sent via mail</success>'
+            '<success>Backup `/tmp/backups/backup.sql` was sent via mail</success>',
         ], $this->out->messages());
         $this->assertEmpty($this->err->messages());
     }

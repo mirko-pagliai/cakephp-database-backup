@@ -23,6 +23,7 @@
  */
 namespace MysqlBackup\Shell;
 
+use Cake\Console\ConsoleIo;
 use Cake\Console\Shell;
 use Cake\I18n\Number;
 use MysqlBackup\Utility\BackupExport;
@@ -35,15 +36,33 @@ use MysqlBackup\Utility\BackupManager;
 class BackupShell extends Shell
 {
     /**
+     * @var \MysqlBackup\Utility\BackupManager
+     */
+    protected $BackupManager;
+
+    /**
+     * Constructor
+     * @param \Cake\Console\ConsoleIo|null $io An io instance
+     * @uses $BackupManager
+     */
+    public function __construct(ConsoleIo $io = null)
+    {
+        parent::__construct($io);
+
+        $this->BackupManager = new BackupManager;
+    }
+
+    /**
      * Deletes all backup files
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#deleteAll
      * @since 1.0.1
      * @uses MysqlBackup\Utility\BackupManager::deleteAll()
+     * @uses $BackupManager
      */
     public function deleteAll()
     {
-        $deleted = (new BackupManager)->deleteAll();
+        $deleted = $this->BackupManager->deleteAll();
 
         if (!$deleted) {
             $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
@@ -70,7 +89,7 @@ class BackupShell extends Shell
     public function export()
     {
         try {
-            $instance = new BackupExport();
+            $instance = new BackupExport;
 
             //Sets the output filename or the compression type.
             //Regarding the `rotate` option, the `BackupShell::rotate()` method
@@ -112,7 +131,7 @@ class BackupShell extends Shell
     public function import($filename)
     {
         try {
-            $file = (new BackupImport())->filename($filename)->import();
+            $file = (new BackupImport)->filename($filename)->import();
 
             $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (\Exception $e) {
@@ -125,11 +144,12 @@ class BackupShell extends Shell
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#index
      * @uses MysqlBackup\Utility\BackupManager::index()
+     * @uses $BackupManager
      */
     public function index()
     {
         //Gets all backups
-        $backups = (new BackupManager)->index();
+        $backups = $this->BackupManager->index();
 
         $this->out(__d('mysql_backup', 'Backup files found: {0}', count($backups)));
 
@@ -179,12 +199,13 @@ class BackupShell extends Shell
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#rotate
      * @uses MysqlBackup\Utility\BackupManager::rotate()
+     * @uses $BackupManager
      */
     public function rotate($keep)
     {
         try {
             //Gets deleted files
-            $deleted = (new BackupManager)->rotate($keep);
+            $deleted = $this->BackupManager->rotate($keep);
 
             if (empty($deleted)) {
                 $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
@@ -210,11 +231,12 @@ class BackupShell extends Shell
      * @return void
      * @since 1.1.0
      * @uses MysqlBackup\Utility\BackupManager::send()
+     * @uses $BackupManager
      */
     public function send($filename, $recipient)
     {
         try {
-            (new BackupManager)->send($filename, $recipient);
+            $this->BackupManager->send($filename, $recipient);
 
             $this->success(__d('mysql_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
         } catch (\Exception $e) {
