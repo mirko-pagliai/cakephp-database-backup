@@ -1,5 +1,8 @@
 # 1.x branch
 ## 1.1 branch
+### 1.1.1
+* added `BackupTrait::getValidCompressions()` method.
+
 ### 1.1.0
 * added `BackupShell::send()` and `BackupManager::send()` methods to send backup
     files via mail;

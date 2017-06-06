@@ -130,7 +130,7 @@ class BackupImport
 
         $compression = $this->getCompression($filename);
 
-        if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
+        if (!in_array($compression, $this->getValidCompressions(), true)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
         }
 

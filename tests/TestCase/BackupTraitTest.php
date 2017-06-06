@@ -104,6 +104,19 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getValidCompressions()` method
+     * @test
+     */
+    public function testGetValidCompressions()
+    {
+        $this->assertEquals([
+            'sql.bz2' => 'bzip2',
+            'sql.gz' => 'gzip',
+            'sql' => false,
+        ], $this->Trait->getValidCompressions());
+    }
+
+    /**
      * Test for `getTarget()` method
      * @test
      */
