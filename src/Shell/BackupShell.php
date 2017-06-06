@@ -203,6 +203,25 @@ class BackupShell extends Shell
     }
 
     /**
+     * Sends a backup file via email
+     * @param string $filename Filename
+     * @param string $to Recipient of the email
+     * @return void
+     * @since 1.1.0
+     * @uses MysqlBackup\Utility\BackupManager::send()
+     */
+    public function send($filename, $to)
+    {
+        try {
+            BackupManager::send($filename, $to);
+
+            $this->success(__d('mysql_backup', 'The backup file was sent via mail'));
+        } catch (\Exception $e) {
+            $this->abort($e->getMessage());
+        }
+    }
+
+    /**
      * Gets the option parser instance and configures it
      * @return ConsoleOptionParser
      */
@@ -258,6 +277,22 @@ class BackupShell extends Shell
                     'keep' => [
                         'help' => __d('mysql_backup', 'Number of backups you want to keep. So, it ' .
                             'will delete all backups that are older'),
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $parser->addSubcommand('send', [
+            'help' => __d('mysql_backup', 'Send a database backup via mail'),
+            'parser' => [
+                'arguments' => [
+                    'filename' => [
+                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'required' => true,
+                    ],
+                    'to' => [
+                        'help' => __d('mysql_backup', 'Recipient of the email'),
                         'required' => true,
                     ],
                 ],

@@ -353,6 +353,35 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Test for `send()` method
+     * @test
+     */
+    public function testSend()
+    {
+        //Gets a backup file
+        $file = collection($this->_createSomeBackups())->extract('filename')->first();
+
+        $this->BackupShell->send($file, 'recipient@example.com');
+
+        $this->assertEquals([
+            '<success>The backup file was sent via mail</success>'
+        ], $this->out->messages());
+        $this->assertEmpty($this->err->messages());
+    }
+
+    /**
+     * Test for `send()` method, without a sender in the configuration
+     * @test
+     * @expectedException Cake\Console\Exception\StopException
+     */
+    public function testSendWithoutSenderInConfiguration()
+    {
+        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+
+        $this->BackupShell->send('file.sql', 'recipient@example.com');
+    }
+
+    /**
      * Test for `getOptionParser()` method
      * @test
      */
@@ -367,6 +396,7 @@ class BackupShellTest extends TestCase
             'import',
             'index',
             'rotate',
+            'send',
         ], array_keys($parser->subcommands()));
         $this->assertEquals('Shell to handle database backups', $parser->getDescription());
         $this->assertEquals(['help', 'quiet', 'verbose'], array_keys($parser->options()));
