@@ -1,4 +1,8 @@
 # 1.x branch
+## 1.1 branch
+### 1.1.0
+* all methods belonging to the `BackupManager` class are no longer static.
+
 ## 1.0 branch
 ### 1.0.3
 * the target directory is created automatically, if it does not exist;

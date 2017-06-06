@@ -125,7 +125,7 @@ class BackupShellTest extends TestCase
 
         $this->BackupExport->filename('backup.sql.gz')->export();
 
-        return BackupManager::index();
+        return (new BackupManager)->index();
     }
 
     /**

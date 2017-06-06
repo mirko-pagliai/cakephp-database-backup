@@ -43,6 +43,11 @@ class BackupManagerTest extends TestCase
     protected $BackupExport;
 
     /**
+     * @var \MysqlBackup\Utility\BackupManager
+     */
+    protected $BackupManager;
+
+    /**
      * Creates some backups
      * @param bool $sleep If `true`, waits a second for each backup
      * @return array
@@ -63,7 +68,7 @@ class BackupManagerTest extends TestCase
 
         $this->BackupExport->filename('backup.sql.gz')->export();
 
-        return BackupManager::index();
+        return $this->BackupManager->index();
     }
 
     /**
@@ -87,6 +92,7 @@ class BackupManagerTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport;
+        $this->BackupManager = new BackupManager;
 
         $this->_deleteAllBackups();
     }
@@ -113,14 +119,14 @@ class BackupManagerTest extends TestCase
         $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
-        $this->assertTrue(BackupManager::delete($filename));
+        $this->assertTrue($this->BackupManager->delete($filename));
         $this->assertFileNotExists($filename);
 
         //Relative path
         $filename = $this->BackupExport->export();
 
         $this->assertFileExists($filename);
-        $this->assertTrue(BackupManager::delete(basename($filename)));
+        $this->assertTrue($this->BackupManager->delete(basename($filename)));
         $this->assertFileNotExists($filename);
     }
 
@@ -133,13 +139,13 @@ class BackupManagerTest extends TestCase
         //Creates some backups
         $this->_createSomeBackups(true);
 
-        $this->assertNotEmpty(BackupManager::index());
+        $this->assertNotEmpty($this->BackupManager->index());
         $this->assertEquals([
             'backup.sql.gz',
             'backup.sql.bz2',
             'backup.sql',
-        ], BackupManager::deleteAll());
-        $this->assertEmpty(BackupManager::index());
+        ], $this->BackupManager->deleteAll());
+        $this->assertEmpty($this->BackupManager->index());
     }
 
     /**
@@ -150,7 +156,7 @@ class BackupManagerTest extends TestCase
      */
     public function testDeleteNoExistingFile()
     {
-        BackupManager::delete('noExistingFile.sql');
+        $this->BackupManager->delete('noExistingFile.sql');
     }
 
     /**
@@ -159,16 +165,16 @@ class BackupManagerTest extends TestCase
      */
     public function testIndex()
     {
-        $this->assertEmpty(BackupManager::index());
+        $this->assertEmpty($this->BackupManager->index());
 
         //Creates a text file. This file should be ignored
         file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'text.txt', null);
 
-        $this->assertEmpty(BackupManager::index());
+        $this->assertEmpty($this->BackupManager->index());
 
         //Creates some backups
         $files = $this->_createSomeBackups(true);
-        $this->assertEquals(3, count(BackupManager::index()));
+        $this->assertEquals(3, count($this->BackupManager->index()));
 
         //Checks compressions
         $compressions = collection($files)->extract('compression')->toArray();
@@ -200,17 +206,17 @@ class BackupManagerTest extends TestCase
      */
     public function testRotate()
     {
-        $this->assertEquals([], BackupManager::rotate(1));
+        $this->assertEquals([], $this->BackupManager->rotate(1));
 
         //Creates some backups
         $files = $this->_createSomeBackups(true);
 
         //Keeps 2 backups. Only 1 backup was deleted
-        $rotate = BackupManager::rotate(2);
+        $rotate = $this->BackupManager->rotate(2);
         $this->assertEquals(1, count($rotate));
 
         //Now there are two files. Only uncompressed file was deleted
-        $filesAfterRotate = BackupManager::index();
+        $filesAfterRotate = $this->BackupManager->index();
         $this->assertEquals(2, count($filesAfterRotate));
         $this->assertEquals('gzip', $filesAfterRotate[0]->compression);
         $this->assertEquals('bzip2', $filesAfterRotate[1]->compression);
@@ -235,7 +241,7 @@ class BackupManagerTest extends TestCase
      */
     public function testRotateWithInvalidValue()
     {
-        BackupManager::rotate(-1);
+        $this->BackupManager->rotate(-1);
     }
 
     /**
@@ -262,7 +268,7 @@ class BackupManagerTest extends TestCase
             'mimetype' => mime_content_type($path),
         ]);
 
-        $send = BackupManager::send($file, $to);
+        $send = $this->BackupManager->send($file, $to);
         $this->assertNotEmpty($send);
         $this->assertEquals(['headers', 'message'], array_keys($send));
     }
@@ -277,6 +283,6 @@ class BackupManagerTest extends TestCase
     {
         Configure::write(MYSQL_BACKUP . '.mailSender', false);
 
-        BackupManager::send('file.sql', 'recipient@example.com');
+        $this->BackupManager->send('file.sql', 'recipient@example.com');
     }
 }

@@ -42,7 +42,7 @@ class BackupManager
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws InternalErrorException
      */
-    public static function delete($filename)
+    public function delete($filename)
     {
         if (!Folder::isAbsolute($filename)) {
             $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . $filename;
@@ -63,12 +63,12 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public static function deleteAll()
+    public function deleteAll()
     {
         $deleted = [];
 
-        foreach (self::index() as $file) {
-            if (self::delete($file->filename)) {
+        foreach ($this->index() as $file) {
+            if ($this->delete($file->filename)) {
                 $deleted[] = $file->filename;
             }
         }
@@ -81,7 +81,7 @@ class BackupManager
      * @return array Backups as entities
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public static function index()
+    public function index()
     {
         $dir = Configure::read(MYSQL_BACKUP . '.target');
 
@@ -111,17 +111,17 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public static function rotate($rotate)
+    public function rotate($rotate)
     {
         if (!isPositive($rotate)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
         }
 
-        $backupsToBeDeleted = array_slice(self::index(), $rotate);
+        $backupsToBeDeleted = array_slice($this->index(), $rotate);
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
-            self::delete($backup->filename);
+            $this->delete($backup->filename);
         }
 
         return $backupsToBeDeleted;
@@ -135,7 +135,7 @@ class BackupManager
      * @since 1.1.0
      * @throws InternalErrorException
      */
-    protected static function _send($filename, $to)
+    protected function _send($filename, $to)
     {
         $sender = Configure::read(MYSQL_BACKUP . '.mailSender');
 
@@ -162,8 +162,8 @@ class BackupManager
      * @since 1.1.0
      * @uses _send()
      */
-    public static function send($filename, $to)
+    public function send($filename, $to)
     {
-        return self::_send($filename, $to)->send();
+        return $this->_send($filename, $to)->send();
     }
 }

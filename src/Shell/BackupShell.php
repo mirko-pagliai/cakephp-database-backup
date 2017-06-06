@@ -43,7 +43,7 @@ class BackupShell extends Shell
      */
     public function deleteAll()
     {
-        $deleted = BackupManager::deleteAll();
+        $deleted = (new BackupManager)->deleteAll();
 
         if (!$deleted) {
             $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
@@ -129,7 +129,7 @@ class BackupShell extends Shell
     public function index()
     {
         //Gets all backups
-        $backups = BackupManager::index();
+        $backups = (new BackupManager)->index();
 
         $this->out(__d('mysql_backup', 'Backup files found: {0}', count($backups)));
 
@@ -184,7 +184,7 @@ class BackupShell extends Shell
     {
         try {
             //Gets deleted files
-            $deleted = BackupManager::rotate($keep);
+            $deleted = (new BackupManager)->rotate($keep);
 
             if (empty($deleted)) {
                 $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
@@ -213,7 +213,7 @@ class BackupShell extends Shell
     public function send($filename, $to)
     {
         try {
-            BackupManager::send($filename, $to);
+            (new BackupManager)->send($filename, $to);
 
             $this->success(__d('mysql_backup', 'The backup file was sent via mail'));
         } catch (\Exception $e) {
