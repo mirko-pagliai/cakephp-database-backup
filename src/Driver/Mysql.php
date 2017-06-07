@@ -71,7 +71,7 @@ class Mysql extends Driver
      * @return string Path of the temporary file
      * @uses $connection
      */
-    protected function getExportStoreAuth()
+    private function getExportStoreAuth()
     {
         $auth = tempnam(sys_get_temp_dir(), 'auth');
 
@@ -121,7 +121,7 @@ class Mysql extends Driver
      * @uses $connection
      * @return string Path of the temporary file
      */
-    protected function getImportStoreAuth()
+    private function getImportStoreAuth()
     {
         $auth = tempnam(sys_get_temp_dir(), 'auth');
 
