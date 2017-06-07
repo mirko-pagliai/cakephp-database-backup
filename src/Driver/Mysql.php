@@ -41,7 +41,7 @@ class Mysql extends Driver
      * @return string
      * @throws InternalErrorException
      */
-    protected function _getExportExecutable($filename)
+    protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
         $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
@@ -71,7 +71,7 @@ class Mysql extends Driver
      * @return string Path of the temporary file
      * @uses $connection
      */
-    protected function _getExportStoreAuth()
+    protected function getExportStoreAuth()
     {
         $auth = tempnam(sys_get_temp_dir(), 'auth');
 
@@ -91,7 +91,7 @@ class Mysql extends Driver
      * @return string
      * @throws InternalErrorException
      */
-    protected function _getImportExecutable($filename)
+    protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
         $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
@@ -121,7 +121,7 @@ class Mysql extends Driver
      * @uses $connection
      * @return string Path of the temporary file
      */
-    protected function _getImportStoreAuth()
+    protected function getImportStoreAuth()
     {
         $auth = tempnam(sys_get_temp_dir(), 'auth');
 
@@ -140,16 +140,16 @@ class Mysql extends Driver
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
      * @uses $connection
-     * @uses _getExportExecutable()
-     * @uses _getExportStoreAuth()
+     * @uses getExportExecutable()
+     * @uses getExportStoreAuth()
      */
     public function export($filename)
     {
         //Stores the authentication data in a temporary file
-        $auth = $this->_getExportStoreAuth();
+        $auth = $this->getExportStoreAuth();
 
         //Executes
-        exec(sprintf($this->_getExportExecutable($filename), $auth, $this->connection['database'], $filename));
+        exec(sprintf($this->getExportExecutable($filename), $auth, $this->connection['database'], $filename));
 
         //Deletes the temporary file with the authentication data
         unlink($auth);
@@ -162,16 +162,16 @@ class Mysql extends Driver
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
      * @uses $connection
-     * @uses _getImportExecutable()
-     * @uses _getImportStoreAuth()
+     * @uses getImportExecutable()
+     * @uses getImportStoreAuth()
      */
     public function import($filename)
     {
         //Stores the authentication data in a temporary file
-        $auth = $this->_getImportStoreAuth();
+        $auth = $this->getImportStoreAuth();
 
         //Executes
-        exec(sprintf($this->_getImportExecutable($filename), $filename, $auth, $this->connection['database']));
+        exec(sprintf($this->getImportExecutable($filename), $filename, $auth, $this->connection['database']));
 
         //Deletes the temporary file with the authentication data
         unlink($auth);

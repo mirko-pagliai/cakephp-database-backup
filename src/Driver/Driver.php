@@ -47,6 +47,20 @@ abstract class Driver
     }
 
     /**
+     * Gets the executable command to export the database
+     * @param string $filename Filename where you want to export the database
+     * @return string
+     */
+    abstract protected function getExportExecutable($filename);
+
+    /**
+     * Gets the executable command to import the database
+     * @param string $filename Filename from which you want to import the database
+     * @return string
+     */
+    abstract protected function getImportExecutable($filename);
+
+    /**
      * Exports the database
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
