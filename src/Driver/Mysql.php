@@ -36,7 +36,7 @@ class Mysql extends Driver
     use BackupTrait;
 
     /**
-     * Gets the executable command
+     * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string
      * @throws InternalErrorException
@@ -61,13 +61,14 @@ class Mysql extends Driver
     }
 
     /**
-     * Stores the authentication data in a temporary file.
+     * Stores the authentication data, to be used to export the database, in a
+     *  temporary file.
      *
      * For security reasons, it's recommended to specify the password in
      *  a configuration file and not in the command (a user can execute
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
-     * @return string File path
+     * @return string Path of the temporary file
      * @uses $connection
      */
     protected function _getExportStoreAuth()
@@ -76,6 +77,56 @@ class Mysql extends Driver
 
         file_put_contents($auth, sprintf(
             "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
+            $this->connection['username'],
+            empty($this->connection['password']) ? null : $this->connection['password'],
+            $this->connection['host']
+        ));
+
+        return $auth;
+    }
+
+    /**
+     * Gets the executable command to import the database
+     * @param string $filename Filename from which you want to import the database
+     * @return string
+     * @throws InternalErrorException
+     */
+    protected function _getImportExecutable($filename)
+    {
+        $compression = $this->getCompression($filename);
+        $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
+
+        if (in_array($compression, ['bzip2', 'gzip'])) {
+            $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
+
+            if (!$executable) {
+                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
+            }
+
+            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $executable, $mysql);
+        }
+
+        //No compression
+        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s', $mysql);
+    }
+
+    /**
+     * Stores the authentication data, to be used to import the database, in a
+     *  temporary file.
+     *
+     * For security reasons, it's recommended to specify the password in
+     *  a configuration file and not in the command (a user can execute
+     *  a `ps aux | grep mysqldump` and see the password).
+     *  So it creates a temporary file to store the configuration options
+     * @uses $connection
+     * @return string Path of the temporary file
+     */
+    protected function _getImportStoreAuth()
+    {
+        $auth = tempnam(sys_get_temp_dir(), 'auth');
+
+        file_put_contents($auth, sprintf(
+            "[client]\nuser=%s\npassword=\"%s\"\nhost=%s",
             $this->connection['username'],
             empty($this->connection['password']) ? null : $this->connection['password'],
             $this->connection['host']
@@ -104,5 +155,27 @@ class Mysql extends Driver
         unlink($auth);
 
         return file_exists($filename);
+    }
+
+    /**
+     * Imports the database
+     * @param string $filename Filename from which you want to import the database
+     * @return bool true on success
+     * @uses $connection
+     * @uses _getImportExecutable()
+     * @uses _getImportStoreAuth()
+     */
+    public function import($filename)
+    {
+        //Stores the authentication data in a temporary file
+        $auth = $this->_getImportStoreAuth();
+
+        //Executes
+        exec(sprintf($this->_getImportExecutable($filename), $filename, $auth, $this->connection['database']));
+
+        //Deletes the temporary file with the authentication data
+        unlink($auth);
+
+        return true;
     }
 }

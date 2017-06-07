@@ -128,4 +128,71 @@ class MysqlTest extends TestCase
 
         unlink($auth);
     }
+
+    /**
+     * Test for `_getImportExecutable()` method
+     * @test
+     */
+    public function testGetImportExecutable()
+    {
+        $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
+        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
+        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
+
+        $this->assertEquals(
+            $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
+            $this->invokeMethod($this->Mysql, '_getImportExecutable', ['bzip2'])
+        );
+        $this->assertEquals(
+            $gzip . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
+            $this->invokeMethod($this->Mysql, '_getImportExecutable', ['gzip'])
+        );
+        $this->assertEquals(
+            'cat %s | ' . $mysql . ' --defaults-extra-file=%s %s',
+            $this->invokeMethod($this->Mysql, '_getImportExecutable', [false])
+        );
+    }
+
+    /**
+     * Test for `_getImportExecutable()` method, with the `bzip2` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `bzip2` executable not available
+     * @test
+     */
+    public function testGetImportExecutableWithBzip2NotAvailable()
+    {
+        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
+
+        $this->invokeMethod($this->Mysql, '_getImportExecutable', ['bzip2']);
+    }
+
+    /**
+     * Test for `_getImportExecutable()` method, with the `gzip` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `gzip` executable not available
+     * @test
+     */
+    public function testGetImportExecutableWithGzipNotAvailable()
+    {
+        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
+
+        $this->invokeMethod($this->Mysql, '_getImportExecutable', ['gzip']);
+    }
+
+    /**
+     * Test for `_getImportStoreAuth()` method
+     * @test
+     */
+    public function testGetImportStoreAuth()
+    {
+        $auth = $this->invokeMethod($this->Mysql, '_getImportStoreAuth');
+
+        $this->assertFileExists($auth);
+
+        $result = file_get_contents($auth);
+        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
+        $this->assertEquals($expected, $result);
+
+        unlink($auth);
+    }
 }

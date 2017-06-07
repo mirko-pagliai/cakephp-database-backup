@@ -36,16 +36,18 @@ class BackupImport
     use BackupTrait;
 
     /**
-     * Compression type
-     * @var bool|string|null
-     */
-    protected $compression = null;
-
-    /**
      * Database connection
      * @var array
      */
     protected $connection;
+
+    /**
+     * Driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @since 2.0.0
+     * @var object
+     */
+    protected $driver;
 
     /**
      * Filename where to import the database
@@ -56,59 +58,15 @@ class BackupImport
     /**
      * Construct
      * @uses $connection
+     * @uses $driver
      */
     public function __construct()
     {
         $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
-    }
 
-    /**
-     * Gets the executable command
-     * @param bool|string $compression Compression. Supported values are
-     *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
-     * @return string
-     * @throws InternalErrorException
-     */
-    protected function _getExecutable($compression)
-    {
-        $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
-
-        if (in_array($compression, ['bzip2', 'gzip'])) {
-            $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
-
-            if (!$executable) {
-                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
-            }
-
-            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $executable, $mysql);
-        }
-
-        //No compression
-        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s', $mysql);
-    }
-
-    /**
-     * Stores the authentication data in a temporary file.
-     *
-     * For security reasons, it's recommended to specify the password in
-     *  a configuration file and not in the command (a user can execute
-     *  a `ps aux | grep mysqldump` and see the password).
-     *  So it creates a temporary file to store the configuration options
-     * @uses $connection
-     * @return string File path
-     */
-    protected function _storeAuth()
-    {
-        $auth = tempnam(sys_get_temp_dir(), 'auth');
-
-        file_put_contents($auth, sprintf(
-            "[client]\nuser=%s\npassword=\"%s\"\nhost=%s",
-            $this->connection['username'],
-            empty($this->connection['password']) ? null : $this->connection['password'],
-            $this->connection['host']
-        ));
-
-        return $auth;
+        $driver = (new \ReflectionClass($this->connection['driver']))->getShortName();
+        $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
+        $this->driver = new $driver;
     }
 
     /**
@@ -117,7 +75,6 @@ class BackupImport
      * @return \MysqlBackup\Utility\BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws InternalErrorException
-     * @uses $compression
      * @uses $filename
      */
     public function filename($filename)
@@ -128,13 +85,10 @@ class BackupImport
             throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));
         }
 
-        $compression = $this->getCompression($filename);
-
-        if (!in_array($compression, $this->getValidCompressions(), true)) {
+        if (!in_array($this->getCompression($filename), $this->getValidCompressions(), true)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
         }
 
-        $this->compression = $compression;
         $this->filename = $filename;
 
         return $this;
@@ -145,10 +99,7 @@ class BackupImport
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility#import
      * @throws InternalErrorException
-     * @uses _getExecutable()
-     * @uses _storeAuth()
-     * @uses $compression
-     * @uses $connection
+     * @uses $driver
      * @uses $filename
      */
     public function import()
@@ -162,14 +113,7 @@ class BackupImport
         $filename = $this->filename;
         unset($this->filename);
 
-        //Stores the authentication data in a temporary file
-        $auth = $this->_storeAuth();
-
-        //Executes
-        exec(sprintf($this->_getExecutable($this->compression), $filename, $auth, $this->connection['database']));
-
-        //Deletes the temporary file
-        unlink($auth);
+        $this->driver->import($filename);
 
         return $filename;
     }

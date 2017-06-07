@@ -85,6 +85,9 @@ class BackupImportTest extends TestCase
         $this->assertEquals($connection['scheme'], 'mysql');
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
+
+        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $this->getProperty($this->BackupImport, 'driver'));
+        $this->assertNull($this->getProperty($this->BackupImport, 'filename'));
     }
 
     /**
@@ -98,26 +101,22 @@ class BackupImportTest extends TestCase
 
         $this->BackupImport->filename($backup);
         $this->assertEquals('/tmp/backups/backup.sql', $this->getProperty($this->BackupImport, 'filename'));
-        $this->assertFalse($this->getProperty($this->BackupImport, 'compression'));
 
         //Creates a `sql.bz2` backup
         $backup = $this->BackupExport->filename('backup.sql.bz2')->export();
 
         $this->BackupImport->filename($backup);
         $this->assertEquals('/tmp/backups/backup.sql.bz2', $this->getProperty($this->BackupImport, 'filename'));
-        $this->assertEquals('bzip2', $this->getProperty($this->BackupImport, 'compression'));
 
         //Creates a `sql.gz` backup
         $backup = $this->BackupExport->filename('backup.sql.gz')->export();
 
         $this->BackupImport->filename($backup);
         $this->assertEquals('/tmp/backups/backup.sql.gz', $this->getProperty($this->BackupImport, 'filename'));
-        $this->assertEquals('gzip', $this->getProperty($this->BackupImport, 'compression'));
 
         //Relative path
         $this->BackupImport->filename(basename($backup));
         $this->assertEquals('/tmp/backups/backup.sql.gz', $this->getProperty($this->BackupImport, 'filename'));
-        $this->assertEquals('gzip', $this->getProperty($this->BackupImport, 'compression'));
     }
 
     /**
@@ -142,73 +141,6 @@ class BackupImportTest extends TestCase
         file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'backup.txt', null);
 
         $this->BackupImport->filename('backup.txt');
-    }
-
-    /**
-     * Test for `_storeAuth()` method
-     * @test
-     */
-    public function testStoreAuth()
-    {
-        $auth = $this->invokeMethod($this->BackupImport, '_storeAuth');
-
-        $this->assertFileExists($auth);
-
-        $result = file_get_contents($auth);
-        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
-        $this->assertEquals($expected, $result);
-
-        unlink($auth);
-    }
-
-    /**
-     * Test for `_getExecutable()` method
-     * @test
-     */
-    public function testExecutable()
-    {
-        $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
-        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
-        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
-
-        $this->assertEquals(
-            $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->BackupImport, '_getExecutable', ['bzip2'])
-        );
-        $this->assertEquals(
-            $gzip . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->BackupImport, '_getExecutable', ['gzip'])
-        );
-        $this->assertEquals(
-            'cat %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->BackupImport, '_getExecutable', [false])
-        );
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `bzip2` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `bzip2` executable not available
-     * @test
-     */
-    public function testExecutableWithBzip2NotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
-
-        $this->invokeMethod($this->BackupImport, '_getExecutable', ['bzip2']);
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `gzip` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `gzip` executable not available
-     * @test
-     */
-    public function testExecutableWithGzipNotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
-
-        $this->invokeMethod($this->BackupImport, '_getExecutable', ['gzip']);
     }
 
     /**

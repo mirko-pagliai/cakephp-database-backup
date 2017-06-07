@@ -52,4 +52,11 @@ abstract class Driver
      * @return bool true on success
      */
     abstract public function export($filename);
+
+    /**
+     * Imports the database
+     * @param string $filename Filename from which you want to import the database
+     * @return bool true on success
+     */
+    abstract public function import($filename);
 }
