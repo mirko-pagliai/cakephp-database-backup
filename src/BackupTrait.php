@@ -25,6 +25,8 @@ namespace MysqlBackup;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Filesystem\Folder;
+use InvalidArgumentException;
+use ReflectionClass;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -68,7 +70,7 @@ trait BackupTrait
 
     /**
      * Gets the connection array
-     * @param string|null $name Connection name or `null`
+     * @param string|null $name Connection name
      * @return array
      */
     public function getConnection($name = null)
@@ -78,6 +80,29 @@ trait BackupTrait
         }
 
         return ConnectionManager::getConfig($name);
+    }
+
+    /**
+     * Gets the driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @param array $connection Connection array
+     * @return object A driver instance
+     * @throws InvalidArgumentException
+     */
+    public function getDriver(array $connection = [])
+    {
+        if (!$connection) {
+            $connection = $this->getConnection();
+        }
+
+        if (empty($connection['driver'])) {
+            throw new InvalidArgumentException(__d('mysql_backup', 'Unable to detect the driver to use'));
+        }
+
+        $driver = (new ReflectionClass($connection['driver']))->getShortName();
+        $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
+
+        return new $driver;
     }
 
     /**

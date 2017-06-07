@@ -61,10 +61,7 @@ class BackupImport
     public function __construct()
     {
         $this->connection = $this->getConnection();
-
-        $driver = (new \ReflectionClass($this->connection['driver']))->getShortName();
-        $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
-        $this->driver = new $driver;
+        $this->driver = $this->getDriver($this->connection);
     }
 
     /**

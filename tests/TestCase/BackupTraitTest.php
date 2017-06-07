@@ -122,6 +122,37 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getDriver()` method
+     * @test
+     */
+    public function testGetDriver()
+    {
+        $driver = $this->Trait->getDriver([
+            'scheme' => 'mysql',
+            'host' => 'localhost',
+            'username' => 'travis',
+            'className' => 'Cake\Database\Connection',
+            'database' => 'test',
+            'driver' => 'Cake\Database\Driver\Mysql',
+            'name' => 'test',
+        ]);
+        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $driver);
+
+        $driver = $this->Trait->getDriver();
+        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $driver);
+    }
+
+    /**
+     * Test for `getDriver()` method, with an invalid argument
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unable to detect the driver to use
+     */
+    public function testGetDriverInvalidArgument()
+    {
+        $this->Trait->getDriver(['invalid']);
+    }
+
+    /**
      * Test for `getExtension()` method
      * @test
      */

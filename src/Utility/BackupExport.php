@@ -93,12 +93,8 @@ class BackupExport
     public function __construct()
     {
         $this->BackupManager = new BackupManager;
-
         $this->connection = $this->getConnection();
-
-        $driver = (new \ReflectionClass($this->connection['driver']))->getShortName();
-        $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
-        $this->driver = new $driver;
+        $this->driver = $this->getDriver($this->connection);
     }
 
     /**
