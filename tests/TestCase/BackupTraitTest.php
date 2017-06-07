@@ -23,6 +23,7 @@
 namespace MysqlBackup\Test\TestCase;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\Utility\BackupManager;
 
@@ -72,6 +73,7 @@ class BackupTraitTest extends TestCase
         $result = $this->Trait->getAbsolutePath(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt');
         $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt', $result);
     }
+
     /**
      * Test for `getCompression()` method
      * @test
@@ -82,6 +84,41 @@ class BackupTraitTest extends TestCase
         $this->assertEquals('bzip2', $this->Trait->getCompression('backup.sql.bz2'));
         $this->assertEquals('gzip', $this->Trait->getCompression('backup.sql.gz'));
         $this->assertNull($this->Trait->getCompression('text.txt'));
+    }
+
+    /**
+     * Test for `getConnection()` method
+     * @test
+     */
+    public function testGetConnection()
+    {
+        $expected = [
+            'scheme' => 'mysql',
+            'host' => 'localhost',
+            'username' => 'travis',
+            'className' => 'Cake\Database\Connection',
+            'database' => 'test',
+            'driver' => 'Cake\Database\Driver\Mysql',
+            'name' => 'test',
+        ];
+
+        $this->assertEquals($expected, $this->Trait->getConnection());
+        $this->assertEquals($expected, $this->Trait->getConnection(Configure::read(MYSQL_BACKUP . '.connection')));
+
+        ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
+
+        $expected = [
+            'scheme' => 'mysql',
+            'host' => 'localhost',
+            'username' => 'root',
+            'password' => 'password',
+            'className' => 'Cake\Database\Connection',
+            'database' => 'my_database',
+            'driver' => 'Cake\Database\Driver\Mysql',
+            'name' => 'fake',
+        ];
+
+        $this->assertEquals($expected, $this->Trait->getConnection('fake'));
     }
 
     /**

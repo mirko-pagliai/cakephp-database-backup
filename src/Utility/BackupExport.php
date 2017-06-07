@@ -24,7 +24,6 @@
 namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use Cake\Network\Exception\InternalErrorException;
 use MysqlBackup\BackupTrait;
 
@@ -95,7 +94,7 @@ class BackupExport
     {
         $this->BackupManager = new BackupManager;
 
-        $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
+        $this->connection = $this->getConnection();
 
         $driver = (new \ReflectionClass($this->connection['driver']))->getShortName();
         $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
