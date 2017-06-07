@@ -63,12 +63,62 @@ class MysqlTest extends TestCase
     }
 
     /**
-     * Test for `_storeAuth()` method
+     * Test for `_getExportExecutable()` method
      * @test
      */
-    public function testStoreAuth()
+    public function testGetExportExecutable()
     {
-        $auth = $this->invokeMethod($this->Mysql, '_storeAuth');
+        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
+        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
+        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
+
+        $this->assertEquals(
+            $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
+            $this->invokeMethod($this->Mysql, '_getExportExecutable', ['bzip2'])
+        );
+        $this->assertEquals(
+            $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s',
+            $this->invokeMethod($this->Mysql, '_getExportExecutable', ['gzip'])
+        );
+        $this->assertEquals(
+            $mysqldump . ' --defaults-file=%s %s > %s',
+            $this->invokeMethod($this->Mysql, '_getExportExecutable', [false])
+        );
+    }
+
+    /**
+     * Test for `_getExportExecutable()` method, with the `bzip2` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `bzip2` executable not available
+     * @test
+     */
+    public function testGetExportExecutableWithBzip2NotAvailable()
+    {
+        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
+
+        $this->invokeMethod($this->Mysql, '_getExportExecutable', ['bzip2']);
+    }
+
+    /**
+     * Test for `_getExportExecutable()` method, with the `gzip` executable not available
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage `gzip` executable not available
+     * @test
+     */
+    public function testGetExportExecutableWithGzipNotAvailable()
+    {
+        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
+
+        $this->invokeMethod($this->Mysql, '_getExportExecutable', ['gzip']);
+    }
+
+    /**
+     * Test for `_getExportStoreAuth()` method
+     * @test
+     */
+    public function testGetExportStoreAuth()
+    {
+        $auth = $this->invokeMethod($this->Mysql, '_getExportStoreAuth');
 
         $this->assertFileExists($auth);
 
@@ -77,55 +127,5 @@ class MysqlTest extends TestCase
         $this->assertEquals($expected, $result);
 
         unlink($auth);
-    }
-
-    /**
-     * Test for `_getExecutable()` method
-     * @test
-     */
-    public function testGetExecutable()
-    {
-        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
-        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
-        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
-
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
-            $this->invokeMethod($this->Mysql, '_getExecutable', ['bzip2'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s',
-            $this->invokeMethod($this->Mysql, '_getExecutable', ['gzip'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s > %s',
-            $this->invokeMethod($this->Mysql, '_getExecutable', [false])
-        );
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `bzip2` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `bzip2` executable not available
-     * @test
-     */
-    public function testGetExecutableWithBzip2NotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
-
-        $this->invokeMethod($this->Mysql, '_getExecutable', ['bzip2']);
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `gzip` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `gzip` executable not available
-     * @test
-     */
-    public function testGetExecutableWithGzipNotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
-
-        $this->invokeMethod($this->Mysql, '_getExecutable', ['gzip']);
     }
 }

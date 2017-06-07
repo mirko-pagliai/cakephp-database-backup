@@ -19,6 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
+ * @since       2.0.0
  */
 namespace MysqlBackup\Driver;
 
@@ -40,7 +41,7 @@ class Mysql extends Driver
      * @return string
      * @throws InternalErrorException
      */
-    protected function _getExecutable($filename)
+    protected function _getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
         $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
@@ -66,10 +67,10 @@ class Mysql extends Driver
      *  a configuration file and not in the command (a user can execute
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
-     * @uses $connection
      * @return string File path
+     * @uses $connection
      */
-    protected function _storeAuth()
+    protected function _getExportStoreAuth()
     {
         $auth = tempnam(sys_get_temp_dir(), 'auth');
 
@@ -88,16 +89,16 @@ class Mysql extends Driver
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
      * @uses $connection
-     * @uses _getExecutable()
-     * @uses _storeAuth()
+     * @uses _getExportExecutable()
+     * @uses _getExportStoreAuth()
      */
     public function export($filename)
     {
         //Stores the authentication data in a temporary file
-        $auth = $this->_storeAuth();
+        $auth = $this->_getExportStoreAuth();
 
         //Executes
-        exec(sprintf($this->_getExecutable($filename), $auth, $this->connection['database'], $filename));
+        exec(sprintf($this->_getExportExecutable($filename), $auth, $this->connection['database'], $filename));
 
         //Deletes the temporary file with the authentication data
         unlink($auth);
