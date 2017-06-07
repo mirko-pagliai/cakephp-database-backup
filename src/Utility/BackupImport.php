@@ -24,7 +24,6 @@
 namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use Cake\Network\Exception\InternalErrorException;
 use MysqlBackup\BackupTrait;
 
@@ -59,7 +58,7 @@ class BackupImport
      */
     public function __construct()
     {
-        $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
+        $this->connection = $this->getConnection();
     }
 
     /**

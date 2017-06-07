@@ -23,6 +23,7 @@
 namespace MysqlBackup;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use Cake\Filesystem\Folder;
 
 /**
@@ -63,6 +64,20 @@ trait BackupTrait
         }
 
         return $this->getValidCompressions()[$extension];
+    }
+
+    /**
+     * Gets the connection array
+     * @param string|null $name Connection name or `null`
+     * @return array
+     */
+    public function getConnection($name = null)
+    {
+        if (!$name) {
+            $name = Configure::read(MYSQL_BACKUP . '.connection');
+        }
+
+        return ConnectionManager::getConfig($name);
     }
 
     /**

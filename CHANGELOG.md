@@ -3,6 +3,7 @@
 ### 1.1.1
 * `_storeAuth()` methods from `BackupExport` and `BackupImport` classes are
     now private;
+* added `BackupTrait::getConnection()` method;
 * added `BackupTrait::getValidCompressions()` method.
 
 ### 1.1.0
