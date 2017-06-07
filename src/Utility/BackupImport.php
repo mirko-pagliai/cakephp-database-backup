@@ -97,7 +97,7 @@ class BackupImport
      * @uses $connection
      * @return string File path
      */
-    protected function _storeAuth()
+    private function _storeAuth()
     {
         $auth = tempnam(sys_get_temp_dir(), 'auth');
 
