@@ -53,16 +53,17 @@ class BackupExport
     protected $connection;
 
     /**
+     * Driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @var object
+     */
+    protected $driver;
+
+    /**
      * Recipient of the email, if you want to send the backup via mail
      * @var bool|string
      */
     protected $emailRecipient = false;
-
-    /**
-     * Executable command
-     * @var string
-     */
-    protected $executable;
 
     /**
      * Filename extension
@@ -85,61 +86,19 @@ class BackupExport
 
     /**
      * Construct
+     * @uses $BackupManager
      * @uses $connection
+     * @uses $driver
      */
     public function __construct()
     {
-        $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
         $this->BackupManager = new BackupManager;
-    }
 
-    /**
-     * Gets the executable command
-     * @param bool|string $compression Compression. Supported values are
-     *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
-     * @return string
-     * @throws InternalErrorException
-     */
-    protected function _getExecutable($compression)
-    {
-        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
+        $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
 
-        if (in_array($compression, ['bzip2', 'gzip'])) {
-            $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
-
-            if (!$executable) {
-                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
-            }
-
-            return sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $executable);
-        }
-
-        //No compression
-        return sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldump);
-    }
-
-    /**
-     * Stores the authentication data in a temporary file.
-     *
-     * For security reasons, it's recommended to specify the password in
-     *  a configuration file and not in the command (a user can execute
-     *  a `ps aux | grep mysqldump` and see the password).
-     *  So it creates a temporary file to store the configuration options
-     * @uses $connection
-     * @return string File path
-     */
-    protected function _storeAuth()
-    {
-        $auth = tempnam(sys_get_temp_dir(), 'auth');
-
-        file_put_contents($auth, sprintf(
-            "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
-            $this->connection['username'],
-            empty($this->connection['password']) ? null : $this->connection['password'],
-            $this->connection['host']
-        ));
-
-        return $auth;
+        $driver = (new \ReflectionClass($this->connection['driver']))->getShortName();
+        $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
+        $this->driver = new $driver;
     }
 
     /**
@@ -151,7 +110,6 @@ class BackupExport
      * @throws InternalErrorException
      * @uses $compression
      * @uses $extension
-     * @uses $filename
      */
     public function compression($compression)
     {
@@ -249,16 +207,12 @@ class BackupExport
      * Exports the database
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#export
-     * @uses MysqlBackup\Utility\BackupManager::rotate()
-     * @uses MysqlBackup\Utility\BackupManager::send()
-     * @uses _getExecutable()
-     * @uses _storeAuth()
      * @uses filename()
      * @uses $BackupManager;
-     * @uses $compression
-     * @uses $connection
-     * @uses $extension
+     * @uses $driver
+     * @uses $emailRecipient
      * @uses $filename
+     * @uses $extension
      * @uses $rotate
      */
     public function export()
@@ -272,14 +226,7 @@ class BackupExport
         $filename = $this->filename;
         unset($this->filename);
 
-        //Stores the authentication data in a temporary file
-        $auth = $this->_storeAuth();
-
-        //Executes
-        exec(sprintf($this->_getExecutable($this->compression), $auth, $this->connection['database'], $filename));
-
-        //Deletes the temporary file
-        unlink($auth);
+        $this->driver->export($filename);
 
         chmod($filename, Configure::read(MYSQL_BACKUP . '.chmod'));
 

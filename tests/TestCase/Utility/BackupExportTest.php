@@ -104,8 +104,8 @@ class BackupExportTest extends TestCase
         $this->assertEquals($connection['database'], 'test');
         $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
 
+        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $this->getProperty($this->BackupExport, 'driver'));
         $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
-        $this->assertNull($this->getProperty($this->BackupExport, 'executable'));
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
         $this->assertNull($this->getProperty($this->BackupExport, 'rotate'));
@@ -277,73 +277,6 @@ class BackupExportTest extends TestCase
 
         $this->BackupExport->send($recipient);
         $this->assertEquals($recipient, $this->getProperty($this->BackupExport, 'emailRecipient'));
-    }
-
-    /**
-     * Test for `_storeAuth()` method
-     * @test
-     */
-    public function testStoreAuth()
-    {
-        $auth = $this->invokeMethod($this->BackupExport, '_storeAuth');
-
-        $this->assertFileExists($auth);
-
-        $result = file_get_contents($auth);
-        $expected = '[mysqldump]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
-        $this->assertEquals($expected, $result);
-
-        unlink($auth);
-    }
-
-    /**
-     * Test for `_getExecutable()` method
-     * @test
-     */
-    public function testExecutable()
-    {
-        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
-        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
-        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
-
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
-            $this->invokeMethod($this->BackupExport, '_getExecutable', ['bzip2'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s',
-            $this->invokeMethod($this->BackupExport, '_getExecutable', ['gzip'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s > %s',
-            $this->invokeMethod($this->BackupExport, '_getExecutable', [false])
-        );
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `bzip2` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `bzip2` executable not available
-     * @test
-     */
-    public function testExecutableWithBzip2NotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
-
-        $this->invokeMethod($this->BackupExport, '_getExecutable', ['bzip2']);
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `gzip` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `gzip` executable not available
-     * @test
-     */
-    public function testExecutableWithGzipNotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
-
-        $this->invokeMethod($this->BackupExport, '_getExecutable', ['gzip']);
     }
 
     /**
