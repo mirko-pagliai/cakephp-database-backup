@@ -65,15 +65,6 @@ class MysqlTest extends TestCase
     }
 
     /**
-     * Test for constructor
-     * @test
-     */
-    public function testConstructor()
-    {
-        $this->assertNotEmpty($this->getProperty($this->Mysql, 'connection'));
-    }
-
-    /**
      * Test for `getCompression()` method
      * @test
      */

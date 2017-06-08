@@ -39,6 +39,7 @@ class Mysql extends Driver
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string
+     * @uses getCompression()
      * @uses getValidCompressions()
      * @throws InternalErrorException
      */
@@ -90,6 +91,8 @@ class Mysql extends Driver
      * Gets the executable command to import the database
      * @param string $filename Filename from which you want to import the database
      * @return string
+     * @uses getCompression()
+     * @uses getValidCompressions()
      * @throws InternalErrorException
      */
     protected function getImportExecutable($filename)
@@ -97,7 +100,7 @@ class Mysql extends Driver
         $compression = $this->getCompression($filename);
         $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
 
-        if (in_array($compression, ['bzip2', 'gzip'])) {
+        if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
 
             if (!$executable) {
@@ -119,8 +122,8 @@ class Mysql extends Driver
      *  a configuration file and not in the command (a user can execute
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
-     * @uses $connection
      * @return string Path of the temporary file
+     * @uses $connection
      */
     private function getImportStoreAuth()
     {
