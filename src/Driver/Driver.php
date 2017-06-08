@@ -35,13 +35,22 @@ abstract class Driver
     use BackupTrait;
 
     /**
+     * Valid compression types for this driver.
+     *
+     * It must be an array (with extensions as keys and the compression type as
+     *  value) or `false` if this driver doesn't support compression
+     * @var bool|array
+     */
+    protected $compressions = false;
+
+    /**
      * Database connection
      * @var array
      */
     protected $connection;
 
     /**
-     * valid extensions for this driver
+     * Valid extensions for this driver
      * @var array
      */
     protected $extensions = [];

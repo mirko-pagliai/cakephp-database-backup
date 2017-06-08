@@ -36,7 +36,13 @@ class Mysql extends Driver
     use BackupTrait;
 
     /**
-     * valid extensions for this driver
+     * Valid compression types for this driver
+     * @var array
+     */
+    protected $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'];
+
+    /**
+     * Valid extensions for this driver
      * @var array
      */
     protected $extensions = ['sql.bz2', 'sql.gz', 'sql'];

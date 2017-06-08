@@ -68,6 +68,7 @@ class MysqlTest extends TestCase
      */
     public function testConstructorAndProperties()
     {
+        $this->assertEquals(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'], $this->getProperty($this->Mysql, 'compressions'));
         $this->assertNotEmpty($this->getProperty($this->Mysql, 'connection'));
         $this->assertEquals(['sql.bz2', 'sql.gz', 'sql'], $this->getProperty($this->Mysql, 'extensions'));
     }
