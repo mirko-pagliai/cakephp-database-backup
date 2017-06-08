@@ -74,6 +74,18 @@ class MysqlTest extends TestCase
     }
 
     /**
+     * Test for `getCompression()` method
+     * @test
+     */
+    public function testGetCompression()
+    {
+        $this->assertEquals(false, $this->Mysql->getCompression('backup.sql'));
+        $this->assertEquals('bzip2', $this->Mysql->getCompression('backup.sql.bz2'));
+        $this->assertEquals('gzip', $this->Mysql->getCompression('backup.sql.gz'));
+        $this->assertNull($this->Mysql->getCompression('text.txt'));
+    }
+
+    /**
      * Test for `getExportExecutable()` method
      * @test
      */
@@ -86,15 +98,15 @@ class MysqlTest extends TestCase
 
         $this->assertEquals(
             $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
-            $this->invokeMethod($this->Mysql, $method, ['bzip2'])
+            $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2'])
         );
         $this->assertEquals(
             $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s',
-            $this->invokeMethod($this->Mysql, $method, ['gzip'])
+            $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz'])
         );
         $this->assertEquals(
             $mysqldump . ' --defaults-file=%s %s > %s',
-            $this->invokeMethod($this->Mysql, $method, [false])
+            $this->invokeMethod($this->Mysql, $method, ['backup.sql'])
         );
     }
 
@@ -108,7 +120,7 @@ class MysqlTest extends TestCase
     {
         Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
 
-        $this->invokeMethod($this->Mysql, 'getExportExecutable', ['bzip2']);
+        $this->invokeMethod($this->Mysql, 'getExportExecutable', ['backup.sql.bz2']);
     }
 
     /**
@@ -121,7 +133,7 @@ class MysqlTest extends TestCase
     {
         Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
 
-        $this->invokeMethod($this->Mysql, 'getExportExecutable', ['gzip']);
+        $this->invokeMethod($this->Mysql, 'getExportExecutable', ['backup.sql.gz']);
     }
 
     /**
@@ -142,6 +154,18 @@ class MysqlTest extends TestCase
     }
 
     /**
+     * Test for `getExtension()` method
+     * @test
+     */
+    public function testGetExtension()
+    {
+        $this->assertEquals('sql', $this->Mysql->getExtension('backup.sql'));
+        $this->assertEquals('sql.bz2', $this->Mysql->getExtension('backup.sql.bz2'));
+        $this->assertEquals('sql.gz', $this->Mysql->getExtension('backup.sql.gz'));
+        $this->assertNull($this->Mysql->getExtension('text.txt'));
+    }
+
+    /**
      * Test for `getImportExecutable()` method
      * @test
      */
@@ -154,15 +178,15 @@ class MysqlTest extends TestCase
 
         $this->assertEquals(
             $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->Mysql, $method, ['bzip2'])
+            $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2'])
         );
         $this->assertEquals(
             $gzip . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->Mysql, $method, ['gzip'])
+            $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz'])
         );
         $this->assertEquals(
             'cat %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->Mysql, $method, [false])
+            $this->invokeMethod($this->Mysql, $method, ['backup.sql'])
         );
     }
 
@@ -176,7 +200,7 @@ class MysqlTest extends TestCase
     {
         Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
 
-        $this->invokeMethod($this->Mysql, 'getImportExecutable', ['bzip2']);
+        $this->invokeMethod($this->Mysql, 'getImportExecutable', ['backup.sql.bz2']);
     }
 
     /**
@@ -189,7 +213,7 @@ class MysqlTest extends TestCase
     {
         Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
 
-        $this->invokeMethod($this->Mysql, 'getImportExecutable', ['gzip']);
+        $this->invokeMethod($this->Mysql, 'getImportExecutable', ['backup.sql.gz']);
     }
 
     /**

@@ -47,11 +47,55 @@ abstract class Driver
     }
 
     /**
+     * Exports the database
+     * @param string $filename Filename where you want to export the database
+     * @return bool true on success
+     */
+    abstract public function export($filename);
+
+    /**
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string
      */
     abstract protected function getExportExecutable($filename);
+
+    /**
+     * Returns the compression type of a filename
+     * @param string $filename Filename
+     * @return string|bool|null Compression type as string, `null` on failure,
+     *  `false` for no compression
+     * @uses getExtension()
+     * @uses getValidCompressions()
+     */
+    public function getCompression($filename)
+    {
+        //Gets the extension
+        $extension = $this->getExtension($filename);
+
+        if (!array_key_exists($extension, $this->getValidCompressions())) {
+            return null;
+        }
+
+        return $this->getValidCompressions()[$extension];
+    }
+
+    /**
+     * Returns the extension of a filename
+     * @param string $filename Filename
+     * @return string|null Extension or `null` on failure
+     * @uses getValidExtensions()
+     */
+    public function getExtension($filename)
+    {
+        $regex = sprintf('/(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
+
+        if (preg_match($regex, $filename, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
 
     /**
      * Gets the executable command to import the database
@@ -77,13 +121,6 @@ abstract class Driver
     {
         return VALID_EXTENSIONS[(new ReflectionClass(get_called_class()))->getShortName()];
     }
-
-    /**
-     * Exports the database
-     * @param string $filename Filename where you want to export the database
-     * @return bool true on success
-     */
-    abstract public function export($filename);
 
     /**
      * Imports the database

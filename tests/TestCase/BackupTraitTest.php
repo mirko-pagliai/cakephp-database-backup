@@ -75,18 +75,6 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getCompression()` method
-     * @test
-     */
-    public function testGetCompression()
-    {
-        $this->assertEquals(false, $this->Trait->getCompression('backup.sql'));
-        $this->assertEquals('bzip2', $this->Trait->getCompression('backup.sql.bz2'));
-        $this->assertEquals('gzip', $this->Trait->getCompression('backup.sql.gz'));
-        $this->assertNull($this->Trait->getCompression('text.txt'));
-    }
-
-    /**
      * Test for `getConnection()` method
      * @test
      */
@@ -150,38 +138,6 @@ class BackupTraitTest extends TestCase
     public function testGetDriverInvalidArgument()
     {
         $this->Trait->getDriver(['invalid']);
-    }
-
-    /**
-     * Test for `getExtension()` method
-     * @test
-     */
-    public function testGetExtension()
-    {
-        //Using compression types
-        $this->assertEquals('sql', $this->Trait->getExtension(false));
-        $this->assertEquals('sql.bz2', $this->Trait->getExtension('bzip2'));
-        $this->assertEquals('sql.gz', $this->Trait->getExtension('gzip'));
-        $this->assertNull($this->Trait->getExtension('noExisting'));
-
-        //Using filenames
-        $this->assertEquals('sql', $this->Trait->getExtension('backup.sql'));
-        $this->assertEquals('sql.bz2', $this->Trait->getExtension('backup.sql.bz2'));
-        $this->assertEquals('sql.gz', $this->Trait->getExtension('backup.sql.gz'));
-        $this->assertNull($this->Trait->getExtension('text.txt'));
-    }
-
-    /**
-     * Test for `getValidCompressions()` method
-     * @test
-     */
-    public function testGetValidCompressions()
-    {
-        $this->assertEquals([
-            'sql.bz2' => 'bzip2',
-            'sql.gz' => 'gzip',
-            'sql' => false,
-        ], $this->Trait->getValidCompressions());
     }
 
     /**

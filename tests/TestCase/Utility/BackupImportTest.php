@@ -81,11 +81,6 @@ class BackupImportTest extends TestCase
      */
     public function testConstruct()
     {
-        $connection = $this->getProperty($this->BackupImport, 'connection');
-        $this->assertEquals($connection['scheme'], 'mysql');
-        $this->assertEquals($connection['database'], 'test');
-        $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
-
         $this->assertInstanceof('MysqlBackup\Driver\Mysql', $this->getProperty($this->BackupImport, 'driver'));
         $this->assertNull($this->getProperty($this->BackupImport, 'filename'));
     }

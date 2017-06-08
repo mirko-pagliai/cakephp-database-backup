@@ -429,6 +429,10 @@ class BackupShellTest extends TestCase
             'rotate',
             'send',
         ], array_keys($parser->subcommands()));
+
+        //Checks "compression" options for the "export" subcommand
+        $this->assertEquals('[-c bzip2|gzip]', $parser->subcommands()['export']->parser()->options()['compression']->usage());
+
         $this->assertEquals('Shell to handle database backups', $parser->getDescription());
         $this->assertEquals(['help', 'quiet', 'verbose'], array_keys($parser->options()));
     }

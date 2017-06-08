@@ -44,15 +44,25 @@ class BackupShell extends Shell
     protected $BackupManager;
 
     /**
+     * Driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @since 2.0.0
+     * @var object
+     */
+    protected $driver;
+
+    /**
      * Constructor
      * @param \Cake\Console\ConsoleIo|null $io An io instance
      * @uses $BackupManager
+     * @uses $driver
      */
     public function __construct(ConsoleIo $io = null)
     {
         parent::__construct($io);
 
         $this->BackupManager = new BackupManager;
+        $this->driver = $this->getDriver();
     }
 
     /**
@@ -270,7 +280,7 @@ class BackupShell extends Shell
             'parser' => [
                 'options' => [
                     'compression' => [
-                        'choices' => array_keys($this->getValidCompressions()),
+                        'choices' => array_filter($this->driver->getValidCompressions()),
                         'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
                         'short' => 'c',
                     ],

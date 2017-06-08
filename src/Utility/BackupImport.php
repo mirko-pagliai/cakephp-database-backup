@@ -34,12 +34,6 @@ class BackupImport
     use BackupTrait;
 
     /**
-     * Database connection
-     * @var array
-     */
-    protected $connection;
-
-    /**
      * Driver containing all methods to export/import database backups
      *  according to the database engine
      * @since 2.0.0
@@ -55,13 +49,11 @@ class BackupImport
 
     /**
      * Construct
-     * @uses $connection
      * @uses $driver
      */
     public function __construct()
     {
-        $this->connection = $this->getConnection();
-        $this->driver = $this->getDriver($this->connection);
+        $this->driver = $this->getDriver();
     }
 
     /**
@@ -81,7 +73,7 @@ class BackupImport
             throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));
         }
 
-        if (!in_array($this->getCompression($filename), $this->driver->getValidCompressions(), true)) {
+        if (!in_array($this->driver->getCompression($filename), $this->driver->getValidCompressions(), true)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
         }
 
