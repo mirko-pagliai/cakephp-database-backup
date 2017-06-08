@@ -63,6 +63,16 @@ class MysqlTest extends TestCase
     }
 
     /**
+     * Test for constructor and properties
+     * @test
+     */
+    public function testConstructorAndProperties()
+    {
+        $this->assertNotEmpty($this->getProperty($this->Mysql, 'connection'));
+        $this->assertEquals(['sql.bz2', 'sql.gz', 'sql'], $this->getProperty($this->Mysql, 'extensions'));
+    }
+
+    /**
      * Test for `getExportExecutable()` method
      * @test
      */

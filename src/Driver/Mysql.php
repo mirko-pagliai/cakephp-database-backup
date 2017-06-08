@@ -36,6 +36,12 @@ class Mysql extends Driver
     use BackupTrait;
 
     /**
+     * valid extensions for this driver
+     * @var array
+     */
+    protected $extensions = ['sql.bz2', 'sql.gz', 'sql'];
+
+    /**
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string

@@ -24,6 +24,7 @@ namespace MysqlBackup\Driver;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use MysqlBackup\BackupTrait;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -31,6 +32,8 @@ use Cake\Datasource\ConnectionManager;
  */
 abstract class Driver
 {
+    use BackupTrait;
+
     /**
      * Database connection
      * @var array
@@ -38,12 +41,18 @@ abstract class Driver
     protected $connection;
 
     /**
+     * valid extensions for this driver
+     * @var array
+     */
+    protected $extensions = [];
+
+    /**
      * Construct
      * @uses $connection
      */
     public function __construct()
     {
-        $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
+        $this->connection = $this->getConnection();
     }
 
     /**
