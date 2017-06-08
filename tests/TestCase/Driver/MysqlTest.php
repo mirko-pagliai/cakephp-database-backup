@@ -84,21 +84,17 @@ class MysqlTest extends TestCase
     {
         $method = 'getExportExecutable';
         $mysqldump = $this->getBinary('mysqldump');
-        $bzip2 = $this->getBinary('bzip2');
-        $gzip = $this->getBinary('gzip');
 
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
-            $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s',
-            $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s > %s',
-            $this->invokeMethod($this->Mysql, $method, ['backup.sql'])
-        );
+        $bzip2 = $this->getBinary('bzip2');
+        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s';
+        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
+
+        $gzip = $this->getBinary('gzip');
+        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s';
+        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
+
+        $expected = $mysqldump . ' --defaults-file=%s %s > %s';
+        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
     }
 
     /**
@@ -138,21 +134,17 @@ class MysqlTest extends TestCase
     {
         $method = 'getImportExecutable';
         $mysql = $this->getBinary('mysql');
-        $bzip2 = $this->getBinary('bzip2');
-        $gzip = $this->getBinary('gzip');
 
-        $this->assertEquals(
-            $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2'])
-        );
-        $this->assertEquals(
-            $gzip . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz'])
-        );
-        $this->assertEquals(
-            'cat %s | ' . $mysql . ' --defaults-extra-file=%s %s',
-            $this->invokeMethod($this->Mysql, $method, ['backup.sql'])
-        );
+        $bzip2 = $this->getBinary('bzip2');
+        $expected = $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s';
+        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
+
+        $gzip = $this->getBinary('gzip');
+        $expected = $gzip . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s';
+        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
+
+        $expected = 'cat %s | ' . $mysql . ' --defaults-extra-file=%s %s';
+        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
     }
 
     /**
