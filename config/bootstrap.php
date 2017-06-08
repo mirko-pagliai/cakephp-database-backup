@@ -23,23 +23,19 @@
  */
 use Cake\Core\Configure;
 
+//Sets the list of valid compressions
+const VALID_COMPRESSIONS = [
+    'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
+];
+
+//Sets the list of valid extensions
+const VALID_EXTENSIONS = [
+    'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
+];
+
 //Sets the default MysqlBackup name
 if (!defined('MYSQL_BACKUP')) {
     define('MYSQL_BACKUP', 'MysqlBackup');
-}
-
-//Sets the list of valid compressions
-if (!defined('VALID_COMPRESSIONS')) {
-    define('VALID_COMPRESSIONS', [
-        'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
-    ]);
-}
-
-//Sets the list of valid extensions
-if (!defined('VALID_EXTENSIONS')) {
-    define('VALID_EXTENSIONS', [
-        'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
-    ]);
 }
 
 //Binaries
