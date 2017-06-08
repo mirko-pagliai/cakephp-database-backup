@@ -102,7 +102,7 @@ trait BackupTrait
         $driver = (new ReflectionClass($connection['driver']))->getShortName();
         $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
 
-        return new $driver;
+        return new $driver($connection);
     }
 
     /**
@@ -123,7 +123,7 @@ trait BackupTrait
             return $matches[1];
         }
 
-        return null;
+       return null;
     }
 
     /**

@@ -29,6 +29,20 @@ if (!defined('MYSQL_BACKUP')) {
     define('MYSQL_BACKUP', 'MysqlBackup');
 }
 
+//Sets the list of valid compressions
+if (!defined('VALID_COMPRESSIONS')) {
+    define('VALID_COMPRESSIONS', [
+        'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
+    ]);
+}
+
+//Sets the list of valid extensions
+if (!defined('VALID_EXTENSIONS')) {
+    define('VALID_EXTENSIONS', [
+        'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
+    ]);
+}
+
 //bzip2 binary
 if (!Configure::check(MYSQL_BACKUP . '.bin.bzip2')) {
     Configure::write(MYSQL_BACKUP . '.bin.bzip2', which('bzip2'));

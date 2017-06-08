@@ -36,21 +36,10 @@ class Mysql extends Driver
     use BackupTrait;
 
     /**
-     * Valid compression types for this driver
-     * @var array
-     */
-    protected $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'];
-
-    /**
-     * Valid extensions for this driver
-     * @var array
-     */
-    protected $extensions = ['sql.bz2', 'sql.gz', 'sql'];
-
-    /**
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string
+     * @uses getValidCompressions()
      * @throws InternalErrorException
      */
     protected function getExportExecutable($filename)
@@ -58,7 +47,7 @@ class Mysql extends Driver
         $compression = $this->getCompression($filename);
         $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
 
-        if (in_array($compression, ['bzip2', 'gzip'])) {
+        if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
 
             if (!$executable) {

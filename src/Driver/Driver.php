@@ -22,9 +22,7 @@
  */
 namespace MysqlBackup\Driver;
 
-use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
-use MysqlBackup\BackupTrait;
+use ReflectionClass;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -32,17 +30,6 @@ use MysqlBackup\BackupTrait;
  */
 abstract class Driver
 {
-    use BackupTrait;
-
-    /**
-     * Valid compression types for this driver.
-     *
-     * It must be an array (with extensions as keys and the compression type as
-     *  value) or `false` if this driver doesn't support compression
-     * @var bool|array
-     */
-    protected $compressions = false;
-
     /**
      * Database connection
      * @var array
@@ -50,18 +37,13 @@ abstract class Driver
     protected $connection;
 
     /**
-     * Valid extensions for this driver
-     * @var array
-     */
-    protected $extensions = [];
-
-    /**
      * Construct
+     * @param array $connection Connection
      * @uses $connection
      */
-    public function __construct()
+    public function __construct($connection)
     {
-        $this->connection = $this->getConnection();
+        $this->connection = $connection;
     }
 
     /**
@@ -77,6 +59,24 @@ abstract class Driver
      * @return string
      */
     abstract protected function getImportExecutable($filename);
+
+    /**
+     * Returns valid compression types for this driver
+     * @return array
+     */
+    public function getValidCompressions()
+    {
+        return VALID_COMPRESSIONS[(new ReflectionClass(get_called_class()))->getShortName()];
+    }
+
+    /**
+     * Returns valid extensions for this driver
+     * @return array
+     */
+    public function getValidExtensions()
+    {
+        return VALID_EXTENSIONS[(new ReflectionClass(get_called_class()))->getShortName()];
+    }
 
     /**
      * Exports the database

@@ -24,6 +24,7 @@ namespace MysqlBackup\Test\TestCase\Driver;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
+use MysqlBackup\BackupTrait;
 use MysqlBackup\Driver\Mysql;
 use Reflection\ReflectionTrait;
 
@@ -32,6 +33,7 @@ use Reflection\ReflectionTrait;
  */
 class MysqlTest extends TestCase
 {
+    use BackupTrait;
     use ReflectionTrait;
 
     /**
@@ -49,7 +51,7 @@ class MysqlTest extends TestCase
     {
         parent::setUp();
 
-        $this->Mysql = new Mysql;
+        $this->Mysql = new Mysql($this->getConnection());
     }
     /**
      * Teardown any static object changes and restore them
@@ -63,14 +65,12 @@ class MysqlTest extends TestCase
     }
 
     /**
-     * Test for constructor and properties
+     * Test for constructor
      * @test
      */
-    public function testConstructorAndProperties()
+    public function testConstructor()
     {
-        $this->assertEquals(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'], $this->getProperty($this->Mysql, 'compressions'));
         $this->assertNotEmpty($this->getProperty($this->Mysql, 'connection'));
-        $this->assertEquals(['sql.bz2', 'sql.gz', 'sql'], $this->getProperty($this->Mysql, 'extensions'));
     }
 
     /**
@@ -207,5 +207,23 @@ class MysqlTest extends TestCase
         $this->assertEquals($expected, $result);
 
         unlink($auth);
+    }
+
+    /**
+     * Test for `getValidExtensions()` method
+     * @test
+     */
+    public function testGetValidExtensions()
+    {
+        $this->assertEquals(['sql.bz2', 'sql.gz', 'sql'], $this->Mysql->getValidExtensions());
+    }
+
+    /**
+     * Test for `getValidCompressions()` method
+     * @test
+     */
+    public function testGetValidCompressions()
+    {
+        $this->assertEquals(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false], $this->Mysql->getValidCompressions());
     }
 }
