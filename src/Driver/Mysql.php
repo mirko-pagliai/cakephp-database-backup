@@ -41,25 +41,18 @@ class Mysql extends Driver
      * @return string
      * @uses getCompression()
      * @uses getValidCompressions()
-     * @throws InternalErrorException
      */
     protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
+        $mysqldumpBinary = $this->getBinary('mysqldump');
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
-
-            if (!$executable) {
-                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
-            }
-
-            return sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldump, $executable);
+            return sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldumpBinary, $this->getBinary($compression));
         }
 
         //No compression
-        return sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldump);
+        return sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldumpBinary);
     }
 
     /**
@@ -93,25 +86,18 @@ class Mysql extends Driver
      * @return string
      * @uses getCompression()
      * @uses getValidCompressions()
-     * @throws InternalErrorException
      */
     protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
+        $mysqlBinary = $this->getBinary('mysql');
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            $executable = Configure::read(sprintf(MYSQL_BACKUP . '.bin.%s', $compression));
-
-            if (!$executable) {
-                throw new InternalErrorException(__d('mysql_backup', '`{0}` executable not available', $compression));
-            }
-
-            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $executable, $mysql);
+            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $this->getBinary($compression), $mysqlBinary);
         }
 
         //No compression
-        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s', $mysql);
+        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s', $mysqlBinary);
     }
 
     /**

@@ -49,9 +49,27 @@ trait BackupTrait
     }
 
     /**
+     * Gets a binary path
+     * @param string $name Binary name
+     * @return string
+     * @throws InvalidArgumentException
+     */
+    public function getBinary($name)
+    {
+        $binary = Configure::read(MYSQL_BACKUP . '.bin.' . $name);
+
+        if (!$binary) {
+            throw new InvalidArgumentException(__d('mysql_backup', '`{0}` executable not available', $name));
+        }
+
+        return $binary;
+    }
+
+    /**
      * Gets the connection array
      * @param string|null $name Connection name
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getConnection($name = null)
     {
@@ -59,7 +77,13 @@ trait BackupTrait
             $name = Configure::read(MYSQL_BACKUP . '.connection');
         }
 
-        return ConnectionManager::getConfig($name);
+        $connection = ConnectionManager::getConfig($name);
+
+        if (empty($connection)) {
+            throw new InvalidArgumentException(__d('mysql_backup', 'Invalid `{0}` connection', $name));
+        }
+
+        return $connection;
     }
 
     /**

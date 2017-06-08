@@ -22,7 +22,6 @@
  * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/Configuration
  */
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 
 //Sets the default MysqlBackup name
 if (!defined('MYSQL_BACKUP')) {
@@ -76,23 +75,6 @@ if (!Configure::check(MYSQL_BACKUP . '.connection')) {
 //Default target directory
 if (!Configure::check(MYSQL_BACKUP . '.target')) {
     Configure::write(MYSQL_BACKUP . '.target', ROOT . DS . 'backups');
-}
-
-//Checks for mysql binary
-if (empty(Configure::read(MYSQL_BACKUP . '.bin.mysql'))) {
-    trigger_error(sprintf('The `%s` binary was not found', 'mysql'), E_USER_ERROR);
-}
-
-//Checks for mysqldump binary
-if (empty(Configure::read(MYSQL_BACKUP . '.bin.mysqldump'))) {
-    trigger_error(sprintf('The `%s` binary was not found', 'mysqldump'), E_USER_ERROR);
-}
-
-//Checks for connection
-$connection = Configure::read(MYSQL_BACKUP . '.connection');
-
-if (empty(ConnectionManager::getConfig($connection))) {
-    trigger_error(sprintf('Invalid `%s` connection', $connection), E_USER_ERROR);
 }
 
 //Checks for the target directory

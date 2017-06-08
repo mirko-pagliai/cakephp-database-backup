@@ -75,6 +75,28 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getBinary()` method
+     * @test
+     */
+    public function testGetBinary()
+    {
+        $this->assertEquals(which('mysql'), $this->Trait->getBinary('mysql'));
+    }
+
+    /**
+     * Test for `getBinary()` method, with a binary not available
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage `bzip2` executable not available
+     * @test
+     */
+    public function testGetBinaryNotAvailable()
+    {
+        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
+
+        $this->Trait->getBinary('bzip2');
+    }
+
+    /**
      * Test for `getConnection()` method
      * @test
      */
@@ -107,6 +129,17 @@ class BackupTraitTest extends TestCase
         ];
 
         $this->assertEquals($expected, $this->Trait->getConnection('fake'));
+    }
+
+    /**
+     * Test for `getConnection()` method, with an invalid connection
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid `noExisting` connection
+     * @test
+     */
+    public function testGetConnectionInvalidConnection()
+    {
+        $this->Trait->getConnection('noExisting');
     }
 
     /**

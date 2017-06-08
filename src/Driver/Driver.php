@@ -71,14 +71,16 @@ abstract class Driver
      */
     public function getCompression($filename)
     {
-        //Gets the extension
+        $compressions = $this->getValidCompressions();
+
+        //Gets the extension from the filename
         $extension = $this->getExtension($filename);
 
-        if (!array_key_exists($extension, $this->getValidCompressions())) {
+        if (!array_key_exists($extension, $compressions)) {
             return null;
         }
 
-        return $this->getValidCompressions()[$extension];
+        return $compressions[$extension];
     }
 
     /**
