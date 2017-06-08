@@ -91,7 +91,7 @@ class BackupTraitTest extends TestCase
      */
     public function testGetBinaryNotAvailable()
     {
-        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
+        Configure::write(MYSQL_BACKUP . '.binaries.bzip2', false);
 
         $this->Trait->getBinary('bzip2');
     }

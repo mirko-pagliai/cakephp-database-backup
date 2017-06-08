@@ -56,7 +56,7 @@ trait BackupTrait
      */
     public function getBinary($name)
     {
-        $binary = Configure::read(MYSQL_BACKUP . '.bin.' . $name);
+        $binary = Configure::read(MYSQL_BACKUP . '.binaries.' . $name);
 
         if (!$binary) {
             throw new InvalidArgumentException(__d('mysql_backup', '`{0}` executable not available', $name));

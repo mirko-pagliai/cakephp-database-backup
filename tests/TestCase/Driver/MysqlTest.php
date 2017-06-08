@@ -83,9 +83,9 @@ class MysqlTest extends TestCase
     public function testGetExportExecutable()
     {
         $method = 'getExportExecutable';
-        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
-        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
-        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
+        $mysqldump = $this->getBinary('mysqldump');
+        $bzip2 = $this->getBinary('bzip2');
+        $gzip = $this->getBinary('gzip');
 
         $this->assertEquals(
             $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
@@ -137,9 +137,9 @@ class MysqlTest extends TestCase
     public function testGetImportExecutable()
     {
         $method = 'getImportExecutable';
-        $mysql = Configure::read(MYSQL_BACKUP . '.bin.mysql');
-        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
-        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
+        $mysql = $this->getBinary('mysql');
+        $bzip2 = $this->getBinary('bzip2');
+        $gzip = $this->getBinary('gzip');
 
         $this->assertEquals(
             $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s',

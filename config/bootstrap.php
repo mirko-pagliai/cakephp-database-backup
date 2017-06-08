@@ -42,24 +42,14 @@ if (!defined('VALID_EXTENSIONS')) {
     ]);
 }
 
-//bzip2 binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.bzip2')) {
-    Configure::write(MYSQL_BACKUP . '.bin.bzip2', which('bzip2'));
-}
-
-//gzip binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.gzip')) {
-    Configure::write(MYSQL_BACKUP . '.bin.gzip', which('gzip'));
-}
-
-//mysql binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.mysql')) {
-    Configure::write(MYSQL_BACKUP . '.bin.mysql', which('mysql'));
-}
-
-//mysqldump binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.mysqldump')) {
-    Configure::write(MYSQL_BACKUP . '.bin.mysqldump', which('mysqldump'));
+//Binaries
+if (!Configure::check(MYSQL_BACKUP . '.binaries')) {
+    Configure::write(MYSQL_BACKUP . '.binaries', [
+        'bzip2' => which('bzip2'),
+        'gzip' => which('gzip'),
+        'mysql' => which('mysql'),
+        'mysqldump' => which('mysqldump'),
+    ]);
 }
 
 //Chmod for backups
