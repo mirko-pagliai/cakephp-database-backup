@@ -23,8 +23,6 @@
  */
 namespace MysqlBackup\Driver;
 
-use Cake\Core\Configure;
-use Cake\Network\Exception\InternalErrorException;
 use MysqlBackup\BackupTrait;
 use MysqlBackup\Driver\Driver;
 

@@ -284,12 +284,12 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `send()` method, without a sender in the configuration
+     * Test for `send()` method, without a sender
      * @test
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage You must first set the mail sender in the configuration
+     * @expectedExceptionMessage You must first set the mail sender
      */
-    public function testSendWithoutSenderInConfiguration()
+    public function testSendWithoutSender()
     {
         Configure::write(MYSQL_BACKUP . '.mailSender', false);
 

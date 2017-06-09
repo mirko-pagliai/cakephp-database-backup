@@ -62,7 +62,7 @@ abstract class Driver
     abstract protected function getExportExecutable($filename);
 
     /**
-     * Returns the compression type of a filename
+     * Returns the compression type from a filename
      * @param string $filename Filename
      * @return string|bool|null Compression type as string, `null` on failure,
      *  `false` for no compression
@@ -91,7 +91,7 @@ abstract class Driver
      */
     public function getExtension($filename)
     {
-        $regex = sprintf('/(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
+        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
 
         if (preg_match($regex, $filename, $matches)) {
             return $matches[1];

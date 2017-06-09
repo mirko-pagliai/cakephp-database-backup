@@ -62,7 +62,7 @@ class BackupImport
      * @return \MysqlBackup\Utility\BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws InternalErrorException
-     * @uses driver
+     * @uses $driver
      * @uses $filename
      */
     public function filename($filename)
@@ -93,7 +93,7 @@ class BackupImport
     public function import()
     {
         if (empty($this->filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'Before you import a database, you have to set the filename'));
+            throw new InternalErrorException(__d('mysql_backup', 'You must first set the filename'));
         }
 
         //This allows the filename to be set again with a next call of this

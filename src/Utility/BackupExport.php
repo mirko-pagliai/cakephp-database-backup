@@ -110,12 +110,13 @@ class BackupExport
      */
     public function compression($compression)
     {
-        if (!in_array($compression, $this->driver->getValidCompressions(), true)) {
+        $this->extension = array_search($compression, $this->driver->getValidCompressions(), true);
+
+        if (!$this->extension) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
         }
 
         $this->compression = $compression;
-        $this->extension = array_search($compression, $this->driver->getValidCompressions());
 
         return $this;
     }

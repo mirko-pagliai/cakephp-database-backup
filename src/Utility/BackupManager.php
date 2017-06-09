@@ -161,7 +161,7 @@ class BackupManager
         $sender = Configure::read(MYSQL_BACKUP . '.mailSender');
 
         if (!$sender) {
-            throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender in the configuration'));
+            throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender'));
         }
 
         $filename = $this->getAbsolutePath($filename);

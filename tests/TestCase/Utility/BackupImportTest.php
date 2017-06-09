@@ -166,7 +166,7 @@ class BackupImportTest extends TestCase
     /**
      * Test for `import()` method, without a filename
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage Before you import a database, you have to set the filename
+     * @expectedExceptionMessage You must first set the filename
      * @test
      */
     public function testImportWithoutFilename()
