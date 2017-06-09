@@ -1,5 +1,11 @@
 # 1.x branch
 ## 1.1 branch
+### 1.1.1
+* `_storeAuth()` methods from `BackupExport` and `BackupImport` classes are
+    now private;
+* added `BackupTrait::getConnection()` method;
+* added `BackupTrait::getValidCompressions()` method.
+
 ### 1.1.0
 * added `BackupShell::send()` and `BackupManager::send()` methods to send backup
     files via mail;

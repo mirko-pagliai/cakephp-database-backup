@@ -26,6 +26,7 @@ namespace MysqlBackup\Shell;
 use Cake\Console\ConsoleIo;
 use Cake\Console\Shell;
 use Cake\I18n\Number;
+use MysqlBackup\BackupTrait;
 use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupImport;
 use MysqlBackup\Utility\BackupManager;
@@ -35,6 +36,8 @@ use MysqlBackup\Utility\BackupManager;
  */
 class BackupShell extends Shell
 {
+    use BackupTrait;
+
     /**
      * @var \MysqlBackup\Utility\BackupManager
      */
@@ -267,7 +270,7 @@ class BackupShell extends Shell
             'parser' => [
                 'options' => [
                     'compression' => [
-                        'choices' => ['gzip', 'bzip2', 'none'],
+                        'choices' => array_keys($this->getValidCompressions()),
                         'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
                         'short' => 'c',
                     ],

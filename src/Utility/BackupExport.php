@@ -24,7 +24,6 @@
 namespace MysqlBackup\Utility;
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use Cake\Network\Exception\InternalErrorException;
 use MysqlBackup\BackupTrait;
 
@@ -89,7 +88,7 @@ class BackupExport
      */
     public function __construct()
     {
-        $this->connection = ConnectionManager::getConfig(Configure::read(MYSQL_BACKUP . '.connection'));
+        $this->connection = $this->getConnection();
         $this->BackupManager = new BackupManager;
     }
 
@@ -128,7 +127,7 @@ class BackupExport
      * @uses $connection
      * @return string File path
      */
-    protected function _storeAuth()
+    private function _storeAuth()
     {
         $auth = tempnam(sys_get_temp_dir(), 'auth');
 
@@ -155,7 +154,7 @@ class BackupExport
      */
     public function compression($compression)
     {
-        if (!in_array($compression, ['bzip2', 'gzip', false], true)) {
+        if (!in_array($compression, $this->getValidCompressions(), true)) {
             throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
         }
 

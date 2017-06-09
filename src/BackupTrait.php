@@ -23,6 +23,7 @@
 namespace MysqlBackup;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use Cake\Filesystem\Folder;
 
 /**
@@ -51,31 +52,43 @@ trait BackupTrait
      * @return string|bool|null Compression type or `null` on failure. `false`
      *  means no compression (a simple sql file)
      * @uses getExtension()
+     * @uses getValidCompressions()
      */
     public function getCompression($filename)
     {
         //Gets the extension
         $extension = $this->getExtension($filename);
 
-        $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
-
-        if (!array_key_exists($extension, $compressions)) {
+        if (!array_key_exists($extension, $this->getValidCompressions())) {
             return null;
         }
 
-        return $compressions[$extension];
+        return $this->getValidCompressions()[$extension];
+    }
+
+    /**
+     * Gets the connection array
+     * @param string|null $name Connection name or `null`
+     * @return array
+     */
+    public function getConnection($name = null)
+    {
+        if (!$name) {
+            $name = Configure::read(MYSQL_BACKUP . '.connection');
+        }
+
+        return ConnectionManager::getConfig($name);
     }
 
     /**
      * Returns the extension starting from a compression type or a filename
      * @param string $compressionOrFilename Compression type or filename
      * @return string|null Extension or `null` on failure
+     * @uses getValidCompressions()
      */
     public function getExtension($compressionOrFilename)
     {
-        $compressions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
-
-        $extension = array_search($compressionOrFilename, $compressions, true);
+        $extension = array_search($compressionOrFilename, $this->getValidCompressions(), true);
 
         if ($extension) {
             return $extension;
@@ -86,6 +99,15 @@ trait BackupTrait
         }
 
         return null;
+    }
+
+    /**
+     * Gets the list of valid compressions
+     * @return array
+     */
+    public function getValidCompressions()
+    {
+        return ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
     }
 
     /**
