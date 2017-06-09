@@ -52,6 +52,7 @@ trait BackupTrait
      * Gets a binary path
      * @param string $name Binary name
      * @return string
+     * @since 2.0.0
      * @throws InvalidArgumentException
      */
     public function getBinary($name)
@@ -91,6 +92,7 @@ trait BackupTrait
      *  according to the database engine
      * @param array $connection Connection array
      * @return object A driver instance
+     * @since 2.0.0
      * @throws InvalidArgumentException
      */
     public function getDriver(array $connection = [])

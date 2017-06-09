@@ -39,13 +39,10 @@ if (!defined('MYSQL_BACKUP')) {
 }
 
 //Binaries
-if (!Configure::check(MYSQL_BACKUP . '.binaries')) {
-    Configure::write(MYSQL_BACKUP . '.binaries', [
-        'bzip2' => which('bzip2'),
-        'gzip' => which('gzip'),
-        'mysql' => which('mysql'),
-        'mysqldump' => which('mysqldump'),
-    ]);
+foreach (['bzip2', 'gzip', 'mysql', 'mysqldump'] as $binary) {
+    if (!Configure::check(MYSQL_BACKUP . '.binaries.' . $binary)) {
+        Configure::write(MYSQL_BACKUP . '.binaries.' . $binary, which($binary));
+    }
 }
 
 //Chmod for backups
