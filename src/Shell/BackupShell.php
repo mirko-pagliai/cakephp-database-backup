@@ -185,7 +185,7 @@ class BackupShell extends Shell
                 __d('mysql_backup', 'Datetime'),
             ];
 
-            $this->helper('table')->output(array_merge([$headers], $backups));
+            $this->helper('table')->output(array_merge([$headers], array_map('array_values', $backups)));
         }
     }
 

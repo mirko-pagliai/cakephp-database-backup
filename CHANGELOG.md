@@ -1,6 +1,7 @@
 # 1.x branch
 ## 1.1 branch
 ### 1.1.1
+* fixed bugs in the table output for the `BackupShell::index()` method;
 * `_storeAuth()` methods from `BackupExport` and `BackupImport` classes are
     now private;
 * added `BackupTrait::getConnection()` method;
