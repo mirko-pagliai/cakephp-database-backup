@@ -57,7 +57,7 @@ class BackupExport
      * @since 2.0.0
      * @var object
      */
-    protected $driver;
+    public $driver;
 
     /**
      * Recipient of the email, if you want to send the backup via mail
@@ -69,7 +69,7 @@ class BackupExport
      * Filename extension
      * @var string
      */
-    protected $extension = 'sql';
+    protected $extension;
 
     /**
      * Filename where to export the database
@@ -82,7 +82,7 @@ class BackupExport
      *  will delete all backups that are older.
      * @var int
      */
-    protected $rotate;
+    protected $rotate = 0;
 
     /**
      * Construct
@@ -217,6 +217,10 @@ class BackupExport
     public function export()
     {
         if (empty($this->filename)) {
+            if (empty($this->extension)) {
+                $this->extension = $this->driver->getDefaultExtension();
+            }
+
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 

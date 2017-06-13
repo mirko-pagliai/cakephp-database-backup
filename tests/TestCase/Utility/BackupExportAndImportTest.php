@@ -29,7 +29,7 @@ use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupImport;
 
 /**
- * BackupExportWithRecordsTest class
+ * BackupExportAndImportTest class
  */
 class BackupExportAndImportTest extends TestCase
 {
@@ -165,8 +165,9 @@ class BackupExportAndImportTest extends TestCase
      */
     public function testExportAndImport()
     {
-        $this->_testExportAndImport(false);
-        $this->_testExportAndImport('bzip2');
-        $this->_testExportAndImport('gzip');
+        //Performs the test for each compression supported by the driver
+        foreach ($this->BackupExport->driver->getValidCompressions() as $compression) {
+            $this->_testExportAndImport($compression);
+        }
     }
 }

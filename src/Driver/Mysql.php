@@ -34,6 +34,12 @@ class Mysql extends Driver
     use BackupTrait;
 
     /**
+     * Default extension for export
+     * @var string
+     */
+    public $defaultExtension = 'sql';
+
+    /**
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string

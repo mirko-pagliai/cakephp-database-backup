@@ -22,7 +22,6 @@
  */
 namespace MysqlBackup\Test\TestCase\Driver;
 
-use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use MysqlBackup\BackupTrait;
 use MysqlBackup\Driver\Mysql;
@@ -77,6 +76,15 @@ class MysqlTest extends TestCase
     }
 
     /**
+     * Test for `getDefaultExtension()` method
+     * @test
+     */
+    public function testGetDefaultExtension()
+    {
+        $this->assertEquals('sql', $this->Mysql->getDefaultExtension());
+    }
+
+    /**
      * Test for `getExportExecutable()` method
      * @test
      */
@@ -85,12 +93,10 @@ class MysqlTest extends TestCase
         $method = 'getExportExecutable';
         $mysqldump = $this->getBinary('mysqldump');
 
-        $bzip2 = $this->getBinary('bzip2');
-        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s';
+        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $this->getBinary('bzip2') . ' > %s';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
 
-        $gzip = $this->getBinary('gzip');
-        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s';
+        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $this->getBinary('gzip') . ' > %s';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
 
         $expected = $mysqldump . ' --defaults-file=%s %s > %s';
@@ -135,12 +141,10 @@ class MysqlTest extends TestCase
         $method = 'getImportExecutable';
         $mysql = $this->getBinary('mysql');
 
-        $bzip2 = $this->getBinary('bzip2');
-        $expected = $bzip2 . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s';
+        $expected = $this->getBinary('bzip2') . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
 
-        $gzip = $this->getBinary('gzip');
-        $expected = $gzip . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s';
+        $expected = $this->getBinary('gzip') . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
 
         $expected = 'cat %s | ' . $mysql . ' --defaults-extra-file=%s %s';

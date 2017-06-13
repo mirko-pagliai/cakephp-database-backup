@@ -38,6 +38,12 @@ abstract class Driver
     protected $connection;
 
     /**
+     * Default extension for export
+     * @var string
+     */
+    protected $defaultExtension;
+
+    /**
      * Construct
      * @param array $connection Connection
      * @uses $connection
@@ -53,6 +59,15 @@ abstract class Driver
      * @return bool true on success
      */
     abstract public function export($filename);
+
+    /**
+     * Returns the default extension for export
+     * @return string
+     */
+    public function getDefaultExtension()
+    {
+        return $this->defaultExtension;
+    }
 
     /**
      * Gets the executable command to export the database
