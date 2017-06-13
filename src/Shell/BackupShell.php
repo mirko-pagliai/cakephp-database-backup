@@ -176,10 +176,6 @@ class BackupShell extends Shell
             //Parses backups
             $backups = collection($backups)
                 ->map(function ($backup) {
-                    if (isset($backup->compression) && !$backup->compression) {
-                        $backup->compression = __d('mysql_backup', 'none');
-                    }
-
                     $backup->size = Number::toReadableSize($backup->size);
 
                     return $backup->toArray();
