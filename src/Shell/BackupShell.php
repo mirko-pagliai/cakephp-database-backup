@@ -44,6 +44,13 @@ class BackupShell extends Shell
     protected $BackupManager;
 
     /**
+     * Database connection
+     * @since 2.0.0
+     * @var array
+     */
+    protected $connection;
+
+    /**
      * Driver containing all methods to export/import database backups
      *  according to the database engine
      * @since 2.0.0
@@ -55,6 +62,7 @@ class BackupShell extends Shell
      * Constructor
      * @param \Cake\Console\ConsoleIo|null $io An io instance
      * @uses $BackupManager
+     * @uses $connection
      * @uses $driver
      */
     public function __construct(ConsoleIo $io = null)
@@ -62,7 +70,23 @@ class BackupShell extends Shell
         parent::__construct($io);
 
         $this->BackupManager = new BackupManager;
-        $this->driver = $this->getDriver();
+        $this->connection = $this->getConnection();
+        $this->driver = $this->getDriver($this->connection);
+    }
+
+    /**
+     * Displays a header for the shell
+     * @return void
+     * @since 2.0.0
+     * @uses $connection
+     */
+    protected function _welcome()
+    {
+        parent::_welcome();
+
+        $this->out(__d('mysql_backup', 'Connection: {0}', $this->connection['name']));
+        $this->out(__d('mysql_backup', 'Driver: {0}', $this->getClassShortName($this->connection['driver'])));
+        $this->hr();
     }
 
     /**

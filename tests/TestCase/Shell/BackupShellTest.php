@@ -30,12 +30,15 @@ use Cake\TestSuite\TestCase;
 use MysqlBackup\Shell\BackupShell;
 use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupManager;
+use Reflection\ReflectionTrait;
 
 /**
  * BackupShellTest class
  */
 class BackupShellTest extends TestCase
 {
+    use ReflectionTrait;
+
     /**
      * @var \MysqlBackup\Utility\BackupExport
      */
@@ -141,6 +144,21 @@ class BackupShellTest extends TestCase
         $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
         return $files;
+    }
+
+    /**
+     * Test for `_welcome()` method
+     * @test
+     */
+    public function testWelcome()
+    {
+        $this->invokeMethod($this->BackupShell, '_welcome');
+
+        $messages = $this->out->messages();
+
+        $this->assertEquals('Connection: test', $messages[6]);
+        $this->assertEquals('Driver: Mysql', $messages[7]);
+        $this->assertRegExp('/^\-+$/', $messages[8]);
     }
 
     /**
