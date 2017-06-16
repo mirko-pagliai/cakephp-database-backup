@@ -300,7 +300,6 @@ class BackupShellTest extends TestCase
         $this->assertEquals([
             'backup.sql',
             'sql',
-            'none',
             Number::toReadableSize($backups[2]->size),
             (string)$backups[2]->datetime,
         ], next($output));
