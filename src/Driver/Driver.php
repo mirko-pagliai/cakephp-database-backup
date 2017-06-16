@@ -23,7 +23,7 @@
  */
 namespace MysqlBackup\Driver;
 
-use ReflectionClass;
+use MysqlBackup\BackupTrait;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -31,6 +31,8 @@ use ReflectionClass;
  */
 abstract class Driver
 {
+    use BackupTrait;
+
     /**
      * Database connection
      * @var array
@@ -128,7 +130,7 @@ abstract class Driver
      */
     public function getValidCompressions()
     {
-        return VALID_COMPRESSIONS[(new ReflectionClass(get_called_class()))->getShortName()];
+        return VALID_COMPRESSIONS[$this->getClassShortName(get_called_class())];
     }
 
     /**
@@ -137,7 +139,7 @@ abstract class Driver
      */
     public function getValidExtensions()
     {
-        return VALID_EXTENSIONS[(new ReflectionClass(get_called_class()))->getShortName()];
+        return VALID_EXTENSIONS[$this->getClassShortName(get_called_class())];
     }
 
     /**

@@ -67,6 +67,16 @@ trait BackupTrait
     }
 
     /**
+     * Gets the short name for class namespace
+     * @param string $class Class namespace
+     * @return string
+     */
+    public function getClassShortName($class)
+    {
+        return (new ReflectionClass($class))->getShortName();
+    }
+
+    /**
      * Gets the connection array
      * @param string|null $name Connection name
      * @return array
@@ -94,6 +104,7 @@ trait BackupTrait
      * @return object A driver instance
      * @since 2.0.0
      * @throws InvalidArgumentException
+     * @uses getClassShortName()
      */
     public function getDriver(array $connection = [])
     {
@@ -105,8 +116,7 @@ trait BackupTrait
             throw new InvalidArgumentException(__d('mysql_backup', 'Unable to detect the driver to use'));
         }
 
-        $driver = (new ReflectionClass($connection['driver']))->getShortName();
-        $driver = MYSQL_BACKUP . '\\Driver\\' . $driver;
+        $driver = MYSQL_BACKUP . '\\Driver\\' . $this->getClassShortName($connection['driver']);
 
         return new $driver($connection);
     }
