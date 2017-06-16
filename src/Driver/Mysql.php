@@ -23,6 +23,7 @@
  */
 namespace MysqlBackup\Driver;
 
+use Cake\Network\Exception\InternalErrorException;
 use MysqlBackup\BackupTrait;
 use MysqlBackup\Driver\Driver;
 
@@ -52,11 +53,11 @@ class Mysql extends Driver
         $mysqldumpBinary = $this->getBinary('mysqldump');
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s --defaults-file=%%s %%s | %s > %%s', $mysqldumpBinary, $this->getBinary($compression));
+            return sprintf('%s --defaults-file=%%s %%s | %s > %%s 2>/dev/null', $mysqldumpBinary, $this->getBinary($compression));
         }
 
         //No compression
-        return sprintf('%s --defaults-file=%%s %%s > %%s', $mysqldumpBinary);
+        return sprintf('%s --defaults-file=%%s %%s > %%s 2>/dev/null', $mysqldumpBinary);
     }
 
     /**
@@ -97,11 +98,11 @@ class Mysql extends Driver
         $mysqlBinary = $this->getBinary('mysql');
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s', $this->getBinary($compression), $mysqlBinary);
+            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s 2>/dev/null', $this->getBinary($compression), $mysqlBinary);
         }
 
         //No compression
-        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s', $mysqlBinary);
+        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s 2>/dev/null', $mysqlBinary);
     }
 
     /**
@@ -133,6 +134,7 @@ class Mysql extends Driver
      * Exports the database
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
+     * @throws InternalErrorException
      * @uses $connection
      * @uses getExportExecutable()
      * @uses getExportStoreAuth()
@@ -143,10 +145,15 @@ class Mysql extends Driver
         $auth = $this->getExportStoreAuth();
 
         //Executes
-        exec(sprintf($this->getExportExecutable($filename), $auth, $this->connection['database'], $filename));
+        $command = sprintf($this->getExportExecutable($filename), $auth, $this->connection['database'], $filename);
+        exec($command, $output, $returnVar);
 
         //Deletes the temporary file with the authentication data
         unlink($auth);
+
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'mysqldump', $returnVar));
+        }
 
         return file_exists($filename);
     }
@@ -155,6 +162,7 @@ class Mysql extends Driver
      * Imports the database
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
+     * @throws InternalErrorException
      * @uses $connection
      * @uses getImportExecutable()
      * @uses getImportStoreAuth()
@@ -165,10 +173,15 @@ class Mysql extends Driver
         $auth = $this->getImportStoreAuth();
 
         //Executes
-        exec(sprintf($this->getImportExecutable($filename), $filename, $auth, $this->connection['database']));
+        $command = sprintf($this->getImportExecutable($filename), $filename, $auth, $this->connection['database']);
+        exec($command, $output, $returnVar);
 
         //Deletes the temporary file with the authentication data
         unlink($auth);
+
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'mysql', $returnVar));
+        }
 
         return true;
     }
