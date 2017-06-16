@@ -1,3 +1,9 @@
+# 2.x branch
+## 2.0 branch
+### 2.0.0
+* the code has been completely rewritten to work with drivers, so it can also
+    work with other database engines.
+
 # 1.x branch
 ## 1.1 branch
 ### 1.1.1
