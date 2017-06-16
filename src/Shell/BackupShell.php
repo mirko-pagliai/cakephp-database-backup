@@ -172,7 +172,7 @@ class BackupShell extends Shell
 
                     $backup->size = Number::toReadableSize($backup->size);
 
-                    return $backup->toArray();
+                    return array_values($backup->toArray());
                 })
                 ->toArray();
 
