@@ -146,7 +146,7 @@ class BackupExport
         ], [
             $this->connection['database'],
             date('YmdHis'),
-            $this->connection['host'],
+            empty($this->connection['host']) ? 'localhost' : $this->connection['host'],
             time(),
         ], $filename);
 
