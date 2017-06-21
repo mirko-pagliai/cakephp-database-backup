@@ -23,23 +23,25 @@
  */
 use Cake\Core\Configure;
 
-//Sets the list of valid compressions
-const VALID_COMPRESSIONS = [
-    'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
-];
-
-//Sets the list of valid extensions
-const VALID_EXTENSIONS = [
-    'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
-];
-
 //Sets the default MysqlBackup name
 if (!defined('MYSQL_BACKUP')) {
     define('MYSQL_BACKUP', 'MysqlBackup');
 }
 
+//Sets the list of valid compressions
+const VALID_COMPRESSIONS = [
+    'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
+    'Sqlite' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
+];
+
+//Sets the list of valid extensions
+const VALID_EXTENSIONS = [
+    'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
+    'Sqlite' => ['sql.bz2', 'sql.gz', 'sql'],
+];
+
 //Binaries
-foreach (['bzip2', 'gzip', 'mysql', 'mysqldump'] as $binary) {
+foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'sqlite3'] as $binary) {
     if (!Configure::check(MYSQL_BACKUP . '.binaries.' . $binary)) {
         Configure::write(MYSQL_BACKUP . '.binaries.' . $binary, which($binary));
     }

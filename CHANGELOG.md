@@ -3,6 +3,7 @@
 ### 2.0.0
 * the code has been completely rewritten to work with drivers, so it can also
     work with other database engines;
+* added support for Sqlite database;
 * checks the return status code when it runs `mysql` and `mysqldump` from the
     command line.
 
