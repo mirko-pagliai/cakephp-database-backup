@@ -23,6 +23,8 @@
  */
 namespace MysqlBackup\Driver;
 
+use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use MysqlBackup\BackupTrait;
 
 /**
@@ -53,6 +55,24 @@ abstract class Driver
     public function __construct($connection)
     {
         $this->connection = $connection;
+    }
+
+    /**
+     * Deletes all the records of all the tables.
+     *
+     * Some drivers (eg. Sqlite) are not able to drop tables before import a
+     *  backup file. For this reason, it may be necessary to delete all records
+     *  first.
+     * @return void
+     * @uses getTables()
+     */
+    public function deleteAllRecords()
+    {
+        $connection = ConnectionManager::get(Configure::read(MYSQL_BACKUP . '.connection'));
+
+        foreach ($this->getTables() as $table) {
+            $connection->delete($table);
+        }
     }
 
     /**
@@ -123,6 +143,17 @@ abstract class Driver
      * @return string
      */
     abstract protected function getImportExecutable($filename);
+
+    /**
+     * Gets all tables of the current database
+     * @return array
+     */
+    public function getTables()
+    {
+        $connection = ConnectionManager::get(Configure::read(MYSQL_BACKUP . '.connection'));
+
+        return $connection->getSchemaCollection()->listTables();
+    }
 
     /**
      * Returns valid compression types for this driver
