@@ -197,6 +197,29 @@ class SqliteTest extends DriverTestCase
     }
 
     /**
+     * Test for `export()` method on failure
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage sqlite3 failed with exit code `1`
+     * @test
+     */
+    public function testExportOnFailure()
+    {
+        $connection = $this->getProperty($this->Sqlite, 'connection');
+
+        $this->Sqlite = $this->getMockBuilder(Sqlite::class)
+            ->setMethods(['getExportExecutable'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
+
+        $this->Sqlite->method('getExportExecutable')
+             ->will($this->returnCallback(function() use ($connection) {
+                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $connection['database']);
+             }));
+
+        $this->Sqlite->export($this->getAbsolutePath('example.sql'));
+    }
+
+    /**
      * Test for `import()` method
      * @test
      */
@@ -207,6 +230,29 @@ class SqliteTest extends DriverTestCase
         $this->Sqlite->export($backup);
 
         $this->assertTrue($this->Sqlite->import($backup));
+    }
+
+    /**
+     * Test for `import()` method on failure
+     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedExceptionMessage sqlite3 failed with exit code `1`
+     * @test
+     */
+    public function testImportOnFailure()
+    {
+        $connection = $this->getProperty($this->Sqlite, 'connection');
+
+        $this->Sqlite = $this->getMockBuilder(Sqlite::class)
+            ->setMethods(['getImportExecutable'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
+
+        $this->Sqlite->method('getImportExecutable')
+             ->will($this->returnCallback(function() use ($connection) {
+                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $connection['database']);
+             }));
+
+        $this->Sqlite->import('noExistingFile');
     }
 
     /**

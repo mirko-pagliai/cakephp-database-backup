@@ -22,6 +22,7 @@
  */
 namespace MysqlBackup\Driver;
 
+use Cake\Network\Exception\InternalErrorException;
 use MysqlBackup\BackupTrait;
 use MysqlBackup\Driver\Driver;
 
@@ -84,12 +85,17 @@ class Sqlite extends Driver
      * Exports the database
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
+     * @throws InternalErrorException
      * @uses getExportExecutable()
      */
     public function export($filename)
     {
         //Executes
         exec($this->getExportExecutable($filename), $output, $returnVar);
+
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
+        }
 
         return file_exists($filename);
     }
@@ -98,6 +104,7 @@ class Sqlite extends Driver
      * Imports the database
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
+     * @throws InternalErrorException
      * @uses deleteAllRecords()
      * @uses getImportExecutable()
      */
@@ -107,6 +114,10 @@ class Sqlite extends Driver
 
         //Executes
         exec($this->getImportExecutable($filename), $output, $returnVar);
+
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
+        }
 
         return true;
     }

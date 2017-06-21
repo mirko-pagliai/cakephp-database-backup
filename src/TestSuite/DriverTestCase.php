@@ -208,10 +208,22 @@ abstract class DriverTestCase extends TestCase
     abstract public function testExport();
 
     /**
+     * Test for `export()` method on failure
+     * @return void
+     */
+    abstract public function testExportOnFailure();
+
+    /**
      * Test for `import()` method
      * @return void
      */
     abstract public function testImport();
+
+    /**
+     * Test for `import()` method on failure
+     * @return void
+     */
+    abstract public function testImportOnFailure();
 
     /**
      * Test for `export()` and `import()` methods.

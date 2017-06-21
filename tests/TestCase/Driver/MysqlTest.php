@@ -221,12 +221,12 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `export()` method, with a failure by mysqldump
+     * Test for `export()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
      * @expectedExceptionMessage mysqldump failed with exit code `2`
      * @test
      */
-    public function testExportMysqldumpFailure()
+    public function testExportOnFailure()
     {
         //Sets a no existing database
         $connection = $this->getProperty($this->Mysql, 'connection');
@@ -250,12 +250,12 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `import()` method, with a failure by mysql
+     * Test for `import()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
      * @expectedExceptionMessage mysql failed with exit code `1`
      * @test
      */
-    public function testImportMysqlFailure()
+    public function testImportOnFailure()
     {
         $backup = $this->getAbsolutePath('example.sql');
 
