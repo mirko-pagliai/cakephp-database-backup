@@ -109,13 +109,13 @@ class MysqlTest extends DriverTestCase
         $method = 'getExportExecutable';
         $mysqldump = $this->getBinary('mysqldump');
 
-        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $this->getBinary('bzip2') . ' > %s 2>/dev/null';
+        $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
 
-        $expected = $mysqldump . ' --defaults-file=%s %s | ' . $this->getBinary('gzip') . ' > %s 2>/dev/null';
+        $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
 
-        $expected = $mysqldump . ' --defaults-file=%s %s > %s 2>/dev/null';
+        $expected = $mysqldump . ' --defaults-file=%s test > backup.sql 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
     }
 
@@ -163,13 +163,13 @@ class MysqlTest extends DriverTestCase
         $method = 'getImportExecutable';
         $mysql = $this->getBinary('mysql');
 
-        $expected = $this->getBinary('bzip2') . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s 2>/dev/null';
+        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
 
-        $expected = $this->getBinary('gzip') . ' -dc %s | ' . $mysql . ' --defaults-extra-file=%s %s 2>/dev/null';
+        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
 
-        $expected = 'cat %s | ' . $mysql . ' --defaults-extra-file=%s %s 2>/dev/null';
+        $expected = 'cat backup.sql | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
     }
 

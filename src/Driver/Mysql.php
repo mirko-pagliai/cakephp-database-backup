@@ -44,6 +44,7 @@ class Mysql extends Driver
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string
+     * @uses $connection
      * @uses getCompression()
      * @uses getValidCompressions()
      */
@@ -53,11 +54,11 @@ class Mysql extends Driver
         $mysqldumpBinary = $this->getBinary('mysqldump');
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s --defaults-file=%%s %%s | %s > %%s 2>/dev/null', $mysqldumpBinary, $this->getBinary($compression));
+            return sprintf('%s --defaults-file=%%s %s | %s > %s 2>/dev/null', $mysqldumpBinary, $this->connection['database'], $this->getBinary($compression), $filename);
         }
 
         //No compression
-        return sprintf('%s --defaults-file=%%s %%s > %%s 2>/dev/null', $mysqldumpBinary);
+        return sprintf('%s --defaults-file=%%s %s > %s 2>/dev/null', $mysqldumpBinary, $this->connection['database'], $filename);
     }
 
     /**
@@ -89,6 +90,7 @@ class Mysql extends Driver
      * Gets the executable command to import the database
      * @param string $filename Filename from which you want to import the database
      * @return string
+     * @uses $connection
      * @uses getCompression()
      * @uses getValidCompressions()
      */
@@ -98,11 +100,11 @@ class Mysql extends Driver
         $mysqlBinary = $this->getBinary('mysql');
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s -dc %%s | %s --defaults-extra-file=%%s %%s 2>/dev/null', $this->getBinary($compression), $mysqlBinary);
+            return sprintf('%s -dc %s | %s --defaults-extra-file=%%s %s 2>/dev/null', $this->getBinary($compression), $filename, $mysqlBinary, $this->connection['database']);
         }
 
         //No compression
-        return sprintf('cat %%s | %s --defaults-extra-file=%%s %%s 2>/dev/null', $mysqlBinary);
+        return sprintf('cat %s | %s --defaults-extra-file=%%s %s 2>/dev/null', $filename, $mysqlBinary, $this->connection['database']);
     }
 
     /**
@@ -145,8 +147,7 @@ class Mysql extends Driver
         $auth = $this->getExportStoreAuth();
 
         //Executes
-        $command = sprintf($this->getExportExecutable($filename), $auth, $this->connection['database'], $filename);
-        exec($command, $output, $returnVar);
+        exec(sprintf($this->getExportExecutable($filename), $auth), $output, $returnVar);
 
         //Deletes the temporary file with the authentication data
         unlink($auth);
@@ -173,8 +174,7 @@ class Mysql extends Driver
         $auth = $this->getImportStoreAuth();
 
         //Executes
-        $command = sprintf($this->getImportExecutable($filename), $filename, $auth, $this->connection['database']);
-        exec($command, $output, $returnVar);
+        exec(sprintf($this->getImportExecutable($filename), $auth), $output, $returnVar);
 
         //Deletes the temporary file with the authentication data
         unlink($auth);
