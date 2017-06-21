@@ -83,22 +83,6 @@ abstract class Driver
     abstract public function export($filename);
 
     /**
-     * Returns the default extension for export
-     * @return string
-     */
-    public function getDefaultExtension()
-    {
-        return $this->defaultExtension;
-    }
-
-    /**
-     * Gets the executable command to export the database
-     * @param string $filename Filename where you want to export the database
-     * @return string
-     */
-    abstract protected function getExportExecutable($filename);
-
-    /**
      * Returns the compression type from a filename
      * @param string $filename Filename
      * @return string|bool|null Compression type as string, `null` on failure,
@@ -119,6 +103,22 @@ abstract class Driver
 
         return $compressions[$extension];
     }
+
+    /**
+     * Returns the default extension for export
+     * @return string
+     */
+    public function getDefaultExtension()
+    {
+        return $this->defaultExtension;
+    }
+
+    /**
+     * Gets the executable command to export the database
+     * @param string $filename Filename where you want to export the database
+     * @return string
+     */
+    abstract protected function getExportExecutable($filename);
 
     /**
      * Returns the extension of a filename
