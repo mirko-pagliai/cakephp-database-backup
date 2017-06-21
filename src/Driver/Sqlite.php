@@ -74,7 +74,7 @@ class Sqlite extends Driver
         $sqlite3Binary = $this->getBinary('sqlite3');
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s -dc %s | %s %s', $this->getBinary($compression), $filename, $sqlite3Binary, $this->connection['database']);
+            return sprintf('%s -dc %s | %s %s 2>/dev/null', $this->getBinary($compression), $filename, $sqlite3Binary, $this->connection['database']);
         }
 
         //No compression

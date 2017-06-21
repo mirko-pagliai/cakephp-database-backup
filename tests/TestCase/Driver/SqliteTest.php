@@ -156,10 +156,10 @@ class SqliteTest extends DriverTestCase
         $method = 'getImportExecutable';
         $sqlite3 = $this->getBinary('sqlite3');
 
-        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $sqlite3 . ' /tmp/example.sq3';
+        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $sqlite3 . ' /tmp/example.sq3 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql.bz2']));
 
-        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $sqlite3 . ' /tmp/example.sq3';
+        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $sqlite3 . ' /tmp/example.sq3 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql.gz']));
 
         $expected = $sqlite3 . ' /tmp/example.sq3 < backup.sql 2>/dev/null';
