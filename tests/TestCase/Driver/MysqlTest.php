@@ -169,7 +169,7 @@ class MysqlTest extends DriverTestCase
         $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
 
-        $expected = 'cat backup.sql | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
+        $expected = $mysql . ' --defaults-extra-file=%s test < backup.sql 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
     }
 

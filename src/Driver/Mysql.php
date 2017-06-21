@@ -104,7 +104,7 @@ class Mysql extends Driver
         }
 
         //No compression
-        return sprintf('cat %s | %s --defaults-extra-file=%%s %s 2>/dev/null', $filename, $mysqlBinary, $this->connection['database']);
+        return sprintf('%s --defaults-extra-file=%%s %s < %s 2>/dev/null', $mysqlBinary, $this->connection['database'], $filename);
     }
 
     /**
