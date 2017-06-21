@@ -53,6 +53,7 @@ class MysqlTest extends TestCase
 
         $this->Mysql = new Mysql($this->getConnection());
     }
+
     /**
      * Teardown any static object changes and restore them
      * @return void
@@ -76,10 +77,16 @@ class MysqlTest extends TestCase
      */
     public function testGetCompression()
     {
-        $this->assertEquals(false, $this->Mysql->getCompression('backup.sql'));
-        $this->assertEquals('bzip2', $this->Mysql->getCompression('backup.sql.bz2'));
-        $this->assertEquals('gzip', $this->Mysql->getCompression('backup.sql.gz'));
-        $this->assertNull($this->Mysql->getCompression('text.txt'));
+        $compressions = [
+            'backup.sql' => false,
+            'backup.sql.bz2' => 'bzip2',
+            'backup.sql.gz' => 'gzip',
+            'text.txt' => null,
+        ];
+
+        foreach ($compressions as $filename => $expectedCompression) {
+            $this->assertEquals($expectedCompression, $this->Mysql->getCompression($filename));
+        }
     }
 
     /**
@@ -133,10 +140,16 @@ class MysqlTest extends TestCase
      */
     public function testGetExtension()
     {
-        $this->assertEquals('sql', $this->Mysql->getExtension('backup.sql'));
-        $this->assertEquals('sql.bz2', $this->Mysql->getExtension('backup.sql.bz2'));
-        $this->assertEquals('sql.gz', $this->Mysql->getExtension('backup.sql.gz'));
-        $this->assertNull($this->Mysql->getExtension('text.txt'));
+        $extensions = [
+            'backup.sql' => 'sql',
+            'backup.sql.bz2' => 'sql.bz2',
+            'backup.sql.gz' => 'sql.gz',
+            'text.txt' => null,
+        ];
+
+        foreach ($extensions as $filename => $expectedExtension) {
+            $this->assertEquals($expectedExtension, $this->Mysql->getExtension($filename));
+        }
     }
 
     /**
