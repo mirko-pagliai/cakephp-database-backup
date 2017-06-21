@@ -65,16 +65,6 @@ class BackupShellTest extends TestCase
     protected $out;
 
     /**
-     * Internal method to delete all backups
-     */
-    protected function _deleteAllBackups()
-    {
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
-    }
-
-    /**
      * Setup the test case, backup the static object values so they can be
      * restored. Specifically backs up the contents of Configure and paths in
      *  App if they have not already been backed up
@@ -147,6 +137,16 @@ class BackupShellTest extends TestCase
     }
 
     /**
+     * Internal method to delete all backups
+     */
+    protected function _deleteAllBackups()
+    {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
      * Test for `_welcome()` method
      * @test
      */
@@ -156,7 +156,7 @@ class BackupShellTest extends TestCase
 
         $messages = $this->out->messages();
 
-        $this->assertEquals('Connection: test', $messages[6]);
+        $this->assertRegExp('/^Connection: test/', $messages[6]);
         $this->assertEquals('Driver: Mysql', $messages[7]);
         $this->assertRegExp('/^\-+$/', $messages[8]);
     }
