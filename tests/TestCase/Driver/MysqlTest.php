@@ -22,16 +22,15 @@
  */
 namespace MysqlBackup\Test\TestCase\Driver;
 
-use Cake\Core\Configure;
-use Cake\TestSuite\TestCase;
 use MysqlBackup\BackupTrait;
 use MysqlBackup\Driver\Mysql;
+use MysqlBackup\TestSuite\DriverTestCase;
 use Reflection\ReflectionTrait;
 
 /**
  * MysqlTest class
  */
-class MysqlTest extends TestCase
+class MysqlTest extends DriverTestCase
 {
     use BackupTrait;
     use ReflectionTrait;
@@ -40,6 +39,15 @@ class MysqlTest extends TestCase
      * @var \MysqlBackup\Driver\Mysql
      */
     protected $Mysql;
+
+    /**
+     * Fixtures
+     * @var array
+     */
+    public $fixtures = [
+        'core.articles',
+        'core.comments',
+    ];
 
     /**
      * Setup the test case, backup the static object values so they can be
@@ -61,12 +69,6 @@ class MysqlTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        //Deletes all backups
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            //@codingStandardsIgnoreLine
-            @unlink($file);
-        }
 
         unset($this->Mysql);
     }
@@ -212,11 +214,10 @@ class MysqlTest extends TestCase
      */
     public function testExport()
     {
-        $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . 'test.sql';
-        $export = $this->Mysql->export($filename);
+        $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertTrue($export);
-        $this->assertFileExists(Configure::read(MYSQL_BACKUP . '.target') . DS . 'test.sql');
+        $this->assertTrue($this->Mysql->export($backup));
+        $this->assertFileExists($backup);
     }
 
     /**
@@ -232,7 +233,7 @@ class MysqlTest extends TestCase
         $connection['database'] = 'noExisting';
         $this->setProperty($this->Mysql, 'connection', $connection);
 
-        $this->Mysql->export(Configure::read(MYSQL_BACKUP . '.target') . DS . 'test.sql');
+        $this->Mysql->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
@@ -241,11 +242,11 @@ class MysqlTest extends TestCase
      */
     public function testImport()
     {
-        $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . 'test.sql';
-        $this->Mysql->export($filename);
+        $backup = $this->getAbsolutePath('example.sql');
 
-        $import = $this->Mysql->import($filename);
-        $this->assertTrue($import);
+        $this->Mysql->export($backup);
+
+        $this->assertTrue($this->Mysql->import($backup));
     }
 
     /**
@@ -256,14 +257,31 @@ class MysqlTest extends TestCase
      */
     public function testImportMysqlFailure()
     {
-        $filename = Configure::read(MYSQL_BACKUP . '.target') . DS . 'test.sql';
-        $this->Mysql->export($filename);
+        $backup = $this->getAbsolutePath('example.sql');
+
+        $this->Mysql->export($backup);
 
         //Sets a no existing database
         $connection = $this->getProperty($this->Mysql, 'connection');
         $connection['database'] = 'noExisting';
         $this->setProperty($this->Mysql, 'connection', $connection);
 
-        $this->Mysql->import($filename);
+        $this->Mysql->import($backup);
+    }
+
+    /**
+     * Test for `export()` and `import()` methods.
+     *
+     * It tests that the backup is properly exported and then imported.
+     * @see \MysqlBackup\TestSuite\DriverTestCase::_testExportAndImport()
+     * @test
+     */
+    public function testExportAndImport()
+    {
+        foreach ($this->Mysql->getValidExtensions() as $extension) {
+            $this->loadFixtures('Articles', 'Comments');
+
+            $this->_testExportAndImport($this->Mysql, sprintf('example.%s', $extension));
+        }
     }
 }

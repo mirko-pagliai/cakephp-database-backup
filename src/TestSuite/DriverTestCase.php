@@ -19,19 +19,21 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
+ * @since       2.0.0
  */
-namespace MysqlBackup\Test\TestCase\Utility;
+namespace MysqlBackup\TestSuite;
 
 use Cake\Core\Configure;
+use Cake\Database\Connection;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupImport;
 
 /**
- * BackupExportAndImportTest class
+ * DriverTestCase class.
+ *
+ * Classes with tests for driver must extend this class.
  */
-class BackupExportAndImportTest extends TestCase
+abstract class DriverTestCase extends TestCase
 {
     /**
      * @var \Cake\ORM\Table
@@ -39,25 +41,20 @@ class BackupExportAndImportTest extends TestCase
     protected $Articles;
 
     /**
-     * @var \MysqlBackup\Utility\BackupExport
-     */
-    protected $BackupExport;
-
-    /**
-     * @var \MysqlBackup\Utility\$BackupImport
-     */
-    protected $BackupImport;
-
-    /**
      * @var \Cake\ORM\Table
      */
     protected $Comments;
 
     /**
+     * @var bool
+     */
+    public $autoFixtures = false;
+
+    /**
      * Fixtures
      * @var array
      */
-    public $fixtures = ['core.articles', 'core.comments'];
+    public $fixtures;
 
     /**
      * Setup the test case, backup the static object values so they can be
@@ -69,11 +66,10 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport;
-        $this->BackupImport = new BackupImport;
+        $connection = new Connection($this->getConnection());
 
-        $this->Articles = TableRegistry::get('Articles');
-        $this->Comments = TableRegistry::get('Comments');
+        $this->Articles = TableRegistry::get('Articles', compact('connection'));
+        $this->Comments = TableRegistry::get('Comments', compact('connection'));
     }
 
     /**
@@ -84,19 +80,20 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->Articles, $this->BackupExport, $this->BackupImport, $this->Comments);
-
         //Deletes all backups
         foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
+            //@codingStandardsIgnoreLine
+            @unlink($file);
         }
+
+        unset($this->Articles, $this->Comments);
     }
 
     /**
      * Internal method to get all records from the database
      * @return array
      */
-    protected function _allRecords()
+    final protected function allRecords()
     {
         return [
             'Articles' => $this->Articles->find()->enableHydration(false)->toArray(),
@@ -105,35 +102,39 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * Internal method. Test for `export()` and `import()` methods
-     * @param bool|string $compression Compression
+     * Internal method to test `export()` and `import()` methods.
+     *
+     * It tests that the backup is properly exported and then imported.
+     * @param object $driverInstance A driver instance
+     * @param string $backup Backup relative path
+     * @return void
      */
-    protected function _testExportAndImport($compression)
+    final protected function _testExportAndImport($driverInstance, $backup = 'example.sql')
     {
+        $backup = $this->getAbsolutePath($backup);
+
         //Initial records. 3 articles and 6 comments
-        $initial = $this->_allRecords();
-        $this->assertEquals(['Articles', 'Comments'], array_keys($initial));
+        $initial = $this->allRecords();
         $this->assertEquals(3, count($initial['Articles']));
         $this->assertEquals(6, count($initial['Comments']));
 
         //Exports backup
-        $backup = $this->BackupExport->compression($compression)->export();
+        $this->assertTrue($driverInstance->export($backup));
 
         //Deletes article with ID 2 and comment with ID 4
         $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
         $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);
 
         //Records after delete. 2 articles and 5 comments
-        $deleted = $this->_allRecords();
-        $this->assertEquals(['Articles', 'Comments'], array_keys($deleted));
-        $this->assertEquals(2, count($deleted['Articles']));
-        $this->assertEquals(5, count($deleted['Comments']));
+        $afterDelete = $this->allRecords();
+        $this->assertEquals(count($afterDelete['Articles']), count($initial['Articles']) - 1);
+        $this->assertEquals(count($afterDelete['Comments']), count($initial['Comments']) - 1);
 
         //Imports backup
-        $this->BackupImport->filename($backup)->import();
+        $this->assertTrue($driverInstance->import($backup));
 
         //Now initial records are the same of final records
-        $final = $this->_allRecords();
+        $final = $this->allRecords();
         $this->assertEquals($initial, $final);
 
         //Gets the difference (`$diff`) between records after delete
@@ -142,7 +143,7 @@ class BackupExportAndImportTest extends TestCase
 
         foreach ($final as $model => $finalValues) {
             foreach ($finalValues as $finalKey => $finalValue) {
-                foreach ($deleted[$model] as $deletedValue) {
+                foreach ($afterDelete[$model] as $deletedValue) {
                     if ($finalValue == $deletedValue) {
                         unset($diff[$model][$finalKey]);
                     }
@@ -150,7 +151,6 @@ class BackupExportAndImportTest extends TestCase
             }
         }
 
-        $this->assertEquals(['Articles', 'Comments'], array_keys($diff));
         $this->assertEquals(1, count($diff['Articles']));
         $this->assertEquals(1, count($diff['Comments']));
 
@@ -160,14 +160,64 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * Test for `export()` and `import()` methods
-     * @test
+     * Test for `getCompression()` method
+     * @return void
      */
-    public function testExportAndImport()
-    {
-        //Performs the test for each compression supported by the driver
-        foreach ($this->BackupExport->driver->getValidCompressions() as $compression) {
-            $this->_testExportAndImport($compression);
-        }
-    }
+    abstract public function testGetCompression();
+
+    /**
+     * Test for `getDefaultExtension()` method
+     * @return void
+     */
+    abstract public function testGetDefaultExtension();
+
+    /**
+     * Test for `getExportExecutable()` method
+     * @return void
+     */
+    abstract public function testGetExportExecutable();
+
+    /**
+     * Test for `getExtension()` method
+     * @return void
+     */
+    abstract public function testGetExtension();
+
+    /**
+     * Test for `getImportExecutable()` method
+     * @return void
+     */
+    abstract public function testGetImportExecutable();
+
+    /**
+     * Test for `getValidExtensions()` method
+     * @return void
+     */
+    abstract public function testGetValidExtensions();
+
+    /**
+     * Test for `getValidCompressions()` method
+     * @return void
+     */
+    abstract public function testGetValidCompressions();
+
+    /**
+     * Test for `export()` method
+     * @return void
+     */
+    abstract public function testExport();
+
+    /**
+     * Test for `import()` method
+     * @return void
+     */
+    abstract public function testImport();
+
+    /**
+     * Test for `export()` and `import()` methods.
+     *
+     * It tests that the backup is properly exported and then imported.
+     * @return void
+     */
+    abstract public function testExportAndImport();
 }
