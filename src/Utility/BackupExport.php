@@ -144,7 +144,7 @@ class BackupExport
             '{$HOSTNAME}',
             '{$TIMESTAMP}',
         ], [
-            $this->connection['database'],
+            pathinfo($this->connection['database'], PATHINFO_FILENAME),
             date('YmdHis'),
             empty($this->connection['host']) ? 'localhost' : $this->connection['host'],
             time(),
