@@ -49,7 +49,7 @@ abstract class Driver
 
     /**
      * Construct
-     * @param \Cake\Datasource\ConnectionInterface A connection object
+     * @param \Cake\Datasource\ConnectionInterface $connection A connection object
      * @uses $config
      */
     public function __construct($connection)

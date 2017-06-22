@@ -99,7 +99,7 @@ class Mysql extends Driver
         $executable = sprintf('%s --defaults-extra-file=%%s %s', $this->getBinary('mysql'), $this->config['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            $executable =  sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
+            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
         } else {
             $executable .= ' < ' . $filename;
         }
