@@ -82,7 +82,6 @@ trait BackupTrait
      * Gets the connection array
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface A connection object
-     * @throws InvalidArgumentException
      */
     public function getConnection($name = null)
     {
@@ -90,13 +89,7 @@ trait BackupTrait
             $name = Configure::read(MYSQL_BACKUP . '.connection');
         }
 
-        $connection = ConnectionManager::get($name);
-
-        if (empty($connection)) {
-            throw new InvalidArgumentException(__d('mysql_backup', 'Invalid `{0}` connection', $name));
-        }
-
-        return $connection;
+        return ConnectionManager::get($name);
     }
 
     /**
