@@ -22,31 +22,29 @@
  * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/Configuration
  */
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 
 //Sets the default MysqlBackup name
 if (!defined('MYSQL_BACKUP')) {
     define('MYSQL_BACKUP', 'MysqlBackup');
 }
 
-//bzip2 binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.bzip2')) {
-    Configure::write(MYSQL_BACKUP . '.bin.bzip2', which('bzip2'));
-}
+//Sets the list of valid compressions
+const VALID_COMPRESSIONS = [
+    'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
+    'Sqlite' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
+];
 
-//gzip binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.gzip')) {
-    Configure::write(MYSQL_BACKUP . '.bin.gzip', which('gzip'));
-}
+//Sets the list of valid extensions
+const VALID_EXTENSIONS = [
+    'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
+    'Sqlite' => ['sql.bz2', 'sql.gz', 'sql'],
+];
 
-//mysql binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.mysql')) {
-    Configure::write(MYSQL_BACKUP . '.bin.mysql', which('mysql'));
-}
-
-//mysqldump binary
-if (!Configure::check(MYSQL_BACKUP . '.bin.mysqldump')) {
-    Configure::write(MYSQL_BACKUP . '.bin.mysqldump', which('mysqldump'));
+//Binaries
+foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'sqlite3'] as $binary) {
+    if (!Configure::check(MYSQL_BACKUP . '.binaries.' . $binary)) {
+        Configure::write(MYSQL_BACKUP . '.binaries.' . $binary, which($binary));
+    }
 }
 
 //Chmod for backups
@@ -62,23 +60,6 @@ if (!Configure::check(MYSQL_BACKUP . '.connection')) {
 //Default target directory
 if (!Configure::check(MYSQL_BACKUP . '.target')) {
     Configure::write(MYSQL_BACKUP . '.target', ROOT . DS . 'backups');
-}
-
-//Checks for mysql binary
-if (empty(Configure::read(MYSQL_BACKUP . '.bin.mysql'))) {
-    trigger_error(sprintf('The `%s` binary was not found', 'mysql'), E_USER_ERROR);
-}
-
-//Checks for mysqldump binary
-if (empty(Configure::read(MYSQL_BACKUP . '.bin.mysqldump'))) {
-    trigger_error(sprintf('The `%s` binary was not found', 'mysqldump'), E_USER_ERROR);
-}
-
-//Checks for connection
-$connection = Configure::read(MYSQL_BACKUP . '.connection');
-
-if (empty(ConnectionManager::getConfig($connection))) {
-    trigger_error(sprintf('Invalid `%s` connection', $connection), E_USER_ERROR);
 }
 
 //Checks for the target directory

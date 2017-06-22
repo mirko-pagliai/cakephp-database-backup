@@ -30,12 +30,15 @@ use Cake\TestSuite\TestCase;
 use MysqlBackup\Shell\BackupShell;
 use MysqlBackup\Utility\BackupExport;
 use MysqlBackup\Utility\BackupManager;
+use Reflection\ReflectionTrait;
 
 /**
  * BackupShellTest class
  */
 class BackupShellTest extends TestCase
 {
+    use ReflectionTrait;
+
     /**
      * @var \MysqlBackup\Utility\BackupExport
      */
@@ -60,16 +63,6 @@ class BackupShellTest extends TestCase
      * @var \Cake\TestSuite\Stub\ConsoleOutput
      */
     protected $out;
-
-    /**
-     * Internal method to delete all backups
-     */
-    protected function _deleteAllBackups()
-    {
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
-    }
 
     /**
      * Setup the test case, backup the static object values so they can be
@@ -141,6 +134,31 @@ class BackupShellTest extends TestCase
         $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
         return $files;
+    }
+
+    /**
+     * Internal method to delete all backups
+     */
+    protected function _deleteAllBackups()
+    {
+        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
+     * Test for `_welcome()` method
+     * @test
+     */
+    public function testWelcome()
+    {
+        $this->invokeMethod($this->BackupShell, '_welcome');
+
+        $messages = $this->out->messages();
+
+        $this->assertRegExp('/^Connection: test/', $messages[6]);
+        $this->assertEquals('Driver: Mysql', $messages[7]);
+        $this->assertRegExp('/^\-+$/', $messages[8]);
     }
 
     /**
@@ -300,7 +318,6 @@ class BackupShellTest extends TestCase
         $this->assertEquals([
             'backup.sql',
             'sql',
-            'none',
             Number::toReadableSize($backups[2]->size),
             (string)$backups[2]->datetime,
         ], next($output));
@@ -429,6 +446,10 @@ class BackupShellTest extends TestCase
             'rotate',
             'send',
         ], array_keys($parser->subcommands()));
+
+        //Checks "compression" options for the "export" subcommand
+        $this->assertEquals('[-c bzip2|gzip]', $parser->subcommands()['export']->parser()->options()['compression']->usage());
+
         $this->assertEquals('Shell to handle database backups', $parser->getDescription());
         $this->assertEquals(['help', 'quiet', 'verbose'], array_keys($parser->options()));
     }

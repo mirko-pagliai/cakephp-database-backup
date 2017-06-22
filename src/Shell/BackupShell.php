@@ -44,15 +44,50 @@ class BackupShell extends Shell
     protected $BackupManager;
 
     /**
+     * Database configuration
+     * @since 2.0.0
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * Driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @since 2.0.0
+     * @var object
+     */
+    protected $driver;
+
+    /**
      * Constructor
      * @param \Cake\Console\ConsoleIo|null $io An io instance
      * @uses $BackupManager
+     * @uses $config
+     * @uses $driver
      */
     public function __construct(ConsoleIo $io = null)
     {
         parent::__construct($io);
 
         $this->BackupManager = new BackupManager;
+        $this->config = $this->getConnection()->config();
+        $this->driver = $this->getDriver($this->getConnection());
+    }
+
+    /**
+     * Displays a header for the shell
+     * @return void
+     * @since 2.0.0
+     * @uses $config
+     * @uses $driver
+     */
+    protected function _welcome()
+    {
+        parent::_welcome();
+
+        $this->out(__d('mysql_backup', 'Connection: {0}', $this->config['name']));
+        $this->out(__d('mysql_backup', 'Driver: {0}', $this->getClassShortName($this->driver)));
+        $this->hr();
     }
 
     /**
@@ -166,10 +201,6 @@ class BackupShell extends Shell
             //Parses backups
             $backups = collection($backups)
                 ->map(function ($backup) {
-                    if (isset($backup->compression) && !$backup->compression) {
-                        $backup->compression = __d('mysql_backup', 'none');
-                    }
-
                     $backup->size = Number::toReadableSize($backup->size);
 
                     return array_values($backup->toArray());
@@ -270,7 +301,7 @@ class BackupShell extends Shell
             'parser' => [
                 'options' => [
                     'compression' => [
-                        'choices' => array_keys($this->getValidCompressions()),
+                        'choices' => array_filter($this->driver->getValidCompressions()),
                         'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
                         'short' => 'c',
                     ],

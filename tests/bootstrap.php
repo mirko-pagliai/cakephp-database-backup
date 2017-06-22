@@ -100,13 +100,8 @@ Cache::setConfig([
     ],
 ]);
 
-// Ensure default test connection is defined
-if (!getenv('db_dsn')) {
-    putenv('db_dsn=mysql://travis@localhost/test');
-}
-
-ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
-ConnectionManager::setConfig('test_custom_i18n_datasource', ['url' => getenv('db_dsn')]);
+ConnectionManager::setConfig('test', ['url' => 'mysql://travis@localhost/test']);
+ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:\\' . TMP . 'example.sq3']);
 
 Configure::write('MysqlBackup.connection', 'test');
 Configure::write('MysqlBackup.target', TMP . 'backups');
