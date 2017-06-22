@@ -85,7 +85,7 @@ class BackupManagerTest extends TestCase
      */
     protected function _deleteAllBackups()
     {
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -177,7 +177,7 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty($this->BackupManager->index());
 
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'text.txt', null);
+        file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'text.txt', null);
 
         $this->assertEmpty($this->BackupManager->index());
 
@@ -270,7 +270,7 @@ class BackupManagerTest extends TestCase
         $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
         $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
 
-        $this->assertEmailFrom(Configure::read(MYSQL_BACKUP . '.mailSender'));
+        $this->assertEmailFrom(Configure::read(DATABASE_BACKUP . '.mailSender'));
         $this->assertEmailTo($to);
         $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
         $this->assertEmailAttachmentsContains(basename($file), [
@@ -291,7 +291,7 @@ class BackupManagerTest extends TestCase
      */
     public function testSendWithoutSender()
     {
-        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+        Configure::write(DATABASE_BACKUP . '.mailSender', false);
 
         $this->BackupManager->send('file.sql', 'recipient@example.com');
     }

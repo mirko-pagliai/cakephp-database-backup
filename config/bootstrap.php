@@ -24,8 +24,8 @@
 use Cake\Core\Configure;
 
 //Sets the default MysqlBackup name
-if (!defined('MYSQL_BACKUP')) {
-    define('MYSQL_BACKUP', 'MysqlBackup');
+if (!defined('DATABASE_BACKUP')) {
+    define('DATABASE_BACKUP', 'MysqlBackup');
 }
 
 //Sets the list of valid compressions
@@ -42,28 +42,28 @@ const VALID_EXTENSIONS = [
 
 //Binaries
 foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'sqlite3'] as $binary) {
-    if (!Configure::check(MYSQL_BACKUP . '.binaries.' . $binary)) {
-        Configure::write(MYSQL_BACKUP . '.binaries.' . $binary, which($binary));
+    if (!Configure::check(DATABASE_BACKUP . '.binaries.' . $binary)) {
+        Configure::write(DATABASE_BACKUP . '.binaries.' . $binary, which($binary));
     }
 }
 
 //Chmod for backups
-if (!Configure::check(MYSQL_BACKUP . '.chmod')) {
-    Configure::write(MYSQL_BACKUP . '.chmod', 0664);
+if (!Configure::check(DATABASE_BACKUP . '.chmod')) {
+    Configure::write(DATABASE_BACKUP . '.chmod', 0664);
 }
 
 //Database connection
-if (!Configure::check(MYSQL_BACKUP . '.connection')) {
-    Configure::write(MYSQL_BACKUP . '.connection', 'default');
+if (!Configure::check(DATABASE_BACKUP . '.connection')) {
+    Configure::write(DATABASE_BACKUP . '.connection', 'default');
 }
 
 //Default target directory
-if (!Configure::check(MYSQL_BACKUP . '.target')) {
-    Configure::write(MYSQL_BACKUP . '.target', ROOT . DS . 'backups');
+if (!Configure::check(DATABASE_BACKUP . '.target')) {
+    Configure::write(DATABASE_BACKUP . '.target', ROOT . DS . 'backups');
 }
 
 //Checks for the target directory
-$target = Configure::read(MYSQL_BACKUP . '.target');
+$target = Configure::read(DATABASE_BACKUP . '.target');
 
 if (!file_exists($target)) {
     //@codingStandardsIgnoreLine

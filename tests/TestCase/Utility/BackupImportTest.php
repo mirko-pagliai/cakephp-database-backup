@@ -70,7 +70,7 @@ class BackupImportTest extends TestCase
         unset($this->BackupExport, $this->BackupImport);
 
         //Deletes all backups
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -133,7 +133,7 @@ class BackupImportTest extends TestCase
      */
     public function testFilenameWithInvalidExtension()
     {
-        file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'backup.txt', null);
+        file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'backup.txt', null);
 
         $this->BackupImport->filename('backup.txt');
     }

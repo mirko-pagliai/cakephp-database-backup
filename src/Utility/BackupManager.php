@@ -158,7 +158,7 @@ class BackupManager
      */
     protected function _send($filename, $recipient)
     {
-        $sender = Configure::read(MYSQL_BACKUP . '.mailSender');
+        $sender = Configure::read(DATABASE_BACKUP . '.mailSender');
 
         if (!$sender) {
             throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender'));

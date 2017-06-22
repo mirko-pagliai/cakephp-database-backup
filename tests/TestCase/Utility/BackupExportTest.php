@@ -83,7 +83,7 @@ class BackupExportTest extends TestCase
         @unlink(LOGS . 'debug.log');
 
         //Deletes all backups
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
             //@codingStandardsIgnoreLine
             @unlink($file);
         }
@@ -261,7 +261,7 @@ class BackupExportTest extends TestCase
         $this->assertEquals('backup.sql.bz2', basename($filename));
 
         //Exports with a different chmod
-        Configure::write(MYSQL_BACKUP . '.chmod', 0777);
+        Configure::write(DATABASE_BACKUP . '.chmod', 0777);
         $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
         $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
 

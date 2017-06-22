@@ -63,7 +63,7 @@ class SqliteTest extends DriverTestCase
      */
     public function setUp()
     {
-        Configure::write(MYSQL_BACKUP . '.connection', 'test_sqlite');
+        Configure::write(DATABASE_BACKUP . '.connection', 'test_sqlite');
 
         parent::setUp();
 
@@ -78,7 +78,7 @@ class SqliteTest extends DriverTestCase
     {
         parent::tearDown();
 
-        Configure::write(MYSQL_BACKUP . '.connection', 'test');
+        Configure::write(DATABASE_BACKUP . '.connection', 'test');
 
         unset($this->Sqlite);
     }

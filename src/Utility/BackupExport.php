@@ -231,7 +231,7 @@ class BackupExport
 
         $this->driver->export($filename);
 
-        chmod($filename, Configure::read(MYSQL_BACKUP . '.chmod'));
+        chmod($filename, Configure::read(DATABASE_BACKUP . '.chmod'));
 
         if ($this->emailRecipient) {
             $this->BackupManager->send($filename, $this->emailRecipient);

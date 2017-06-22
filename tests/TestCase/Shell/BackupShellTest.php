@@ -141,7 +141,7 @@ class BackupShellTest extends TestCase
      */
     protected function _deleteAllBackups()
     {
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -424,7 +424,7 @@ class BackupShellTest extends TestCase
      */
     public function testSendWithoutSenderInConfiguration()
     {
-        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+        Configure::write(DATABASE_BACKUP . '.mailSender', false);
 
         $this->BackupShell->send('file.sql', 'recipient@example.com');
     }

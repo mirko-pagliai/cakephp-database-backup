@@ -68,10 +68,10 @@ class BackupTraitTest extends TestCase
         $this->assertEquals('/file.txt', $result);
 
         $result = $this->Trait->getAbsolutePath('file.txt');
-        $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt', $result);
+        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
 
-        $result = $this->Trait->getAbsolutePath(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt');
-        $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt', $result);
+        $result = $this->Trait->getAbsolutePath(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt');
+        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
     }
 
     /**
@@ -91,7 +91,7 @@ class BackupTraitTest extends TestCase
      */
     public function testGetBinaryNotAvailable()
     {
-        Configure::write(MYSQL_BACKUP . '.binaries.bzip2', false);
+        Configure::write(DATABASE_BACKUP . '.binaries.bzip2', false);
 
         $this->Trait->getBinary('bzip2');
     }
@@ -116,7 +116,7 @@ class BackupTraitTest extends TestCase
 
         foreach ([
             null,
-            Configure::read(MYSQL_BACKUP . '.connection'),
+            Configure::read(DATABASE_BACKUP . '.connection'),
             'fake',
         ] as $name) {
             $connection = $this->Trait->getConnection($name);
@@ -177,6 +177,6 @@ class BackupTraitTest extends TestCase
      */
     public function testGetTarget()
     {
-        $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target'), $this->Trait->getTarget());
+        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->Trait->getTarget());
     }
 }

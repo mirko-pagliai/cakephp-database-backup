@@ -59,7 +59,7 @@ trait BackupTrait
      */
     public function getBinary($name)
     {
-        $binary = Configure::read(MYSQL_BACKUP . '.binaries.' . $name);
+        $binary = Configure::read(DATABASE_BACKUP . '.binaries.' . $name);
 
         if (!$binary) {
             throw new InvalidArgumentException(__d('mysql_backup', '`{0}` executable not available', $name));
@@ -86,7 +86,7 @@ trait BackupTrait
     public function getConnection($name = null)
     {
         if (!$name) {
-            $name = Configure::read(MYSQL_BACKUP . '.connection');
+            $name = Configure::read(DATABASE_BACKUP . '.connection');
         }
 
         return ConnectionManager::get($name);
@@ -109,7 +109,7 @@ trait BackupTrait
         }
 
         $className = $this->getClassShortName($connection->getDriver());
-        $driver = App::classname(MYSQL_BACKUP . '.' . $className, 'Driver');
+        $driver = App::classname(DATABASE_BACKUP . '.' . $className, 'Driver');
 
         if (!$driver) {
             throw new InvalidArgumentException(__d('mysql_backup', 'The `{0}` driver does not exist', $className));
@@ -124,6 +124,6 @@ trait BackupTrait
      */
     public function getTarget()
     {
-        return Configure::read(MYSQL_BACKUP . '.target');
+        return Configure::read(DATABASE_BACKUP . '.target');
     }
 }

@@ -80,7 +80,7 @@ abstract class DriverTestCase extends TestCase
         parent::tearDown();
 
         //Deletes all backups
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
             //@codingStandardsIgnoreLine
             @unlink($file);
         }
