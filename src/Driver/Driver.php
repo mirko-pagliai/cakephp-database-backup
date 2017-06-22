@@ -23,8 +23,6 @@
  */
 namespace DatabaseBackup\Driver;
 
-use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
 
 /**
