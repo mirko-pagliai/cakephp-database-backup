@@ -107,7 +107,7 @@ Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups');
 Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
-Plugin::load('MysqlBackup', [
+Plugin::load('DatabaseBackup', [
     'bootstrap' => true,
     'path' => ROOT,
 ]);

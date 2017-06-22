@@ -1,7 +1,7 @@
 {
-    "name": "mirko-pagliai/cakephp-mysql-backup",
-    "description": "Mysql Backup plugin for CakePHP",
-    "homepage": "https://github.com/mirko-pagliai/cakephp-mysql-backup",
+    "name": "mirko-pagliai/cakephp-database-backup",
+    "description": "Database Backup plugin for CakePHP",
+    "homepage": "https://github.com/mirko-pagliai/cakephp-database-backup",
     "type": "cakephp-plugin",
     "license": "AGPL",
     "authors": [{
