@@ -98,10 +98,10 @@ class BackupExportTest extends TestCase
         $this->assertInstanceof('MysqlBackup\Utility\BackupManager', $this->BackupExport->BackupManager);
         $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
 
-        $connection = $this->getProperty($this->BackupExport, 'connection');
-        $this->assertEquals($connection['scheme'], 'mysql');
-        $this->assertEquals($connection['database'], 'test');
-        $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
+        $config = $this->getProperty($this->BackupExport, 'config');
+        $this->assertEquals($config['scheme'], 'mysql');
+        $this->assertEquals($config['database'], 'test');
+        $this->assertEquals($config['driver'], 'Cake\Database\Driver\Mysql');
 
         $this->assertInstanceof('MysqlBackup\Driver\Mysql', $this->getProperty($this->BackupExport, 'driver'));
         $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));

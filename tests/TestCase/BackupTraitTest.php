@@ -112,39 +112,23 @@ class BackupTraitTest extends TestCase
      */
     public function testGetConnection()
     {
-        $expected = [
-            'scheme' => 'mysql',
-            'host' => 'localhost',
-            'username' => 'travis',
-            'className' => 'Cake\Database\Connection',
-            'database' => 'test',
-            'driver' => 'Cake\Database\Driver\Mysql',
-            'name' => 'test',
-        ];
-
-        $this->assertEquals($expected, $this->Trait->getConnection());
-        $this->assertEquals($expected, $this->Trait->getConnection(Configure::read(MYSQL_BACKUP . '.connection')));
-
         ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
 
-        $expected = [
-            'scheme' => 'mysql',
-            'host' => 'localhost',
-            'username' => 'root',
-            'password' => 'password',
-            'className' => 'Cake\Database\Connection',
-            'database' => 'my_database',
-            'driver' => 'Cake\Database\Driver\Mysql',
-            'name' => 'fake',
-        ];
-
-        $this->assertEquals($expected, $this->Trait->getConnection('fake'));
+        foreach ([
+            null,
+            Configure::read(MYSQL_BACKUP . '.connection'),
+            'fake',
+        ] as $name) {
+            $connection = $this->Trait->getConnection($name);
+            $this->assertInstanceof('Cake\Database\Connection', $connection);
+            $this->assertInstanceof('Cake\Database\Driver\Mysql', $connection->getDriver());
+        }
     }
 
     /**
      * Test for `getConnection()` method, with an invalid connection
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid `noExisting` connection
+     * @expectedException \Cake\Datasource\Exception\MissingDatasourceConfigException
+     * @expectedExceptionMessage The datasource configuration "noExisting" was not found.
      * @test
      */
     public function testGetConnectionInvalidConnection()
@@ -158,29 +142,11 @@ class BackupTraitTest extends TestCase
      */
     public function testGetDriver()
     {
-        $driver = $this->Trait->getDriver([
-            'scheme' => 'mysql',
-            'host' => 'localhost',
-            'username' => 'travis',
-            'className' => 'Cake\Database\Connection',
-            'database' => 'test',
-            'driver' => 'Cake\Database\Driver\Mysql',
-            'name' => 'test',
-        ]);
+        $driver = $this->Trait->getDriver(ConnectionManager::get('test'));
         $this->assertInstanceof('MysqlBackup\Driver\Mysql', $driver);
 
         $driver = $this->Trait->getDriver();
         $this->assertInstanceof('MysqlBackup\Driver\Mysql', $driver);
-    }
-
-    /**
-     * Test for `getDriver()` method, with an invalid argument
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unable to detect the driver to use
-     */
-    public function testGetDriverInvalidArgument()
-    {
-        $this->Trait->getDriver(['invalid']);
     }
 
     /**

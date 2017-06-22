@@ -24,7 +24,6 @@
 namespace MysqlBackup\TestSuite;
 
 use Cake\Core\Configure;
-use Cake\Database\Connection;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
@@ -66,7 +65,7 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
-        $connection = new Connection($this->getConnection());
+        $connection = $this->getConnection();
 
         $this->Articles = TableRegistry::get('Articles', compact('connection'));
         $this->Comments = TableRegistry::get('Comments', compact('connection'));

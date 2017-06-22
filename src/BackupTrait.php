@@ -23,6 +23,7 @@
 namespace MysqlBackup;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Cake\Filesystem\Folder;
 use InvalidArgumentException;
@@ -79,7 +80,7 @@ trait BackupTrait
     /**
      * Gets the connection array
      * @param string|null $name Connection name
-     * @return array
+     * @return \Cake\Datasource\ConnectionInterface A connection object
      * @throws InvalidArgumentException
      */
     public function getConnection($name = null)
@@ -88,7 +89,7 @@ trait BackupTrait
             $name = Configure::read(MYSQL_BACKUP . '.connection');
         }
 
-        $connection = ConnectionManager::getConfig($name);
+        $connection = ConnectionManager::get($name);
 
         if (empty($connection)) {
             throw new InvalidArgumentException(__d('mysql_backup', 'Invalid `{0}` connection', $name));
@@ -100,23 +101,19 @@ trait BackupTrait
     /**
      * Gets the driver containing all methods to export/import database backups
      *  according to the database engine
-     * @param array $connection Connection array
+     * @param \Cake\Datasource\ConnectionInterface|null A connection object
      * @return object A driver instance
      * @since 2.0.0
-     * @throws InvalidArgumentException
+     * @uses getConnection()
      * @uses getClassShortName()
      */
-    public function getDriver(array $connection = [])
+    public function getDriver(ConnectionInterface $connection = null)
     {
         if (!$connection) {
             $connection = $this->getConnection();
         }
 
-        if (empty($connection['driver'])) {
-            throw new InvalidArgumentException(__d('mysql_backup', 'Unable to detect the driver to use'));
-        }
-
-        $driver = MYSQL_BACKUP . '\\Driver\\' . $this->getClassShortName($connection['driver']);
+        $driver = MYSQL_BACKUP . '\\Driver\\' . $this->getClassShortName(get_class($connection->getDriver()));
 
         return new $driver($connection);
     }

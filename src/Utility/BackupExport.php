@@ -46,10 +46,10 @@ class BackupExport
     protected $compression = null;
 
     /**
-     * Database connection
+     * Database configuration
      * @var array
      */
-    protected $connection;
+    protected $config;
 
     /**
      * Driver containing all methods to export/import database backups
@@ -87,14 +87,14 @@ class BackupExport
     /**
      * Construct
      * @uses $BackupManager
-     * @uses $connection
+     * @uses $config
      * @uses $driver
      */
     public function __construct()
     {
         $this->BackupManager = new BackupManager;
-        $this->connection = $this->getConnection();
-        $this->driver = $this->getDriver($this->connection);
+        $this->config = $this->getConnection()->config();
+        $this->driver = $this->getDriver($this->getConnection());
     }
 
     /**
@@ -131,7 +131,7 @@ class BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws InternalErrorException
      * @uses compression()
-     * @uses $connection
+     * @uses $config
      * @uses $driver
      * @uses $filename
      */
@@ -144,9 +144,9 @@ class BackupExport
             '{$HOSTNAME}',
             '{$TIMESTAMP}',
         ], [
-            pathinfo($this->connection['database'], PATHINFO_FILENAME),
+            pathinfo($this->config['database'], PATHINFO_FILENAME),
             date('YmdHis'),
-            empty($this->connection['host']) ? 'localhost' : $this->connection['host'],
+            empty($this->config['host']) ? 'localhost' : $this->config['host'],
             time(),
         ], $filename);
 

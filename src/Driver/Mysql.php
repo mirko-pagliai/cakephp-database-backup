@@ -44,14 +44,14 @@ class Mysql extends Driver
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string
-     * @uses $connection
+     * @uses $config
      * @uses getCompression()
      * @uses getValidCompressions()
      */
     protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $executable = sprintf('%s --defaults-file=%%s %s', $this->getBinary('mysqldump'), $this->connection['database']);
+        $executable = sprintf('%s --defaults-file=%%s %s', $this->getBinary('mysqldump'), $this->config['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable .= ' | ' . $this->getBinary($compression);
@@ -69,7 +69,7 @@ class Mysql extends Driver
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
      * @return string Path of the temporary file
-     * @uses $connection
+     * @uses $config
      */
     private function getExportStoreAuth()
     {
@@ -77,9 +77,9 @@ class Mysql extends Driver
 
         file_put_contents($auth, sprintf(
             "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
-            $this->connection['username'],
-            empty($this->connection['password']) ? null : $this->connection['password'],
-            $this->connection['host']
+            $this->config['username'],
+            empty($this->config['password']) ? null : $this->config['password'],
+            $this->config['host']
         ));
 
         return $auth;
@@ -89,14 +89,14 @@ class Mysql extends Driver
      * Gets the executable command to import the database
      * @param string $filename Filename from which you want to import the database
      * @return string
-     * @uses $connection
+     * @uses $config
      * @uses getCompression()
      * @uses getValidCompressions()
      */
     protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $executable = sprintf('%s --defaults-extra-file=%%s %s', $this->getBinary('mysql'), $this->connection['database']);
+        $executable = sprintf('%s --defaults-extra-file=%%s %s', $this->getBinary('mysql'), $this->config['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable =  sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
@@ -116,7 +116,7 @@ class Mysql extends Driver
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
      * @return string Path of the temporary file
-     * @uses $connection
+     * @uses $config
      */
     private function getImportStoreAuth()
     {
@@ -124,9 +124,9 @@ class Mysql extends Driver
 
         file_put_contents($auth, sprintf(
             "[client]\nuser=%s\npassword=\"%s\"\nhost=%s",
-            $this->connection['username'],
-            empty($this->connection['password']) ? null : $this->connection['password'],
-            $this->connection['host']
+            $this->config['username'],
+            empty($this->config['password']) ? null : $this->config['password'],
+            $this->config['host']
         ));
 
         return $auth;

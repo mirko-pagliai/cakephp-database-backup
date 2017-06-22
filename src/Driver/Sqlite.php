@@ -43,14 +43,14 @@ class Sqlite extends Driver
      * Gets the executable command to export the database
      * @param string $filename Filename where you want to export the database
      * @return string
-     * @uses $connection
+     * @uses $config
      * @uses getCompression()
      * @uses getValidCompressions()
      */
     protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $executable = sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->connection['database']);
+        $executable = sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->config['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable .= ' | ' . $this->getBinary($compression);
@@ -63,14 +63,14 @@ class Sqlite extends Driver
      * Gets the executable command to import the database
      * @param string $filename Filename from which you want to import the database
      * @return string
-     * @uses $connection
+     * @uses $config
      * @uses getCompression()
      * @uses getValidCompressions()
      */
     protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $executable = sprintf('%s %s', $this->getBinary('sqlite3'), $this->connection['database']);
+        $executable = sprintf('%s %s', $this->getBinary('sqlite3'), $this->config['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;

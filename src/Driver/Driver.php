@@ -36,10 +36,10 @@ abstract class Driver
     use BackupTrait;
 
     /**
-     * Database connection
+     * Database configuration
      * @var array
      */
-    protected $connection;
+    protected $config;
 
     /**
      * Default extension for export
@@ -49,12 +49,12 @@ abstract class Driver
 
     /**
      * Construct
-     * @param array $connection Connection
-     * @uses $connection
+     * @param \Cake\Datasource\ConnectionInterface A connection object
+     * @uses $config
      */
     public function __construct($connection)
     {
-        $this->connection = $connection;
+        $this->config = $connection->config();
     }
 
     /**

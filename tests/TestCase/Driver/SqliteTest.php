@@ -204,7 +204,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportOnFailure()
     {
-        $connection = $this->getProperty($this->Sqlite, 'connection');
+        $config = $this->getProperty($this->Sqlite, 'config');
 
         $this->Sqlite = $this->getMockBuilder(Sqlite::class)
             ->setMethods(['getExportExecutable'])
@@ -212,8 +212,8 @@ class SqliteTest extends DriverTestCase
             ->getMock();
 
         $this->Sqlite->method('getExportExecutable')
-             ->will($this->returnCallback(function() use ($connection) {
-                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $connection['database']);
+             ->will($this->returnCallback(function() use ($config) {
+                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
              }));
 
         $this->Sqlite->export($this->getAbsolutePath('example.sql'));
@@ -240,7 +240,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testImportOnFailure()
     {
-        $connection = $this->getProperty($this->Sqlite, 'connection');
+        $config = $this->getProperty($this->Sqlite, 'config');
 
         $this->Sqlite = $this->getMockBuilder(Sqlite::class)
             ->setMethods(['getImportExecutable'])
@@ -248,8 +248,8 @@ class SqliteTest extends DriverTestCase
             ->getMock();
 
         $this->Sqlite->method('getImportExecutable')
-             ->will($this->returnCallback(function() use ($connection) {
-                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $connection['database']);
+             ->will($this->returnCallback(function() use ($config) {
+                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
              }));
 
         $this->Sqlite->import('noExistingFile');
