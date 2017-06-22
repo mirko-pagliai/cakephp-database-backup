@@ -68,10 +68,8 @@ abstract class Driver
      */
     public function deleteAllRecords()
     {
-        $connection = ConnectionManager::get(Configure::read(MYSQL_BACKUP . '.connection'));
-
         foreach ($this->getTables() as $table) {
-            $connection->delete($table);
+            $this->getConnection()->delete($table);
         }
     }
 
@@ -150,9 +148,7 @@ abstract class Driver
      */
     public function getTables()
     {
-        $connection = ConnectionManager::get(Configure::read(MYSQL_BACKUP . '.connection'));
-
-        return $connection->getSchemaCollection()->listTables();
+        return $this->getConnection()->getSchemaCollection()->listTables();
     }
 
     /**
