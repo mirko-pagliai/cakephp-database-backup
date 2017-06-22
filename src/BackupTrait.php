@@ -22,6 +22,7 @@
  */
 namespace MysqlBackup;
 
+use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
@@ -113,7 +114,7 @@ trait BackupTrait
             $connection = $this->getConnection();
         }
 
-        $driver = MYSQL_BACKUP . '\\Driver\\' . $this->getClassShortName(get_class($connection->getDriver()));
+        $driver = App::classname(MYSQL_BACKUP . '.' . $this->getClassShortName($connection->getDriver()), 'Driver');
 
         return new $driver($connection);
     }
