@@ -96,15 +96,17 @@ class DriverTest extends TestCase
      */
     public function testdeleteAllRecords()
     {
-        $this->loadFixtures('Articles', 'Comments');
+        $tables = ['table1', 'table2'];
 
-        $this->assertGreaterThan(0, $this->Articles->find()->count());
-        $this->assertGreaterThan(0, $this->Comments->find()->count());
+        //Creates some tables
+        foreach ($tables as $table) {
+            $this->getConnection()->execute(sprintf('CREATE TABLE IF NOT EXISTS %s (id int);', $table));
+        }
 
-        $this->Mysql->deleteAllRecords();
+        $this->assertEquals(['table1', 'table2'], $this->Mysql->getTables());
 
-        $this->assertEquals(0, $this->Articles->find()->count());
-        $this->assertEquals(0, $this->Comments->find()->count());
+        $this->assertInstanceof('Cake\Database\Statement\MysqlStatement', $this->Mysql->deleteAllRecords());
+        $this->assertEmpty($this->Mysql->getTables());
     }
 
     /**

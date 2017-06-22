@@ -63,14 +63,16 @@ abstract class Driver
      * Some drivers (eg. Sqlite) are not able to drop tables before import a
      *  backup file. For this reason, it may be necessary to delete all records
      *  first.
-     * @return void
+     * @return \Cake\Database\StatementInterface Executed statement
      * @uses getTables()
      */
     public function deleteAllRecords()
     {
-        foreach ($this->getTables() as $table) {
-            $this->getConnection()->delete($table);
-        }
+        $queries = collection($this->getTables())->map(function ($table) {
+            return sprintf('DROP TABLE %s;', $table);
+        })->toArray();
+
+        return $this->getConnection()->execute(implode(' ', $queries));
     }
 
     /**
