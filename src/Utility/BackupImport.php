@@ -70,11 +70,11 @@ class BackupImport
         $filename = $this->getAbsolutePath($filename);
 
         if (!is_readable($filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not readable', $filename));
+            throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not readable', $filename));
         }
 
         if (!in_array($this->driver->getCompression($filename), $this->driver->getValidCompressions(), true)) {
-            throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
+            throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));
         }
 
         $this->filename = $filename;
@@ -93,7 +93,7 @@ class BackupImport
     public function import()
     {
         if (empty($this->filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'You must first set the filename'));
+            throw new InternalErrorException(__d('database_backup', 'You must first set the filename'));
         }
 
         //This allows the filename to be set again with a next call of this

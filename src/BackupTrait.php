@@ -62,7 +62,7 @@ trait BackupTrait
         $binary = Configure::read(DATABASE_BACKUP . '.binaries.' . $name);
 
         if (!$binary) {
-            throw new InvalidArgumentException(__d('mysql_backup', '`{0}` executable not available', $name));
+            throw new InvalidArgumentException(__d('database_backup', '`{0}` executable not available', $name));
         }
 
         return $binary;
@@ -112,7 +112,7 @@ trait BackupTrait
         $driver = App::classname(DATABASE_BACKUP . '.' . $className, 'Driver');
 
         if (!$driver) {
-            throw new InvalidArgumentException(__d('mysql_backup', 'The `{0}` driver does not exist', $className));
+            throw new InvalidArgumentException(__d('database_backup', 'The `{0}` driver does not exist', $className));
         }
 
         return new $driver($connection);

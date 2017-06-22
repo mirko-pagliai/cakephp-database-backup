@@ -153,7 +153,7 @@ class Mysql extends Driver
         unlink($auth);
 
         if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'mysqldump', $returnVar));
+            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'mysqldump', $returnVar));
         }
 
         return file_exists($filename);
@@ -180,7 +180,7 @@ class Mysql extends Driver
         unlink($auth);
 
         if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'mysql', $returnVar));
+            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'mysql', $returnVar));
         }
 
         return true;

@@ -113,7 +113,7 @@ class BackupExport
         $this->extension = array_search($compression, $this->driver->getValidCompressions(), true);
 
         if (!$this->extension) {
-            throw new InternalErrorException(__d('mysql_backup', 'Invalid compression type'));
+            throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));
         }
 
         $this->compression = $compression;
@@ -153,16 +153,16 @@ class BackupExport
         $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable(dirname($filename))) {
-            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not writable', dirname($filename)));
+            throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not writable', dirname($filename)));
         }
 
         if (file_exists($filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'File `{0}` already exists', $filename));
+            throw new InternalErrorException(__d('database_backup', 'File `{0}` already exists', $filename));
         }
 
         //Checks for extension
         if (!$this->driver->getExtension($filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'Invalid file extension'));
+            throw new InternalErrorException(__d('database_backup', 'Invalid file extension'));
         }
 
         //Sets the compression

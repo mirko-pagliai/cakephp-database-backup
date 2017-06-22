@@ -85,8 +85,8 @@ class BackupShell extends Shell
     {
         parent::_welcome();
 
-        $this->out(__d('mysql_backup', 'Connection: {0}', $this->config['name']));
-        $this->out(__d('mysql_backup', 'Driver: {0}', $this->getClassShortName($this->driver)));
+        $this->out(__d('database_backup', 'Connection: {0}', $this->config['name']));
+        $this->out(__d('database_backup', 'Driver: {0}', $this->getClassShortName($this->driver)));
         $this->hr();
     }
 
@@ -103,16 +103,16 @@ class BackupShell extends Shell
         $deleted = $this->BackupManager->deleteAll();
 
         if (!$deleted) {
-            $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
+            $this->verbose(__d('database_backup', 'No backup has been deleted'));
 
             return;
         }
 
         foreach ($deleted as $file) {
-            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', rtr($file)));
+            $this->verbose(__d('database_backup', 'Backup `{0}` has been deleted', rtr($file)));
         }
 
-        $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+        $this->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
     }
 
     /**
@@ -148,7 +148,7 @@ class BackupShell extends Shell
             //Exports
             $file = $instance->export();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', rtr($file)));
+            $this->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
             //Sends via email
             if ($this->param('send')) {
@@ -177,7 +177,7 @@ class BackupShell extends Shell
         try {
             $file = (new BackupImport)->filename($filename)->import();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', rtr($file)));
+            $this->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -195,7 +195,7 @@ class BackupShell extends Shell
         //Gets all backups
         $backups = $this->BackupManager->index();
 
-        $this->out(__d('mysql_backup', 'Backup files found: {0}', count($backups)));
+        $this->out(__d('database_backup', 'Backup files found: {0}', count($backups)));
 
         if ($backups) {
             //Parses backups
@@ -209,11 +209,11 @@ class BackupShell extends Shell
 
             //Table headers
             $headers = [
-                __d('mysql_backup', 'Filename'),
-                __d('mysql_backup', 'Extension'),
-                __d('mysql_backup', 'Compression'),
-                __d('mysql_backup', 'Size'),
-                __d('mysql_backup', 'Datetime'),
+                __d('database_backup', 'Filename'),
+                __d('database_backup', 'Extension'),
+                __d('database_backup', 'Compression'),
+                __d('database_backup', 'Size'),
+                __d('database_backup', 'Datetime'),
             ];
 
             $this->helper('table')->output(array_merge([$headers], $backups));
@@ -248,16 +248,16 @@ class BackupShell extends Shell
             $deleted = $this->BackupManager->rotate($keep);
 
             if (empty($deleted)) {
-                $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
+                $this->verbose(__d('database_backup', 'No backup has been deleted'));
 
                 return;
             }
 
             foreach ($deleted as $file) {
-                $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file->filename));
+                $this->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->filename));
             }
 
-            $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+            $this->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -278,7 +278,7 @@ class BackupShell extends Shell
         try {
             $this->BackupManager->send($filename, $recipient);
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
+            $this->success(__d('database_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -292,31 +292,31 @@ class BackupShell extends Shell
     {
         $parser = parent::getOptionParser();
 
-        $parser->setDescription(__d('mysql_backup', 'Shell to handle database backups'));
+        $parser->setDescription(__d('database_backup', 'Shell to handle database backups'));
 
-        $parser->addSubcommand('deleteAll', ['help' => __d('mysql_backup', 'Deletes all database backups')]);
+        $parser->addSubcommand('deleteAll', ['help' => __d('database_backup', 'Deletes all database backups')]);
 
         $parser->addSubcommand('export', [
-            'help' => __d('mysql_backup', 'Exports a database backup'),
+            'help' => __d('database_backup', 'Exports a database backup'),
             'parser' => [
                 'options' => [
                     'compression' => [
                         'choices' => array_filter($this->driver->getValidCompressions()),
-                        'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
+                        'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
                         'short' => 'c',
                     ],
                     'filename' => [
-                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path and may contain ' .
+                        'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
                             'patterns. The compression type will be automatically setted'),
                         'short' => 'f',
                     ],
                     'rotate' => [
-                        'help' => __d('mysql_backup', 'Rotates backups. You have to indicate the number of backups you ' .
+                        'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups you ' .
                             'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
                         'short' => 'r',
                     ],
                     'send' => [
-                        'help' => __d('mysql_backup', 'Sends the backup file via email. You have ' .
+                        'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
                             'to indicate the recipient\'s email address'),
                         'short' => 's',
                     ],
@@ -324,14 +324,14 @@ class BackupShell extends Shell
             ],
         ]);
 
-        $parser->addSubcommand('index', ['help' => __d('mysql_backup', 'Lists database backups')]);
+        $parser->addSubcommand('index', ['help' => __d('database_backup', 'Lists database backups')]);
 
         $parser->addSubcommand('import', [
-            'help' => __d('mysql_backup', 'Imports a database backup'),
+            'help' => __d('database_backup', 'Imports a database backup'),
             'parser' => [
                 'arguments' => [
                     'filename' => [
-                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'help' => __d('database_backup', 'Filename. It can be an absolute path'),
                         'required' => true,
                     ],
                 ],
@@ -339,11 +339,11 @@ class BackupShell extends Shell
         ]);
 
         $parser->addSubcommand('rotate', [
-            'help' => __d('mysql_backup', 'Rotates backups'),
+            'help' => __d('database_backup', 'Rotates backups'),
             'parser' => [
                 'arguments' => [
                     'keep' => [
-                        'help' => __d('mysql_backup', 'Number of backups you want to keep. So, it ' .
+                        'help' => __d('database_backup', 'Number of backups you want to keep. So, it ' .
                             'will delete all backups that are older'),
                         'required' => true,
                     ],
@@ -352,15 +352,15 @@ class BackupShell extends Shell
         ]);
 
         $parser->addSubcommand('send', [
-            'help' => __d('mysql_backup', 'Send a database backup via mail'),
+            'help' => __d('database_backup', 'Send a database backup via mail'),
             'parser' => [
                 'arguments' => [
                     'filename' => [
-                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'help' => __d('database_backup', 'Filename. It can be an absolute path'),
                         'required' => true,
                     ],
                     'recipient' => [
-                        'help' => __d('mysql_backup', 'Recipient\'s email address'),
+                        'help' => __d('database_backup', 'Recipient\'s email address'),
                         'required' => true,
                     ],
                 ],

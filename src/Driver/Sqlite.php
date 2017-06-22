@@ -94,7 +94,7 @@ class Sqlite extends Driver
         exec($this->getExportExecutable($filename), $output, $returnVar);
 
         if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
+            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
         }
 
         return file_exists($filename);
@@ -116,7 +116,7 @@ class Sqlite extends Driver
         exec($this->getImportExecutable($filename), $output, $returnVar);
 
         if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('mysql_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
+            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
         }
 
         return true;

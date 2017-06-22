@@ -69,7 +69,7 @@ class BackupManager
         $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable($filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not writable', $filename));
+            throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not writable', $filename));
         }
 
         return unlink($filename);
@@ -135,7 +135,7 @@ class BackupManager
     public function rotate($rotate)
     {
         if (!isPositive($rotate)) {
-            throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
+            throw new InternalErrorException(__d('database_backup', 'Invalid rotate value'));
         }
 
         $backupsToBeDeleted = array_slice($this->index(), $rotate);
@@ -161,7 +161,7 @@ class BackupManager
         $sender = Configure::read(DATABASE_BACKUP . '.mailSender');
 
         if (!$sender) {
-            throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender'));
+            throw new InternalErrorException(__d('database_backup', 'You must first set the mail sender'));
         }
 
         $filename = $this->getAbsolutePath($filename);
@@ -169,7 +169,7 @@ class BackupManager
         return (new Email)
             ->setFrom($sender)
             ->setTo($recipient)
-            ->setSubject(__d('mysql_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
+            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
             ->setAttachments($filename);
     }
 
