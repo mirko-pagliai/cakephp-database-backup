@@ -101,7 +101,7 @@ Cache::setConfig([
 ]);
 
 ConnectionManager::setConfig('test', ['url' => 'mysql://travis@localhost/test']);
-ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite://127.0.0.1/' . TMP . 'example.sq3']);
+ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:\\' . TMP . 'example.sq3']);
 
 Configure::write('MysqlBackup.connection', 'test');
 Configure::write('MysqlBackup.target', TMP . 'backups');
