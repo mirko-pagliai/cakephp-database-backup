@@ -243,7 +243,7 @@ class SqliteTest extends DriverTestCase
         $config = $this->getProperty($this->Sqlite, 'config');
 
         $this->Sqlite = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['getImportExecutable'])
+            ->setMethods(['dropTables', 'getImportExecutable'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
