@@ -51,14 +51,13 @@ class Mysql extends Driver
     protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $mysqldumpBinary = $this->getBinary('mysqldump');
+        $executable = sprintf('%s --defaults-file=%%s %s', $this->getBinary('mysqldump'), $this->connection['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s --defaults-file=%%s %s | %s > %s 2>/dev/null', $mysqldumpBinary, $this->connection['database'], $this->getBinary($compression), $filename);
+            $executable .= ' | ' . $this->getBinary($compression);
         }
 
-        //No compression
-        return sprintf('%s --defaults-file=%%s %s > %s 2>/dev/null', $mysqldumpBinary, $this->connection['database'], $filename);
+        return $executable . ' > ' . $filename . ' 2>/dev/null';
     }
 
     /**
@@ -97,14 +96,15 @@ class Mysql extends Driver
     protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $mysqlBinary = $this->getBinary('mysql');
+        $executable = sprintf('%s --defaults-extra-file=%%s %s', $this->getBinary('mysql'), $this->connection['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s -dc %s | %s --defaults-extra-file=%%s %s 2>/dev/null', $this->getBinary($compression), $filename, $mysqlBinary, $this->connection['database']);
+            $executable =  sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
+        } else {
+            $executable .= ' < ' . $filename;
         }
 
-        //No compression
-        return sprintf('%s --defaults-extra-file=%%s %s < %s 2>/dev/null', $mysqlBinary, $this->connection['database'], $filename);
+        return $executable . ' 2>/dev/null';
     }
 
     /**

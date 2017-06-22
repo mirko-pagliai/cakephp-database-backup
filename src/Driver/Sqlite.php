@@ -50,14 +50,13 @@ class Sqlite extends Driver
     protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $sqlite3Binary = $this->getBinary('sqlite3');
+        $executable = sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->connection['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s %s .dump | %s > %s 2>/dev/null', $sqlite3Binary, $this->connection['database'], $this->getBinary($compression), $filename);
+            $executable .= ' | ' . $this->getBinary($compression);
         }
 
-        //No compression
-        return sprintf('%s %s .dump > %s 2>/dev/null', $sqlite3Binary, $this->connection['database'], $filename);
+        return $executable . ' > ' . $filename . ' 2>/dev/null';
     }
 
     /**
@@ -71,14 +70,15 @@ class Sqlite extends Driver
     protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $sqlite3Binary = $this->getBinary('sqlite3');
+        $executable = sprintf('%s %s', $this->getBinary('sqlite3'), $this->connection['database']);
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
-            return sprintf('%s -dc %s | %s %s 2>/dev/null', $this->getBinary($compression), $filename, $sqlite3Binary, $this->connection['database']);
+            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
+        } else {
+            $executable .= ' < ' . $filename;
         }
 
-        //No compression
-        return sprintf('%s %s < %s 2>/dev/null', $sqlite3Binary, $this->connection['database'], $filename);
+        return $executable . ' 2>/dev/null';
     }
 
     /**
