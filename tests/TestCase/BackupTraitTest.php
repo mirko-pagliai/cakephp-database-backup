@@ -150,6 +150,28 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getDriver()` method, with a no existing driver
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The `stdClass` driver does not exist
+     * @test
+     */
+    public function testGetDriverNoExistingDriver()
+    {
+        $connection = $this->getMockBuilder(get_class($this->Trait->getConnection()))
+            ->setMethods(['getDriver'])
+            ->setConstructorArgs([$this->Trait->getConnection()->config()])
+            ->getMock();
+
+        $connection->method('getDriver')
+             ->will($this->returnCallback(function () {
+                return new \stdClass();
+             }));
+
+        $driver = $this->Trait->getDriver($connection);
+        dd($driver);
+    }
+
+    /**
      * Test for `getTarget()` method
      * @test
      */

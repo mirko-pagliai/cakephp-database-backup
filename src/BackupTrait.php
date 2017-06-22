@@ -105,6 +105,7 @@ trait BackupTrait
      * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
      * @return object A driver instance
      * @since 2.0.0
+     * @throws InvalidArgumentException
      * @uses getConnection()
      * @uses getClassShortName()
      */
@@ -114,7 +115,12 @@ trait BackupTrait
             $connection = $this->getConnection();
         }
 
-        $driver = App::classname(MYSQL_BACKUP . '.' . $this->getClassShortName($connection->getDriver()), 'Driver');
+        $className = $this->getClassShortName($connection->getDriver());
+        $driver = App::classname(MYSQL_BACKUP . '.' . $className, 'Driver');
+
+        if (!$driver) {
+            throw new InvalidArgumentException(__d('mysql_backup', 'The `{0}` driver does not exist', $className));
+        }
 
         return new $driver($connection);
     }
