@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "MysqlBackup\\": "src"
+            "DatabaseBackup\\": "src"
         },
         "files": [
             "src/Core/global_functions.php"
@@ -28,7 +28,7 @@
     "autoload-dev": {
         "psr-4": {
             "Cake\\Test\\": "vendor/cakephp/cakephp/tests",
-            "MysqlBackup\\Test\\": "tests"
+            "DatabaseBackup\\Test\\": "tests"
         }
     }
 }

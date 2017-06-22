@@ -20,12 +20,12 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Utility;
+namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupImport;
+use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupImport;
 use Reflection\ReflectionTrait;
 
 /**
@@ -36,12 +36,12 @@ class BackupImportTest extends TestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupExport
+     * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
     /**
-     * @var \MysqlBackup\Utility\$BackupImport
+     * @var \DatabaseBackup\Utility\$BackupImport
      */
     protected $BackupImport;
 
@@ -81,7 +81,7 @@ class BackupImportTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $this->getProperty($this->BackupImport, 'driver'));
+        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $this->getProperty($this->BackupImport, 'driver'));
         $this->assertNull($this->getProperty($this->BackupImport, 'filename'));
     }
 

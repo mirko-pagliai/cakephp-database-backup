@@ -20,11 +20,11 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Driver;
 
-use MysqlBackup\BackupTrait;
-use MysqlBackup\Driver\Mysql;
-use MysqlBackup\TestSuite\DriverTestCase;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Driver\Mysql;
+use DatabaseBackup\TestSuite\DriverTestCase;
 use Reflection\ReflectionTrait;
 
 /**
@@ -36,7 +36,7 @@ class MysqlTest extends DriverTestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Driver\Mysql
+     * @var \DatabaseBackup\Driver\Mysql
      */
     protected $Mysql;
 
@@ -271,7 +271,7 @@ class MysqlTest extends DriverTestCase
      * Test for `export()` and `import()` methods.
      *
      * It tests that the backup is properly exported and then imported.
-     * @see \MysqlBackup\TestSuite\DriverTestCase::_testExportAndImport()
+     * @see \DatabaseBackup\TestSuite\DriverTestCase::_testExportAndImport()
      * @test
      */
     public function testExportAndImport()

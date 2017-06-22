@@ -21,7 +21,7 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @since       2.0.0
  */
-namespace MysqlBackup\Test\Fixture\Sqlite;
+namespace DatabaseBackup\Test\Fixture\Sqlite;
 
 use Cake\Test\Fixture\ArticlesFixture as CakeArticlesFixture;
 

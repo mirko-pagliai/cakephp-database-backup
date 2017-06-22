@@ -20,7 +20,7 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup;
+namespace DatabaseBackup;
 
 use Cake\Core\App;
 use Cake\Core\Configure;

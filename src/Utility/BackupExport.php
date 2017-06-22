@@ -21,11 +21,11 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility
  */
-namespace MysqlBackup\Utility;
+namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Network\Exception\InternalErrorException;
-use MysqlBackup\BackupTrait;
+use DatabaseBackup\BackupTrait;
 
 /**
  * Utility to export databases
@@ -35,7 +35,7 @@ class BackupExport
     use BackupTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     public $BackupManager;
 
@@ -101,7 +101,7 @@ class BackupExport
      * Sets the compression
      * @param bool|string $compression Compression type. Supported values are
      *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
-     * @return \MysqlBackup\Utility\BackupExport
+     * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws InternalErrorException
      * @uses $compression
@@ -127,7 +127,7 @@ class BackupExport
      * The compression type will be automatically setted by the filename.
      * @param string $filename Filename. It can be an absolute path and may
      *  contain patterns
-     * @return \MysqlBackup\Utility\BackupExport
+     * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws InternalErrorException
      * @uses compression()
@@ -177,7 +177,7 @@ class BackupExport
      * Sets the number of backups you want to keep. So, it will delete all
      * backups that are older
      * @param int $rotate Number of backups you want to keep
-     * @return \MysqlBackup\Utility\BackupExport
+     * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#rotate
      * @uses $rotate
      */
@@ -191,7 +191,7 @@ class BackupExport
     /**
      * Sets the recipient's email address to send the backup file via mail
      * @param bool|string $recipient Recipient's email address or `false` to disable
-     * @return \MysqlBackup\Utility\BackupExport
+     * @return \DatabaseBackup\Utility\BackupExport
      * @since 1.1.0
      * @uses $emailRecipient
      */

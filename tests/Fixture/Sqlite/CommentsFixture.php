@@ -20,7 +20,7 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\Fixture\Sqlite;
+namespace DatabaseBackup\Test\Fixture\Sqlite;
 
 use Cake\Test\Fixture\CommentsFixture as CakeCommentsFixture;
 

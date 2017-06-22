@@ -20,12 +20,12 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Driver;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\BackupTrait;
-use MysqlBackup\Driver\Mysql;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Driver\Mysql;
 
 /**
  * DriverTest class
@@ -45,7 +45,7 @@ class DriverTest extends TestCase
     protected $Comments;
 
     /**
-     * @var \MysqlBackup\Driver\Mysql
+     * @var \DatabaseBackup\Driver\Mysql
      */
     protected $Mysql;
 

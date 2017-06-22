@@ -20,13 +20,13 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Utility;
+namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailAssertTrait;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use Reflection\ReflectionTrait;
 
 /**
@@ -38,12 +38,12 @@ class BackupManagerTest extends TestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupExport
+     * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $BackupManager;
 

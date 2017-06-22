@@ -23,9 +23,9 @@
  */
 use Cake\Core\Configure;
 
-//Sets the default MysqlBackup name
+//Sets the default DatabaseBackup name
 if (!defined('DATABASE_BACKUP')) {
-    define('DATABASE_BACKUP', 'MysqlBackup');
+    define('DATABASE_BACKUP', 'DatabaseBackup');
 }
 
 //Sets the list of valid compressions

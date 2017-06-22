@@ -20,12 +20,12 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Driver;
 
 use Cake\Core\Configure;
-use MysqlBackup\BackupTrait;
-use MysqlBackup\Driver\Sqlite;
-use MysqlBackup\TestSuite\DriverTestCase;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Driver\Sqlite;
+use DatabaseBackup\TestSuite\DriverTestCase;
 use Reflection\ReflectionTrait;
 
 /**
@@ -37,7 +37,7 @@ class SqliteTest extends DriverTestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Driver\Sqlite
+     * @var \DatabaseBackup\Driver\Sqlite
      */
     protected $Sqlite;
 
@@ -51,8 +51,8 @@ class SqliteTest extends DriverTestCase
      * @var array
      */
     public $fixtures = [
-        'plugin.mysql_backup.sqlite\Articles',
-        'plugin.mysql_backup.sqlite\Comments',
+        'plugin.database_backup.sqlite\Articles',
+        'plugin.database_backup.sqlite\Comments',
     ];
 
     /**

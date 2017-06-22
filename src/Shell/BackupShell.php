@@ -21,15 +21,15 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @use         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell
  */
-namespace MysqlBackup\Shell;
+namespace DatabaseBackup\Shell;
 
 use Cake\Console\ConsoleIo;
 use Cake\Console\Shell;
 use Cake\I18n\Number;
-use MysqlBackup\BackupTrait;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupImport;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupImport;
+use DatabaseBackup\Utility\BackupManager;
 
 /**
  * Shell to handle database backups
@@ -39,7 +39,7 @@ class BackupShell extends Shell
     use BackupTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $BackupManager;
 
@@ -95,7 +95,7 @@ class BackupShell extends Shell
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#deleteAll
      * @since 1.0.1
-     * @uses MysqlBackup\Utility\BackupManager::deleteAll()
+     * @uses DatabaseBackup\Utility\BackupManager::deleteAll()
      * @uses $BackupManager
      */
     public function deleteAll()
@@ -119,9 +119,9 @@ class BackupShell extends Shell
      * Exports a database backup
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#export
-     * @uses MysqlBackup\Utility\BackupExport::compression()
-     * @uses MysqlBackup\Utility\BackupExport::export()
-     * @uses MysqlBackup\Utility\BackupExport::filename()
+     * @uses DatabaseBackup\Utility\BackupExport::compression()
+     * @uses DatabaseBackup\Utility\BackupExport::export()
+     * @uses DatabaseBackup\Utility\BackupExport::filename()
      * @uses rotate()
      * @uses send()
      */
@@ -169,8 +169,8 @@ class BackupShell extends Shell
      * @param string $filename Filename. It can be an absolute path
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#import
-     * @uses MysqlBackup\Utility\BackupImport::filename()
-     * @uses MysqlBackup\Utility\BackupImport::import()
+     * @uses DatabaseBackup\Utility\BackupImport::filename()
+     * @uses DatabaseBackup\Utility\BackupImport::import()
      */
     public function import($filename)
     {
@@ -187,7 +187,7 @@ class BackupShell extends Shell
      * Lists database backups
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#index
-     * @uses MysqlBackup\Utility\BackupManager::index()
+     * @uses DatabaseBackup\Utility\BackupManager::index()
      * @uses $BackupManager
      */
     public function index()
@@ -238,7 +238,7 @@ class BackupShell extends Shell
      * @param int $keep Number of backups you want to keep
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#rotate
-     * @uses MysqlBackup\Utility\BackupManager::rotate()
+     * @uses DatabaseBackup\Utility\BackupManager::rotate()
      * @uses $BackupManager
      */
     public function rotate($keep)
@@ -270,7 +270,7 @@ class BackupShell extends Shell
      * @param string $recipient Recipient's email address
      * @return void
      * @since 1.1.0
-     * @uses MysqlBackup\Utility\BackupManager::send()
+     * @uses DatabaseBackup\Utility\BackupManager::send()
      * @uses $BackupManager
      */
     public function send($filename, $recipient)

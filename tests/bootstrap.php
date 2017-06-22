@@ -103,9 +103,9 @@ Cache::setConfig([
 ConnectionManager::setConfig('test', ['url' => 'mysql://travis@localhost/test']);
 ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:\\' . TMP . 'example.sq3']);
 
-Configure::write('MysqlBackup.connection', 'test');
-Configure::write('MysqlBackup.target', TMP . 'backups');
-Configure::write('MysqlBackup.mailSender', 'sender@example.com');
+Configure::write('DatabaseBackup.connection', 'test');
+Configure::write('DatabaseBackup.target', TMP . 'backups');
+Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
 Plugin::load('MysqlBackup', [
     'bootstrap' => true,

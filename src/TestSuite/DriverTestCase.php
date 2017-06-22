@@ -21,7 +21,7 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @since       2.0.0
  */
-namespace MysqlBackup\TestSuite;
+namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;

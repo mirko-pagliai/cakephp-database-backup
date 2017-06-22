@@ -21,7 +21,7 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility
  */
-namespace MysqlBackup\Utility;
+namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
@@ -29,7 +29,7 @@ use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\Entity;
-use MysqlBackup\BackupTrait;
+use DatabaseBackup\BackupTrait;
 
 /**
  * Utility to manage database backups

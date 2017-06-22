@@ -20,11 +20,11 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Driver;
+namespace DatabaseBackup\Driver;
 
 use Cake\Network\Exception\InternalErrorException;
-use MysqlBackup\BackupTrait;
-use MysqlBackup\Driver\Driver;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Driver\Driver;
 
 /**
  * Sqlite driver to export/import database backups

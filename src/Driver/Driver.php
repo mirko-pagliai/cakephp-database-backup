@@ -21,11 +21,11 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @since       2.0.0
  */
-namespace MysqlBackup\Driver;
+namespace DatabaseBackup\Driver;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use MysqlBackup\BackupTrait;
+use DatabaseBackup\BackupTrait;
 
 /**
  * Represents a driver containing all methods to export/import database backups

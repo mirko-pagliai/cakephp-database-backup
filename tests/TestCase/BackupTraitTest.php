@@ -20,17 +20,17 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase;
+namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\Utility\BackupManager;
 
 class BackupTraitTest extends TestCase
 {
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $Trait;
 
@@ -143,10 +143,10 @@ class BackupTraitTest extends TestCase
     public function testGetDriver()
     {
         $driver = $this->Trait->getDriver(ConnectionManager::get('test'));
-        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $driver);
+        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
 
         $driver = $this->Trait->getDriver();
-        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $driver);
+        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
     }
 
     /**

@@ -20,16 +20,16 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Shell;
+namespace DatabaseBackup\Test\TestCase\Shell;
 
 use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\I18n\Number;
 use Cake\TestSuite\Stub\ConsoleOutput;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Shell\BackupShell;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\Shell\BackupShell;
+use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use Reflection\ReflectionTrait;
 
 /**
@@ -40,17 +40,17 @@ class BackupShellTest extends TestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupExport
+     * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $BackupManager;
 
     /**
-     * @var \MysqlBackup\Shell\BackupShell
+     * @var \DatabaseBackup\Shell\BackupShell
      */
     protected $BackupShell;
 

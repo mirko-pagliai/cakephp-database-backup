@@ -21,10 +21,10 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility
  */
-namespace MysqlBackup\Utility;
+namespace DatabaseBackup\Utility;
 
 use Cake\Network\Exception\InternalErrorException;
-use MysqlBackup\BackupTrait;
+use DatabaseBackup\BackupTrait;
 
 /**
  * Utility to import databases
@@ -59,7 +59,7 @@ class BackupImport
     /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
-     * @return \MysqlBackup\Utility\BackupImport
+     * @return \DatabaseBackup\Utility\BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws InternalErrorException
      * @uses $driver

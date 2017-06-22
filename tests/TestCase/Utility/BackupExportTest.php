@@ -20,12 +20,12 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Utility;
+namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupExport;
 use Reflection\ReflectionTrait;
 
 /**
@@ -36,7 +36,7 @@ class BackupExportTest extends TestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupExport
+     * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
@@ -95,7 +95,7 @@ class BackupExportTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceof('MysqlBackup\Utility\BackupManager', $this->BackupExport->BackupManager);
+        $this->assertInstanceof(DATABASE_BACKUP . '\Utility\BackupManager', $this->BackupExport->BackupManager);
         $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
 
         $config = $this->getProperty($this->BackupExport, 'config');
@@ -103,7 +103,7 @@ class BackupExportTest extends TestCase
         $this->assertEquals($config['database'], 'test');
         $this->assertEquals($config['driver'], 'Cake\Database\Driver\Mysql');
 
-        $this->assertInstanceof('MysqlBackup\Driver\Mysql', $this->getProperty($this->BackupExport, 'driver'));
+        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $this->getProperty($this->BackupExport, 'driver'));
         $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
         $this->assertNull($this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));

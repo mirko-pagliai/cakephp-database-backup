@@ -21,11 +21,11 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @since       2.0.0
  */
-namespace MysqlBackup\Driver;
+namespace DatabaseBackup\Driver;
 
 use Cake\Network\Exception\InternalErrorException;
-use MysqlBackup\BackupTrait;
-use MysqlBackup\Driver\Driver;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Driver\Driver;
 
 /**
  * Mysql driver to export/import database backups
