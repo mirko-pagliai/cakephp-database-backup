@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.0 branch
 ### 2.0.0
+* the plugin has been renamed as `DatabaseBackup` (`cakephp-database-backup`);
 * the code has been completely rewritten to work with drivers, so it can also
     work with other database engines;
 * added support for Sqlite database;
