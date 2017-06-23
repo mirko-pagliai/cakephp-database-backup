@@ -3,7 +3,8 @@
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-database-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-database-backup)
 [![Coverage Status](https://img.shields.io/codecov/c/github/mirko-pagliai/cakephp-database-backup.svg?style=flat-square)](https://codecov.io/github/mirko-pagliai/cakephp-database-backup)
 
-*DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.
+*DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.  
+Currently, the plugin supports MySql and Sqlite databases.
 
 ## Installation
 You can install the plugin via composer:
@@ -25,9 +26,13 @@ files. So you have to create the directory and make it writable:
 If you want to use a different directory, read below.
 
 ## Requirements
-*DatabaseBackup* requires `mysql` and `mysqldump`.  
+*DatabaseBackup* requires:
+* `mysql` and `mysqldump` for *MySql* databases;
+* `sqlite3` for *Sqlite* databases.
+
 **Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are 
-also required.  
+also required.
+
 The installation of these binaries may vary depending on your operating system.
 
 ## Configuration
