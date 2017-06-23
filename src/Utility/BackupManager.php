@@ -1,19 +1,19 @@
 <?php
 /**
- * This file is part of cakephp-mysql-backup.
+ * This file is part of cakephp-database-backup.
  *
- * cakephp-mysql-backup is free software: you can redistribute it and/or modify
+ * cakephp-database-backup is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * cakephp-mysql-backup is distributed in the hope that it will be useful,
+ * cakephp-database-backup is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with cakephp-mysql-backup.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cakephp-database-backup.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author      Mirko Pagliai <mirko.pagliai@gmail.com>
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
@@ -21,7 +21,7 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility
  */
-namespace MysqlBackup\Utility;
+namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
@@ -29,7 +29,7 @@ use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\Entity;
-use MysqlBackup\BackupTrait;
+use DatabaseBackup\BackupTrait;
 
 /**
  * Utility to manage database backups
@@ -37,6 +37,24 @@ use MysqlBackup\BackupTrait;
 class BackupManager
 {
     use BackupTrait;
+
+    /**
+     * Driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @since 2.0.0
+     * @var object
+     */
+    protected $driver;
+
+    /**
+     * Construct
+     * @uses $connection
+     * @uses $driver
+     */
+    public function __construct()
+    {
+        $this->driver = $this->getDriver();
+    }
 
     /**
      * Deletes a backup file
@@ -51,7 +69,7 @@ class BackupManager
         $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable($filename)) {
-            throw new InternalErrorException(__d('mysql_backup', 'File or directory `{0}` not writable', $filename));
+            throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not writable', $filename));
         }
 
         return unlink($filename);
@@ -82,19 +100,20 @@ class BackupManager
      * Returns a list of database backups
      * @return array Backups as entities
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index
+     * @uses $driver
      */
     public function index()
     {
         $target = $this->getTarget();
 
         return collection((new Folder($target))->find('.+\.sql(\.(gz|bz2))?'))
-            ->map(function ($file) use ($target) {
+            ->map(function ($filename) use ($target) {
                 return new Entity([
-                    'filename' => $file,
-                    'extension' => $this->getExtension($file),
-                    'compression' => $this->getCompression($file),
-                    'size' => filesize($target . DS . $file),
-                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $file))),
+                    'filename' => $filename,
+                    'extension' => $this->driver->getExtension($filename),
+                    'compression' => $this->driver->getCompression($filename),
+                    'size' => filesize($target . DS . $filename),
+                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $filename))),
                 ]);
             })
             ->sortBy('datetime')
@@ -116,7 +135,7 @@ class BackupManager
     public function rotate($rotate)
     {
         if (!isPositive($rotate)) {
-            throw new InternalErrorException(__d('mysql_backup', 'Invalid rotate value'));
+            throw new InternalErrorException(__d('database_backup', 'Invalid rotate value'));
         }
 
         $backupsToBeDeleted = array_slice($this->index(), $rotate);
@@ -139,10 +158,10 @@ class BackupManager
      */
     protected function _send($filename, $recipient)
     {
-        $sender = Configure::read(MYSQL_BACKUP . '.mailSender');
+        $sender = Configure::read(DATABASE_BACKUP . '.mailSender');
 
         if (!$sender) {
-            throw new InternalErrorException(__d('mysql_backup', 'You must first set the mail sender in the configuration'));
+            throw new InternalErrorException(__d('database_backup', 'You must first set the mail sender'));
         }
 
         $filename = $this->getAbsolutePath($filename);
@@ -150,7 +169,7 @@ class BackupManager
         return (new Email)
             ->setFrom($sender)
             ->setTo($recipient)
-            ->setSubject(__d('mysql_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
+            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
             ->setAttachments($filename);
     }
 

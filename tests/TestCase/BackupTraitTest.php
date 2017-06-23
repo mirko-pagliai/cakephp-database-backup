@@ -1,36 +1,36 @@
 <?php
 /**
- * This file is part of cakephp-mysql-backup.
+ * This file is part of cakephp-database-backup.
  *
- * cakephp-mysql-backup is free software: you can redistribute it and/or modify
+ * cakephp-database-backup is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * cakephp-mysql-backup is distributed in the hope that it will be useful,
+ * cakephp-database-backup is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with cakephp-mysql-backup.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cakephp-database-backup.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author      Mirko Pagliai <mirko.pagliai@gmail.com>
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase;
+namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\Utility\BackupManager;
 
 class BackupTraitTest extends TestCase
 {
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $Trait;
 
@@ -68,22 +68,42 @@ class BackupTraitTest extends TestCase
         $this->assertEquals('/file.txt', $result);
 
         $result = $this->Trait->getAbsolutePath('file.txt');
-        $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt', $result);
+        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
 
-        $result = $this->Trait->getAbsolutePath(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt');
-        $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target') . DS . 'file.txt', $result);
+        $result = $this->Trait->getAbsolutePath(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt');
+        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
     }
 
     /**
-     * Test for `getCompression()` method
+     * Test for `getBinary()` method
      * @test
      */
-    public function testGetCompression()
+    public function testGetBinary()
     {
-        $this->assertEquals(false, $this->Trait->getCompression('backup.sql'));
-        $this->assertEquals('bzip2', $this->Trait->getCompression('backup.sql.bz2'));
-        $this->assertEquals('gzip', $this->Trait->getCompression('backup.sql.gz'));
-        $this->assertNull($this->Trait->getCompression('text.txt'));
+        $this->assertEquals(which('mysql'), $this->Trait->getBinary('mysql'));
+    }
+
+    /**
+     * Test for `getBinary()` method, with a binary not available
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage `bzip2` executable not available
+     * @test
+     */
+    public function testGetBinaryNotAvailable()
+    {
+        Configure::write(DATABASE_BACKUP . '.binaries.bzip2', false);
+
+        $this->Trait->getBinary('bzip2');
+    }
+
+    /**
+     * Test for `getClassShortName()` method
+     * @test
+     */
+    public function testGetClassShortName()
+    {
+        $this->assertEquals('TestCase', $this->Trait->getClassShortName('\Cake\TestSuite\TestCase'));
+        $this->assertEquals('TestCase', $this->Trait->getClassShortName('Cake\TestSuite\TestCase'));
     }
 
     /**
@@ -92,65 +112,63 @@ class BackupTraitTest extends TestCase
      */
     public function testGetConnection()
     {
-        $expected = [
-            'scheme' => 'mysql',
-            'host' => 'localhost',
-            'username' => 'travis',
-            'className' => 'Cake\Database\Connection',
-            'database' => 'test',
-            'driver' => 'Cake\Database\Driver\Mysql',
-            'name' => 'test',
-        ];
-
-        $this->assertEquals($expected, $this->Trait->getConnection());
-        $this->assertEquals($expected, $this->Trait->getConnection(Configure::read(MYSQL_BACKUP . '.connection')));
-
         ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
 
-        $expected = [
-            'scheme' => 'mysql',
-            'host' => 'localhost',
-            'username' => 'root',
-            'password' => 'password',
-            'className' => 'Cake\Database\Connection',
-            'database' => 'my_database',
-            'driver' => 'Cake\Database\Driver\Mysql',
-            'name' => 'fake',
-        ];
-
-        $this->assertEquals($expected, $this->Trait->getConnection('fake'));
+        foreach ([
+            null,
+            Configure::read(DATABASE_BACKUP . '.connection'),
+            'fake',
+        ] as $name) {
+            $connection = $this->Trait->getConnection($name);
+            $this->assertInstanceof('Cake\Database\Connection', $connection);
+            $this->assertInstanceof('Cake\Database\Driver\Mysql', $connection->getDriver());
+        }
     }
 
     /**
-     * Test for `getExtension()` method
+     * Test for `getConnection()` method, with an invalid connection
+     * @expectedException \Cake\Datasource\Exception\MissingDatasourceConfigException
+     * @expectedExceptionMessage The datasource configuration "noExisting" was not found.
      * @test
      */
-    public function testGetExtension()
+    public function testGetConnectionInvalidConnection()
     {
-        //Using compression types
-        $this->assertEquals('sql', $this->Trait->getExtension(false));
-        $this->assertEquals('sql.bz2', $this->Trait->getExtension('bzip2'));
-        $this->assertEquals('sql.gz', $this->Trait->getExtension('gzip'));
-        $this->assertNull($this->Trait->getExtension('noExisting'));
-
-        //Using filenames
-        $this->assertEquals('sql', $this->Trait->getExtension('backup.sql'));
-        $this->assertEquals('sql.bz2', $this->Trait->getExtension('backup.sql.bz2'));
-        $this->assertEquals('sql.gz', $this->Trait->getExtension('backup.sql.gz'));
-        $this->assertNull($this->Trait->getExtension('text.txt'));
+        $this->Trait->getConnection('noExisting');
     }
 
     /**
-     * Test for `getValidCompressions()` method
+     * Test for `getDriver()` method
      * @test
      */
-    public function testGetValidCompressions()
+    public function testGetDriver()
     {
-        $this->assertEquals([
-            'sql.bz2' => 'bzip2',
-            'sql.gz' => 'gzip',
-            'sql' => false,
-        ], $this->Trait->getValidCompressions());
+        $driver = $this->Trait->getDriver(ConnectionManager::get('test'));
+        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
+
+        $driver = $this->Trait->getDriver();
+        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
+    }
+
+    /**
+     * Test for `getDriver()` method, with a no existing driver
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The `stdClass` driver does not exist
+     * @test
+     */
+    public function testGetDriverNoExistingDriver()
+    {
+        $connection = $this->getMockBuilder(get_class($this->Trait->getConnection()))
+            ->setMethods(['getDriver'])
+            ->setConstructorArgs([$this->Trait->getConnection()->config()])
+            ->getMock();
+
+        $connection->method('getDriver')
+             ->will($this->returnCallback(function () {
+                return new \stdClass();
+             }));
+
+        $driver = $this->Trait->getDriver($connection);
+        dd($driver);
     }
 
     /**
@@ -159,6 +177,6 @@ class BackupTraitTest extends TestCase
      */
     public function testGetTarget()
     {
-        $this->assertEquals(Configure::read(MYSQL_BACKUP . '.target'), $this->Trait->getTarget());
+        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->Trait->getTarget());
     }
 }

@@ -1,19 +1,19 @@
 <?php
 /**
- * This file is part of cakephp-mysql-backup.
+ * This file is part of cakephp-database-backup.
  *
- * cakephp-mysql-backup is free software: you can redistribute it and/or modify
+ * cakephp-database-backup is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * cakephp-mysql-backup is distributed in the hope that it will be useful,
+ * cakephp-database-backup is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with cakephp-mysql-backup.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cakephp-database-backup.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author      Mirko Pagliai <mirko.pagliai@gmail.com>
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
@@ -21,15 +21,15 @@
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  * @use         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell
  */
-namespace MysqlBackup\Shell;
+namespace DatabaseBackup\Shell;
 
 use Cake\Console\ConsoleIo;
 use Cake\Console\Shell;
 use Cake\I18n\Number;
-use MysqlBackup\BackupTrait;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupImport;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupImport;
+use DatabaseBackup\Utility\BackupManager;
 
 /**
  * Shell to handle database backups
@@ -39,20 +39,55 @@ class BackupShell extends Shell
     use BackupTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $BackupManager;
+
+    /**
+     * Database configuration
+     * @since 2.0.0
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * Driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @since 2.0.0
+     * @var object
+     */
+    protected $driver;
 
     /**
      * Constructor
      * @param \Cake\Console\ConsoleIo|null $io An io instance
      * @uses $BackupManager
+     * @uses $config
+     * @uses $driver
      */
     public function __construct(ConsoleIo $io = null)
     {
         parent::__construct($io);
 
         $this->BackupManager = new BackupManager;
+        $this->config = $this->getConnection()->config();
+        $this->driver = $this->getDriver($this->getConnection());
+    }
+
+    /**
+     * Displays a header for the shell
+     * @return void
+     * @since 2.0.0
+     * @uses $config
+     * @uses $driver
+     */
+    protected function _welcome()
+    {
+        parent::_welcome();
+
+        $this->out(__d('database_backup', 'Connection: {0}', $this->config['name']));
+        $this->out(__d('database_backup', 'Driver: {0}', $this->getClassShortName($this->driver)));
+        $this->hr();
     }
 
     /**
@@ -60,7 +95,7 @@ class BackupShell extends Shell
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#deleteAll
      * @since 1.0.1
-     * @uses MysqlBackup\Utility\BackupManager::deleteAll()
+     * @uses DatabaseBackup\Utility\BackupManager::deleteAll()
      * @uses $BackupManager
      */
     public function deleteAll()
@@ -68,25 +103,25 @@ class BackupShell extends Shell
         $deleted = $this->BackupManager->deleteAll();
 
         if (!$deleted) {
-            $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
+            $this->verbose(__d('database_backup', 'No backup has been deleted'));
 
             return;
         }
 
         foreach ($deleted as $file) {
-            $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', rtr($file)));
+            $this->verbose(__d('database_backup', 'Backup `{0}` has been deleted', rtr($file)));
         }
 
-        $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+        $this->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
     }
 
     /**
      * Exports a database backup
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#export
-     * @uses MysqlBackup\Utility\BackupExport::compression()
-     * @uses MysqlBackup\Utility\BackupExport::export()
-     * @uses MysqlBackup\Utility\BackupExport::filename()
+     * @uses DatabaseBackup\Utility\BackupExport::compression()
+     * @uses DatabaseBackup\Utility\BackupExport::export()
+     * @uses DatabaseBackup\Utility\BackupExport::filename()
      * @uses rotate()
      * @uses send()
      */
@@ -113,7 +148,7 @@ class BackupShell extends Shell
             //Exports
             $file = $instance->export();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been exported', rtr($file)));
+            $this->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
             //Sends via email
             if ($this->param('send')) {
@@ -134,15 +169,15 @@ class BackupShell extends Shell
      * @param string $filename Filename. It can be an absolute path
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#import
-     * @uses MysqlBackup\Utility\BackupImport::filename()
-     * @uses MysqlBackup\Utility\BackupImport::import()
+     * @uses DatabaseBackup\Utility\BackupImport::filename()
+     * @uses DatabaseBackup\Utility\BackupImport::import()
      */
     public function import($filename)
     {
         try {
             $file = (new BackupImport)->filename($filename)->import();
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` has been imported', rtr($file)));
+            $this->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -152,7 +187,7 @@ class BackupShell extends Shell
      * Lists database backups
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#index
-     * @uses MysqlBackup\Utility\BackupManager::index()
+     * @uses DatabaseBackup\Utility\BackupManager::index()
      * @uses $BackupManager
      */
     public function index()
@@ -160,16 +195,12 @@ class BackupShell extends Shell
         //Gets all backups
         $backups = $this->BackupManager->index();
 
-        $this->out(__d('mysql_backup', 'Backup files found: {0}', count($backups)));
+        $this->out(__d('database_backup', 'Backup files found: {0}', count($backups)));
 
         if ($backups) {
             //Parses backups
             $backups = collection($backups)
                 ->map(function ($backup) {
-                    if (isset($backup->compression) && !$backup->compression) {
-                        $backup->compression = __d('mysql_backup', 'none');
-                    }
-
                     $backup->size = Number::toReadableSize($backup->size);
 
                     return array_values($backup->toArray());
@@ -178,11 +209,11 @@ class BackupShell extends Shell
 
             //Table headers
             $headers = [
-                __d('mysql_backup', 'Filename'),
-                __d('mysql_backup', 'Extension'),
-                __d('mysql_backup', 'Compression'),
-                __d('mysql_backup', 'Size'),
-                __d('mysql_backup', 'Datetime'),
+                __d('database_backup', 'Filename'),
+                __d('database_backup', 'Extension'),
+                __d('database_backup', 'Compression'),
+                __d('database_backup', 'Size'),
+                __d('database_backup', 'Datetime'),
             ];
 
             $this->helper('table')->output(array_merge([$headers], $backups));
@@ -207,7 +238,7 @@ class BackupShell extends Shell
      * @param int $keep Number of backups you want to keep
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#rotate
-     * @uses MysqlBackup\Utility\BackupManager::rotate()
+     * @uses DatabaseBackup\Utility\BackupManager::rotate()
      * @uses $BackupManager
      */
     public function rotate($keep)
@@ -217,16 +248,16 @@ class BackupShell extends Shell
             $deleted = $this->BackupManager->rotate($keep);
 
             if (empty($deleted)) {
-                $this->verbose(__d('mysql_backup', 'No backup has been deleted'));
+                $this->verbose(__d('database_backup', 'No backup has been deleted'));
 
                 return;
             }
 
             foreach ($deleted as $file) {
-                $this->verbose(__d('mysql_backup', 'Backup `{0}` has been deleted', $file->filename));
+                $this->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->filename));
             }
 
-            $this->success(__d('mysql_backup', 'Deleted backup files: {0}', count($deleted)));
+            $this->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -239,7 +270,7 @@ class BackupShell extends Shell
      * @param string $recipient Recipient's email address
      * @return void
      * @since 1.1.0
-     * @uses MysqlBackup\Utility\BackupManager::send()
+     * @uses DatabaseBackup\Utility\BackupManager::send()
      * @uses $BackupManager
      */
     public function send($filename, $recipient)
@@ -247,7 +278,7 @@ class BackupShell extends Shell
         try {
             $this->BackupManager->send($filename, $recipient);
 
-            $this->success(__d('mysql_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
+            $this->success(__d('database_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
         } catch (\Exception $e) {
             $this->abort($e->getMessage());
         }
@@ -261,31 +292,31 @@ class BackupShell extends Shell
     {
         $parser = parent::getOptionParser();
 
-        $parser->setDescription(__d('mysql_backup', 'Shell to handle database backups'));
+        $parser->setDescription(__d('database_backup', 'Shell to handle database backups'));
 
-        $parser->addSubcommand('deleteAll', ['help' => __d('mysql_backup', 'Deletes all database backups')]);
+        $parser->addSubcommand('deleteAll', ['help' => __d('database_backup', 'Deletes all database backups')]);
 
         $parser->addSubcommand('export', [
-            'help' => __d('mysql_backup', 'Exports a database backup'),
+            'help' => __d('database_backup', 'Exports a database backup'),
             'parser' => [
                 'options' => [
                     'compression' => [
-                        'choices' => array_keys($this->getValidCompressions()),
-                        'help' => __d('mysql_backup', 'Compression type. By default, no compression will be used'),
+                        'choices' => array_filter($this->driver->getValidCompressions()),
+                        'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
                         'short' => 'c',
                     ],
                     'filename' => [
-                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path and may contain ' .
+                        'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
                             'patterns. The compression type will be automatically setted'),
                         'short' => 'f',
                     ],
                     'rotate' => [
-                        'help' => __d('mysql_backup', 'Rotates backups. You have to indicate the number of backups you ' .
+                        'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups you ' .
                             'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
                         'short' => 'r',
                     ],
                     'send' => [
-                        'help' => __d('mysql_backup', 'Sends the backup file via email. You have ' .
+                        'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
                             'to indicate the recipient\'s email address'),
                         'short' => 's',
                     ],
@@ -293,14 +324,14 @@ class BackupShell extends Shell
             ],
         ]);
 
-        $parser->addSubcommand('index', ['help' => __d('mysql_backup', 'Lists database backups')]);
+        $parser->addSubcommand('index', ['help' => __d('database_backup', 'Lists database backups')]);
 
         $parser->addSubcommand('import', [
-            'help' => __d('mysql_backup', 'Imports a database backup'),
+            'help' => __d('database_backup', 'Imports a database backup'),
             'parser' => [
                 'arguments' => [
                     'filename' => [
-                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'help' => __d('database_backup', 'Filename. It can be an absolute path'),
                         'required' => true,
                     ],
                 ],
@@ -308,11 +339,11 @@ class BackupShell extends Shell
         ]);
 
         $parser->addSubcommand('rotate', [
-            'help' => __d('mysql_backup', 'Rotates backups'),
+            'help' => __d('database_backup', 'Rotates backups'),
             'parser' => [
                 'arguments' => [
                     'keep' => [
-                        'help' => __d('mysql_backup', 'Number of backups you want to keep. So, it ' .
+                        'help' => __d('database_backup', 'Number of backups you want to keep. So, it ' .
                             'will delete all backups that are older'),
                         'required' => true,
                     ],
@@ -321,15 +352,15 @@ class BackupShell extends Shell
         ]);
 
         $parser->addSubcommand('send', [
-            'help' => __d('mysql_backup', 'Send a database backup via mail'),
+            'help' => __d('database_backup', 'Send a database backup via mail'),
             'parser' => [
                 'arguments' => [
                     'filename' => [
-                        'help' => __d('mysql_backup', 'Filename. It can be an absolute path'),
+                        'help' => __d('database_backup', 'Filename. It can be an absolute path'),
                         'required' => true,
                     ],
                     'recipient' => [
-                        'help' => __d('mysql_backup', 'Recipient\'s email address'),
+                        'help' => __d('database_backup', 'Recipient\'s email address'),
                         'required' => true,
                     ],
                 ],

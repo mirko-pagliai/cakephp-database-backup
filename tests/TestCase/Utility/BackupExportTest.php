@@ -1,32 +1,31 @@
 <?php
 /**
- * This file is part of cakephp-mysql-backup.
+ * This file is part of cakephp-database-backup.
  *
- * cakephp-mysql-backup is free software: you can redistribute it and/or modify
+ * cakephp-database-backup is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * cakephp-mysql-backup is distributed in the hope that it will be useful,
+ * cakephp-database-backup is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with cakephp-mysql-backup.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cakephp-database-backup.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author      Mirko Pagliai <mirko.pagliai@gmail.com>
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Utility;
+namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\Utility\BackupExport;
 use Reflection\ReflectionTrait;
 
 /**
@@ -37,7 +36,7 @@ class BackupExportTest extends TestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupExport
+     * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
@@ -55,7 +54,7 @@ class BackupExportTest extends TestCase
 
         //Mocks the `send()` method of `BackupManager` class, so that it writes
         //  on the debug log instead of sending a real mail
-        $this->BackupExport->BackupManager = $this->getMockBuilder(BackupManager::class)
+        $this->BackupExport->BackupManager = $this->getMockBuilder(get_class($this->BackupExport->BackupManager))
             ->setMethods(['send'])
             ->getMock();
 
@@ -84,7 +83,7 @@ class BackupExportTest extends TestCase
         @unlink(LOGS . 'debug.log');
 
         //Deletes all backups
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
             //@codingStandardsIgnoreLine
             @unlink($file);
         }
@@ -96,19 +95,19 @@ class BackupExportTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceof('MysqlBackup\Utility\BackupManager', $this->BackupExport->BackupManager);
+        $this->assertInstanceof(DATABASE_BACKUP . '\Utility\BackupManager', $this->BackupExport->BackupManager);
         $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
 
-        $connection = $this->getProperty($this->BackupExport, 'connection');
-        $this->assertEquals($connection['scheme'], 'mysql');
-        $this->assertEquals($connection['database'], 'test');
-        $this->assertEquals($connection['driver'], 'Cake\Database\Driver\Mysql');
+        $config = $this->getProperty($this->BackupExport, 'config');
+        $this->assertEquals($config['scheme'], 'mysql');
+        $this->assertEquals($config['database'], 'test');
+        $this->assertEquals($config['driver'], 'Cake\Database\Driver\Mysql');
 
+        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $this->getProperty($this->BackupExport, 'driver'));
         $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
-        $this->assertNull($this->getProperty($this->BackupExport, 'executable'));
-        $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'extension'));
+        $this->assertNull($this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
-        $this->assertNull($this->getProperty($this->BackupExport, 'rotate'));
+        $this->assertEquals(0, $this->getProperty($this->BackupExport, 'rotate'));
     }
 
     /**
@@ -121,36 +120,17 @@ class BackupExportTest extends TestCase
         $this->BackupExport->compression('bzip2');
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
         $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
-
-        $this->BackupExport->compression('gzip');
-        $this->assertEquals('gzip', $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertEquals('sql.gz', $this->getProperty($this->BackupExport, 'extension'));
-
-        $this->BackupExport->compression(false);
-        $this->assertEquals(false, $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'extension'));
     }
 
     /**
-     * Test for `compression()` method, with an invalid stringvalue
+     * Test for `compression()` method, with an invalid type
      * @expectedException Cake\Network\Exception\InternalErrorException
      * @expectedExceptionMessage Invalid compression type
      * @test
      */
-    public function testCompressionWithInvalidString()
+    public function testCompressionWithInvalidType()
     {
-        $this->BackupExport->compression('invalidValue');
-    }
-
-    /**
-     * Test for `compression()` method, with an invalid boolean value
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage Invalid compression type
-     * @test
-     */
-    public function testCompressionWithInvalidBool()
-    {
-        $this->BackupExport->compression(true);
+        $this->BackupExport->compression('invalidType');
     }
 
     /**
@@ -161,35 +141,16 @@ class BackupExportTest extends TestCase
      */
     public function testFilename()
     {
-        //`sql` filename
-        $this->BackupExport->filename('backup.sql');
-        $this->assertEquals('/tmp/backups/backup.sql', $this->getProperty($this->BackupExport, 'filename'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'compression'));
-
-        //`sql.bz2` filename
         $this->BackupExport->filename('backup.sql.bz2');
         $this->assertEquals('/tmp/backups/backup.sql.bz2', $this->getProperty($this->BackupExport, 'filename'));
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
+        $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 
-        //`sql.gz` filename
-        $this->BackupExport->filename('backup.sql.gz');
-        $this->assertEquals('/tmp/backups/backup.sql.gz', $this->getProperty($this->BackupExport, 'filename'));
-        $this->assertEquals('gzip', $this->getProperty($this->BackupExport, 'compression'));
-
-        //Filename with absolute path
-        $this->BackupExport->filename('/tmp/backups/other.sql');
-        $this->assertEquals('/tmp/backups/other.sql', $this->getProperty($this->BackupExport, 'filename'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'compression'));
-
-        //Compression is ignored, because a filename has been given
+        //Compression is ignored, because there's a filename
         $this->BackupExport->compression('gzip')->filename('backup.sql.bz2');
         $this->assertEquals('backup.sql.bz2', basename($this->getProperty($this->BackupExport, 'filename')));
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
-
-        //Compression is ignored, because a filename has been given
-        $this->BackupExport->compression('bzip2')->filename('backup.sql');
-        $this->assertEquals('backup.sql', basename($this->getProperty($this->BackupExport, 'filename')));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'compression'));
+        $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 
         //Filename with `{$DATABASE}` pattern
         $this->BackupExport->filename('{$DATABASE}.sql');
@@ -222,12 +183,12 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method, with invalid directory
+     * Test for `filename()` method, with a no writable directory
      * @expectedException Cake\Network\Exception\InternalErrorException
      * @expectedExceptionMessage File or directory `/tmp/backups/noExistingDir` not writable
      * @test
      */
-    public function testFilenameWithInvalidDirectory()
+    public function testFilenameNotWritableDirectory()
     {
         $this->BackupExport->filename('noExistingDir' . DS . 'backup.sql');
     }
@@ -280,125 +241,33 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `_storeAuth()` method
-     * @test
-     */
-    public function testStoreAuth()
-    {
-        $auth = $this->invokeMethod($this->BackupExport, '_storeAuth');
-
-        $this->assertFileExists($auth);
-
-        $result = file_get_contents($auth);
-        $expected = '[mysqldump]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
-        $this->assertEquals($expected, $result);
-
-        unlink($auth);
-    }
-
-    /**
-     * Test for `_getExecutable()` method
-     * @test
-     */
-    public function testExecutable()
-    {
-        $mysqldump = Configure::read(MYSQL_BACKUP . '.bin.mysqldump');
-        $bzip2 = Configure::read(MYSQL_BACKUP . '.bin.bzip2');
-        $gzip = Configure::read(MYSQL_BACKUP . '.bin.gzip');
-
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $bzip2 . ' > %s',
-            $this->invokeMethod($this->BackupExport, '_getExecutable', ['bzip2'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s | ' . $gzip . ' > %s',
-            $this->invokeMethod($this->BackupExport, '_getExecutable', ['gzip'])
-        );
-        $this->assertEquals(
-            $mysqldump . ' --defaults-file=%s %s > %s',
-            $this->invokeMethod($this->BackupExport, '_getExecutable', [false])
-        );
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `bzip2` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `bzip2` executable not available
-     * @test
-     */
-    public function testExecutableWithBzip2NotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.bzip2', false);
-
-        $this->invokeMethod($this->BackupExport, '_getExecutable', ['bzip2']);
-    }
-
-    /**
-     * Test for `_getExecutable()` method, with the `gzip` executable not available
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage `gzip` executable not available
-     * @test
-     */
-    public function testExecutableWithGzipNotAvailable()
-    {
-        Configure::write(MYSQL_BACKUP . '.bin.gzip', false);
-
-        $this->invokeMethod($this->BackupExport, '_getExecutable', ['gzip']);
-    }
-
-    /**
      * Test for `export()` method, without compression
      * @test
      */
     public function testExport()
     {
-        //Exports with no compression
-        $filename = $this->BackupExport->compression(false)->export();
+        $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
 
-        //Exports with `bzip2` compression
+        //Exports with `compression()`
         $filename = $this->BackupExport->compression('bzip2')->export();
         $this->assertFileExists($filename);
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
 
-        //Exports with `gzip` compression
-        $filename = $this->BackupExport->compression('gzip')->export();
-        $this->assertFileExists($filename);
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
-
-        //Exports with `sql` filename
-        $filename = $this->BackupExport->filename('backup.sql')->export();
-        $this->assertFileExists($filename);
-        $this->assertEquals('backup.sql', basename($filename));
-
-        //Exports with `sql.bz2` filename
+        //Exports with `filename()`
         $filename = $this->BackupExport->filename('backup.sql.bz2')->export();
         $this->assertFileExists($filename);
         $this->assertEquals('backup.sql.bz2', basename($filename));
 
-        //Exports with `sql.gz` filename
-        $filename = $this->BackupExport->filename('backup.sql.gz')->export();
-        $this->assertFileExists($filename);
-        $this->assertEquals('backup.sql.gz', basename($filename));
-
-        //Changes chmod
-        Configure::write(MYSQL_BACKUP . '.chmod', 0777);
-
         //Exports with a different chmod
-        $filename = $this->BackupExport->filename('backup2.sql')->export();
+        Configure::write(DATABASE_BACKUP . '.chmod', 0777);
+        $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
         $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
-    }
 
-    /**
-     * Test for `export()` method, after calling the `send()` method
-     * @test
-     */
-    public function testExportWithSend()
-    {
+        //Exports with `send()`
         $recipient = 'recipient@example.com';
-        $filename = $this->BackupExport->send($recipient)->export();
-
+        $filename = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
         $log = file_get_contents(LOGS . 'debug.log');
         $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
     }

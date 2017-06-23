@@ -19,4 +19,20 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
+ * @since       2.0.0
  */
+namespace DatabaseBackup\Test\Fixture\Sqlite;
+
+use Cake\Test\Fixture\ArticlesFixture as CakeArticlesFixture;
+
+/**
+ * ArticlesFixture class
+ */
+class ArticlesFixture extends CakeArticlesFixture
+{
+    /**
+     * Fixture datasource
+     * @var string
+     */
+    public $connection = 'test_sqlite';
+}

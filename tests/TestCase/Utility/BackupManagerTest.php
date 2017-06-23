@@ -1,32 +1,32 @@
 <?php
 /**
- * This file is part of cakephp-mysql-backup.
+ * This file is part of cakephp-database-backup.
  *
- * cakephp-mysql-backup is free software: you can redistribute it and/or modify
+ * cakephp-database-backup is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * cakephp-mysql-backup is distributed in the hope that it will be useful,
+ * cakephp-database-backup is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with cakephp-mysql-backup.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cakephp-database-backup.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author      Mirko Pagliai <mirko.pagliai@gmail.com>
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Utility;
+namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailAssertTrait;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use Reflection\ReflectionTrait;
 
 /**
@@ -38,12 +38,12 @@ class BackupManagerTest extends TestCase
     use ReflectionTrait;
 
     /**
-     * @var \MysqlBackup\Utility\BackupExport
+     * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $BackupManager;
 
@@ -85,7 +85,7 @@ class BackupManagerTest extends TestCase
      */
     protected function _deleteAllBackups()
     {
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
             unlink($file);
         }
     }
@@ -177,7 +177,7 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty($this->BackupManager->index());
 
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read(MYSQL_BACKUP . '.target') . DS . 'text.txt', null);
+        file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'text.txt', null);
 
         $this->assertEmpty($this->BackupManager->index());
 
@@ -270,7 +270,7 @@ class BackupManagerTest extends TestCase
         $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
         $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
 
-        $this->assertEmailFrom(Configure::read(MYSQL_BACKUP . '.mailSender'));
+        $this->assertEmailFrom(Configure::read(DATABASE_BACKUP . '.mailSender'));
         $this->assertEmailTo($to);
         $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
         $this->assertEmailAttachmentsContains(basename($file), [
@@ -284,14 +284,14 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `send()` method, without a sender in the configuration
+     * Test for `send()` method, without a sender
      * @test
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage You must first set the mail sender in the configuration
+     * @expectedExceptionMessage You must first set the mail sender
      */
-    public function testSendWithoutSenderInConfiguration()
+    public function testSendWithoutSender()
     {
-        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+        Configure::write(DATABASE_BACKUP . '.mailSender', false);
 
         $this->BackupManager->send('file.sql', 'recipient@example.com');
     }

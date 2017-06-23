@@ -20,3 +20,18 @@
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
+namespace DatabaseBackup\Test\Fixture\Sqlite;
+
+use Cake\Test\Fixture\CommentsFixture as CakeCommentsFixture;
+
+/**
+ * CommentsFixture class
+ */
+class CommentsFixture extends CakeCommentsFixture
+{
+    /**
+     * Fixture datasource
+     * @var string
+     */
+    public $connection = 'test_sqlite';
+}

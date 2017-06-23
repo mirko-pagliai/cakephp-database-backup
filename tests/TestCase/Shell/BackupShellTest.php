@@ -1,53 +1,56 @@
 <?php
 /**
- * This file is part of cakephp-mysql-backup.
+ * This file is part of cakephp-database-backup.
  *
- * cakephp-mysql-backup is free software: you can redistribute it and/or modify
+ * cakephp-database-backup is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * cakephp-mysql-backup is distributed in the hope that it will be useful,
+ * cakephp-database-backup is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with cakephp-mysql-backup.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cakephp-database-backup.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author      Mirko Pagliai <mirko.pagliai@gmail.com>
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
  */
-namespace MysqlBackup\Test\TestCase\Shell;
+namespace DatabaseBackup\Test\TestCase\Shell;
 
 use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\I18n\Number;
 use Cake\TestSuite\Stub\ConsoleOutput;
 use Cake\TestSuite\TestCase;
-use MysqlBackup\Shell\BackupShell;
-use MysqlBackup\Utility\BackupExport;
-use MysqlBackup\Utility\BackupManager;
+use DatabaseBackup\Shell\BackupShell;
+use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
+use Reflection\ReflectionTrait;
 
 /**
  * BackupShellTest class
  */
 class BackupShellTest extends TestCase
 {
+    use ReflectionTrait;
+
     /**
-     * @var \MysqlBackup\Utility\BackupExport
+     * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
 
     /**
-     * @var \MysqlBackup\Utility\BackupManager
+     * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $BackupManager;
 
     /**
-     * @var \MysqlBackup\Shell\BackupShell
+     * @var \DatabaseBackup\Shell\BackupShell
      */
     protected $BackupShell;
 
@@ -60,16 +63,6 @@ class BackupShellTest extends TestCase
      * @var \Cake\TestSuite\Stub\ConsoleOutput
      */
     protected $out;
-
-    /**
-     * Internal method to delete all backups
-     */
-    protected function _deleteAllBackups()
-    {
-        foreach (glob(Configure::read(MYSQL_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
-    }
 
     /**
      * Setup the test case, backup the static object values so they can be
@@ -141,6 +134,31 @@ class BackupShellTest extends TestCase
         $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
         return $files;
+    }
+
+    /**
+     * Internal method to delete all backups
+     */
+    protected function _deleteAllBackups()
+    {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
+     * Test for `_welcome()` method
+     * @test
+     */
+    public function testWelcome()
+    {
+        $this->invokeMethod($this->BackupShell, '_welcome');
+
+        $messages = $this->out->messages();
+
+        $this->assertRegExp('/^Connection: test/', $messages[6]);
+        $this->assertEquals('Driver: Mysql', $messages[7]);
+        $this->assertRegExp('/^\-+$/', $messages[8]);
     }
 
     /**
@@ -300,7 +318,6 @@ class BackupShellTest extends TestCase
         $this->assertEquals([
             'backup.sql',
             'sql',
-            'none',
             Number::toReadableSize($backups[2]->size),
             (string)$backups[2]->datetime,
         ], next($output));
@@ -407,7 +424,7 @@ class BackupShellTest extends TestCase
      */
     public function testSendWithoutSenderInConfiguration()
     {
-        Configure::write(MYSQL_BACKUP . '.mailSender', false);
+        Configure::write(DATABASE_BACKUP . '.mailSender', false);
 
         $this->BackupShell->send('file.sql', 'recipient@example.com');
     }
@@ -429,6 +446,10 @@ class BackupShellTest extends TestCase
             'rotate',
             'send',
         ], array_keys($parser->subcommands()));
+
+        //Checks "compression" options for the "export" subcommand
+        $this->assertEquals('[-c bzip2|gzip]', $parser->subcommands()['export']->parser()->options()['compression']->usage());
+
         $this->assertEquals('Shell to handle database backups', $parser->getDescription());
         $this->assertEquals(['help', 'quiet', 'verbose'], array_keys($parser->options()));
     }
