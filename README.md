@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/mirko-pagliai/cakephp-database-backup.svg?style=flat-square)](https://codecov.io/github/mirko-pagliai/cakephp-database-backup)
 
 *DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.  
-Currently, the plugin supports MySql and Sqlite databases.
+Currently, the plugin supports *MySql* and *Sqlite* databases.
 
 ## Installation
 You can install the plugin via composer:
