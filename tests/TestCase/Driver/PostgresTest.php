@@ -211,7 +211,6 @@ class PostgresTest extends DriverTestCase
         $this->setProperty($this->Postgres, 'config', array_merge($config, ['database' => 'noExisting']));
 
         $this->Postgres->export($this->getAbsolutePath('example.sql'));
-
     }
 
     /**
