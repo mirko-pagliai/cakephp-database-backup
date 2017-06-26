@@ -17,6 +17,7 @@ matrix:
 
 services:
   - mysql
+  - postgresql
 
 install:
   - composer self-update
@@ -24,6 +25,7 @@ install:
 
 before_script:
   - mysql -e 'create database test;'
+  - psql -c 'create database travis_ci_test;' -U postgres
   
 script:
   - if [[ $PHPCS != '1' && $COVERAGE != '1' ]]; then vendor/bin/phpunit; fi

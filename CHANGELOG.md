@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.1 branch
+### 2.1.0
+* added support for Postgres databases.
+
 ## 2.0 branch
 ### 2.0.0
 * the plugin has been renamed as `DatabaseBackup` (`cakephp-database-backup`);
