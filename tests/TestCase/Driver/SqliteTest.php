@@ -42,11 +42,6 @@ class SqliteTest extends DriverTestCase
     protected $Sqlite;
 
     /**
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
      * Fixtures
      * @var array
      */
@@ -77,8 +72,6 @@ class SqliteTest extends DriverTestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        Configure::write(DATABASE_BACKUP . '.connection', 'test');
 
         unset($this->Sqlite);
     }
