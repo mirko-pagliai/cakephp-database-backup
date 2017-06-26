@@ -130,7 +130,7 @@ class Postgres extends Driver
         exec($this->getImportExecutable($filename), $output, $returnVar);
 
         if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_dump', $returnVar));
+            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_restore', $returnVar));
         }
 
         return true;

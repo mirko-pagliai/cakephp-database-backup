@@ -229,7 +229,7 @@ class PostgresTest extends DriverTestCase
     /**
      * Test for `import()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage pg_dump failed with exit code `1`
+     * @expectedExceptionMessage pg_restore failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()
