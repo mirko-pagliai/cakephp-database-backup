@@ -114,7 +114,7 @@ class Postgres extends Driver
             $executable .= ' < ' . $filename;
         }
 
-        return $executable;
+        return $executable . ' 2>/dev/null';
     }
 
     /**
