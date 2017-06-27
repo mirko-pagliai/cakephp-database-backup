@@ -34,6 +34,12 @@ abstract class Driver
     use BackupTrait;
 
     /**
+     * A connection object
+     * @var \Cake\Datasource\ConnectionInterface
+     */
+    protected $connection;
+
+    /**
      * Database configuration
      * @var array
      */
@@ -43,9 +49,11 @@ abstract class Driver
      * Construct
      * @param \Cake\Datasource\ConnectionInterface $connection A connection object
      * @uses $config
+     * @uses $connection
      */
     public function __construct($connection)
     {
+        $this->connection = $connection;
         $this->config = $connection->config();
     }
 
@@ -56,11 +64,12 @@ abstract class Driver
      *  backup file. For this reason, it may be necessary to run it manually.
      * @return void
      * @uses getTables()
+     * @uses $connection
      */
     public function dropTables()
     {
         foreach ($this->getTables() as $table) {
-            $this->getConnection()->execute(sprintf('DROP TABLE %s;', $table));
+            $this->connection->execute(sprintf('DROP TABLE %s;', $table));
         }
     }
 
@@ -88,10 +97,11 @@ abstract class Driver
     /**
      * Gets all tables of the current database
      * @return array
+     * @uses $connection
      */
     public function getTables()
     {
-        return $this->getConnection()->getSchemaCollection()->listTables();
+        return $this->connection->getSchemaCollection()->listTables();
     }
 
     /**
