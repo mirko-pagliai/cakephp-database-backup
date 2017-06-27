@@ -120,10 +120,10 @@ class PostgresTest extends DriverTestCase
         $pgDump = $this->getBinary('pg_dump');
         $dbnameAsString = 'postgresql://postgres@localhost/travis_ci_test';
 
-        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('bzip2') .' > backup.sql.bz2 2>/dev/null';
+        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.bz2']));
 
-        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('gzip') .' > backup.sql.gz 2>/dev/null';
+        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.gz']));
 
         $expected = $pgDump . ' -Fc -b --dbname=postgresql://postgres@localhost/travis_ci_test > backup.sql 2>/dev/null';
