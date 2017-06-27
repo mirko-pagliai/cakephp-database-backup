@@ -25,7 +25,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\TestCase;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * DriverTestCase class.
@@ -100,17 +100,6 @@ abstract class DriverTestCase extends TestCase
             'Articles' => $this->Articles->find()->enableHydration(false)->toArray(),
             'Comments' => $this->Comments->find()->enableHydration(false)->toArray(),
         ];
-    }
-
-    /**
-     * Internal method to load all fixtures declared in the `$fixtures` property
-     * @return void
-     */
-    final protected function loadAllFixtures()
-    {
-        $fixtures = $this->getProperty($this->fixtureManager, '_fixtureMap');
-
-        call_user_func_array([$this, 'loadFixtures'], array_keys($fixtures));
     }
 
     /**

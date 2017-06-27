@@ -23,9 +23,9 @@
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\TestCase;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * DriverTest class
@@ -96,7 +96,7 @@ class DriverTest extends TestCase
      */
     public function testGetTables()
     {
-        $this->loadFixtures('Articles', 'Comments');
+        $this->loadAllFixtures();
 
         $this->assertEquals(['articles', 'comments'], $this->Mysql->getTables());
     }
