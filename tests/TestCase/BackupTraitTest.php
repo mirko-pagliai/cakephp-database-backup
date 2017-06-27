@@ -107,6 +107,24 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getCompression()` method
+     * @test
+     */
+    public function testGetCompression()
+    {
+        $compressions = [
+            'backup.sql' => false,
+            'backup.sql.bz2' => 'bzip2',
+            'backup.sql.gz' => 'gzip',
+            'text.txt' => null,
+        ];
+
+        foreach ($compressions as $filename => $expectedCompression) {
+            $this->assertEquals($expectedCompression, $this->Trait->getCompression($filename));
+        }
+    }
+
+    /**
      * Test for `getConnection()` method
      * @test
      */
@@ -147,6 +165,24 @@ class BackupTraitTest extends TestCase
 
         $driver = $this->Trait->getDriver();
         $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
+    }
+
+    /**
+     * Test for `getExtension()` method
+     * @test
+     */
+    public function testGetExtension()
+    {
+        $extensions = [
+            'backup.sql' => 'sql',
+            'backup.sql.bz2' => 'sql.bz2',
+            'backup.sql.gz' => 'sql.gz',
+            'text.txt' => null,
+        ];
+
+        foreach ($extensions as $filename => $expectedExtension) {
+            $this->assertEquals($expectedExtension, $this->Trait->getExtension($filename));
+        }
     }
 
     /**

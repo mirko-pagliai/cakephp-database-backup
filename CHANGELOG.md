@@ -2,6 +2,9 @@
 ## 2.1 branch
 ### 2.1.0
 * added support for Postgres databases;
+* `getCompression()` and `getExtension()` moved from `Driver` to `BackupTrait`
+    class, because these methods are not strictly related to the database engine
+    you are using;
 * removed `getValidExtensions()` and `getValidCompressions()` methods from
     `Driver` class, because extensions and compressions are the same for any
     database engine;

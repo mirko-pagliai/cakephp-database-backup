@@ -62,7 +62,6 @@ class BackupImport
      * @return \DatabaseBackup\Utility\BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws InternalErrorException
-     * @uses $driver
      * @uses $filename
      */
     public function filename($filename)
@@ -74,7 +73,7 @@ class BackupImport
         }
 
         //Checks for extension
-        if (!$this->driver->getExtension($filename)) {
+        if (!$this->getExtension($filename)) {
             throw new InternalErrorException(__d('database_backup', 'Invalid file extension'));
         }
 

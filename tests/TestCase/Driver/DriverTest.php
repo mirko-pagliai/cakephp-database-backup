@@ -91,42 +91,6 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `getCompression()` method
-     * @test
-     */
-    public function testGetCompression()
-    {
-        $compressions = [
-            'backup.sql' => false,
-            'backup.sql.bz2' => 'bzip2',
-            'backup.sql.gz' => 'gzip',
-            'text.txt' => null,
-        ];
-
-        foreach ($compressions as $filename => $expectedCompression) {
-            $this->assertEquals($expectedCompression, $this->Mysql->getCompression($filename));
-        }
-    }
-
-    /**
-     * Test for `getExtension()` method
-     * @test
-     */
-    public function testGetExtension()
-    {
-        $extensions = [
-            'backup.sql' => 'sql',
-            'backup.sql.bz2' => 'sql.bz2',
-            'backup.sql.gz' => 'sql.gz',
-            'text.txt' => null,
-        ];
-
-        foreach ($extensions as $filename => $expectedExtension) {
-            $this->assertEquals($expectedExtension, $this->Mysql->getExtension($filename));
-        }
-    }
-
-    /**
      * Test for `getTables()` method
      * @test
      */
