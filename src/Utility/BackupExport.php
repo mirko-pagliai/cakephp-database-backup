@@ -52,6 +52,12 @@ class BackupExport
     protected $config;
 
     /**
+     * Default extension
+     * @var string
+     */
+    protected $defaultExtension = 'sql';
+
+    /**
      * Driver containing all methods to export/import database backups
      *  according to the database engine
      * @since 2.0.0
@@ -99,20 +105,25 @@ class BackupExport
 
     /**
      * Sets the compression
-     * @param bool|string $compression Compression type. Supported values are
-     *  `bzip2`, `gzip` and `false` (if you don't want to use compression)
+     * @param bool|string $compression Compression type as string. Supported
+     *  values are `bzip2` and `gzip`. Use `false` for no compression
      * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws InternalErrorException
      * @uses $compression
+     * @uses $defaultExtension
      * @uses $extension
      */
     public function compression($compression)
     {
-        $this->extension = array_search($compression, VALID_COMPRESSIONS, true);
+        if ($compression) {
+            $this->extension = array_search($compression, VALID_COMPRESSIONS);
 
-        if (!$this->extension) {
-            throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));
+            if (!$this->extension) {
+                throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));
+            }
+        } else {
+            $this->extension = $this->defaultExtension;
         }
 
         $this->compression = $compression;
@@ -207,6 +218,7 @@ class BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#export
      * @uses filename()
      * @uses $BackupManager;
+     * @uses $defaultExtension
      * @uses $emailRecipient
      * @uses $filename
      * @uses $extension
@@ -216,7 +228,7 @@ class BackupExport
     {
         if (empty($this->filename)) {
             if (empty($this->extension)) {
-                $this->extension = 'sql';
+                $this->extension = $this->defaultExtension;
             }
 
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));

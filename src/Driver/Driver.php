@@ -74,8 +74,7 @@ abstract class Driver
     /**
      * Returns the compression type from a filename
      * @param string $filename Filename
-     * @return string|bool|null Compression type as string, `null` on failure,
-     *  `false` for no compression
+     * @return string|bool Compression type as string or `false`
      * @uses getExtension()
      */
     public function getCompression($filename)
@@ -84,7 +83,7 @@ abstract class Driver
         $extension = $this->getExtension($filename);
 
         if (!array_key_exists($extension, VALID_COMPRESSIONS)) {
-            return null;
+            return false;
         }
 
         return VALID_COMPRESSIONS[$extension];

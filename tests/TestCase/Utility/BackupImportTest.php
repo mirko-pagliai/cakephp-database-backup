@@ -128,7 +128,7 @@ class BackupImportTest extends TestCase
     /**
      * Test for `filename()` method, with invalid extension
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage Invalid compression type
+     * @expectedExceptionMessage Invalid file extension
      * @test
      */
     public function testFilenameWithInvalidExtension()

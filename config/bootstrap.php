@@ -29,7 +29,7 @@ if (!defined('DATABASE_BACKUP')) {
 }
 
 //Sets the list of valid compressions
-const VALID_COMPRESSIONS = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+const VALID_COMPRESSIONS = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'];
 
 //Sets the list of valid extensions
 const VALID_EXTENSIONS = ['sql.bz2', 'sql.gz', 'sql'];
