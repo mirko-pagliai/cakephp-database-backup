@@ -77,24 +77,6 @@ class SqliteTest extends DriverTestCase
     }
 
     /**
-     * Test for `getCompression()` method
-     * @test
-     */
-    public function testGetCompression()
-    {
-        $compressions = [
-            'backup.sql' => false,
-            'backup.sql.bz2' => 'bzip2',
-            'backup.sql.gz' => 'gzip',
-            'text.txt' => null,
-        ];
-
-        foreach ($compressions as $filename => $expectedCompression) {
-            $this->assertEquals($expectedCompression, $this->Sqlite->getCompression($filename));
-        }
-    }
-
-    /**
      * Test for `getExportExecutable()` method
      * @test
      */

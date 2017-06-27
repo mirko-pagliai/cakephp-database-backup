@@ -161,18 +161,6 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `getCompression()` method
-     * @return void
-     */
-    abstract public function testGetCompression();
-
-    /**
-     * Test for `getDefaultExtension()` method
-     * @return void
-     */
-    abstract public function testGetDefaultExtension();
-
-    /**
      * Test for `getExportExecutable()` method
      * @return void
      */
