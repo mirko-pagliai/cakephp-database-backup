@@ -88,7 +88,7 @@ class Postgres extends Driver
     protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $executable = sprintf('%s -F c --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
+        $executable = sprintf('%s -Fc -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable .= ' | ' . $this->getBinary($compression);
@@ -106,7 +106,7 @@ class Postgres extends Driver
     protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
-        $executable = sprintf('%s -c --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
+        $executable = sprintf('%s -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
 
         if (in_array($compression, array_filter($this->getValidCompressions()))) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;

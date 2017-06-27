@@ -120,13 +120,13 @@ class PostgresTest extends DriverTestCase
         $pgDump = $this->getBinary('pg_dump');
         $dbnameAsString = 'postgresql://postgres@localhost/travis_ci_test';
 
-        $expected = $pgDump . ' -F c --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('bzip2') .' > backup.sql.bz2 2>/dev/null';
+        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('bzip2') .' > backup.sql.bz2 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.bz2']));
 
-        $expected = $pgDump . ' -F c --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('gzip') .' > backup.sql.gz 2>/dev/null';
+        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('gzip') .' > backup.sql.gz 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.gz']));
 
-        $expected = $pgDump . ' -F c --dbname=postgresql://postgres@localhost/travis_ci_test > backup.sql 2>/dev/null';
+        $expected = $pgDump . ' -Fc -b --dbname=postgresql://postgres@localhost/travis_ci_test > backup.sql 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql']));
     }
 
@@ -158,13 +158,13 @@ class PostgresTest extends DriverTestCase
         $pgRestore = $this->getBinary('pg_restore');
         $dbnameAsString = 'postgresql://postgres@localhost/travis_ci_test';
 
-        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $pgRestore . ' -c --dbname=' . $dbnameAsString . ' 2>/dev/null';
+        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.bz2']));
 
-        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $pgRestore . ' -c --dbname=' . $dbnameAsString . ' 2>/dev/null';
+        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.gz']));
 
-        $expected = $pgRestore . ' -c --dbname=' . $dbnameAsString . ' < backup.sql 2>/dev/null';
+        $expected = $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' < backup.sql 2>/dev/null';
         $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql']));
     }
 
