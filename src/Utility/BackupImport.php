@@ -19,7 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
- * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility
+ * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility
  */
 namespace DatabaseBackup\Utility;
 
@@ -60,7 +60,7 @@ class BackupImport
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
      * @return \DatabaseBackup\Utility\BackupImport
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility#filename
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws InternalErrorException
      * @uses $driver
      * @uses $filename
@@ -85,7 +85,7 @@ class BackupImport
     /**
      * Imports the database
      * @return string Filename path
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupImport-utility#import
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      * @throws InternalErrorException
      * @uses $driver
      * @uses $filename
