@@ -19,7 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
- * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/Configuration
+ * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration
  */
 use Cake\Core\Configure;
 

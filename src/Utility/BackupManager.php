@@ -19,7 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
- * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility
+ * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility
  */
 namespace DatabaseBackup\Utility;
 
@@ -43,7 +43,7 @@ class BackupManager
      * @param string $filename Filename of the backup that you want to delete.
      *  The path can be relative to the backup directory
      * @return bool
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#delete
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws InternalErrorException
      */
     public function delete($filename)
@@ -60,7 +60,7 @@ class BackupManager
     /**
      * Deletes all backup files
      * @return array List of deleted backup files
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
      * @uses delete()
      * @uses index()
@@ -81,7 +81,7 @@ class BackupManager
     /**
      * Returns a list of database backups
      * @return array Backups as entities
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#index
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public function index()
     {
@@ -108,7 +108,7 @@ class BackupManager
      *  delete all backups that are older.
      * @param int $rotate Number of backups that you want to keep
      * @return array Array of deleted files
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupManager-utility#rotate
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws InternalErrorException
      * @uses delete()
      * @uses index()

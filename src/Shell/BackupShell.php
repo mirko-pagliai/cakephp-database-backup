@@ -19,7 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
- * @use         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell
+ * @use         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell
  */
 namespace DatabaseBackup\Shell;
 
@@ -93,7 +93,7 @@ class BackupShell extends Shell
     /**
      * Deletes all backup files
      * @return void
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#deleteAll
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#deleteAll
      * @since 1.0.1
      * @uses DatabaseBackup\Utility\BackupManager::deleteAll()
      * @uses $BackupManager
@@ -118,7 +118,7 @@ class BackupShell extends Shell
     /**
      * Exports a database backup
      * @return void
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#export
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
      * @uses DatabaseBackup\Utility\BackupExport::compression()
      * @uses DatabaseBackup\Utility\BackupExport::export()
      * @uses DatabaseBackup\Utility\BackupExport::filename()
@@ -168,7 +168,7 @@ class BackupShell extends Shell
      * Imports a database backup
      * @param string $filename Filename. It can be an absolute path
      * @return void
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#import
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#import
      * @uses DatabaseBackup\Utility\BackupImport::filename()
      * @uses DatabaseBackup\Utility\BackupImport::import()
      */
@@ -186,7 +186,7 @@ class BackupShell extends Shell
     /**
      * Lists database backups
      * @return void
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#index
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#index
      * @uses DatabaseBackup\Utility\BackupManager::index()
      * @uses $BackupManager
      */
@@ -237,7 +237,7 @@ class BackupShell extends Shell
      *  delete all backups that are older. By default, no backup will be deleted
      * @param int $keep Number of backups you want to keep
      * @return void
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupShell#rotate
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#rotate
      * @uses DatabaseBackup\Utility\BackupManager::rotate()
      * @uses $BackupManager
      */

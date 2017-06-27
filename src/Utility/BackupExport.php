@@ -19,7 +19,7 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
- * @see         https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility
+ * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility
  */
 namespace DatabaseBackup\Utility;
 
@@ -99,8 +99,11 @@ class BackupExport
     public function __construct()
     {
         $this->BackupManager = new BackupManager;
-        $this->config = $this->getConnection()->config();
-        $this->driver = $this->getDriver($this->getConnection());
+
+        $connection = $this->getConnection();
+
+        $this->config = $connection->config();
+        $this->driver = $this->getDriver($connection);
     }
 
     /**
@@ -108,7 +111,7 @@ class BackupExport
      * @param bool|string $compression Compression type as string. Supported
      *  values are `bzip2` and `gzip`. Use `false` for no compression
      * @return \DatabaseBackup\Utility\BackupExport
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#compression
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws InternalErrorException
      * @uses $compression
      * @uses $defaultExtension
@@ -138,7 +141,7 @@ class BackupExport
      * @param string $filename Filename. It can be an absolute path and may
      *  contain patterns
      * @return \DatabaseBackup\Utility\BackupExport
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#filename
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws InternalErrorException
      * @uses compression()
      * @uses $config
@@ -187,7 +190,7 @@ class BackupExport
      * backups that are older
      * @param int $rotate Number of backups you want to keep
      * @return \DatabaseBackup\Utility\BackupExport
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#rotate
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
      * @uses $rotate
      */
     public function rotate($rotate)
@@ -214,7 +217,7 @@ class BackupExport
     /**
      * Exports the database
      * @return string Filename path
-     * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#export
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      * @uses filename()
      * @uses $BackupManager;
      * @uses $defaultExtension
