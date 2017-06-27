@@ -57,7 +57,7 @@ abstract class Driver
      * @return void
      * @uses getTables()
      */
-    public function dropTables()
+    final public function dropTables()
     {
         foreach ($this->getTables() as $table) {
             $this->getConnection()->execute(sprintf('DROP TABLE %s;', $table));
@@ -89,7 +89,7 @@ abstract class Driver
      * Gets all tables of the current database
      * @return array
      */
-    public function getTables()
+    final public function getTables()
     {
         return $this->getConnection()->getSchemaCollection()->listTables();
     }
