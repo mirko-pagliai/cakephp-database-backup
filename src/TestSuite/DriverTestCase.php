@@ -85,6 +85,8 @@ abstract class DriverTestCase extends TestCase
             @unlink($file);
         }
 
+        Configure::write(DATABASE_BACKUP . '.connection', 'test');
+
         unset($this->Articles, $this->Comments);
     }
 

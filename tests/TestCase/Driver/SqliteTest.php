@@ -42,17 +42,12 @@ class SqliteTest extends DriverTestCase
     protected $Sqlite;
 
     /**
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
      * Fixtures
      * @var array
      */
     public $fixtures = [
-        'plugin.database_backup.sqlite\Articles',
-        'plugin.database_backup.sqlite\Comments',
+        'plugin.database_backup.Sqlite/Articles',
+        'plugin.database_backup.Sqlite/Comments',
     ];
 
     /**
@@ -77,8 +72,6 @@ class SqliteTest extends DriverTestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        Configure::write(DATABASE_BACKUP . '.connection', 'test');
 
         unset($this->Sqlite);
     }
@@ -263,8 +256,10 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportAndImport()
     {
-        $this->loadFixtures('Sqlite\Articles', 'Sqlite\Comments');
+        foreach ($this->Sqlite->getValidExtensions() as $extension) {
+            $this->loadFixtures('Sqlite\Articles', 'Sqlite\Comments');
 
-        $this->_testExportAndImport($this->Sqlite);
+            $this->_testExportAndImport($this->Sqlite, sprintf('example.%s', $extension));
+        }
     }
 }
