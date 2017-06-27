@@ -99,6 +99,7 @@ abstract class Driver
     /**
      * Returns the default extension for export
      * @return string
+     * @uses $defaultExtension
      */
     public function getDefaultExtension()
     {
