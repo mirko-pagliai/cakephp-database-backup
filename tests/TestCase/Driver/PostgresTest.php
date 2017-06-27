@@ -208,7 +208,7 @@ class PostgresTest extends DriverTestCase
     public function testExportAndImport()
     {
         foreach (VALID_EXTENSIONS as $extension) {
-            $this->loadFixtures('Postgres\Articles', 'Postgres\Comments');
+            $this->loadAllFixtures();
 
             $this->_testExportAndImport($this->Postgres, sprintf('example.%s', $extension));
         }

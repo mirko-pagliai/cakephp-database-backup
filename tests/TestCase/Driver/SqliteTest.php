@@ -194,7 +194,7 @@ class SqliteTest extends DriverTestCase
     public function testExportAndImport()
     {
         foreach (VALID_EXTENSIONS as $extension) {
-            $this->loadFixtures('Sqlite\Articles', 'Sqlite\Comments');
+            $this->loadAllFixtures();
 
             $this->_testExportAndImport($this->Sqlite, sprintf('example.%s', $extension));
         }

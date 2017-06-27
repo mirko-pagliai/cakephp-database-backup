@@ -214,7 +214,7 @@ class MysqlTest extends DriverTestCase
     public function testExportAndImport()
     {
         foreach (VALID_EXTENSIONS as $extension) {
-            $this->loadFixtures('Articles', 'Comments');
+            $this->loadAllFixtures();
 
             $this->_testExportAndImport($this->Mysql, sprintf('example.%s', $extension));
         }

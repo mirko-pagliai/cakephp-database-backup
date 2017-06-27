@@ -103,6 +103,17 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
+     * Internal method to load all fixtures declared in the `$fixtures` property
+     * @return void
+     */
+    final protected function loadAllFixtures()
+    {
+        $fixtures = $this->getProperty($this->fixtureManager, '_fixtureMap');
+
+        call_user_func_array([$this, 'loadFixtures'], array_keys($fixtures));
+    }
+
+    /**
      * Internal method to test `export()` and `import()` methods.
      *
      * It tests that the backup is properly exported and then imported.
