@@ -137,24 +137,6 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `getExtension()` method
-     * @test
-     */
-    public function testGetExtension()
-    {
-        $extensions = [
-            'backup.sql' => 'sql',
-            'backup.sql.bz2' => 'sql.bz2',
-            'backup.sql.gz' => 'sql.gz',
-            'text.txt' => null,
-        ];
-
-        foreach ($extensions as $filename => $expectedExtension) {
-            $this->assertEquals($expectedExtension, $this->Mysql->getExtension($filename));
-        }
-    }
-
-    /**
      * Test for `getImportExecutable()` method
      * @test
      */
@@ -188,24 +170,6 @@ class MysqlTest extends DriverTestCase
         $this->assertEquals($expected, $result);
 
         unlink($auth);
-    }
-
-    /**
-     * Test for `getValidExtensions()` method
-     * @test
-     */
-    public function testGetValidExtensions()
-    {
-        $this->assertEquals(['sql.bz2', 'sql.gz', 'sql'], $this->Mysql->getValidExtensions());
-    }
-
-    /**
-     * Test for `getValidCompressions()` method
-     * @test
-     */
-    public function testGetValidCompressions()
-    {
-        $this->assertEquals(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false], $this->Mysql->getValidCompressions());
     }
 
     /**
@@ -276,7 +240,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testExportAndImport()
     {
-        foreach ($this->Mysql->getValidExtensions() as $extension) {
+        foreach (VALID_EXTENSIONS as $extension) {
             $this->loadFixtures('Articles', 'Comments');
 
             $this->_testExportAndImport($this->Mysql, sprintf('example.%s', $extension));

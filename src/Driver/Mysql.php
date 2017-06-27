@@ -46,14 +46,13 @@ class Mysql extends Driver
      * @return string
      * @uses $config
      * @uses getCompression()
-     * @uses getValidCompressions()
      */
     protected function getExportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
         $executable = sprintf('%s --defaults-file=%%s %s', $this->getBinary('mysqldump'), $this->config['database']);
 
-        if (in_array($compression, array_filter($this->getValidCompressions()))) {
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
             $executable .= ' | ' . $this->getBinary($compression);
         }
 
@@ -91,14 +90,13 @@ class Mysql extends Driver
      * @return string
      * @uses $config
      * @uses getCompression()
-     * @uses getValidCompressions()
      */
     protected function getImportExecutable($filename)
     {
         $compression = $this->getCompression($filename);
         $executable = sprintf('%s --defaults-extra-file=%%s %s', $this->getBinary('mysql'), $this->config['database']);
 
-        if (in_array($compression, array_filter($this->getValidCompressions()))) {
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
         } else {
             $executable .= ' < ' . $filename;

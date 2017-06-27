@@ -179,28 +179,10 @@ abstract class DriverTestCase extends TestCase
     abstract public function testGetExportExecutable();
 
     /**
-     * Test for `getExtension()` method
-     * @return void
-     */
-    abstract public function testGetExtension();
-
-    /**
      * Test for `getImportExecutable()` method
      * @return void
      */
     abstract public function testGetImportExecutable();
-
-    /**
-     * Test for `getValidExtensions()` method
-     * @return void
-     */
-    abstract public function testGetValidExtensions();
-
-    /**
-     * Test for `getValidCompressions()` method
-     * @return void
-     */
-    abstract public function testGetValidCompressions();
 
     /**
      * Test for `export()` method

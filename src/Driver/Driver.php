@@ -83,20 +83,17 @@ abstract class Driver
      * @return string|bool|null Compression type as string, `null` on failure,
      *  `false` for no compression
      * @uses getExtension()
-     * @uses getValidCompressions()
      */
     public function getCompression($filename)
     {
-        $compressions = $this->getValidCompressions();
-
         //Gets the extension from the filename
         $extension = $this->getExtension($filename);
 
-        if (!array_key_exists($extension, $compressions)) {
+        if (!array_key_exists($extension, VALID_COMPRESSIONS)) {
             return null;
         }
 
-        return $compressions[$extension];
+        return VALID_COMPRESSIONS[$extension];
     }
 
     /**
@@ -119,11 +116,10 @@ abstract class Driver
      * Returns the extension of a filename
      * @param string $filename Filename
      * @return string|null Extension or `null` on failure
-     * @uses getValidExtensions()
      */
     public function getExtension($filename)
     {
-        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
+        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', VALID_EXTENSIONS)));
 
         if (preg_match($regex, $filename, $matches)) {
             return $matches[1];
@@ -146,24 +142,6 @@ abstract class Driver
     public function getTables()
     {
         return $this->getConnection()->getSchemaCollection()->listTables();
-    }
-
-    /**
-     * Returns valid compression types for this driver
-     * @return array
-     */
-    public function getValidCompressions()
-    {
-        return VALID_COMPRESSIONS[$this->getClassShortName(get_called_class())];
-    }
-
-    /**
-     * Returns valid extensions for this driver
-     * @return array
-     */
-    public function getValidExtensions()
-    {
-        return VALID_EXTENSIONS[$this->getClassShortName(get_called_class())];
     }
 
     /**

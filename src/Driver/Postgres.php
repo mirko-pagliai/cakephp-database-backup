@@ -90,7 +90,7 @@ class Postgres extends Driver
         $compression = $this->getCompression($filename);
         $executable = sprintf('%s -Fc -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
 
-        if (in_array($compression, array_filter($this->getValidCompressions()))) {
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
             $executable .= ' | ' . $this->getBinary($compression);
         }
 
@@ -108,7 +108,7 @@ class Postgres extends Driver
         $compression = $this->getCompression($filename);
         $executable = sprintf('%s -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
 
-        if (in_array($compression, array_filter($this->getValidCompressions()))) {
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
         } else {
             $executable .= ' < ' . $filename;

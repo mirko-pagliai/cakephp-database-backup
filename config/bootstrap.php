@@ -29,18 +29,10 @@ if (!defined('DATABASE_BACKUP')) {
 }
 
 //Sets the list of valid compressions
-const VALID_COMPRESSIONS = [
-    'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
-    'Postgres' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
-    'Sqlite' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
-];
+const VALID_COMPRESSIONS = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
 //Sets the list of valid extensions
-const VALID_EXTENSIONS = [
-    'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
-    'Postgres' => ['sql.bz2', 'sql.gz', 'sql'],
-    'Sqlite' => ['sql.bz2', 'sql.gz', 'sql'],
-];
+const VALID_EXTENSIONS = ['sql.bz2', 'sql.gz', 'sql'];
 
 //Binaries
 foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlite3'] as $binary) {

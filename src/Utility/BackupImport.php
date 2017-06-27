@@ -73,7 +73,7 @@ class BackupImport
             throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not readable', $filename));
         }
 
-        if (!in_array($this->driver->getCompression($filename), $this->driver->getValidCompressions(), true)) {
+        if (!in_array($this->driver->getCompression($filename), VALID_COMPRESSIONS, true)) {
             throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));
         }
 

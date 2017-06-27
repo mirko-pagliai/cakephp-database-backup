@@ -105,12 +105,11 @@ class BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws InternalErrorException
      * @uses $compression
-     * @uses $driver
      * @uses $extension
      */
     public function compression($compression)
     {
-        $this->extension = array_search($compression, $this->driver->getValidCompressions(), true);
+        $this->extension = array_search($compression, VALID_COMPRESSIONS, true);
 
         if (!$this->extension) {
             throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));

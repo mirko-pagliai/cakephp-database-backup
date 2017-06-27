@@ -1,7 +1,10 @@
 # 2.x branch
 ## 2.1 branch
 ### 2.1.0
-* added support for Postgres databases.
+* added support for Postgres databases;
+* removed `getValidExtensions()` and `getValidCompressions()` methods from
+    `Driver` class, because extensions and compressions are the same for any
+    database engine.
 
 ## 2.0 branch
 ### 2.0.0

@@ -91,6 +91,24 @@ class DriverTest extends TestCase
     }
 
     /**
+     * Test for `getExtension()` method
+     * @test
+     */
+    public function testGetExtension()
+    {
+        $extensions = [
+            'backup.sql' => 'sql',
+            'backup.sql.bz2' => 'sql.bz2',
+            'backup.sql.gz' => 'sql.gz',
+            'text.txt' => null,
+        ];
+
+        foreach ($extensions as $filename => $expectedExtension) {
+            $this->assertEquals($expectedExtension, $this->Mysql->getExtension($filename));
+        }
+    }
+
+    /**
      * Test for `getTables()` method
      * @test
      */
