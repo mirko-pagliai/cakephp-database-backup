@@ -80,7 +80,24 @@ class PostgresTest extends DriverTestCase
 
         Configure::write(DATABASE_BACKUP . '.connection', 'test');
 
-        unset($this->Sqlite);
+        unset($this->Postgres);
+    }
+
+    /**
+     * Test for `getDbnameAsString()` method
+     * @test
+     */
+    public function testGetDbnameAsString()
+    {
+        $result = $this->invokeMethod($this->Postgres, 'getDbnameAsString');
+        $this->assertEquals('postgresql://postgres@localhost/travis_ci_test', $result);
+
+        //Adds a password to the config
+        $config = $this->getProperty($this->Postgres, 'config');
+        $this->setProperty($this->Postgres, 'config', array_merge($config, ['password' => 'mypassword']));
+
+        $result = $this->invokeMethod($this->Postgres, 'getDbnameAsString');
+        $this->assertEquals('postgresql://postgres:mypassword@localhost/travis_ci_test', $result);
     }
 
     /**
