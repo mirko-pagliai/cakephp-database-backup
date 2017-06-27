@@ -40,12 +40,6 @@ abstract class Driver
     protected $config;
 
     /**
-     * Default extension for export
-     * @var string
-     */
-    protected $defaultExtension = 'sql';
-
-    /**
      * Construct
      * @param \Cake\Datasource\ConnectionInterface $connection A connection object
      * @uses $config
@@ -94,16 +88,6 @@ abstract class Driver
         }
 
         return VALID_COMPRESSIONS[$extension];
-    }
-
-    /**
-     * Returns the default extension for export
-     * @return string
-     * @uses $defaultExtension
-     */
-    public function getDefaultExtension()
-    {
-        return $this->defaultExtension;
     }
 
     /**

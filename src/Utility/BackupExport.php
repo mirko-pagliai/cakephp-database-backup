@@ -207,7 +207,6 @@ class BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-mysql-backup/wiki/How-to-use-the-BackupExport-utility#export
      * @uses filename()
      * @uses $BackupManager;
-     * @uses $driver
      * @uses $emailRecipient
      * @uses $filename
      * @uses $extension
@@ -217,7 +216,7 @@ class BackupExport
     {
         if (empty($this->filename)) {
             if (empty($this->extension)) {
-                $this->extension = $this->driver->getDefaultExtension();
+                $this->extension = 'sql';
             }
 
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));

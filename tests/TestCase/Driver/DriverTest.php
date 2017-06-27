@@ -109,15 +109,6 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `getDefaultExtension()` method
-     * @test
-     */
-    public function testGetDefaultExtension()
-    {
-        $this->assertEquals('sql', $this->Mysql->getDefaultExtension());
-    }
-
-    /**
      * Test for `getExtension()` method
      * @test
      */

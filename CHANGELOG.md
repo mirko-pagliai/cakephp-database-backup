@@ -4,7 +4,9 @@
 * added support for Postgres databases;
 * removed `getValidExtensions()` and `getValidCompressions()` methods from
     `Driver` class, because extensions and compressions are the same for any
-    database engine.
+    database engine;
+* removed `getDefaultExtension()` method from `Driver` class, because the
+    default extension is the same for any database engine.
 
 ## 2.0 branch
 ### 2.0.0
