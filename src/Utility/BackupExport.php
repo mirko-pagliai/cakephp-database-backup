@@ -93,8 +93,11 @@ class BackupExport
     public function __construct()
     {
         $this->BackupManager = new BackupManager;
-        $this->config = $this->getConnection()->config();
-        $this->driver = $this->getDriver($this->getConnection());
+
+        $connection = $this->getConnection();
+
+        $this->config = $connection->config();
+        $this->driver = $this->getDriver($connection);
     }
 
     /**
