@@ -32,12 +32,6 @@ use DatabaseBackup\Driver\Driver;
 class Postgres extends Driver
 {
     /**
-     * Default extension for export
-     * @var string
-     */
-    public $defaultExtension = 'sql';
-
-    /**
      * Exports the database
      * @param string $filename Filename where you want to export the database
      * @return bool true on success

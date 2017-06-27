@@ -43,7 +43,7 @@ abstract class Driver
      * Default extension for export
      * @var string
      */
-    protected $defaultExtension;
+    protected $defaultExtension = 'sql';
 
     /**
      * Construct

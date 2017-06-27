@@ -102,15 +102,6 @@ class PostgresTest extends DriverTestCase
     }
 
     /**
-     * Test for `getDefaultExtension()` method
-     * @test
-     */
-    public function testGetDefaultExtension()
-    {
-        $this->assertEquals('sql', $this->Postgres->getDefaultExtension());
-    }
-
-    /**
      * Test for `getExportExecutable()` method
      * @test
      */

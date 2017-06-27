@@ -95,15 +95,6 @@ class SqliteTest extends DriverTestCase
     }
 
     /**
-     * Test for `getDefaultExtension()` method
-     * @test
-     */
-    public function testGetDefaultExtension()
-    {
-        $this->assertEquals('sql', $this->Sqlite->getDefaultExtension());
-    }
-
-    /**
      * Test for `getExportExecutable()` method
      * @test
      */
