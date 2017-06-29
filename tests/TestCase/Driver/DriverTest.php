@@ -100,4 +100,21 @@ class DriverTest extends TestCase
 
         $this->assertEquals(['articles', 'comments'], $this->Mysql->getTables());
     }
+
+    /**
+     * Test for `truncateTables()` method
+     * @test
+     */
+    public function testTruncateTables()
+    {
+        $this->loadAllFixtures();
+
+        $this->assertGreaterThan(0, $this->Articles->find()->count());
+        $this->assertGreaterThan(0, $this->Comments->find()->count());
+
+        $this->Mysql->truncateTables();
+
+        $this->assertEquals(0, $this->Articles->find()->count());
+        $this->assertEquals(0, $this->Comments->find()->count());
+    }
 }
