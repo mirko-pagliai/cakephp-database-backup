@@ -23,6 +23,7 @@
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Core\Configure;
 use Cake\TestSuite\TestCase as CakeTestCase;
 use Reflection\ReflectionTrait;
 
@@ -32,6 +33,45 @@ use Reflection\ReflectionTrait;
 class TestCase extends CakeTestCase
 {
     use ReflectionTrait;
+
+    /**
+     * Setup the test case, backup the static object values so they can be
+     * restored. Specifically backs up the contents of Configure and paths in
+     *  App if they have not already been backed up
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->deleteAllBackups();
+    }
+
+    /**
+     * Teardown any static object changes and restore them
+     * @return void
+     * @uses deleteAllBackups()
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $this->deleteAllBackups();
+
+        Configure::write(DATABASE_BACKUP . '.connection', 'test');
+    }
+
+    /**
+     * Deletes all backups
+     * @return void
+     */
+    public function deleteAllBackups()
+    {
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
+            //@codingStandardsIgnoreLine
+            @unlink($file);
+        }
+    }
 
     /**
      * Loads all fixtures declared in the `$fixtures` property

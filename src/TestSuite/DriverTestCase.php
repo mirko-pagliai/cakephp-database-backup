@@ -23,7 +23,6 @@
  */
 namespace DatabaseBackup\TestSuite;
 
-use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\TestSuite\TestCase;
 
@@ -83,14 +82,6 @@ abstract class DriverTestCase extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        //Deletes all backups
-        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
-            //@codingStandardsIgnoreLine
-            @unlink($file);
-        }
-
-        Configure::write(DATABASE_BACKUP . '.connection', 'test');
 
         unset($this->Articles, $this->Comments, $this->Driver);
     }

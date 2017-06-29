@@ -23,7 +23,7 @@
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use Cake\TestSuite\TestCase;
+use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 use Reflection\ReflectionTrait;
@@ -68,11 +68,6 @@ class BackupImportTest extends TestCase
         parent::tearDown();
 
         unset($this->BackupExport, $this->BackupImport);
-
-        //Deletes all backups
-        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
     }
 
     /**

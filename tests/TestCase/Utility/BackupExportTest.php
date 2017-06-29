@@ -24,7 +24,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Log\Log;
-use Cake\TestSuite\TestCase;
+use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Reflection\ReflectionTrait;
 
@@ -81,12 +81,6 @@ class BackupExportTest extends TestCase
         //Deletes debug log
         //@codingStandardsIgnoreLine
         @unlink(LOGS . 'debug.log');
-
-        //Deletes all backups
-        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
-            //@codingStandardsIgnoreLine
-            @unlink($file);
-        }
     }
 
     /**
