@@ -47,7 +47,7 @@ class DriverTest extends TestCase
     /**
      * @var \DatabaseBackup\Driver\Mysql
      */
-    protected $Mysql;
+    protected $Driver;
 
     /**
      * @var bool
@@ -76,7 +76,7 @@ class DriverTest extends TestCase
         $this->Articles = TableRegistry::get('Articles');
         $this->Comments = TableRegistry::get('Comments');
 
-        $this->Mysql = new Mysql($this->getConnection());
+        $this->Driver = new Mysql($this->getConnection());
     }
 
     /**
@@ -87,7 +87,7 @@ class DriverTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->Articles, $this->Comments, $this->Mysql);
+        unset($this->Articles, $this->Comments, $this->Driver);
     }
 
     /**
@@ -98,7 +98,7 @@ class DriverTest extends TestCase
     {
         $this->loadAllFixtures();
 
-        $this->assertEquals(['articles', 'comments'], $this->Mysql->getTables());
+        $this->assertEquals(['articles', 'comments'], $this->Driver->getTables());
     }
 
     /**
@@ -112,7 +112,7 @@ class DriverTest extends TestCase
         $this->assertGreaterThan(0, $this->Articles->find()->count());
         $this->assertGreaterThan(0, $this->Comments->find()->count());
 
-        $this->Mysql->truncateTables();
+        $this->Driver->truncateTables();
 
         $this->assertEquals(0, $this->Articles->find()->count());
         $this->assertEquals(0, $this->Comments->find()->count());
