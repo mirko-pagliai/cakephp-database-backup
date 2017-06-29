@@ -153,11 +153,44 @@ trait BackupTrait
     }
 
     /**
+     * Gets all tables of the database
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
+     * @return array
+     */
+    public function getTables(ConnectionInterface $connection = null)
+    {
+        if (!$connection) {
+            $connection = $this->getConnection();
+        }
+
+        return $connection->getSchemaCollection()->listTables();
+    }
+
+    /**
      * Returns the target path
      * @return string
      */
     public function getTarget()
     {
         return Configure::read(DATABASE_BACKUP . '.target');
+    }
+
+    /**
+     * Truncates tables.
+     *
+     * Some drivers (eg. Sqlite) are not able to truncates tables before import
+     *  a backup file. For this reason, it may be necessary to run it manually.
+     * @return void
+     * @uses getTables()
+     */
+    public function truncateTables(ConnectionInterface $connection = null)
+    {
+        if (!$connection) {
+            $connection = $this->getConnection();
+        }
+
+        foreach ($this->getTables($connection) as $table) {
+            $connection->delete($table);
+        }
     }
 }

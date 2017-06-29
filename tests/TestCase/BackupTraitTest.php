@@ -24,7 +24,8 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\TestSuite\TestCase;
+use Cake\ORM\TableRegistry;
+use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupManager;
 
 class BackupTraitTest extends TestCase
@@ -33,6 +34,20 @@ class BackupTraitTest extends TestCase
      * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $Trait;
+
+    /**
+     * @var bool
+     */
+    public $autoFixtures = false;
+
+    /**
+     * Fixtures
+     * @var array
+     */
+    public $fixtures = [
+        'core.articles',
+        'core.comments',
+    ];
 
     /**
      * Setup the test case, backup the static object values so they can be
@@ -203,8 +218,18 @@ class BackupTraitTest extends TestCase
                 return new \stdClass();
              }));
 
-        $driver = $this->Trait->getDriver($connection);
-        dd($driver);
+        $this->Trait->getDriver($connection);
+    }
+
+    /**
+     * Test for `getTables()` method
+     * @test
+     */
+    public function testGetTables()
+    {
+        $this->loadAllFixtures();
+
+        $this->assertEquals(['articles', 'comments'], $this->Trait->getTables());
     }
 
     /**
@@ -214,5 +239,25 @@ class BackupTraitTest extends TestCase
     public function testGetTarget()
     {
         $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->Trait->getTarget());
+    }
+
+    /**
+     * Test for `truncateTables()` method
+     * @test
+     */
+    public function testTruncateTables()
+    {
+        $articles = TableRegistry::get('Articles');
+        $comments = TableRegistry::get('Comments');
+
+        $this->loadAllFixtures();
+
+        $this->assertGreaterThan(0, $articles->find()->count());
+        $this->assertGreaterThan(0, $comments->find()->count());
+
+        $this->Trait->truncateTables();
+
+        $this->assertEquals(0, $articles->find()->count());
+        $this->assertEquals(0, $comments->find()->count());
     }
 }
