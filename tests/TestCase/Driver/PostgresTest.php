@@ -128,18 +128,6 @@ class PostgresTest extends DriverTestCase
     }
 
     /**
-     * Test for `export()` method
-     * @test
-     */
-    public function testExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-
-        $this->assertTrue($this->Driver->export($backup));
-        $this->assertFileExists($backup);
-    }
-
-    /**
      * Test for `export()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
      * @expectedExceptionMessage pg_dump failed with exit code `1`
@@ -152,19 +140,6 @@ class PostgresTest extends DriverTestCase
         $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `import()` method
-     * @test
-     */
-    public function testImport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-
-        $this->Driver->export($backup);
-
-        $this->assertTrue($this->Driver->import($backup));
     }
 
     /**
@@ -184,20 +159,5 @@ class PostgresTest extends DriverTestCase
         $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
         $this->Driver->import($backup);
-    }
-
-    /**
-     * Test for `export()` and `import()` methods.
-     *
-     * It tests that the backup is properly exported and then imported.
-     * @test
-     */
-    public function testExportAndImport()
-    {
-        foreach (VALID_EXTENSIONS as $extension) {
-            $this->loadAllFixtures();
-
-            $this->_testExportAndImport($this->Driver, sprintf('example.%s', $extension));
-        }
     }
 }

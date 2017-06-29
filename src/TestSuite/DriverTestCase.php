@@ -108,6 +108,56 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
+     * Test for `getExportExecutable()` method
+     * @return void
+     */
+    abstract public function testGetExportExecutable();
+
+    /**
+     * Test for `getImportExecutable()` method
+     * @return void
+     */
+    abstract public function testGetImportExecutable();
+
+    /**
+     * Test for `export()` method
+     * @return void
+     * @test
+     */
+    public function testExport()
+    {
+        $backup = $this->getAbsolutePath('example.sql');
+
+        $this->assertTrue($this->Driver->export($backup));
+        $this->assertFileExists($backup);
+    }
+
+    /**
+     * Test for `export()` method on failure
+     * @return void
+     */
+    abstract public function testExportOnFailure();
+
+    /**
+     * Test for `import()` method
+     * @return void
+     * @test
+     */
+    public function testImport()
+    {
+        $backup = $this->getAbsolutePath('example.sql');
+
+        $this->assertTrue($this->Driver->export($backup));
+        $this->assertTrue($this->Driver->import($backup));
+    }
+
+    /**
+     * Test for `import()` method on failure
+     * @return void
+     */
+    abstract public function testImportOnFailure();
+
+    /**
      * Internal method to test `export()` and `import()` methods.
      *
      * It tests that the backup is properly exported and then imported.
@@ -115,7 +165,7 @@ abstract class DriverTestCase extends TestCase
      * @param string $backup Backup relative path
      * @return void
      */
-    final protected function _testExportAndImport($driverInstance, $backup = 'example.sql')
+    private function _testExportAndImport($driverInstance, $backup = 'example.sql')
     {
         $backup = $this->getAbsolutePath($backup);
 
@@ -166,46 +216,18 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `getExportExecutable()` method
-     * @return void
-     */
-    abstract public function testGetExportExecutable();
-
-    /**
-     * Test for `getImportExecutable()` method
-     * @return void
-     */
-    abstract public function testGetImportExecutable();
-
-    /**
-     * Test for `export()` method
-     * @return void
-     */
-    abstract public function testExport();
-
-    /**
-     * Test for `export()` method on failure
-     * @return void
-     */
-    abstract public function testExportOnFailure();
-
-    /**
-     * Test for `import()` method
-     * @return void
-     */
-    abstract public function testImport();
-
-    /**
-     * Test for `import()` method on failure
-     * @return void
-     */
-    abstract public function testImportOnFailure();
-
-    /**
      * Test for `export()` and `import()` methods.
      *
      * It tests that the backup is properly exported and then imported.
      * @return void
+     * @test
      */
-    abstract public function testExportAndImport();
+    public function testExportAndImport()
+    {
+        foreach (VALID_EXTENSIONS as $extension) {
+            $this->loadAllFixtures();
+
+            $this->_testExportAndImport($this->Driver, sprintf('example.%s', $extension));
+        }
+    }
 }
