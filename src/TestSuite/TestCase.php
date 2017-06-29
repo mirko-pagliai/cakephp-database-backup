@@ -32,7 +32,7 @@ use Reflection\ReflectionTrait;
 class TestCase extends CakeTestCase
 {
     use ReflectionTrait;
-    
+
     /**
      * Loads all fixtures declared in the `$fixtures` property
      * @return void
