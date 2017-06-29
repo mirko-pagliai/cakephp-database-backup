@@ -39,7 +39,7 @@ class SqliteTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Sqlite
      */
-    protected $Sqlite;
+    protected $Driver;
 
     /**
      * Fixtures
@@ -62,18 +62,7 @@ class SqliteTest extends DriverTestCase
 
         parent::setUp();
 
-        $this->Sqlite = new Sqlite($this->getConnection());
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->Sqlite);
+        $this->Driver = new Sqlite($this->getConnection());
     }
 
     /**
@@ -86,13 +75,13 @@ class SqliteTest extends DriverTestCase
         $sqlite3 = $this->getBinary('sqlite3');
 
         $expected = $sqlite3 . ' /tmp/example.sq3 .dump | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql.bz2']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
 
         $expected = $sqlite3 . ' /tmp/example.sq3 .dump | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql.gz']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
 
         $expected = $sqlite3 . ' /tmp/example.sq3 .dump > backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
     }
 
     /**
@@ -105,13 +94,13 @@ class SqliteTest extends DriverTestCase
         $sqlite3 = $this->getBinary('sqlite3');
 
         $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $sqlite3 . ' /tmp/example.sq3 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql.bz2']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
 
         $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $sqlite3 . ' /tmp/example.sq3 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql.gz']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
 
         $expected = $sqlite3 . ' /tmp/example.sq3 < backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Sqlite, $method, ['backup.sql']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
     }
 
     /**
@@ -122,7 +111,7 @@ class SqliteTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertTrue($this->Sqlite->export($backup));
+        $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
     }
 
@@ -134,19 +123,19 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportOnFailure()
     {
-        $config = $this->getProperty($this->Sqlite, 'config');
+        $config = $this->getProperty($this->Driver, 'config');
 
-        $this->Sqlite = $this->getMockBuilder(Sqlite::class)
+        $this->Driver = $this->getMockBuilder(Sqlite::class)
             ->setMethods(['getExportExecutable'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Sqlite->method('getExportExecutable')
+        $this->Driver->method('getExportExecutable')
              ->will($this->returnCallback(function () use ($config) {
                 return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
              }));
 
-        $this->Sqlite->export($this->getAbsolutePath('example.sql'));
+        $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
@@ -157,9 +146,9 @@ class SqliteTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->Sqlite->export($backup);
+        $this->Driver->export($backup);
 
-        $this->assertTrue($this->Sqlite->import($backup));
+        $this->assertTrue($this->Driver->import($backup));
     }
 
     /**
@@ -170,19 +159,19 @@ class SqliteTest extends DriverTestCase
      */
     public function testImportOnFailure()
     {
-        $config = $this->getProperty($this->Sqlite, 'config');
+        $config = $this->getProperty($this->Driver, 'config');
 
-        $this->Sqlite = $this->getMockBuilder(Sqlite::class)
+        $this->Driver = $this->getMockBuilder(Sqlite::class)
             ->setMethods(['dropTables', 'getImportExecutable'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Sqlite->method('getImportExecutable')
+        $this->Driver->method('getImportExecutable')
              ->will($this->returnCallback(function () use ($config) {
                 return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
              }));
 
-        $this->Sqlite->import('noExistingFile');
+        $this->Driver->import('noExistingFile');
     }
 
     /**
@@ -196,7 +185,7 @@ class SqliteTest extends DriverTestCase
         foreach (VALID_EXTENSIONS as $extension) {
             $this->loadAllFixtures();
 
-            $this->_testExportAndImport($this->Sqlite, sprintf('example.%s', $extension));
+            $this->_testExportAndImport($this->Driver, sprintf('example.%s', $extension));
         }
     }
 }

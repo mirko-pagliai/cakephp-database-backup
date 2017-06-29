@@ -38,7 +38,7 @@ class MysqlTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Mysql
      */
-    protected $Mysql;
+    protected $Driver;
 
     /**
      * Fixtures
@@ -59,18 +59,7 @@ class MysqlTest extends DriverTestCase
     {
         parent::setUp();
 
-        $this->Mysql = new Mysql($this->getConnection());
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->Mysql);
+        $this->Driver = new Mysql($this->getConnection());
     }
 
     /**
@@ -83,13 +72,13 @@ class MysqlTest extends DriverTestCase
         $mysqldump = $this->getBinary('mysqldump');
 
         $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
 
         $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
 
         $expected = $mysqldump . ' --defaults-file=%s test > backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
     }
 
     /**
@@ -98,7 +87,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testGetExportStoreAuth()
     {
-        $auth = $this->invokeMethod($this->Mysql, 'getExportStoreAuth');
+        $auth = $this->invokeMethod($this->Driver, 'getExportStoreAuth');
 
         $this->assertFileExists($auth);
 
@@ -119,13 +108,13 @@ class MysqlTest extends DriverTestCase
         $mysql = $this->getBinary('mysql');
 
         $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
 
         $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
 
         $expected = $mysql . ' --defaults-extra-file=%s test < backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
     }
 
     /**
@@ -134,7 +123,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testGetImportStoreAuth()
     {
-        $auth = $this->invokeMethod($this->Mysql, 'getImportStoreAuth');
+        $auth = $this->invokeMethod($this->Driver, 'getImportStoreAuth');
 
         $this->assertFileExists($auth);
 
@@ -153,7 +142,7 @@ class MysqlTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertTrue($this->Mysql->export($backup));
+        $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
     }
 
@@ -166,10 +155,10 @@ class MysqlTest extends DriverTestCase
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $config = $this->getProperty($this->Mysql, 'config');
-        $this->setProperty($this->Mysql, 'config', array_merge($config, ['database' => 'noExisting']));
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
-        $this->Mysql->export($this->getAbsolutePath('example.sql'));
+        $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
@@ -180,9 +169,9 @@ class MysqlTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->Mysql->export($backup);
+        $this->Driver->export($backup);
 
-        $this->assertTrue($this->Mysql->import($backup));
+        $this->assertTrue($this->Driver->import($backup));
     }
 
     /**
@@ -195,13 +184,13 @@ class MysqlTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->Mysql->export($backup);
+        $this->Driver->export($backup);
 
         //Sets a no existing database
-        $config = $this->getProperty($this->Mysql, 'config');
-        $this->setProperty($this->Mysql, 'config', array_merge($config, ['database' => 'noExisting']));
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
-        $this->Mysql->import($backup);
+        $this->Driver->import($backup);
     }
 
     /**
@@ -216,7 +205,7 @@ class MysqlTest extends DriverTestCase
         foreach (VALID_EXTENSIONS as $extension) {
             $this->loadAllFixtures();
 
-            $this->_testExportAndImport($this->Mysql, sprintf('example.%s', $extension));
+            $this->_testExportAndImport($this->Driver, sprintf('example.%s', $extension));
         }
     }
 }

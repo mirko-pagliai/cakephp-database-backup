@@ -39,7 +39,7 @@ class PostgresTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Postgres
      */
-    protected $Postgres;
+    protected $Driver;
 
     /**
      * @var bool
@@ -67,20 +67,7 @@ class PostgresTest extends DriverTestCase
 
         parent::setUp();
 
-        $this->Postgres = new Postgres($this->getConnection());
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        Configure::write(DATABASE_BACKUP . '.connection', 'test');
-
-        unset($this->Postgres);
+        $this->Driver = new Postgres($this->getConnection());
     }
 
     /**
@@ -89,14 +76,14 @@ class PostgresTest extends DriverTestCase
      */
     public function testGetDbnameAsString()
     {
-        $result = $this->invokeMethod($this->Postgres, 'getDbnameAsString');
+        $result = $this->invokeMethod($this->Driver, 'getDbnameAsString');
         $this->assertEquals('postgresql://postgres@localhost/travis_ci_test', $result);
 
         //Adds a password to the config
-        $config = $this->getProperty($this->Postgres, 'config');
-        $this->setProperty($this->Postgres, 'config', array_merge($config, ['password' => 'mypassword']));
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['password' => 'mypassword']));
 
-        $result = $this->invokeMethod($this->Postgres, 'getDbnameAsString');
+        $result = $this->invokeMethod($this->Driver, 'getDbnameAsString');
         $this->assertEquals('postgresql://postgres:mypassword@localhost/travis_ci_test', $result);
     }
 
@@ -111,13 +98,13 @@ class PostgresTest extends DriverTestCase
         $dbnameAsString = 'postgresql://postgres@localhost/travis_ci_test';
 
         $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.bz2']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
 
         $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.gz']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
 
         $expected = $pgDump . ' -Fc -b --dbname=postgresql://postgres@localhost/travis_ci_test > backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
     }
 
     /**
@@ -131,13 +118,13 @@ class PostgresTest extends DriverTestCase
         $dbnameAsString = 'postgresql://postgres@localhost/travis_ci_test';
 
         $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.bz2']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
 
         $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql.gz']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
 
         $expected = $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' < backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Postgres, $method, ['backup.sql']));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
     }
 
     /**
@@ -148,7 +135,7 @@ class PostgresTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertTrue($this->Postgres->export($backup));
+        $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
     }
 
@@ -161,10 +148,10 @@ class PostgresTest extends DriverTestCase
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $config = $this->getProperty($this->Postgres, 'config');
-        $this->setProperty($this->Postgres, 'config', array_merge($config, ['database' => 'noExisting']));
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
-        $this->Postgres->export($this->getAbsolutePath('example.sql'));
+        $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
@@ -175,9 +162,9 @@ class PostgresTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->Postgres->export($backup);
+        $this->Driver->export($backup);
 
-        $this->assertTrue($this->Postgres->import($backup));
+        $this->assertTrue($this->Driver->import($backup));
     }
 
     /**
@@ -190,13 +177,13 @@ class PostgresTest extends DriverTestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->Postgres->export($backup);
+        $this->Driver->export($backup);
 
         //Sets a no existing database
-        $config = $this->getProperty($this->Postgres, 'config');
-        $this->setProperty($this->Postgres, 'config', array_merge($config, ['database' => 'noExisting']));
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
-        $this->Postgres->import($backup);
+        $this->Driver->import($backup);
     }
 
     /**
@@ -210,7 +197,7 @@ class PostgresTest extends DriverTestCase
         foreach (VALID_EXTENSIONS as $extension) {
             $this->loadAllFixtures();
 
-            $this->_testExportAndImport($this->Postgres, sprintf('example.%s', $extension));
+            $this->_testExportAndImport($this->Driver, sprintf('example.%s', $extension));
         }
     }
 }

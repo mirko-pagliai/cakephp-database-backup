@@ -45,6 +45,11 @@ abstract class DriverTestCase extends TestCase
     protected $Comments;
 
     /**
+     * @var object
+     */
+    protected $Driver;
+
+    /**
      * @var bool
      */
     public $autoFixtures = false;
@@ -87,7 +92,7 @@ abstract class DriverTestCase extends TestCase
 
         Configure::write(DATABASE_BACKUP . '.connection', 'test');
 
-        unset($this->Articles, $this->Comments);
+        unset($this->Articles, $this->Comments, $this->Driver);
     }
 
     /**
