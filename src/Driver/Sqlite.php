@@ -98,12 +98,12 @@ class Sqlite extends Driver
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
      * @throws InternalErrorException
-     * @uses dropTables()
      * @uses getImportExecutable()
+     * @uses truncateTables()
      */
     public function import($filename)
     {
-        $this->dropTables();
+        $this->truncatesTables();
 
         //Executes
         exec($this->getImportExecutable($filename), $output, $returnVar);

@@ -58,18 +58,18 @@ abstract class Driver
     }
 
     /**
-     * Drops tables.
+     * Truncates tables.
      *
-     * Some drivers (eg. Sqlite) are not able to drop tables before import a
-     *  backup file. For this reason, it may be necessary to run it manually.
+     * Some drivers (eg. Sqlite) are not able to truncates tables before import
+     *  a backup file. For this reason, it may be necessary to run it manually.
      * @return void
      * @uses getTables()
      * @uses $connection
      */
-    public function dropTables()
+    public function truncateTables()
     {
         foreach ($this->getTables() as $table) {
-            $this->connection->execute(sprintf('DROP TABLE %s;', $table));
+            $this->connection->delete($table);
         }
     }
 
