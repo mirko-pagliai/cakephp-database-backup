@@ -103,7 +103,7 @@ class Sqlite extends Driver
      */
     public function import($filename)
     {
-        $this->truncatesTables();
+        $this->truncateTables();
 
         //Executes
         exec($this->getImportExecutable($filename), $output, $returnVar);
