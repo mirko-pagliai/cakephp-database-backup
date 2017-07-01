@@ -63,81 +63,120 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `getExportExecutable()` method
+     * Test for `_exportExecutable()` method
      * @test
      */
-    public function testGetExportExecutable()
+    public function testExportExecutable()
     {
-        $method = 'getExportExecutable';
-        $mysqldump = $this->getBinary('mysqldump');
+        $this->setProperty($this->Driver, 'auth', 'authFile');
 
-        $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
-
-        $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
-
-        $expected = $mysqldump . ' --defaults-file=%s test > backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
+        $expected = $this->getBinary('mysqldump') . ' --defaults-file=authFile test';
+        $result = $this->invokeMethod($this->Driver, '_exportExecutable');
+        $this->assertEquals($expected, $result);
     }
 
     /**
-     * Test for `getExportStoreAuth()` method
+     * Test for `_importExecutable()` method
      * @test
      */
-    public function testGetExportStoreAuth()
+    public function testImportExecutable()
     {
-        $auth = $this->invokeMethod($this->Driver, 'getExportStoreAuth');
+        $this->setProperty($this->Driver, 'auth', 'authFile');
 
-        $this->assertFileExists($auth);
+        $expected = $this->getBinary('mysql') . ' --defaults-extra-file=authFile test';
+        $result = $this->invokeMethod($this->Driver, '_importExecutable');
+        $this->assertEquals($expected, $result);
+    }
 
-        $result = file_get_contents($auth);
+    /**
+     * Test for `afterExport()` method
+     * @test
+     */
+    public function testAfterExport()
+    {
+        $this->Driver = $this->getMockBuilder(Mysql::class)
+            ->setMethods(['deleteAuthFile'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
+
+        $this->Driver->expects($this->once())
+            ->method('deleteAuthFile');
+
+        $this->Driver->afterExport();
+    }
+
+    /**
+     * Test for `afterImport()` method
+     * @test
+     */
+    public function testAfterImport()
+    {
+        $this->Driver = $this->getMockBuilder(Mysql::class)
+            ->setMethods(['deleteAuthFile'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
+
+        $this->Driver->expects($this->once())
+            ->method('deleteAuthFile');
+
+        $this->Driver->afterImport();
+    }
+
+    /**
+     * Test for `beforeExport()` method
+     * @test
+     */
+    public function testBeforeExport()
+    {
+        $this->assertNull($this->getProperty($this->Driver, 'auth'));
+
+        $this->Driver->beforeExport();
+
         $expected = '[mysqldump]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
-        $this->assertEquals($expected, $result);
+        $auth = $this->getProperty($this->Driver, 'auth');
+        $this->assertFileExists($auth);
+        $this->assertEquals($expected, file_get_contents($auth));
 
         unlink($auth);
     }
 
     /**
-     * Test for `getImportExecutable()` method
+     * Test for `beforeImport()` method
      * @test
      */
-    public function testGetImportExecutable()
+    public function testBeforeImport()
     {
-        $method = 'getImportExecutable';
-        $mysql = $this->getBinary('mysql');
+        $this->assertNull($this->getProperty($this->Driver, 'auth'));
 
-        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
+        $this->Driver->beforeImport();
 
-        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
-
-        $expected = $mysql . ' --defaults-extra-file=%s test < backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
+        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
+        $auth = $this->getProperty($this->Driver, 'auth');
+        $this->assertFileExists($auth);
+        $this->assertEquals($expected, file_get_contents($auth));
     }
 
     /**
-     * Test for `getImportStoreAuth()` method
+     * Test for `deleteAuthFile()` method
      * @test
      */
-    public function testGetImportStoreAuth()
+    public function testDeleteAuthFile()
     {
-        $auth = $this->invokeMethod($this->Driver, 'getImportStoreAuth');
+        $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
+
+        //Creates auth file
+        $auth = tempnam(sys_get_temp_dir(), 'auth');
+        $this->setProperty($this->Driver, 'auth', $auth);
 
         $this->assertFileExists($auth);
-
-        $result = file_get_contents($auth);
-        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
-        $this->assertEquals($expected, $result);
-
-        unlink($auth);
+        $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
+        $this->assertFileNotExists($auth);
     }
 
     /**
      * Test for `export()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage mysqldump failed with exit code `2`
+     * @expectedExceptionMessage Failed with exit code `2`
      * @test
      */
     public function testExportOnFailure()
@@ -152,7 +191,7 @@ class MysqlTest extends DriverTestCase
     /**
      * Test for `import()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage mysql failed with exit code `1`
+     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()

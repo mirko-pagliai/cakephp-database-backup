@@ -99,16 +99,70 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `getExportExecutable()` method
+     * Test for `_exportExecutable()` method
      * @return void
      */
-    abstract public function testGetExportExecutable();
+    abstract public function testExportExecutable();
 
     /**
-     * Test for `getImportExecutable()` method
+     * Test for `export()` method on failure
      * @return void
      */
-    abstract public function testGetImportExecutable();
+    abstract public function testExportOnFailure();
+
+    /**
+     * Test for `_importExecutable()` method
+     * @return void
+     */
+    abstract public function testImportExecutable();
+
+    /**
+     * Test for `import()` method on failure
+     * @return void
+     */
+    abstract public function testImportOnFailure();
+
+    /**
+     * Test for `_exportExecutableWithCompression()` method
+     * @return void
+     */
+    public function testExportExecutableWithCompression()
+    {
+        $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
+
+        //No compression
+        $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
+        $expected = $basicExecutable . ' > backup.sql 2>/dev/null';
+        $this->assertEquals($expected, $result);
+
+        //Gzip and Bzip2 compressions
+        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
+            $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
+            $expected = $basicExecutable . ' | ' . $this->getBinary($compression) . ' > ' . $filename . ' 2>/dev/null';
+            $this->assertEquals($expected, $result);
+        }
+    }
+
+    /**
+     * Test for `_importExecutableWithCompression()` method
+     * @return void
+     */
+    public function testImportExecutableWithCompression()
+    {
+        $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
+
+        //No compression
+        $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
+        $expected = $basicExecutable . ' < backup.sql 2>/dev/null';
+        $this->assertEquals($expected, $result);
+
+        //Gzip and Bzip2 compressions
+        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
+            $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
+            $expected = $this->getBinary($compression) . ' -dc ' . $filename . ' | ' . $basicExecutable . ' 2>/dev/null';
+            $this->assertEquals($expected, $result);
+        }
+    }
 
     /**
      * Test for `export()` method
@@ -124,12 +178,6 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `export()` method on failure
-     * @return void
-     */
-    abstract public function testExportOnFailure();
-
-    /**
      * Test for `import()` method
      * @return void
      * @test
@@ -140,70 +188,6 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertTrue($this->Driver->export($backup));
         $this->assertTrue($this->Driver->import($backup));
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @return void
-     */
-    abstract public function testImportOnFailure();
-
-    /**
-     * Internal method to test `export()` and `import()` methods.
-     *
-     * It tests that the backup is properly exported and then imported.
-     * @param object $driverInstance A driver instance
-     * @param string $backup Backup relative path
-     * @return void
-     */
-    private function _testExportAndImport($driverInstance, $backup = 'example.sql')
-    {
-        $backup = $this->getAbsolutePath($backup);
-
-        //Initial records. 3 articles and 6 comments
-        $initial = $this->allRecords();
-        $this->assertEquals(3, count($initial['Articles']));
-        $this->assertEquals(6, count($initial['Comments']));
-
-        //Exports backup
-        $this->assertTrue($driverInstance->export($backup));
-
-        //Deletes article with ID 2 and comment with ID 4
-        $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
-        $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);
-
-        //Records after delete. 2 articles and 5 comments
-        $afterDelete = $this->allRecords();
-        $this->assertEquals(count($afterDelete['Articles']), count($initial['Articles']) - 1);
-        $this->assertEquals(count($afterDelete['Comments']), count($initial['Comments']) - 1);
-
-        //Imports backup
-        $this->assertTrue($driverInstance->import($backup));
-
-        //Now initial records are the same of final records
-        $final = $this->allRecords();
-        $this->assertEquals($initial, $final);
-
-        //Gets the difference (`$diff`) between records after delete
-        //  (`$deleted`)and records after import (`$final`)
-        $diff = $final;
-
-        foreach ($final as $model => $finalValues) {
-            foreach ($finalValues as $finalKey => $finalValue) {
-                foreach ($afterDelete[$model] as $deletedValue) {
-                    if ($finalValue == $deletedValue) {
-                        unset($diff[$model][$finalKey]);
-                    }
-                }
-            }
-        }
-
-        $this->assertEquals(1, count($diff['Articles']));
-        $this->assertEquals(1, count($diff['Comments']));
-
-        //Difference is article with ID 2 and comment with ID 4
-        $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
-        $this->assertEquals(4, collection($diff['Comments'])->extract('id')->first());
     }
 
     /**
@@ -218,7 +202,52 @@ abstract class DriverTestCase extends TestCase
         foreach (VALID_EXTENSIONS as $extension) {
             $this->loadAllFixtures();
 
-            $this->_testExportAndImport($this->Driver, sprintf('example.%s', $extension));
+            $backup = $this->getAbsolutePath(sprintf('example.%s', $extension));
+
+            //Initial records. 3 articles and 6 comments
+            $initial = $this->allRecords();
+            $this->assertEquals(3, count($initial['Articles']));
+            $this->assertEquals(6, count($initial['Comments']));
+
+            //Exports backup
+            $this->assertTrue($this->Driver->export($backup));
+
+            //Deletes article with ID 2 and comment with ID 4
+            $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
+            $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);
+
+            //Records after delete. 2 articles and 5 comments
+            $afterDelete = $this->allRecords();
+            $this->assertEquals(count($afterDelete['Articles']), count($initial['Articles']) - 1);
+            $this->assertEquals(count($afterDelete['Comments']), count($initial['Comments']) - 1);
+
+            //Imports backup
+            $this->assertTrue($this->Driver->import($backup));
+
+            //Now initial records are the same of final records
+            $final = $this->allRecords();
+            $this->assertEquals($initial, $final);
+
+            //Gets the difference (`$diff`) between records after delete
+            //  (`$deleted`)and records after import (`$final`)
+            $diff = $final;
+
+            foreach ($final as $model => $finalValues) {
+                foreach ($finalValues as $finalKey => $finalValue) {
+                    foreach ($afterDelete[$model] as $deletedValue) {
+                        if ($finalValue == $deletedValue) {
+                            unset($diff[$model][$finalKey]);
+                        }
+                    }
+                }
+            }
+
+            $this->assertEquals(1, count($diff['Articles']));
+            $this->assertEquals(1, count($diff['Comments']));
+
+            //Difference is article with ID 2 and comment with ID 4
+            $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
+            $this->assertEquals(4, collection($diff['Comments'])->extract('id')->first());
         }
     }
 }

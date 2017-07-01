@@ -23,7 +23,7 @@
  */
 namespace DatabaseBackup\Driver;
 
-use Cake\Network\Exception\InternalErrorException;
+use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -31,24 +31,7 @@ use DatabaseBackup\Driver\Driver;
  */
 class Postgres extends Driver
 {
-    /**
-     * Exports the database
-     * @param string $filename Filename where you want to export the database
-     * @return bool true on success
-     * @uses getExportExecutable()
-     * @throws InternalErrorException
-     */
-    public function export($filename)
-    {
-        //Executes
-        exec($this->getExportExecutable($filename), $output, $returnVar);
-
-        if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_dump', $returnVar));
-        }
-
-        return file_exists($filename);
-    }
+    use BackupTrait;
 
     /**
      * Gets the value for the `--dbname` option for export and import
@@ -75,58 +58,59 @@ class Postgres extends Driver
 
     /**
      * Gets the executable command to export the database
-     * @param string $filename Filename where you want to export the database
      * @return string
      * @uses getDbnameAsString()
      */
-    protected function getExportExecutable($filename)
+    protected function _exportExecutable()
     {
-        $compression = $this->getCompression($filename);
-        $executable = sprintf('%s -Fc -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
-
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
-            $executable .= ' | ' . $this->getBinary($compression);
-        }
-
-        return $executable . ' > ' . $filename . ' 2>/dev/null';
+        return sprintf('%s -Fc -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
     }
 
     /**
      * Gets the executable command to import the database
-     * @param string $filename Filename from which you want to import the database
      * @return string
      * @uses getDbnameAsString()
      */
-    protected function getImportExecutable($filename)
+    protected function _importExecutable()
     {
-        $compression = $this->getCompression($filename);
-        $executable = sprintf('%s -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
-
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
-            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
-        } else {
-            $executable .= ' < ' . $filename;
-        }
-
-        return $executable . ' 2>/dev/null';
+        return sprintf('%s -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
     }
 
-    /**
-     * Imports the database
-     * @param string $filename Filename from which you want to import the database
-     * @return bool true on success
-     * @uses getImportExecutable()
-     * @throws InternalErrorException
-     */
-    public function import($filename)
-    {
-        //Executes
-        exec($this->getImportExecutable($filename), $output, $returnVar);
-
-        if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_restore', $returnVar));
-        }
-
-        return true;
-    }
+//
+//    /**
+//     * Exports the database
+//     * @param string $filename Filename where you want to export the database
+//     * @return bool true on success
+//     * @uses getExportExecutable()
+//     * @throws InternalErrorException
+//     */
+//    public function export($filename)
+//    {
+//        //Executes
+//        exec($this->getExportExecutable($filename), $output, $returnVar);
+//
+//        if ($returnVar !== 0) {
+//            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_dump', $returnVar));
+//        }
+//
+//        return file_exists($filename);
+//    }
+//    /**
+//     * Imports the database
+//     * @param string $filename Filename from which you want to import the database
+//     * @return bool true on success
+//     * @uses getImportExecutable()
+//     * @throws InternalErrorException
+//     */
+//    public function import($filename)
+//    {
+//        //Executes
+//        exec($this->getImportExecutable($filename), $output, $returnVar);
+//
+//        if ($returnVar !== 0) {
+//            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_restore', $returnVar));
+//        }
+//
+//        return true;
+//    }
 }

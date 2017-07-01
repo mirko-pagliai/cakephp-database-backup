@@ -23,7 +23,6 @@
  */
 namespace DatabaseBackup\Driver;
 
-use Cake\Network\Exception\InternalErrorException;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 
@@ -36,82 +35,31 @@ class Sqlite extends Driver
 
     /**
      * Gets the executable command to export the database
-     * @param string $filename Filename where you want to export the database
      * @return string
      * @uses $config
-     * @uses getCompression()
      */
-    protected function getExportExecutable($filename)
+    protected function _exportExecutable()
     {
-        $compression = $this->getCompression($filename);
-        $executable = sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->config['database']);
-
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
-            $executable .= ' | ' . $this->getBinary($compression);
-        }
-
-        return $executable . ' > ' . $filename . ' 2>/dev/null';
+        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->config['database']);
     }
 
     /**
      * Gets the executable command to import the database
-     * @param string $filename Filename from which you want to import the database
      * @return string
      * @uses $config
-     * @uses getCompression()
      */
-    protected function getImportExecutable($filename)
+    protected function _importExecutable()
     {
-        $compression = $this->getCompression($filename);
-        $executable = sprintf('%s %s', $this->getBinary('sqlite3'), $this->config['database']);
-
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
-            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
-        } else {
-            $executable .= ' < ' . $filename;
-        }
-
-        return $executable . ' 2>/dev/null';
+        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->config['database']);
     }
 
     /**
-     * Exports the database
-     * @param string $filename Filename where you want to export the database
-     * @return bool true on success
-     * @throws InternalErrorException
-     * @uses getExportExecutable()
-     */
-    public function export($filename)
-    {
-        //Executes
-        exec($this->getExportExecutable($filename), $output, $returnVar);
-
-        if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
-        }
-
-        return file_exists($filename);
-    }
-
-    /**
-     * Imports the database
-     * @param string $filename Filename from which you want to import the database
-     * @return bool true on success
-     * @throws InternalErrorException
-     * @uses getImportExecutable()
+     * Called before import
+     * @return void
      * @uses truncateTables()
      */
-    public function import($filename)
+    public function beforeImport()
     {
         $this->truncateTables();
-
-        //Executes
-        exec($this->getImportExecutable($filename), $output, $returnVar);
-
-        if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'sqlite3', $returnVar));
-        }
-
-        return true;
     }
 }

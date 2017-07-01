@@ -42,11 +42,6 @@ class PostgresTest extends DriverTestCase
     protected $Driver;
 
     /**
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
      * Fixtures
      * @var array
      */
@@ -88,49 +83,31 @@ class PostgresTest extends DriverTestCase
     }
 
     /**
-     * Test for `getExportExecutable()` method
+     * Test for `_exportExecutable()` method
      * @test
      */
-    public function testGetExportExecutable()
+    public function testExportExecutable()
     {
-        $method = 'getExportExecutable';
-        $pgDump = $this->getBinary('pg_dump');
-        $dbnameAsString = 'postgresql://postgres@localhost/travis_ci_test';
-
-        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
-
-        $expected = $pgDump . ' -Fc -b --dbname=' . $dbnameAsString . ' | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
-
-        $expected = $pgDump . ' -Fc -b --dbname=postgresql://postgres@localhost/travis_ci_test > backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
+        $expected = $this->getBinary('pg_dump') . ' -Fc -b --dbname=postgresql://postgres@localhost/travis_ci_test';
+        $result = $this->invokeMethod($this->Driver, '_exportExecutable');
+        $this->assertEquals($expected, $result);
     }
 
     /**
-     * Test for `getImportExecutable()` method
+     * Test for `_importExecutable()` method
      * @test
      */
-    public function testGetImportExecutable()
+    public function testImportExecutable()
     {
-        $method = 'getImportExecutable';
-        $pgRestore = $this->getBinary('pg_restore');
-        $dbnameAsString = 'postgresql://postgres@localhost/travis_ci_test';
-
-        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
-
-        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
-
-        $expected = $pgRestore . ' -c -e --dbname=' . $dbnameAsString . ' < backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
+        $expected = $this->getBinary('pg_restore') . ' -c -e --dbname=postgresql://postgres@localhost/travis_ci_test';
+        $result = $this->invokeMethod($this->Driver, '_importExecutable');
+        $this->assertEquals($expected, $result);
     }
 
     /**
      * Test for `export()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage pg_dump failed with exit code `1`
+     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testExportOnFailure()
@@ -145,7 +122,7 @@ class PostgresTest extends DriverTestCase
     /**
      * Test for `import()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage pg_restore failed with exit code `1`
+     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()

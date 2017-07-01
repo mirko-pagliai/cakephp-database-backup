@@ -23,7 +23,7 @@
  */
 namespace DatabaseBackup\Driver;
 
-use DatabaseBackup\BackupTrait;
+use Cake\Network\Exception\InternalErrorException;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -31,14 +31,6 @@ use DatabaseBackup\BackupTrait;
  */
 abstract class Driver
 {
-    use BackupTrait;
-
-    /**
-     * A connection object
-     * @var \Cake\Datasource\ConnectionInterface
-     */
-    protected $connection;
-
     /**
      * Database configuration
      * @var array
@@ -49,65 +41,139 @@ abstract class Driver
      * Construct
      * @param \Cake\Datasource\ConnectionInterface $connection A connection object
      * @uses $config
-     * @uses $connection
      */
     public function __construct($connection)
     {
-        $this->connection = $connection;
         $this->config = $connection->config();
     }
 
     /**
-     * Truncates tables.
-     *
-     * Some drivers (eg. Sqlite) are not able to truncates tables before import
-     *  a backup file. For this reason, it may be necessary to run it manually.
-     * @return void
-     * @uses getTables()
-     * @uses $connection
+     * Gets the executable command to export the database
+     * @return string
      */
-    public function truncateTables()
+    abstract protected function _exportExecutable();
+
+    /**
+     * Gets the executable command to import the database
+     * @return string
+     */
+    abstract protected function _importExecutable();
+
+    /**
+     * Called after export
+     * @return void
+     */
+    public function afterExport()
     {
-        foreach ($this->getTables() as $table) {
-            $this->connection->delete($table);
+    }
+
+    /**
+     * Called after import
+     * @return void
+     */
+    public function afterImport()
+    {
+    }
+
+    /**
+     * Called before export
+     * @return void
+     */
+    public function beforeExport()
+    {
+    }
+
+    /**
+     * Called before import
+     * @return void
+     */
+    public function beforeImport()
+    {
+    }
+
+    /**
+     * Gets the executable command to export the database, with compression
+     * @param string $filename Filename where you want to export the database
+     * @return string
+     * @uses _exportExecutable()
+     */
+    protected function _exportExecutableWithCompression($filename)
+    {
+        $executable = $this->_exportExecutable();
+        $compression = $this->getCompression($filename);
+
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
+            $executable .= ' | ' . $this->getBinary($compression);
         }
+
+        return $executable . ' > ' . $filename . ' 2>/dev/null';
+    }
+
+    /**
+     * Gets the executable command to import the database, with compression
+     * @param string $filename Filename from which you want to import the database
+     * @return string
+     * @uses _importExecutable()
+     */
+    protected function _importExecutableWithCompression($filename)
+    {
+        $executable = $this->_importExecutable();
+        $compression = $this->getCompression($filename);
+
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
+            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
+        } else {
+            $executable .= ' < ' . $filename;
+        }
+
+        return $executable . ' 2>/dev/null';
     }
 
     /**
      * Exports the database
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
+     * @throws InternalErrorException
+     * @uses _exportExecutableWithCompression()
+     * @uses afterExport()
+     * @uses beforeExport()
      */
-    abstract public function export($filename);
-
-    /**
-     * Gets the executable command to export the database
-     * @param string $filename Filename where you want to export the database
-     * @return string
-     */
-    abstract protected function getExportExecutable($filename);
-
-    /**
-     * Gets the executable command to import the database
-     * @param string $filename Filename from which you want to import the database
-     * @return string
-     */
-    abstract protected function getImportExecutable($filename);
-
-    /**
-     * Gets all tables of the current database
-     * @return array
-     * @uses $connection
-     */
-    public function getTables()
+    final public function export($filename)
     {
-        return $this->connection->getSchemaCollection()->listTables();
+        $this->beforeExport();
+
+        exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
+
+        $this->afterExport();
+
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        }
+
+        return file_exists($filename);
     }
 
     /**
      * Imports the database
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
+     * @throws InternalErrorException
+     * @uses _importExecutableWithCompression()
+     * @uses afterImport()
+     * @uses beforeImport()
      */
-    abstract public function import($filename);
+    final public function import($filename)
+    {
+        $this->beforeImport();
+
+        exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
+
+        $this->afterImport();
+
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        }
+
+        return true;
+    }
 }

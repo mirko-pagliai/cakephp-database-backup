@@ -23,7 +23,6 @@
  */
 namespace DatabaseBackup\Driver;
 
-use Cake\Network\Exception\InternalErrorException;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 
@@ -35,146 +34,120 @@ class Mysql extends Driver
     use BackupTrait;
 
     /**
-     * Gets the executable command to export the database
-     * @param string $filename Filename where you want to export the database
-     * @return string
-     * @uses $config
-     * @uses getCompression()
+     * Temporary file with the database authentication data
+     * @var string
      */
-    protected function getExportExecutable($filename)
+    protected $auth;
+
+    /**
+     * Gets the executable command to export the database
+     * @return string
+     * @uses $auth
+     * @uses $config
+     */
+    protected function _exportExecutable()
     {
-        $compression = $this->getCompression($filename);
-        $executable = sprintf('%s --defaults-file=%%s %s', $this->getBinary('mysqldump'), $this->config['database']);
-
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
-            $executable .= ' | ' . $this->getBinary($compression);
-        }
-
-        return $executable . ' > ' . $filename . ' 2>/dev/null';
+        return sprintf('%s --defaults-file=%s %s', $this->getBinary('mysqldump'), $this->auth, $this->config['database']);
     }
 
     /**
-     * Stores the authentication data, to be used to export the database, in a
-     *  temporary file.
-     *
-     * For security reasons, it's recommended to specify the password in
-     *  a configuration file and not in the command (a user can execute
-     *  a `ps aux | grep mysqldump` and see the password).
-     *  So it creates a temporary file to store the configuration options
-     * @return string Path of the temporary file
+     * Gets the executable command to import the database
+     * @return string
+     * @uses $auth
      * @uses $config
      */
-    private function getExportStoreAuth()
+    protected function _importExecutable()
     {
-        $auth = tempnam(sys_get_temp_dir(), 'auth');
+        return sprintf('%s --defaults-extra-file=%s %s', $this->getBinary('mysql'), $this->auth, $this->config['database']);
+    }
 
-        file_put_contents($auth, sprintf(
+    /**
+     * Called after export
+     * @return void
+     * @uses deleteAuthFile()
+     */
+    public function afterExport()
+    {
+        $this->deleteAuthFile();
+    }
+
+    /**
+     * Called after import
+     * @return void
+     * @uses deleteAuthFile()
+     */
+    public function afterImport()
+    {
+        $this->deleteAuthFile();
+    }
+
+    /**
+     * Called before export.
+     *
+     * It stores the authentication data, to be used to export the database, in
+     *  a temporary file.
+     *
+     * For security reasons, it's recommended to specify the password in a
+     *  configuration file and not in the command (a user can execute a
+     *  `ps aux | grep mysqldump` and see the password).
+     * So it creates a temporary file to store the configuration options
+     * @return void
+     * @uses $auth
+     * @uses $config
+     */
+    public function beforeExport()
+    {
+        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
+
+        file_put_contents($this->auth, sprintf(
             "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
             $this->config['username'],
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']
         ));
-
-        return $auth;
     }
 
     /**
-     * Gets the executable command to import the database
-     * @param string $filename Filename from which you want to import the database
-     * @return string
-     * @uses $config
-     * @uses getCompression()
-     */
-    protected function getImportExecutable($filename)
-    {
-        $compression = $this->getCompression($filename);
-        $executable = sprintf('%s --defaults-extra-file=%%s %s', $this->getBinary('mysql'), $this->config['database']);
-
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
-            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
-        } else {
-            $executable .= ' < ' . $filename;
-        }
-
-        return $executable . ' 2>/dev/null';
-    }
-
-    /**
-     * Stores the authentication data, to be used to import the database, in a
-     *  temporary file.
+     * Called before export.
+     *
+     * It stores the authentication data, to be used to import the database, in
+     *  a temporary file.
      *
      * For security reasons, it's recommended to specify the password in
      *  a configuration file and not in the command (a user can execute
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
-     * @return string Path of the temporary file
+     * @return void
+     * @uses $auth
      * @uses $config
      */
-    private function getImportStoreAuth()
+    public function beforeImport()
     {
-        $auth = tempnam(sys_get_temp_dir(), 'auth');
+        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
 
-        file_put_contents($auth, sprintf(
+        file_put_contents($this->auth, sprintf(
             "[client]\nuser=%s\npassword=\"%s\"\nhost=%s",
             $this->config['username'],
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']
         ));
-
-        return $auth;
     }
 
     /**
-     * Exports the database
-     * @param string $filename Filename where you want to export the database
-     * @return bool true on success
-     * @throws InternalErrorException
-     * @uses $connection
-     * @uses getExportExecutable()
-     * @uses getExportStoreAuth()
+     * Deletes the temporary file with the database authentication data
+     * @return bool `true` on success
+     * @uses $auth
      */
-    public function export($filename)
+    protected function deleteAuthFile()
     {
-        //Stores the authentication data in a temporary file
-        $auth = $this->getExportStoreAuth();
-
-        //Executes
-        exec(sprintf($this->getExportExecutable($filename), $auth), $output, $returnVar);
-
         //Deletes the temporary file with the authentication data
-        unlink($auth);
+        if ($this->auth && file_exists($this->auth)) {
+            unlink($this->auth);
+            unset($this->auth);
 
-        if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'mysqldump', $returnVar));
+            return true;
         }
 
-        return file_exists($filename);
-    }
-
-    /**
-     * Imports the database
-     * @param string $filename Filename from which you want to import the database
-     * @return bool true on success
-     * @throws InternalErrorException
-     * @uses $connection
-     * @uses getImportExecutable()
-     * @uses getImportStoreAuth()
-     */
-    public function import($filename)
-    {
-        //Stores the authentication data in a temporary file
-        $auth = $this->getImportStoreAuth();
-
-        //Executes
-        exec(sprintf($this->getImportExecutable($filename), $auth), $output, $returnVar);
-
-        //Deletes the temporary file with the authentication data
-        unlink($auth);
-
-        if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'mysql', $returnVar));
-        }
-
-        return true;
+        return false;
     }
 }

@@ -66,61 +66,62 @@ class SqliteTest extends DriverTestCase
     }
 
     /**
-     * Test for `getExportExecutable()` method
+     * Test for `_exportExecutable()` method
      * @test
      */
-    public function testGetExportExecutable()
+    public function testExportExecutable()
     {
-        $method = 'getExportExecutable';
-        $sqlite3 = $this->getBinary('sqlite3');
-
-        $expected = $sqlite3 . ' /tmp/example.sq3 .dump | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
-
-        $expected = $sqlite3 . ' /tmp/example.sq3 .dump | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
-
-        $expected = $sqlite3 . ' /tmp/example.sq3 .dump > backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
+        $expected = $this->getBinary('sqlite3') . ' /tmp/example.sq3 .dump';
+        $result = $this->invokeMethod($this->Driver, '_exportExecutable');
+        $this->assertEquals($expected, $result);
     }
 
     /**
-     * Test for `getImportExecutable()` method
+     * Test for `_importExecutable()` method
      * @test
      */
-    public function testGetImportExecutable()
+    public function testImportExecutable()
     {
-        $method = 'getImportExecutable';
-        $sqlite3 = $this->getBinary('sqlite3');
+        $expected = $this->getBinary('sqlite3') . ' /tmp/example.sq3';
+        $result = $this->invokeMethod($this->Driver, '_importExecutable');
+        $this->assertEquals($expected, $result);
+    }
 
-        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $sqlite3 . ' /tmp/example.sq3 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.bz2']));
+    /**
+     * Test for `beforeImport()` method
+     * @test
+     */
+    public function testBeforeImport()
+    {
+        $this->Driver = $this->getMockBuilder(Sqlite::class)
+            ->setMethods(['truncateTables'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
 
-        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $sqlite3 . ' /tmp/example.sq3 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql.gz']));
+        $this->Driver->expects($this->once())
+            ->method('truncateTables');
 
-        $expected = $sqlite3 . ' /tmp/example.sq3 < backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, $method, ['backup.sql']));
+        $this->Driver->beforeImport();
     }
 
     /**
      * Test for `export()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage sqlite3 failed with exit code `1`
+     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testExportOnFailure()
     {
-        $config = $this->getProperty($this->Driver, 'config');
-
         $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['getExportExecutable'])
+            ->setMethods(['_exportExecutableWithCompression'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Driver->method('getExportExecutable')
-             ->will($this->returnCallback(function () use ($config) {
-                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
+        $this->Driver->method('_exportExecutableWithCompression')
+             ->will($this->returnCallback(function () {
+                $config = $this->getProperty($this->Driver, 'config');
+
+                return sprintf('%s %s .dump noExistingDir/dump.sql 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
              }));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
@@ -129,20 +130,20 @@ class SqliteTest extends DriverTestCase
     /**
      * Test for `import()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage sqlite3 failed with exit code `1`
+     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()
     {
-        $config = $this->getProperty($this->Driver, 'config');
-
         $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['dropTables', 'getImportExecutable'])
+            ->setMethods(['_importExecutableWithCompression', 'truncateTables'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Driver->method('getImportExecutable')
-             ->will($this->returnCallback(function () use ($config) {
+        $this->Driver->method('_importExecutableWithCompression')
+             ->will($this->returnCallback(function () {
+                $config = $this->getProperty($this->Driver, 'config');
+
                 return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
              }));
 
