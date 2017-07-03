@@ -24,7 +24,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailAssertTrait;
-use Cake\TestSuite\TestCase;
+use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use Reflection\ReflectionTrait;
@@ -81,16 +81,6 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Internal method to delete all backups
-     */
-    protected function _deleteAllBackups()
-    {
-        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
-    }
-
-    /**
      * Setup the test case, backup the static object values so they can be
      * restored. Specifically backs up the contents of Configure and paths in
      *  App if they have not already been backed up
@@ -102,8 +92,6 @@ class BackupManagerTest extends TestCase
 
         $this->BackupExport = new BackupExport;
         $this->BackupManager = new BackupManager;
-
-        $this->_deleteAllBackups();
     }
 
     /**
@@ -115,8 +103,6 @@ class BackupManagerTest extends TestCase
         parent::tearDown();
 
         unset($this->BackupExport);
-
-        $this->_deleteAllBackups();
     }
 
     /**

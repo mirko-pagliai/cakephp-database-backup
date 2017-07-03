@@ -39,24 +39,6 @@ class BackupManager
     use BackupTrait;
 
     /**
-     * Driver containing all methods to export/import database backups
-     *  according to the database engine
-     * @since 2.0.0
-     * @var object
-     */
-    protected $driver;
-
-    /**
-     * Construct
-     * @uses $connection
-     * @uses $driver
-     */
-    public function __construct()
-    {
-        $this->driver = $this->getDriver();
-    }
-
-    /**
      * Deletes a backup file
      * @param string $filename Filename of the backup that you want to delete.
      *  The path can be relative to the backup directory
@@ -100,7 +82,6 @@ class BackupManager
      * Returns a list of database backups
      * @return array Backups as entities
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
-     * @uses $driver
      */
     public function index()
     {
@@ -110,8 +91,8 @@ class BackupManager
             ->map(function ($filename) use ($target) {
                 return new Entity([
                     'filename' => $filename,
-                    'extension' => $this->driver->getExtension($filename),
-                    'compression' => $this->driver->getCompression($filename),
+                    'extension' => $this->getExtension($filename),
+                    'compression' => $this->getCompression($filename),
                     'size' => filesize($target . DS . $filename),
                     'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $filename))),
                 ]);

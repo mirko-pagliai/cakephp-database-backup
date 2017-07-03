@@ -23,7 +23,7 @@
  */
 namespace DatabaseBackup\Driver;
 
-use DatabaseBackup\BackupTrait;
+use Cake\Network\Exception\InternalErrorException;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -31,7 +31,11 @@ use DatabaseBackup\BackupTrait;
  */
 abstract class Driver
 {
-    use BackupTrait;
+    /**
+     * A connection object
+     * @var \Cake\Datasource\ConnectionInterface
+     */
+    protected $connection;
 
     /**
      * Database configuration
@@ -40,137 +44,150 @@ abstract class Driver
     protected $config;
 
     /**
-     * Default extension for export
-     * @var string
-     */
-    protected $defaultExtension;
-
-    /**
      * Construct
      * @param \Cake\Datasource\ConnectionInterface $connection A connection object
      * @uses $config
+     * @uses $connection
      */
     public function __construct($connection)
     {
+        $this->connection = $connection;
         $this->config = $connection->config();
     }
 
     /**
-     * Drops tables.
-     *
-     * Some drivers (eg. Sqlite) are not able to drop tables before import a
-     *  backup file. For this reason, it may be necessary to run it manually.
-     * @return void
-     * @uses getTables()
+     * Gets the executable command to export the database
+     * @return string
      */
-    public function dropTables()
+    abstract protected function _exportExecutable();
+
+    /**
+     * Gets the executable command to import the database
+     * @return string
+     */
+    abstract protected function _importExecutable();
+
+    /**
+     * Called after export
+     * @return void
+     */
+    public function afterExport()
     {
-        foreach ($this->getTables() as $table) {
-            $this->getConnection()->execute(sprintf('DROP TABLE %s;', $table));
+    }
+
+    /**
+     * Called after import
+     * @return void
+     */
+    public function afterImport()
+    {
+    }
+
+    /**
+     * Called before export
+     * @return bool Returns `false` to stop the export
+     */
+    public function beforeExport()
+    {
+        return true;
+    }
+
+    /**
+     * Called before import
+     * @return bool Returns `false` to stop the import
+     */
+    public function beforeImport()
+    {
+        return true;
+    }
+
+    /**
+     * Gets the executable command to export the database, with compression
+     * @param string $filename Filename where you want to export the database
+     * @return string
+     * @uses _exportExecutable()
+     */
+    protected function _exportExecutableWithCompression($filename)
+    {
+        $executable = $this->_exportExecutable();
+        $compression = $this->getCompression($filename);
+
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
+            $executable .= ' | ' . $this->getBinary($compression);
         }
+
+        return $executable . ' > ' . $filename . ' 2>/dev/null';
+    }
+
+    /**
+     * Gets the executable command to import the database, with compression
+     * @param string $filename Filename from which you want to import the database
+     * @return string
+     * @uses _importExecutable()
+     */
+    protected function _importExecutableWithCompression($filename)
+    {
+        $executable = $this->_importExecutable();
+        $compression = $this->getCompression($filename);
+
+        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
+            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
+        } else {
+            $executable .= ' < ' . $filename;
+        }
+
+        return $executable . ' 2>/dev/null';
     }
 
     /**
      * Exports the database
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
+     * @throws InternalErrorException
+     * @uses _exportExecutableWithCompression()
+     * @uses afterExport()
+     * @uses beforeExport()
      */
-    abstract public function export($filename);
-
-    /**
-     * Returns the compression type from a filename
-     * @param string $filename Filename
-     * @return string|bool|null Compression type as string, `null` on failure,
-     *  `false` for no compression
-     * @uses getExtension()
-     * @uses getValidCompressions()
-     */
-    public function getCompression($filename)
+    final public function export($filename)
     {
-        $compressions = $this->getValidCompressions();
-
-        //Gets the extension from the filename
-        $extension = $this->getExtension($filename);
-
-        if (!array_key_exists($extension, $compressions)) {
-            return null;
+        if (!$this->beforeExport()) {
+            return false;
         }
 
-        return $compressions[$extension];
-    }
+        exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
 
-    /**
-     * Returns the default extension for export
-     * @return string
-     * @uses $defaultExtension
-     */
-    public function getDefaultExtension()
-    {
-        return $this->defaultExtension;
-    }
+        $this->afterExport();
 
-    /**
-     * Gets the executable command to export the database
-     * @param string $filename Filename where you want to export the database
-     * @return string
-     */
-    abstract protected function getExportExecutable($filename);
-
-    /**
-     * Returns the extension of a filename
-     * @param string $filename Filename
-     * @return string|null Extension or `null` on failure
-     * @uses getValidExtensions()
-     */
-    public function getExtension($filename)
-    {
-        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
-
-        if (preg_match($regex, $filename, $matches)) {
-            return $matches[1];
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
         }
 
-        return null;
-    }
-
-    /**
-     * Gets the executable command to import the database
-     * @param string $filename Filename from which you want to import the database
-     * @return string
-     */
-    abstract protected function getImportExecutable($filename);
-
-    /**
-     * Gets all tables of the current database
-     * @return array
-     */
-    public function getTables()
-    {
-        return $this->getConnection()->getSchemaCollection()->listTables();
-    }
-
-    /**
-     * Returns valid compression types for this driver
-     * @return array
-     */
-    public function getValidCompressions()
-    {
-        return VALID_COMPRESSIONS[$this->getClassShortName(get_called_class())];
-    }
-
-    /**
-     * Returns valid extensions for this driver
-     * @return array
-     */
-    public function getValidExtensions()
-    {
-        return VALID_EXTENSIONS[$this->getClassShortName(get_called_class())];
+        return file_exists($filename);
     }
 
     /**
      * Imports the database
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
+     * @throws InternalErrorException
+     * @uses _importExecutableWithCompression()
+     * @uses afterImport()
+     * @uses beforeImport()
      */
-    abstract public function import($filename);
+    final public function import($filename)
+    {
+        if (!$this->beforeImport()) {
+            return false;
+        }
+
+        exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
+
+        $this->afterImport();
+
+        if ($returnVar !== 0) {
+            throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        }
+
+        return true;
+    }
 }

@@ -19,54 +19,20 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
- * @since       2.0.0
+ * @since       2.1.0
  */
-namespace DatabaseBackup\Driver;
+namespace DatabaseBackup\Test\Fixture\Postgres;
 
-use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
+use Cake\Test\Fixture\ArticlesFixture as CakeArticlesFixture;
 
 /**
- * Sqlite driver to export/import database backups
+ * ArticlesFixture class
  */
-class Sqlite extends Driver
+class ArticlesFixture extends CakeArticlesFixture
 {
-    use BackupTrait;
-
     /**
-     * Gets the executable command to export the database
-     * @return string
-     * @uses $config
+     * Fixture datasource
+     * @var string
      */
-    protected function _exportExecutable()
-    {
-        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->config['database']);
-    }
-
-    /**
-     * Gets the executable command to import the database
-     * @return string
-     * @uses $config
-     */
-    protected function _importExecutable()
-    {
-        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->config['database']);
-    }
-
-    /**
-     * Called before import
-     * @return bool
-     * @uses $config
-     * @uses $connection
-     */
-    public function beforeImport()
-    {
-        $this->connection->disconnect();
-
-        unlink($this->config['database']);
-
-        $this->connection->connect();
-
-        return true;
-    }
+    public $connection = 'test_postgres';
 }
