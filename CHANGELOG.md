@@ -2,6 +2,9 @@
 ## 2.1 branch
 ### 2.1.0
 * added support for Postgres databases;
+* all `export()` and `import()` methods have been moved to the `Driver` class;
+* added `afterExport()`, `afterImport()`, `beforeExport()` and `beforeImport`
+    methods to the `Driver` class;
 * `getCompression()` and `getExtension()` moved from `Driver` to `BackupTrait`
     class, because these methods are not strictly related to the database engine
     you are using;

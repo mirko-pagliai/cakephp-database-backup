@@ -39,6 +39,7 @@ abstract class Driver
 
     /**
      * Database configuration
+     * @since 2.1.0
      * @var array
      */
     protected $config;
@@ -70,6 +71,7 @@ abstract class Driver
     /**
      * Called after export
      * @return void
+     * @since 2.1.0
      */
     public function afterExport()
     {
@@ -78,6 +80,7 @@ abstract class Driver
     /**
      * Called after import
      * @return void
+     * @since 2.1.0
      */
     public function afterImport()
     {
@@ -86,6 +89,7 @@ abstract class Driver
     /**
      * Called before export
      * @return bool Returns `false` to stop the export
+     * @since 2.1.0
      */
     public function beforeExport()
     {
@@ -95,6 +99,7 @@ abstract class Driver
     /**
      * Called before import
      * @return bool Returns `false` to stop the import
+     * @since 2.1.0
      */
     public function beforeImport()
     {

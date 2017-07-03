@@ -35,6 +35,7 @@ class Mysql extends Driver
 
     /**
      * Temporary file with the database authentication data
+     * @since 2.1.0
      * @var string
      */
     protected $auth;
@@ -64,6 +65,7 @@ class Mysql extends Driver
     /**
      * Called after export
      * @return void
+     * @since 2.1.0
      * @uses deleteAuthFile()
      */
     public function afterExport()
@@ -74,6 +76,7 @@ class Mysql extends Driver
     /**
      * Called after import
      * @return void
+     * @since 2.1.0
      * @uses deleteAuthFile()
      */
     public function afterImport()
@@ -92,6 +95,7 @@ class Mysql extends Driver
      *  `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options
      * @return bool
+     * @since 2.1.0
      * @uses $auth
      * @uses $config
      */
@@ -120,6 +124,7 @@ class Mysql extends Driver
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
      * @return bool
+     * @since 2.1.0
      * @uses $auth
      * @uses $config
      */
@@ -140,6 +145,7 @@ class Mysql extends Driver
     /**
      * Deletes the temporary file with the database authentication data
      * @return bool `true` on success
+     * @since 2.1.0
      * @uses $auth
      */
     protected function deleteAuthFile()

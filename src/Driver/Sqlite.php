@@ -56,6 +56,7 @@ class Sqlite extends Driver
     /**
      * Called before import
      * @return bool
+     * @since 2.1.0
      * @uses $config
      * @uses $connection
      */
