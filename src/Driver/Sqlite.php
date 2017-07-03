@@ -56,10 +56,15 @@ class Sqlite extends Driver
     /**
      * Called before import
      * @return void
-     * @uses truncateTables()
+     * @uses $config
+     * @uses $connection
      */
     public function beforeImport()
     {
-        $this->truncateTables();
+        $this->connection->disconnect();
+
+        unlink($this->config['database']);
+
+        $this->connection->connect();
     }
 }

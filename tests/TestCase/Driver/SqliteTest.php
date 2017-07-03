@@ -88,23 +88,6 @@ class SqliteTest extends DriverTestCase
     }
 
     /**
-     * Test for `beforeImport()` method
-     * @test
-     */
-    public function testBeforeImport()
-    {
-        $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['truncateTables'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $this->Driver->expects($this->once())
-            ->method('truncateTables');
-
-        $this->Driver->beforeImport();
-    }
-
-    /**
      * Test for `export()` method
      * @return void
      * @test
@@ -156,7 +139,7 @@ class SqliteTest extends DriverTestCase
     public function testImportOnFailure()
     {
         $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['_importExecutableWithCompression', 'truncateTables'])
+            ->setMethods(['_importExecutableWithCompression', 'beforeImport'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 

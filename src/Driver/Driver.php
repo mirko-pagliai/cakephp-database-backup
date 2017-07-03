@@ -32,6 +32,12 @@ use Cake\Network\Exception\InternalErrorException;
 abstract class Driver
 {
     /**
+     * A connection object
+     * @var \Cake\Datasource\ConnectionInterface
+     */
+    protected $connection;
+
+    /**
      * Database configuration
      * @var array
      */
@@ -41,9 +47,11 @@ abstract class Driver
      * Construct
      * @param \Cake\Datasource\ConnectionInterface $connection A connection object
      * @uses $config
+     * @uses $connection
      */
     public function __construct($connection)
     {
+        $this->connection = $connection;
         $this->config = $connection->config();
     }
 
