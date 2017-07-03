@@ -88,26 +88,6 @@ class SqliteTest extends DriverTestCase
     }
 
     /**
-     * Test for `export()` method
-     * @return void
-     * @test
-     */
-    public function testExport()
-    {
-        $this->loadAllFixtures();
-
-        $backup = $this->getAbsolutePath('example.sql');
-
-        $this->assertTrue($this->Driver->export($backup));
-        $this->assertFileExists($backup);
-
-        $content = file_get_contents($backup);
-
-        $this->assertTextContains('CREATE TABLE IF NOT EXISTS "articles"', $content);
-        $this->assertTextContains('CREATE TABLE IF NOT EXISTS "comments"', $content);
-    }
-
-    /**
      * Test for `export()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
      * @expectedExceptionMessage Failed with exit code `1`
