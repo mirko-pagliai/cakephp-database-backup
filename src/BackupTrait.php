@@ -69,6 +69,16 @@ trait BackupTrait
     }
 
     /**
+     * Gets the short name for class namespace
+     * @param string $class Class namespace
+     * @return string
+     */
+    public function getClassShortName($class)
+    {
+        return (new ReflectionClass($class))->getShortName();
+    }
+
+    /**
      * Returns the compression type from a filename
      * @param string $filename Filename
      * @return string|bool Compression type as string or `false`
@@ -84,16 +94,6 @@ trait BackupTrait
         }
 
         return VALID_COMPRESSIONS[$extension];
-    }
-
-    /**
-     * Gets the short name for class namespace
-     * @param string $class Class namespace
-     * @return string
-     */
-    public function getClassShortName($class)
-    {
-        return (new ReflectionClass($class))->getShortName();
     }
 
     /**
