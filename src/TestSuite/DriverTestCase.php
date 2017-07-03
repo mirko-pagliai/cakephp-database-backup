@@ -178,6 +178,28 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
+     * Test for `export()` method. Export is stopped because the
+     *  `beforeExport()` method returns `false`
+     * @return void
+     * @test
+     */
+    public function testExportStoppedByBeforeExport()
+    {
+        $this->Driver = $this->getMockBuilder(get_class($this->Driver))
+            ->setMethods(['beforeExport'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
+
+        $this->Driver->method('beforeExport')
+             ->will($this->returnValue(false));
+
+        $backup = $this->getAbsolutePath('example.sql');
+
+        $this->assertFalse($this->Driver->export($backup));
+        $this->assertFileNotExists($backup);
+    }
+
+    /**
      * Test for `import()` method
      * @return void
      * @test
@@ -188,6 +210,28 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertTrue($this->Driver->export($backup));
         $this->assertTrue($this->Driver->import($backup));
+    }
+
+    /**
+     * Test for `import()` method. Import is stopped because the
+     *  `beforeImport()` method returns `false`
+     * @return void
+     * @test
+     */
+    public function testImportStoppedByBeforeExport()
+    {
+        $this->Driver = $this->getMockBuilder(get_class($this->Driver))
+            ->setMethods(['beforeImport'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
+
+        $this->Driver->method('beforeImport')
+             ->will($this->returnValue(false));
+
+        $backup = $this->getAbsolutePath('example.sql');
+
+        $this->assertTrue($this->Driver->export($backup));
+        $this->assertFalse($this->Driver->import($backup));
     }
 
     /**

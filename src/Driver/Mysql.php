@@ -91,7 +91,7 @@ class Mysql extends Driver
      *  configuration file and not in the command (a user can execute a
      *  `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options
-     * @return void
+     * @return bool
      * @uses $auth
      * @uses $config
      */
@@ -105,6 +105,8 @@ class Mysql extends Driver
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']
         ));
+
+        return true;
     }
 
     /**
@@ -117,7 +119,7 @@ class Mysql extends Driver
      *  a configuration file and not in the command (a user can execute
      *  a `ps aux | grep mysqldump` and see the password).
      *  So it creates a temporary file to store the configuration options
-     * @return void
+     * @return bool
      * @uses $auth
      * @uses $config
      */
@@ -131,6 +133,8 @@ class Mysql extends Driver
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']
         ));
+
+        return true;
     }
 
     /**

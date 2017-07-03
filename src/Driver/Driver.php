@@ -85,18 +85,20 @@ abstract class Driver
 
     /**
      * Called before export
-     * @return void
+     * @return bool Returns `false` to stop the export
      */
     public function beforeExport()
     {
+        return true;
     }
 
     /**
      * Called before import
-     * @return void
+     * @return bool Returns `false` to stop the import
      */
     public function beforeImport()
     {
+        return true;
     }
 
     /**
@@ -148,7 +150,9 @@ abstract class Driver
      */
     final public function export($filename)
     {
-        $this->beforeExport();
+        if (!$this->beforeExport()) {
+            return false;
+        }
 
         exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
 
@@ -172,7 +176,9 @@ abstract class Driver
      */
     final public function import($filename)
     {
-        $this->beforeImport();
+        if (!$this->beforeImport()) {
+            return false;
+        }
 
         exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
 

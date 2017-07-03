@@ -55,7 +55,7 @@ class Sqlite extends Driver
 
     /**
      * Called before import
-     * @return void
+     * @return bool
      * @uses $config
      * @uses $connection
      */
@@ -66,5 +66,7 @@ class Sqlite extends Driver
         unlink($this->config['database']);
 
         $this->connection->connect();
+
+        return true;
     }
 }
