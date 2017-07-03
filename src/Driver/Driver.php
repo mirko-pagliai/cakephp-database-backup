@@ -117,7 +117,7 @@ abstract class Driver
         $executable = $this->_exportExecutable();
         $compression = $this->getCompression($filename);
 
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
+        if (in_array($compression, VALID_COMPRESSIONS)) {
             $executable .= ' | ' . $this->getBinary($compression);
         }
 
@@ -135,7 +135,7 @@ abstract class Driver
         $executable = $this->_importExecutable();
         $compression = $this->getCompression($filename);
 
-        if (in_array($compression, array_filter(VALID_COMPRESSIONS))) {
+        if (in_array($compression, VALID_COMPRESSIONS)) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
         } else {
             $executable .= ' < ' . $filename;

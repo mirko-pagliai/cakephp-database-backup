@@ -301,7 +301,7 @@ class BackupShell extends Shell
             'parser' => [
                 'options' => [
                     'compression' => [
-                        'choices' => array_filter(VALID_COMPRESSIONS),
+                        'choices' => VALID_COMPRESSIONS,
                         'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
                         'short' => 'c',
                     ],
