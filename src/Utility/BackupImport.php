@@ -62,7 +62,6 @@ class BackupImport
      * @return \DatabaseBackup\Utility\BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws InternalErrorException
-     * @uses $driver
      * @uses $filename
      */
     public function filename($filename)
@@ -73,8 +72,9 @@ class BackupImport
             throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not readable', $filename));
         }
 
-        if (!in_array($this->driver->getCompression($filename), $this->driver->getValidCompressions(), true)) {
-            throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));
+        //Checks for extension
+        if (!$this->getExtension($filename)) {
+            throw new InternalErrorException(__d('database_backup', 'Invalid file extension'));
         }
 
         $this->filename = $filename;

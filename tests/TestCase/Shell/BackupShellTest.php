@@ -26,8 +26,8 @@ use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\I18n\Number;
 use Cake\TestSuite\Stub\ConsoleOutput;
-use Cake\TestSuite\TestCase;
 use DatabaseBackup\Shell\BackupShell;
+use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use Reflection\ReflectionTrait;
@@ -86,8 +86,6 @@ class BackupShellTest extends TestCase
             ->setMethods(['in', '_stop'])
             ->setConstructorArgs([$io])
             ->getMock();
-
-        $this->_deleteAllBackups();
     }
 
     /**
@@ -99,8 +97,6 @@ class BackupShellTest extends TestCase
         parent::tearDown();
 
         unset($this->BackupExport, $this->BackupManager, $this->BackupShell, $this->err, $this->out);
-
-        $this->_deleteAllBackups();
     }
 
     /**
@@ -134,16 +130,6 @@ class BackupShellTest extends TestCase
         $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
         return $files;
-    }
-
-    /**
-     * Internal method to delete all backups
-     */
-    protected function _deleteAllBackups()
-    {
-        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
-            unlink($file);
-        }
     }
 
     /**

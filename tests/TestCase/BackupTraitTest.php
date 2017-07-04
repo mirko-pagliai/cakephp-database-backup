@@ -24,7 +24,8 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\TestSuite\TestCase;
+use Cake\ORM\TableRegistry;
+use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupManager;
 
 class BackupTraitTest extends TestCase
@@ -33,6 +34,20 @@ class BackupTraitTest extends TestCase
      * @var \DatabaseBackup\Utility\BackupManager
      */
     protected $Trait;
+
+    /**
+     * @var bool
+     */
+    public $autoFixtures = false;
+
+    /**
+     * Fixtures
+     * @var array
+     */
+    public $fixtures = [
+        'core.articles',
+        'core.comments',
+    ];
 
     /**
      * Setup the test case, backup the static object values so they can be
@@ -107,6 +122,24 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getCompression()` method
+     * @test
+     */
+    public function testGetCompression()
+    {
+        $compressions = [
+            'backup.sql' => false,
+            'backup.sql.bz2' => 'bzip2',
+            'backup.sql.gz' => 'gzip',
+            'text.txt' => null,
+        ];
+
+        foreach ($compressions as $filename => $expectedCompression) {
+            $this->assertEquals($expectedCompression, $this->Trait->getCompression($filename));
+        }
+    }
+
+    /**
      * Test for `getConnection()` method
      * @test
      */
@@ -150,6 +183,24 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getExtension()` method
+     * @test
+     */
+    public function testGetExtension()
+    {
+        $extensions = [
+            'backup.sql' => 'sql',
+            'backup.sql.bz2' => 'sql.bz2',
+            'backup.sql.gz' => 'sql.gz',
+            'text.txt' => null,
+        ];
+
+        foreach ($extensions as $filename => $expectedExtension) {
+            $this->assertEquals($expectedExtension, $this->Trait->getExtension($filename));
+        }
+    }
+
+    /**
      * Test for `getDriver()` method, with a no existing driver
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage The `stdClass` driver does not exist
@@ -167,8 +218,7 @@ class BackupTraitTest extends TestCase
                 return new \stdClass();
              }));
 
-        $driver = $this->Trait->getDriver($connection);
-        dd($driver);
+        $this->Trait->getDriver($connection);
     }
 
     /**

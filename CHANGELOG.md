@@ -1,4 +1,19 @@
 # 2.x branch
+## 2.1 branch
+### 2.1.0
+* added support for Postgres databases;
+* all `export()` and `import()` methods have been moved to the `Driver` class;
+* added `afterExport()`, `afterImport()`, `beforeExport()` and `beforeImport`
+    methods to the `Driver` class;
+* `getCompression()` and `getExtension()` moved from `Driver` to `BackupTrait`
+    class, because these methods are not strictly related to the database engine
+    you are using;
+* removed `getValidExtensions()` and `getValidCompressions()` methods from
+    `Driver` class, because extensions and compressions are the same for any
+    database engine;
+* removed `getDefaultExtension()` method from `Driver` class, because the
+    default extension is the same for any database engine.
+
 ## 2.0 branch
 ### 2.0.0
 * the plugin has been renamed as `DatabaseBackup` (`cakephp-database-backup`);

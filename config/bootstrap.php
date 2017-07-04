@@ -29,19 +29,13 @@ if (!defined('DATABASE_BACKUP')) {
 }
 
 //Sets the list of valid compressions
-const VALID_COMPRESSIONS = [
-    'Mysql' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
-    'Sqlite' => ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false],
-];
+const VALID_COMPRESSIONS = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'];
 
 //Sets the list of valid extensions
-const VALID_EXTENSIONS = [
-    'Mysql' => ['sql.bz2', 'sql.gz', 'sql'],
-    'Sqlite' => ['sql.bz2', 'sql.gz', 'sql'],
-];
+const VALID_EXTENSIONS = ['sql.bz2', 'sql.gz', 'sql'];
 
 //Binaries
-foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'sqlite3'] as $binary) {
+foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlite3'] as $binary) {
     if (!Configure::check(DATABASE_BACKUP . '.binaries.' . $binary)) {
         Configure::write(DATABASE_BACKUP . '.binaries.' . $binary, which($binary));
     }

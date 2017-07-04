@@ -24,20 +24,20 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Sqlite;
+use DatabaseBackup\Driver\Postgres;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use Reflection\ReflectionTrait;
 
 /**
- * SqliteTest class
+ * PostgresTest class
  */
-class SqliteTest extends DriverTestCase
+class PostgresTest extends DriverTestCase
 {
     use BackupTrait;
     use ReflectionTrait;
 
     /**
-     * @var \DatabaseBackup\Driver\Sqlite
+     * @var \DatabaseBackup\Driver\Postgres
      */
     protected $Driver;
 
@@ -46,8 +46,8 @@ class SqliteTest extends DriverTestCase
      * @var array
      */
     public $fixtures = [
-        'plugin.database_backup.Sqlite/Articles',
-        'plugin.database_backup.Sqlite/Comments',
+        'plugin.database_backup.Postgres/Articles',
+        'plugin.database_backup.Postgres/Comments',
     ];
 
     /**
@@ -58,11 +58,28 @@ class SqliteTest extends DriverTestCase
      */
     public function setUp()
     {
-        Configure::write(DATABASE_BACKUP . '.connection', 'test_sqlite');
+        Configure::write(DATABASE_BACKUP . '.connection', 'test_postgres');
 
         parent::setUp();
 
-        $this->Driver = new Sqlite($this->getConnection());
+        $this->Driver = new Postgres($this->getConnection());
+    }
+
+    /**
+     * Test for `getDbnameAsString()` method
+     * @test
+     */
+    public function testGetDbnameAsString()
+    {
+        $result = $this->invokeMethod($this->Driver, 'getDbnameAsString');
+        $this->assertEquals('postgresql://postgres@localhost/travis_ci_test', $result);
+
+        //Adds a password to the config
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['password' => 'mypassword']));
+
+        $result = $this->invokeMethod($this->Driver, 'getDbnameAsString');
+        $this->assertEquals('postgresql://postgres:mypassword@localhost/travis_ci_test', $result);
     }
 
     /**
@@ -71,7 +88,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' /tmp/example.sq3 .dump';
+        $expected = $this->getBinary('pg_dump') . ' -Fc -b --dbname=postgresql://postgres@localhost/travis_ci_test';
         $result = $this->invokeMethod($this->Driver, '_exportExecutable');
         $this->assertEquals($expected, $result);
     }
@@ -82,7 +99,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testImportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' /tmp/example.sq3';
+        $expected = $this->getBinary('pg_restore') . ' -c -e --dbname=postgresql://postgres@localhost/travis_ci_test';
         $result = $this->invokeMethod($this->Driver, '_importExecutable');
         $this->assertEquals($expected, $result);
     }
@@ -95,17 +112,9 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportOnFailure()
     {
-        $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['_exportExecutableWithCompression'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $this->Driver->method('_exportExecutableWithCompression')
-             ->will($this->returnCallback(function () {
-                $config = $this->getProperty($this->Driver, 'config');
-
-                return sprintf('%s %s .dump noExistingDir/dump.sql 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
-             }));
+        //Sets a no existing database
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
@@ -118,21 +127,14 @@ class SqliteTest extends DriverTestCase
      */
     public function testImportOnFailure()
     {
-        $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['_importExecutableWithCompression', 'beforeImport'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
+        $backup = $this->getAbsolutePath('example.sql');
 
-        $this->Driver->method('beforeImport')
-            ->will($this->returnValue(true));
+        $this->Driver->export($backup);
 
-        $this->Driver->method('_importExecutableWithCompression')
-             ->will($this->returnCallback(function () {
-                $config = $this->getProperty($this->Driver, 'config');
+        //Sets a no existing database
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
-                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
-             }));
-
-        $this->Driver->import('noExistingFile');
+        $this->Driver->import($backup);
     }
 }

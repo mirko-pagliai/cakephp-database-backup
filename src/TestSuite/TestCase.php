@@ -19,49 +19,20 @@
  * @copyright   Copyright (c) 2016, Mirko Pagliai for Nova Atlantis Ltd
  * @license     http://www.gnu.org/licenses/agpl.txt AGPL License
  * @link        http://git.novatlantis.it Nova Atlantis Ltd
+ * @since       2.0.0
  */
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\TestSuite;
 
-use Cake\ORM\TableRegistry;
-use Cake\TestSuite\TestCase;
-use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Mysql;
+use Cake\Core\Configure;
+use Cake\TestSuite\TestCase as CakeTestCase;
+use Reflection\ReflectionTrait;
 
 /**
- * DriverTest class
+ * TestCase class
  */
-class DriverTest extends TestCase
+class TestCase extends CakeTestCase
 {
-    use BackupTrait;
-
-    /**
-     * @var \Cake\ORM\Table
-     */
-    protected $Articles;
-
-    /**
-     * @var \Cake\ORM\Table
-     */
-    protected $Comments;
-
-    /**
-     * @var \DatabaseBackup\Driver\Mysql
-     */
-    protected $Mysql;
-
-    /**
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
-     * Fixtures
-     * @var array
-     */
-    public $fixtures = [
-        'core.articles',
-        'core.comments',
-    ];
+    use ReflectionTrait;
 
     /**
      * Setup the test case, backup the static object values so they can be
@@ -73,31 +44,43 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->Articles = TableRegistry::get('Articles');
-        $this->Comments = TableRegistry::get('Comments');
-
-        $this->Mysql = new Mysql($this->getConnection());
+        $this->deleteAllBackups();
     }
 
     /**
      * Teardown any static object changes and restore them
      * @return void
+     * @uses deleteAllBackups()
      */
     public function tearDown()
     {
         parent::tearDown();
 
-        unset($this->Articles, $this->Comments, $this->Mysql);
+        $this->deleteAllBackups();
+
+        Configure::write(DATABASE_BACKUP . '.connection', 'test');
     }
 
     /**
-     * Test for `getTables()` method
-     * @test
+     * Deletes all backups
+     * @return void
      */
-    public function testGetTables()
+    public function deleteAllBackups()
     {
-        $this->loadFixtures('Articles', 'Comments');
+        foreach (glob(Configure::read(DATABASE_BACKUP . '.target') . DS . '*') as $file) {
+            //@codingStandardsIgnoreLine
+            @unlink($file);
+        }
+    }
 
-        $this->assertEquals(['articles', 'comments'], $this->Mysql->getTables());
+    /**
+     * Loads all fixtures declared in the `$fixtures` property
+     * @return void
+     */
+    public function loadAllFixtures()
+    {
+        $fixtures = $this->getProperty($this->fixtureManager, '_fixtureMap');
+
+        call_user_func_array([$this, 'loadFixtures'], array_keys($fixtures));
     }
 }

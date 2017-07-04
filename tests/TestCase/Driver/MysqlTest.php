@@ -38,7 +38,7 @@ class MysqlTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Mysql
      */
-    protected $Mysql;
+    protected $Driver;
 
     /**
      * Fixtures
@@ -59,227 +59,151 @@ class MysqlTest extends DriverTestCase
     {
         parent::setUp();
 
-        $this->Mysql = new Mysql($this->getConnection());
+        $this->Driver = new Mysql($this->getConnection());
     }
 
     /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->Mysql);
-    }
-
-    /**
-     * Test for `getCompression()` method
+     * Test for `_exportExecutable()` method
      * @test
      */
-    public function testGetCompression()
+    public function testExportExecutable()
     {
-        $compressions = [
-            'backup.sql' => false,
-            'backup.sql.bz2' => 'bzip2',
-            'backup.sql.gz' => 'gzip',
-            'text.txt' => null,
-        ];
+        $this->setProperty($this->Driver, 'auth', 'authFile');
 
-        foreach ($compressions as $filename => $expectedCompression) {
-            $this->assertEquals($expectedCompression, $this->Mysql->getCompression($filename));
-        }
+        $expected = $this->getBinary('mysqldump') . ' --defaults-file=authFile test';
+        $result = $this->invokeMethod($this->Driver, '_exportExecutable');
+        $this->assertEquals($expected, $result);
     }
 
     /**
-     * Test for `getDefaultExtension()` method
+     * Test for `_importExecutable()` method
      * @test
      */
-    public function testGetDefaultExtension()
+    public function testImportExecutable()
     {
-        $this->assertEquals('sql', $this->Mysql->getDefaultExtension());
+        $this->setProperty($this->Driver, 'auth', 'authFile');
+
+        $expected = $this->getBinary('mysql') . ' --defaults-extra-file=authFile test';
+        $result = $this->invokeMethod($this->Driver, '_importExecutable');
+        $this->assertEquals($expected, $result);
     }
 
     /**
-     * Test for `getExportExecutable()` method
+     * Test for `afterExport()` method
      * @test
      */
-    public function testGetExportExecutable()
+    public function testAfterExport()
     {
-        $method = 'getExportExecutable';
-        $mysqldump = $this->getBinary('mysqldump');
+        $this->Driver = $this->getMockBuilder(Mysql::class)
+            ->setMethods(['deleteAuthFile'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
 
-        $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('bzip2') . ' > backup.sql.bz2 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
+        $this->Driver->expects($this->once())
+            ->method('deleteAuthFile');
 
-        $expected = $mysqldump . ' --defaults-file=%s test | ' . $this->getBinary('gzip') . ' > backup.sql.gz 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
-
-        $expected = $mysqldump . ' --defaults-file=%s test > backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
+        $this->Driver->afterExport();
     }
 
     /**
-     * Test for `getExportStoreAuth()` method
+     * Test for `afterImport()` method
      * @test
      */
-    public function testGetExportStoreAuth()
+    public function testAfterImport()
     {
-        $auth = $this->invokeMethod($this->Mysql, 'getExportStoreAuth');
+        $this->Driver = $this->getMockBuilder(Mysql::class)
+            ->setMethods(['deleteAuthFile'])
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
 
-        $this->assertFileExists($auth);
+        $this->Driver->expects($this->once())
+            ->method('deleteAuthFile');
 
-        $result = file_get_contents($auth);
+        $this->Driver->afterImport();
+    }
+
+    /**
+     * Test for `beforeExport()` method
+     * @test
+     */
+    public function testBeforeExport()
+    {
+        $this->assertNull($this->getProperty($this->Driver, 'auth'));
+
+        $this->Driver->beforeExport();
+
         $expected = '[mysqldump]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
-        $this->assertEquals($expected, $result);
+        $auth = $this->getProperty($this->Driver, 'auth');
+        $this->assertFileExists($auth);
+        $this->assertEquals($expected, file_get_contents($auth));
 
         unlink($auth);
     }
 
     /**
-     * Test for `getExtension()` method
+     * Test for `beforeImport()` method
      * @test
      */
-    public function testGetExtension()
+    public function testBeforeImport()
     {
-        $extensions = [
-            'backup.sql' => 'sql',
-            'backup.sql.bz2' => 'sql.bz2',
-            'backup.sql.gz' => 'sql.gz',
-            'text.txt' => null,
-        ];
+        $this->assertNull($this->getProperty($this->Driver, 'auth'));
 
-        foreach ($extensions as $filename => $expectedExtension) {
-            $this->assertEquals($expectedExtension, $this->Mysql->getExtension($filename));
-        }
+        $this->Driver->beforeImport();
+
+        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
+        $auth = $this->getProperty($this->Driver, 'auth');
+        $this->assertFileExists($auth);
+        $this->assertEquals($expected, file_get_contents($auth));
     }
 
     /**
-     * Test for `getImportExecutable()` method
+     * Test for `deleteAuthFile()` method
      * @test
      */
-    public function testGetImportExecutable()
+    public function testDeleteAuthFile()
     {
-        $method = 'getImportExecutable';
-        $mysql = $this->getBinary('mysql');
+        $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
 
-        $expected = $this->getBinary('bzip2') . ' -dc backup.sql.bz2 | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.bz2']));
-
-        $expected = $this->getBinary('gzip') . ' -dc backup.sql.gz | ' . $mysql . ' --defaults-extra-file=%s test 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql.gz']));
-
-        $expected = $mysql . ' --defaults-extra-file=%s test < backup.sql 2>/dev/null';
-        $this->assertEquals($expected, $this->invokeMethod($this->Mysql, $method, ['backup.sql']));
-    }
-
-    /**
-     * Test for `getImportStoreAuth()` method
-     * @test
-     */
-    public function testGetImportStoreAuth()
-    {
-        $auth = $this->invokeMethod($this->Mysql, 'getImportStoreAuth');
+        //Creates auth file
+        $auth = tempnam(sys_get_temp_dir(), 'auth');
+        $this->setProperty($this->Driver, 'auth', $auth);
 
         $this->assertFileExists($auth);
-
-        $result = file_get_contents($auth);
-        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
-        $this->assertEquals($expected, $result);
-
-        unlink($auth);
-    }
-
-    /**
-     * Test for `getValidExtensions()` method
-     * @test
-     */
-    public function testGetValidExtensions()
-    {
-        $this->assertEquals(['sql.bz2', 'sql.gz', 'sql'], $this->Mysql->getValidExtensions());
-    }
-
-    /**
-     * Test for `getValidCompressions()` method
-     * @test
-     */
-    public function testGetValidCompressions()
-    {
-        $this->assertEquals(['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false], $this->Mysql->getValidCompressions());
-    }
-
-    /**
-     * Test for `export()` method
-     * @test
-     */
-    public function testExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-
-        $this->assertTrue($this->Mysql->export($backup));
-        $this->assertFileExists($backup);
+        $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
+        $this->assertFileNotExists($auth);
     }
 
     /**
      * Test for `export()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage mysqldump failed with exit code `2`
+     * @expectedExceptionMessage Failed with exit code `2`
      * @test
      */
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $config = $this->getProperty($this->Mysql, 'config');
-        $this->setProperty($this->Mysql, 'config', array_merge($config, ['database' => 'noExisting']));
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
-        $this->Mysql->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `import()` method
-     * @test
-     */
-    public function testImport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-
-        $this->Mysql->export($backup);
-
-        $this->assertTrue($this->Mysql->import($backup));
+        $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
      * Test for `import()` method on failure
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage mysql failed with exit code `1`
+     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()
     {
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->Mysql->export($backup);
+        $this->Driver->export($backup);
 
         //Sets a no existing database
-        $config = $this->getProperty($this->Mysql, 'config');
-        $this->setProperty($this->Mysql, 'config', array_merge($config, ['database' => 'noExisting']));
+        $config = $this->getProperty($this->Driver, 'config');
+        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
 
-        $this->Mysql->import($backup);
-    }
-
-    /**
-     * Test for `export()` and `import()` methods.
-     *
-     * It tests that the backup is properly exported and then imported.
-     * @see \DatabaseBackup\TestSuite\DriverTestCase::_testExportAndImport()
-     * @test
-     */
-    public function testExportAndImport()
-    {
-        foreach ($this->Mysql->getValidExtensions() as $extension) {
-            $this->loadFixtures('Articles', 'Comments');
-
-            $this->_testExportAndImport($this->Mysql, sprintf('example.%s', $extension));
-        }
+        $this->Driver->import($backup);
     }
 }

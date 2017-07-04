@@ -79,6 +79,24 @@ trait BackupTrait
     }
 
     /**
+     * Returns the compression type from a filename
+     * @param string $filename Filename
+     * @return string|bool Compression type as string or `false`
+     * @uses getExtension()
+     */
+    public function getCompression($filename)
+    {
+        //Gets the extension from the filename
+        $extension = $this->getExtension($filename);
+
+        if (!array_key_exists($extension, VALID_COMPRESSIONS)) {
+            return false;
+        }
+
+        return VALID_COMPRESSIONS[$extension];
+    }
+
+    /**
      * Gets the connection array
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface A connection object
@@ -116,6 +134,22 @@ trait BackupTrait
         }
 
         return new $driver($connection);
+    }
+
+    /**
+     * Returns the extension of a filename
+     * @param string $filename Filename
+     * @return string|null Extension or `null` on failure
+     */
+    public function getExtension($filename)
+    {
+        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', VALID_EXTENSIONS)));
+
+        if (preg_match($regex, $filename, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 
     /**
