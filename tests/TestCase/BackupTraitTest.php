@@ -214,9 +214,7 @@ class BackupTraitTest extends TestCase
             ->getMock();
 
         $connection->method('getDriver')
-             ->will($this->returnCallback(function () {
-                return new \stdClass();
-             }));
+             ->will($this->returnValue(new \stdClass()));
 
         $this->Trait->getDriver($connection);
     }
