@@ -1,5 +1,6 @@
 # DatabaseBackup
 
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-database-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-database-backup)
 [![Coverage Status](https://img.shields.io/codecov/c/github/mirko-pagliai/cakephp-database-backup.svg?style=flat-square)](https://codecov.io/github/mirko-pagliai/cakephp-database-backup)
 

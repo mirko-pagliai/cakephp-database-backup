@@ -3,7 +3,7 @@
     "description": "Database Backup plugin for CakePHP",
     "homepage": "https://github.com/mirko-pagliai/cakephp-database-backup",
     "type": "cakephp-plugin",
-    "license": "AGPL",
+    "license": "MIT",
     "authors": [{
         "name": "Mirko Pagliai",
         "email": "mirko.pagliai@gmail.com"
