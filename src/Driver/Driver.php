@@ -13,6 +13,7 @@
  */
 namespace DatabaseBackup\Driver;
 
+use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use Cake\Network\Exception\InternalErrorException;
@@ -137,7 +138,13 @@ abstract class Driver implements EventListenerInterface
             $executable .= ' | ' . $this->getBinary($compression);
         }
 
-        return $executable . ' > ' . $filename . ' 2>/dev/null';
+        $executable .= ' > ' . $filename;
+
+        if (Configure::read(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
+            $executable .= ' 2>/dev/null';
+        }
+
+        return $executable;
     }
 
     /**
@@ -157,7 +164,11 @@ abstract class Driver implements EventListenerInterface
             $executable .= ' < ' . $filename;
         }
 
-        return $executable . ' 2>/dev/null';
+        if (Configure::read(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
+            $executable .= ' 2>/dev/null';
+        }
+
+        return $executable;
     }
 
     /**
