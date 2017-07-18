@@ -1,5 +1,9 @@
 # 2.x branch
 ## 2.1 branch
+### 2.1.1
+* `afterExport()`, `afterImport()`, `beforeExport()` and `beforeImport` methods
+    are now real events.
+
 ### 2.1.0
 * added support for Postgres databases;
 * all `export()` and `import()` methods have been moved to the `Driver` class;

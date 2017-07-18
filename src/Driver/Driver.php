@@ -62,11 +62,11 @@ abstract class Driver implements EventListenerInterface
      *  is fired
      * @since 2.1.1
      */
-    public function implementedEvents()
+    final public function implementedEvents()
     {
         return [
             'Backup.afterExport' => 'afterExport',
-            'Backup.afterImport' => 'afterExport',
+            'Backup.afterImport' => 'afterImport',
             'Backup.beforeExport' => 'beforeExport',
             'Backup.beforeImport' => 'beforeImport',
         ];

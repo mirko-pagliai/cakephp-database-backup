@@ -13,6 +13,7 @@
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Event\EventList;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\TestSuite\TestCase;
 
@@ -63,6 +64,9 @@ abstract class DriverTestCase extends TestCase
 
         $this->Articles = TableRegistry::get('Articles', compact('connection'));
         $this->Comments = TableRegistry::get('Comments', compact('connection'));
+
+        //Enable event tracking
+        $this->Driver->eventManager()->setEventList(new EventList);
     }
 
     /**
@@ -82,10 +86,11 @@ abstract class DriverTestCase extends TestCase
      */
     final protected function allRecords()
     {
-        return [
-            'Articles' => $this->Articles->find()->enableHydration(false)->toArray(),
-            'Comments' => $this->Comments->find()->enableHydration(false)->toArray(),
-        ];
+        foreach (['Articles', 'Comments'] as $name) {
+            $records[$name] = $this->$name->find()->enableHydration(false)->toArray();
+        }
+
+        return $records;
     }
 
     /**
@@ -178,6 +183,8 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
+        $this->assertEventFired('Backup.beforeExport', $this->Driver->eventManager());
+        $this->assertEventFired('Backup.afterExport', $this->Driver->eventManager());
     }
 
     /**
@@ -213,6 +220,8 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertTrue($this->Driver->export($backup));
         $this->assertTrue($this->Driver->import($backup));
+        $this->assertEventFired('Backup.beforeImport', $this->Driver->eventManager());
+        $this->assertEventFired('Backup.afterImport', $this->Driver->eventManager());
     }
 
     /**

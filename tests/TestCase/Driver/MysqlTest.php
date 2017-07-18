@@ -47,9 +47,9 @@ class MysqlTest extends DriverTestCase
      */
     public function setUp()
     {
-        parent::setUp();
-
         $this->Driver = new Mysql($this->getConnection());
+
+        parent::setUp();
     }
 
     /**
