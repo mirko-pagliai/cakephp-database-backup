@@ -2,7 +2,9 @@
 ## 2.1 branch
 ### 2.1.1
 * `afterExport()`, `afterImport()`, `beforeExport()` and `beforeImport` methods
-    are now real events.
+    are now real events;
+* now you can choose if you want to redirects stderr to `/dev/null`. This
+    suppresses the output of executed commands.
 
 ### 2.1.0
 * added support for Postgres databases;

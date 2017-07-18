@@ -41,6 +41,11 @@ if (!Configure::check(DATABASE_BACKUP . '.connection')) {
     Configure::write(DATABASE_BACKUP . '.connection', 'default');
 }
 
+//Redirects stderr to `/dev/null`. This suppresses the output of executed commands
+if (!Configure::check(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
+    Configure::write(DATABASE_BACKUP . '.redirectStderrToDevNull', true);
+}
+
 //Default target directory
 if (!Configure::check(DATABASE_BACKUP . '.target')) {
     Configure::write(DATABASE_BACKUP . '.target', ROOT . DS . 'backups');
