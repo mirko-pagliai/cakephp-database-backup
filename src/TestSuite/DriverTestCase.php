@@ -89,6 +89,17 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
+     * Test for `__construct()` method
+     * @return void
+     * @test
+     */
+    public function testConstruct()
+    {
+        $this->assertInstanceof('Cake\Database\Connection', $this->getProperty($this->Driver, 'connection'));
+        $this->assertTrue(is_array($this->getProperty($this->Driver, 'config')));
+    }
+
+    /**
      * Test for `_exportExecutable()` method
      * @return void
      */
@@ -115,6 +126,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `_exportExecutableWithCompression()` method
      * @return void
+     * @test
      */
     public function testExportExecutableWithCompression()
     {
@@ -136,6 +148,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `_importExecutableWithCompression()` method
      * @return void
+     * @test
      */
     public function testImportExecutableWithCompression()
     {
