@@ -50,9 +50,9 @@ class PostgresTest extends DriverTestCase
     {
         Configure::write(DATABASE_BACKUP . '.connection', 'test_postgres');
 
-        parent::setUp();
-
         $this->Driver = new Postgres($this->getConnection());
+
+        parent::setUp();
     }
 
     /**

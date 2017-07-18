@@ -13,14 +13,18 @@
  */
 namespace DatabaseBackup\Driver;
 
+use Cake\Event\EventDispatcherTrait;
+use Cake\Event\EventListenerInterface;
 use Cake\Network\Exception\InternalErrorException;
 
 /**
  * Represents a driver containing all methods to export/import database backups
  *  according to the database engine
  */
-abstract class Driver
+abstract class Driver implements EventListenerInterface
 {
+    use EventDispatcherTrait;
+
     /**
      * A connection object
      * @var \Cake\Datasource\ConnectionInterface
@@ -44,6 +48,28 @@ abstract class Driver
     {
         $this->connection = $connection;
         $this->config = $connection->config();
+
+        //Attachs the object to the event manager
+        $this->eventManager()->on($this);
+    }
+
+    /**
+     * List of events this object is implementing. When the class is registered
+     *  in an event manager, each individual method will be associated with the
+     *  respective event
+     * @return array Associative array or event key names pointing to the
+     *  function that should be called in the object when the respective event
+     *  is fired
+     * @since 2.1.1
+     */
+    final public function implementedEvents()
+    {
+        return [
+            'Backup.afterExport' => 'afterExport',
+            'Backup.afterImport' => 'afterImport',
+            'Backup.beforeExport' => 'beforeExport',
+            'Backup.beforeImport' => 'beforeImport',
+        ];
     }
 
     /**
@@ -135,23 +161,28 @@ abstract class Driver
     }
 
     /**
-     * Exports the database
+     * Exports the database.
+     *
+     * When exporting, this method will trigger these events:
+     *
+     * - Backup.beforeExport: will be triggered before export
+     * - Backup.afterExport: will be triggered after export
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
      * @throws InternalErrorException
      * @uses _exportExecutableWithCompression()
-     * @uses afterExport()
-     * @uses beforeExport()
      */
     final public function export($filename)
     {
-        if (!$this->beforeExport()) {
+        $beforeExport = $this->dispatchEvent('Backup.beforeExport');
+
+        if ($beforeExport->isStopped()) {
             return false;
         }
 
         exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
 
-        $this->afterExport();
+        $this->dispatchEvent('Backup.afterExport');
 
         if ($returnVar !== 0) {
             throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
@@ -161,23 +192,28 @@ abstract class Driver
     }
 
     /**
-     * Imports the database
+     * Imports the database.
+     *
+     * When importing, this method will trigger these events:
+     *
+     * - Backup.beforeImport: will be triggered before import
+     * - Backup.afterImport: will be triggered after import
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
      * @throws InternalErrorException
      * @uses _importExecutableWithCompression()
-     * @uses afterImport()
-     * @uses beforeImport()
      */
     final public function import($filename)
     {
-        if (!$this->beforeImport()) {
+        $beforeImport = $this->dispatchEvent('Backup.beforeImport');
+
+        if ($beforeImport->isStopped()) {
             return false;
         }
 
         exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
 
-        $this->afterImport();
+        $this->dispatchEvent('Backup.afterImport');
 
         if ($returnVar !== 0) {
             throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));

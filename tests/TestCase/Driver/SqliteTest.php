@@ -50,9 +50,9 @@ class SqliteTest extends DriverTestCase
     {
         Configure::write(DATABASE_BACKUP . '.connection', 'test_sqlite');
 
-        parent::setUp();
-
         $this->Driver = new Sqlite($this->getConnection());
+
+        parent::setUp();
     }
 
     /**
@@ -98,6 +98,17 @@ class SqliteTest extends DriverTestCase
              }));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
+    }
+
+    /**
+     * Test for `import()` method
+     * @test
+     */
+    public function testImport()
+    {
+        $this->loadAllFixtures();
+
+        parent::testImport();
     }
 
     /**
