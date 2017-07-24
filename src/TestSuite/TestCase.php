@@ -20,7 +20,7 @@ use Reflection\ReflectionTrait;
 /**
  * TestCase class
  */
-class TestCase extends CakeTestCase
+abstract class TestCase extends CakeTestCase
 {
     use ReflectionTrait;
 
