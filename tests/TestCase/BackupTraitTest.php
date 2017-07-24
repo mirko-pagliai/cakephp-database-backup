@@ -17,6 +17,9 @@ use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupManager;
 
+/**
+ * BackupTraitTest class
+ */
 class BackupTraitTest extends TestCase
 {
     /**
