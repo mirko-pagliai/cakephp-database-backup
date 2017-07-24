@@ -14,7 +14,6 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\ORM\TableRegistry;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupManager;
 
