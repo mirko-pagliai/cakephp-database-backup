@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.1 branch
+### 2.1.3
+* `BackupManager::_send()` has become `getEmailInstance()`.
+
 ### 2.1.2
 * fixed `composer.json`: the plugin requires at least version 3.4 of CakePHP.
 

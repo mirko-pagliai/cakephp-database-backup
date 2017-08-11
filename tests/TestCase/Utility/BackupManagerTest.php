@@ -243,7 +243,7 @@ class BackupManagerTest extends TestCase
         $file = $this->_createBackup();
 
         $instance = new BackupManager;
-        $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
+        $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $to]);
         $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
 
         $this->assertEmailFrom(Configure::read(DATABASE_BACKUP . '.mailSender'));
