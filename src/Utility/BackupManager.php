@@ -120,14 +120,15 @@ class BackupManager
     }
 
     /**
-     * Internal method to send a backup file via email
-     * @param string $filename Filename
+     * Internal method to get an email instance with all options to send a
+     *  backup file via email
+     * @param string $backup Backup you want to send
      * @param string $recipient Recipient's email address
      * @return \Cake\Mailer\Email
      * @since 1.1.0
      * @throws InternalErrorException
      */
-    protected function _send($filename, $recipient)
+    protected function getEmailInstance($backup, $recipient)
     {
         $sender = Configure::read(DATABASE_BACKUP . '.mailSender');
 
@@ -135,13 +136,13 @@ class BackupManager
             throw new InternalErrorException(__d('database_backup', 'You must first set the mail sender'));
         }
 
-        $filename = $this->getAbsolutePath($filename);
+        $backup = $this->getAbsolutePath($backup);
 
         return (new Email)
             ->setFrom($sender)
             ->setTo($recipient)
-            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($filename), env('SERVER_NAME', 'localhost')))
-            ->setAttachments($filename);
+            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($backup), env('SERVER_NAME', 'localhost')))
+            ->setAttachments($backup);
     }
 
     /**
@@ -151,10 +152,10 @@ class BackupManager
      * @param string $recipient Recipient's email address
      * @return array
      * @since 1.1.0
-     * @uses _send()
+     * @uses getEmailInstance()
      */
     public function send($filename, $recipient)
     {
-        return $this->_send($filename, $recipient)->send();
+        return $this->getEmailInstance($filename, $recipient)->send();
     }
 }

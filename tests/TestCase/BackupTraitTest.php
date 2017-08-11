@@ -14,18 +14,15 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
-use DatabaseBackup\Utility\BackupManager;
 
 /**
  * BackupTraitTest class
  */
 class BackupTraitTest extends TestCase
 {
-    /**
-     * @var \DatabaseBackup\Utility\BackupManager
-     */
-    protected $Trait;
+    use BackupTrait;
 
     /**
      * @var bool
@@ -42,42 +39,18 @@ class BackupTraitTest extends TestCase
     ];
 
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
-     * @return void
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->Trait = new BackupManager;
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->Trait);
-    }
-
-    /**
      * Test for `getAbsolutePath()` method
      * @test
      */
     public function testGetAbsolutePath()
     {
-        $result = $this->Trait->getAbsolutePath('/file.txt');
+        $result = $this->getAbsolutePath('/file.txt');
         $this->assertEquals('/file.txt', $result);
 
-        $result = $this->Trait->getAbsolutePath('file.txt');
+        $result = $this->getAbsolutePath('file.txt');
         $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
 
-        $result = $this->Trait->getAbsolutePath(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt');
+        $result = $this->getAbsolutePath(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt');
         $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
     }
 
@@ -87,7 +60,7 @@ class BackupTraitTest extends TestCase
      */
     public function testGetBinary()
     {
-        $this->assertEquals(which('mysql'), $this->Trait->getBinary('mysql'));
+        $this->assertEquals(which('mysql'), $this->getBinary('mysql'));
     }
 
     /**
@@ -100,7 +73,7 @@ class BackupTraitTest extends TestCase
     {
         Configure::write(DATABASE_BACKUP . '.binaries.bzip2', false);
 
-        $this->Trait->getBinary('bzip2');
+        $this->getBinary('bzip2');
     }
 
     /**
@@ -109,8 +82,8 @@ class BackupTraitTest extends TestCase
      */
     public function testGetClassShortName()
     {
-        $this->assertEquals('TestCase', $this->Trait->getClassShortName('\Cake\TestSuite\TestCase'));
-        $this->assertEquals('TestCase', $this->Trait->getClassShortName('Cake\TestSuite\TestCase'));
+        $this->assertEquals('TestCase', $this->getClassShortName('\Cake\TestSuite\TestCase'));
+        $this->assertEquals('TestCase', $this->getClassShortName('Cake\TestSuite\TestCase'));
     }
 
     /**
@@ -127,7 +100,7 @@ class BackupTraitTest extends TestCase
         ];
 
         foreach ($compressions as $filename => $expectedCompression) {
-            $this->assertEquals($expectedCompression, $this->Trait->getCompression($filename));
+            $this->assertEquals($expectedCompression, $this->getCompression($filename));
         }
     }
 
@@ -144,7 +117,7 @@ class BackupTraitTest extends TestCase
             Configure::read(DATABASE_BACKUP . '.connection'),
             'fake',
         ] as $name) {
-            $connection = $this->Trait->getConnection($name);
+            $connection = $this->getConnection($name);
             $this->assertInstanceof('Cake\Database\Connection', $connection);
             $this->assertInstanceof('Cake\Database\Driver\Mysql', $connection->getDriver());
         }
@@ -158,7 +131,7 @@ class BackupTraitTest extends TestCase
      */
     public function testGetConnectionInvalidConnection()
     {
-        $this->Trait->getConnection('noExisting');
+        $this->getConnection('noExisting');
     }
 
     /**
@@ -167,10 +140,10 @@ class BackupTraitTest extends TestCase
      */
     public function testGetDriver()
     {
-        $driver = $this->Trait->getDriver(ConnectionManager::get('test'));
+        $driver = $this->getDriver(ConnectionManager::get('test'));
         $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
 
-        $driver = $this->Trait->getDriver();
+        $driver = $this->getDriver();
         $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
     }
 
@@ -188,7 +161,7 @@ class BackupTraitTest extends TestCase
         ];
 
         foreach ($extensions as $filename => $expectedExtension) {
-            $this->assertEquals($expectedExtension, $this->Trait->getExtension($filename));
+            $this->assertEquals($expectedExtension, $this->getExtension($filename));
         }
     }
 
@@ -200,15 +173,15 @@ class BackupTraitTest extends TestCase
      */
     public function testGetDriverNoExistingDriver()
     {
-        $connection = $this->getMockBuilder(get_class($this->Trait->getConnection()))
+        $connection = $this->getMockBuilder(get_class($this->getConnection()))
             ->setMethods(['getDriver'])
-            ->setConstructorArgs([$this->Trait->getConnection()->config()])
+            ->setConstructorArgs([$this->getConnection()->config()])
             ->getMock();
 
         $connection->method('getDriver')
              ->will($this->returnValue(new \stdClass()));
 
-        $this->Trait->getDriver($connection);
+        $this->getDriver($connection);
     }
 
     /**
@@ -217,6 +190,6 @@ class BackupTraitTest extends TestCase
      */
     public function testGetTarget()
     {
-        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->Trait->getTarget());
+        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->getTarget());
     }
 }

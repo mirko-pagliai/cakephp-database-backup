@@ -67,8 +67,8 @@ class BackupShellTest extends TestCase
         $this->BackupExport = new BackupExport;
         $this->BackupManager = new BackupManager;
 
-        $this->out = new ConsoleOutput();
-        $this->err = new ConsoleOutput();
+        $this->out = new ConsoleOutput;
+        $this->err = new ConsoleOutput;
         $io = new ConsoleIo($this->out, $this->err);
         $io->level(2);
 
@@ -76,50 +76,6 @@ class BackupShellTest extends TestCase
             ->setMethods(['in', '_stop'])
             ->setConstructorArgs([$io])
             ->getMock();
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->BackupExport, $this->BackupManager, $this->BackupShell, $this->err, $this->out);
-    }
-
-    /**
-     * Internal method to create a backup file
-     * @return string
-     */
-    protected function _createBackup()
-    {
-        return $this->BackupExport->filename('backup.sql')->export();
-    }
-
-    /**
-     * Internal method to creates some backup files
-     * @param bool $sleep If `true`, waits a second for each backup
-     * @return array
-     */
-    protected function _createSomeBackups($sleep = false)
-    {
-        $files[] = $this->BackupExport->filename('backup.sql')->export();
-
-        if ($sleep) {
-            sleep(1);
-        }
-
-        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
-
-        if ($sleep) {
-            sleep(1);
-        }
-
-        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
-
-        return $files;
     }
 
     /**
@@ -147,7 +103,7 @@ class BackupShellTest extends TestCase
         $this->BackupShell->deleteAll();
 
         //Creates some backups
-        $this->_createSomeBackups(true);
+        $this->createSomeBackups(true);
 
         $this->BackupShell->deleteAll();
 
@@ -249,7 +205,7 @@ class BackupShellTest extends TestCase
         $this->BackupShell->index();
 
         //Creates some backups
-        $this->_createSomeBackups(true);
+        $this->createSomeBackups(true);
         $backups = $this->BackupManager->index();
 
         $this->BackupShell->index();
@@ -353,7 +309,7 @@ class BackupShellTest extends TestCase
         $this->BackupShell->rotate(1);
 
         //Creates some backups
-        $this->_createSomeBackups(true);
+        $this->createSomeBackups(true);
 
         $this->BackupShell->rotate(1);
 
@@ -383,7 +339,7 @@ class BackupShellTest extends TestCase
     public function testSend()
     {
         //Gets a backup file
-        $file = $this->_createBackup();
+        $file = $this->createBackup();
 
         $this->BackupShell->send($file, 'recipient@example.com');
 

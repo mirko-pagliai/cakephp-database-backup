@@ -38,39 +38,6 @@ class BackupManagerTest extends TestCase
     protected $BackupManager;
 
     /**
-     * Internal method to create a backup file
-     * @return string
-     */
-    protected function _createBackup()
-    {
-        return $this->BackupExport->filename('backup.sql')->export();
-    }
-
-    /**
-     * Internal method to create some backup files
-     * @param bool $sleep If `true`, waits a second for each backup
-     * @return array
-     */
-    protected function _createSomeBackups($sleep = false)
-    {
-        $files[] = $this->BackupExport->filename('backup.sql')->export();
-
-        if ($sleep) {
-            sleep(1);
-        }
-
-        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
-
-        if ($sleep) {
-            sleep(1);
-        }
-
-        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
-
-        return $files;
-    }
-
-    /**
      * Setup the test case, backup the static object values so they can be
      * restored. Specifically backs up the contents of Configure and paths in
      *  App if they have not already been backed up
@@ -82,17 +49,6 @@ class BackupManagerTest extends TestCase
 
         $this->BackupExport = new BackupExport;
         $this->BackupManager = new BackupManager;
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->BackupExport);
     }
 
     /**
@@ -122,7 +78,7 @@ class BackupManagerTest extends TestCase
     public function testDeleteAll()
     {
         //Creates some backups
-        $this->_createSomeBackups(true);
+        $this->createSomeBackups(true);
 
         $this->assertNotEmpty($this->BackupManager->index());
         $this->assertEquals([
@@ -158,7 +114,7 @@ class BackupManagerTest extends TestCase
         $this->assertEmpty($this->BackupManager->index());
 
         //Creates some backups
-        $this->_createSomeBackups(true);
+        $this->createSomeBackups(true);
         $files = $this->BackupManager->index();
         $this->assertEquals(3, count($files));
 
@@ -195,7 +151,7 @@ class BackupManagerTest extends TestCase
         $this->assertEquals([], $this->BackupManager->rotate(1));
 
         //Creates some backups
-        $this->_createSomeBackups(true);
+        $this->createSomeBackups(true);
         $initialFiles = $this->BackupManager->index();
 
         //Keeps 2 backups. Only 1 backup was deleted
@@ -240,10 +196,10 @@ class BackupManagerTest extends TestCase
         $to = 'recipient@example.com';
 
         //Get a backup file
-        $file = $this->_createBackup();
+        $file = $this->createBackup();
 
         $instance = new BackupManager;
-        $this->_email = $this->invokeMethod($instance, '_send', [$file, $to]);
+        $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $to]);
         $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
 
         $this->assertEmailFrom(Configure::read(DATABASE_BACKUP . '.mailSender'));
