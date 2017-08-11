@@ -52,6 +52,39 @@ abstract class TestCase extends CakeTestCase
     }
 
     /**
+     * Internal method to create a backup file
+     * @return string
+     */
+    protected function createBackup()
+    {
+        return $this->BackupExport->filename('backup.sql')->export();
+    }
+
+    /**
+     * Internal method to creates some backup files
+     * @param bool $sleep If `true`, waits a second for each backup
+     * @return array
+     */
+    protected function createSomeBackups($sleep = false)
+    {
+        $files[] = $this->BackupExport->filename('backup.sql')->export();
+
+        if ($sleep) {
+            sleep(1);
+        }
+
+        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
+
+        if ($sleep) {
+            sleep(1);
+        }
+
+        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
+
+        return $files;
+    }
+
+    /**
      * Deletes all backups
      * @return void
      */

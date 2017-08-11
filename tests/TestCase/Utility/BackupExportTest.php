@@ -66,8 +66,6 @@ class BackupExportTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->BackupExport);
-
         //Deletes debug log
         //@codingStandardsIgnoreLine
         @unlink(LOGS . 'debug.log');

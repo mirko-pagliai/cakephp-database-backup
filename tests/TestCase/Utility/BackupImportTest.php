@@ -50,17 +50,6 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->BackupExport, $this->BackupImport);
-    }
-
-    /**
      * Test for `construct()` method
      * @test
      */
