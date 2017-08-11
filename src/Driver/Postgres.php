@@ -65,42 +65,4 @@ class Postgres extends Driver
     {
         return sprintf('%s -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
     }
-
-//
-//    /**
-//     * Exports the database
-//     * @param string $filename Filename where you want to export the database
-//     * @return bool true on success
-//     * @uses getExportExecutable()
-//     * @throws InternalErrorException
-//     */
-//    public function export($filename)
-//    {
-//        //Executes
-//        exec($this->getExportExecutable($filename), $output, $returnVar);
-//
-//        if ($returnVar !== 0) {
-//            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_dump', $returnVar));
-//        }
-//
-//        return file_exists($filename);
-//    }
-//    /**
-//     * Imports the database
-//     * @param string $filename Filename from which you want to import the database
-//     * @return bool true on success
-//     * @uses getImportExecutable()
-//     * @throws InternalErrorException
-//     */
-//    public function import($filename)
-//    {
-//        //Executes
-//        exec($this->getImportExecutable($filename), $output, $returnVar);
-//
-//        if ($returnVar !== 0) {
-//            throw new InternalErrorException(__d('database_backup', '{0} failed with exit code `{1}`', 'pg_restore', $returnVar));
-//        }
-//
-//        return true;
-//    }
 }
