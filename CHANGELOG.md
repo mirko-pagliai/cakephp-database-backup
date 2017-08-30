@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.2 branch
 ### 2.2.0
+* added `ConsoleIntegrationTestCase` and `TestCaseTrait` classes. Console tests
+    have been simplified;
 * updated for CakePHP 3.5.
 
 ## 2.1 branch
