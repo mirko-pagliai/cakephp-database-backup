@@ -233,7 +233,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
      */
     public function testRotateInvalidValue()
     {
-        $this->exec('database_backup.backup rotate -1');
+        $this->exec('database_backup.backup rotate string');
         $this->assertExitWithError();
     }
 
