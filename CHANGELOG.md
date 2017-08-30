@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.2 branch
+### 2.2.0
+* updated for CakePHP 3.5.
+
 ## 2.1 branch
 ### 2.1.3
 * added `createBackup()` and `createSomeBackups()` to the `TestCase` class;

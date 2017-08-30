@@ -66,7 +66,7 @@ abstract class DriverTestCase extends TestCase
         $this->Comments = TableRegistry::get('Comments', compact('connection'));
 
         //Enable event tracking
-        $this->Driver->eventManager()->setEventList(new EventList);
+        $this->Driver->getEventManager()->setEventList(new EventList);
     }
 
     /**
@@ -183,8 +183,8 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
-        $this->assertEventFired('Backup.beforeExport', $this->Driver->eventManager());
-        $this->assertEventFired('Backup.afterExport', $this->Driver->eventManager());
+        $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $this->Driver->getEventManager());
     }
 
     /**
@@ -220,8 +220,8 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertTrue($this->Driver->export($backup));
         $this->assertTrue($this->Driver->import($backup));
-        $this->assertEventFired('Backup.beforeImport', $this->Driver->eventManager());
-        $this->assertEventFired('Backup.afterImport', $this->Driver->eventManager());
+        $this->assertEventFired('Backup.beforeImport', $this->Driver->getEventManager());
+        $this->assertEventFired('Backup.afterImport', $this->Driver->getEventManager());
     }
 
     /**

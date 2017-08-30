@@ -88,9 +88,9 @@ class BackupShellTest extends TestCase
 
         $messages = $this->out->messages();
 
-        $this->assertRegExp('/^Connection: test/', $messages[6]);
-        $this->assertEquals('Driver: Mysql', $messages[7]);
-        $this->assertRegExp('/^\-+$/', $messages[8]);
+        $this->assertRegExp('/^Connection: test/', $messages[0]);
+        $this->assertEquals('Driver: Mysql', $messages[1]);
+        $this->assertRegExp('/^\-+$/', $messages[2]);
     }
 
     /**
@@ -371,7 +371,7 @@ class BackupShellTest extends TestCase
 
         $this->assertInstanceOf('Cake\Console\ConsoleOptionParser', $parser);
         $this->assertEquals([
-            'deleteAll',
+            'delete_all',
             'export',
             'import',
             'index',
