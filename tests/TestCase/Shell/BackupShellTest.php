@@ -167,7 +167,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
             $this->assertRegExp('/^backup\.sql(\.(bz2|gz))?$/', $backup[0]);
             $this->assertRegExp('/^sql(\.(bz2|gz))?$/', $backup[1]);
             $this->assertTrue(in_array($backup[2], ['bzip2', 'gzip', ''], true));
-            $this->assertRegExp('/^\d+\.\d+ KB$/', $backup[3]);
+            $this->assertRegExp('/^\d+(\.\d+)? (Bytes|KB)$/', $backup[3]);
             $this->assertRegExp('/^[\d\/]+, [\d:]+ (A|P)M$/', $backup[4]);
         }
     }
