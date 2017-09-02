@@ -1,5 +1,9 @@
 # 2.x branch
 ## 2.1 branch
+### 2.1.4
+* when a backup is sent by mail, the mimetype is forced;
+* fixed some tests.
+
 ### 2.1.3
 * added `createBackup()` and `createSomeBackups()` to the `TestCase` class;
 * `BackupManager::_send()` has become `getEmailInstance()`.

@@ -90,8 +90,8 @@ Cache::setConfig([
     ],
 ]);
 
-ConnectionManager::setConfig('test', ['url' => 'mysql://travis@localhost/test']);
-ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:\\' . TMP . 'example.sq3']);
+ConnectionManager::setConfig('test', ['url' => 'mysql://root@localhost/test']);
+ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:///' . TMP . 'example.sq3']);
 ConnectionManager::setConfig('test_postgres', ['url' => 'postgres://postgres@localhost/travis_ci_test']);
 
 Configure::write('DatabaseBackup.connection', 'test');
