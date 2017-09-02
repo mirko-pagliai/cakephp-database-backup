@@ -126,12 +126,6 @@ class BackupShell extends Shell
             if ($this->param('filename')) {
                 $instance->filename($this->param('filename'));
             } elseif ($this->param('compression')) {
-                //The `compression` option takes the value `none`, while the
-                //  `BackupExport::compression` method takes the argument `false`
-                if ($this->param('compression') === 'none') {
-                    $this->params['compression'] = false;
-                }
-
                 $instance->compression($this->param('compression'));
             }
 
