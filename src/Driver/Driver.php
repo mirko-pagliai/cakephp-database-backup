@@ -51,7 +51,7 @@ abstract class Driver implements EventListenerInterface
         $this->config = $connection->config();
 
         //Attachs the object to the event manager
-        $this->eventManager()->on($this);
+        $this->getEventManager()->on($this);
     }
 
     /**
