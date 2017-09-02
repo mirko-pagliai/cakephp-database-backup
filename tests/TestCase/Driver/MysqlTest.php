@@ -12,6 +12,7 @@
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
@@ -122,7 +123,10 @@ class MysqlTest extends DriverTestCase
 
         $this->Driver->beforeExport();
 
-        $expected = '[mysqldump]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
+        $expected = '[mysqldump]' . PHP_EOL .
+            'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
+            'password=""' . PHP_EOL .
+            'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
         $this->assertEquals($expected, file_get_contents($auth));
@@ -140,7 +144,10 @@ class MysqlTest extends DriverTestCase
 
         $this->Driver->beforeImport();
 
-        $expected = '[client]' . PHP_EOL . 'user=travis' . PHP_EOL . 'password=""' . PHP_EOL . 'host=localhost';
+        $expected = '[client]' . PHP_EOL .
+            'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
+            'password=""' . PHP_EOL .
+            'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
         $this->assertEquals($expected, file_get_contents($auth));

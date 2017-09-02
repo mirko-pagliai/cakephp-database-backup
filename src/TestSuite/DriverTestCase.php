@@ -62,6 +62,7 @@ abstract class DriverTestCase extends TestCase
 
         $connection = $this->getConnection();
 
+        TableRegistry::clear();
         $this->Articles = TableRegistry::get('Articles', compact('connection'));
         $this->Comments = TableRegistry::get('Comments', compact('connection'));
 

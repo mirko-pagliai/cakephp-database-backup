@@ -49,7 +49,6 @@ class BackupShellTest extends ConsoleIntegrationTestCase
 
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
-        $this->assertRegExp('/^\-+$/', $this->_out->messages()[2]);
     }
 
     /**

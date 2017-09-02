@@ -142,7 +142,10 @@ class BackupManager
             ->setFrom($sender)
             ->setTo($recipient)
             ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($backup), env('SERVER_NAME', 'localhost')))
-            ->setAttachments($backup);
+            ->setAttachments([basename($backup) => [
+                'file' => $backup,
+                'mimetype' => mime_content_type($backup),
+            ]]);
     }
 
     /**
