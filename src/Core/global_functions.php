@@ -44,9 +44,8 @@ if (!function_exists('which')) {
      */
     function which($command)
     {
-        exec(sprintf('which %s 2>&1', $command), $path, $exitcode);
+        exec(sprintf('which %s 2>&1', $command), $path, $exitCode);
 
-        return ($exitcode == 0 ? $path[0] : null);
+        return $exitCode == 0 && !empty($path[0]) ? $path[0] : null;
     }
 }
-
