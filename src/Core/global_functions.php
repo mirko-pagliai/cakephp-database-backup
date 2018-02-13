@@ -40,10 +40,13 @@ if (!function_exists('which')) {
     /**
      * Executes the `which` command and shows the full path of (shell) commands
      * @param string $command Command
-     * @return string
+     * @return string|null
      */
     function which($command)
     {
-        return exec(sprintf('which %s', $command));
+        exec(sprintf('which %s 2>&1', $command), $path, $exitcode);
+
+        return ($exitcode == 0 ? $path[0] : null);
     }
 }
+
