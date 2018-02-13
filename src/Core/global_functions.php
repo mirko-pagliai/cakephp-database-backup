@@ -46,6 +46,6 @@ if (!function_exists('which')) {
     {
         exec(sprintf('which %s 2>&1', $command), $path, $exitCode);
 
-        return $exitCode == 0 && !empty($path[0]) ? $path[0] : null;
+        return $exitCode === 0 && !empty($path[0]) ? $path[0] : null;
     }
 }
