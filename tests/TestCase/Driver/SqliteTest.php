@@ -96,7 +96,8 @@ class SqliteTest extends DriverTestCase
 
                 return sprintf(
                     '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
-                    $this->getBinary('sqlite3'), $config['database']
+                    $this->getBinary('sqlite3'),
+                    $config['database']
                 );
              }));
 
@@ -136,7 +137,8 @@ class SqliteTest extends DriverTestCase
 
                 return sprintf(
                     '%s %s .dump noExisting'. REDIRECT_TO_DEV_NULL,
-                    $this->getBinary('sqlite3'), $config['database']
+                    $this->getBinary('sqlite3'),
+                    $config['database']
                 );
              }));
 
