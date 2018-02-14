@@ -141,7 +141,11 @@ abstract class Driver implements EventListenerInterface
         $executable .= ' > ' . $filename;
 
         if (Configure::read(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
-            $executable .= ' 2>/dev/null';
+            if (stristr(PHP_OS, 'WIN')) {
+                $executable .= ' 2>nul';
+            } else {
+                $executable .= ' 2>/dev/null';
+            }
         }
 
         return $executable;
@@ -165,7 +169,11 @@ abstract class Driver implements EventListenerInterface
         }
 
         if (Configure::read(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
-            $executable .= ' 2>/dev/null';
+            if (stristr(PHP_OS, 'WIN')) {
+                $executable .= ' 2>nul';
+            } else {
+                $executable .= ' 2>/dev/null';
+            }
         }
 
         return $executable;
