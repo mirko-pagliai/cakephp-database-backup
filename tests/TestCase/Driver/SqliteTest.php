@@ -94,7 +94,10 @@ class SqliteTest extends DriverTestCase
              ->will($this->returnCallback(function () {
                 $config = $this->getProperty($this->Driver, 'config');
 
-                return sprintf('%s %s .dump noExistingDir/dump.sql 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
+                return sprintf(
+                    '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
+                    $this->getBinary('sqlite3'), $config['database']
+                );
              }));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
@@ -131,7 +134,10 @@ class SqliteTest extends DriverTestCase
              ->will($this->returnCallback(function () {
                 $config = $this->getProperty($this->Driver, 'config');
 
-                return sprintf('%s %s .dump noExisting 2>/dev/null', $this->getBinary('sqlite3'), $config['database']);
+                return sprintf(
+                    '%s %s .dump noExisting'. REDIRECT_TO_DEV_NULL,
+                    $this->getBinary('sqlite3'), $config['database']
+                );
              }));
 
         $this->Driver->import('noExistingFile');
