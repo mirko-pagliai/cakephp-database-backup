@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<ruleset>
+    <arg value="p"/>
+    <file>.</file>
+    
+    <rule ref="./vendor/cakephp/cakephp-codesniffer/CakePHP/ruleset.xml"/>
+
+    <rule ref="Internal.NoCodeFound">
+        <severity>0</severity>
+    </rule>
+
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>/webroot</exclude-pattern>
+    </rule>
+
+    <exclude-pattern>*.min.css</exclude-pattern>
+    <exclude-pattern>*.min.js</exclude-pattern>
+    <exclude-pattern>/config/ckeditor/build-config.js</exclude-pattern>
+    <exclude-pattern>/config/Migrations</exclude-pattern>
+    <exclude-pattern>/coverage</exclude-pattern>
+    <exclude-pattern>/vendor</exclude-pattern>
+</ruleset>
