@@ -18,6 +18,11 @@ if (!defined('DATABASE_BACKUP')) {
     define('DATABASE_BACKUP', 'DatabaseBackup');
 }
 
+//Sets the redirect to `/dev/null`. This string can be concatenated to shell commands
+if (!defined('REDIRECT_TO_DEV_NULL')) {
+    define('REDIRECT_TO_DEV_NULL', DS == '\\' ? ' 2>nul' : ' 2>/dev/null');
+}
+
 //Sets the list of valid compressions
 const VALID_COMPRESSIONS = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'];
 
