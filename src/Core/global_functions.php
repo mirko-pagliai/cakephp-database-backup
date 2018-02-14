@@ -44,11 +44,12 @@ if (!function_exists('which')) {
      */
     function which($command)
     {
-        $which = DS == '\\' ? 'where' : 'which';
+        $isWin = DS == '\\';
+        $which = $isWin ? 'where' : 'which';
 
         exec(sprintf('%s %s 2>&1', $which, $command), $path, $exitCode);
 
-        $path = !empty($path) ? array_map('escapeshellarg', $path) : $path;
+        $path = $isWin && !empty($path) ? array_map('escapeshellarg', $path) : $path;
 
         return $exitCode === 0 && !empty($path[0]) ? $path[0] : null;
     }
