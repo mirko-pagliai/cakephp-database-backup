@@ -141,7 +141,7 @@ abstract class Driver implements EventListenerInterface
         $executable .= ' > ' . $filename;
 
         if (Configure::read(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
-            $executable .= ' 2>/dev/null';
+            $executable .= REDIRECT_TO_DEV_NULL;
         }
 
         return $executable;
@@ -165,7 +165,7 @@ abstract class Driver implements EventListenerInterface
         }
 
         if (Configure::read(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
-            $executable .= ' 2>/dev/null';
+            $executable .= REDIRECT_TO_DEV_NULL;
         }
 
         return $executable;
