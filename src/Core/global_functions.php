@@ -49,9 +49,7 @@ if (!function_exists('which')) {
 
         exec(sprintf('%s %s 2>&1', $which, $command), $path, $exitCode);
 
-        if ($isWin && !empty($path)) {
-            $path = array_map('escapeshellarg', $path);
-        }
+        $path = $isWin && !empty($path) ? array_map('escapeshellarg', $path) : $path;
 
         return $exitCode === 0 && !empty($path[0]) ? $path[0] : null;
     }
