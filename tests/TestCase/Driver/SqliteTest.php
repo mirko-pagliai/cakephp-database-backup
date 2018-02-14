@@ -136,7 +136,7 @@ class SqliteTest extends DriverTestCase
                 $config = $this->getProperty($this->Driver, 'config');
 
                 return sprintf(
-                    '%s %s .dump noExisting'. REDIRECT_TO_DEV_NULL,
+                    '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
                     $this->getBinary('sqlite3'),
                     $config['database']
                 );
