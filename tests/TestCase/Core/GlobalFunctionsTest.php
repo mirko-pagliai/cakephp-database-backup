@@ -21,7 +21,6 @@ class GlobalFunctionsTest extends TestCase
 {
     /**
      * Test for `isPositive()` global function
-     * @return void
      * @test
      */
     public function testIsPositive()
@@ -34,7 +33,6 @@ class GlobalFunctionsTest extends TestCase
 
     /**
      * Test for `rtr()` global function
-     * @return void
      * @test
      */
     public function testRtr()
@@ -54,7 +52,6 @@ class GlobalFunctionsTest extends TestCase
 
     /**
      * Test for `which()` global function
-     * @return void
      * @test
      */
     public function testWhich()
