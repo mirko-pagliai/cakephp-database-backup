@@ -4,14 +4,10 @@ max_jobs: 3
 platform: x86
 
 environment:
+  db_dsn: 'mysql://root:Password12!@localhost/test'
+  db_dsn_postgres: 'postgres://postgres:Password12!@localhost/travis_ci_test'
   global:
     PHP: "C:/PHP"
-
-  matrix:
-    - db: mysql
-      db_dsn: 'mysql://root:Password12!@localhost/test'
-    - db: postgresql
-      db_dsn_postgres: 'postgres://postgres:Password12!@localhost/travis_ci_test'
 
 services:
   - mysql
