@@ -2,8 +2,6 @@ build: false
 clone_folder: C:\projects\cakephp-database-backup
 platform: x86
 
-image: Visual Studio 2013
-
 environment:
   db_dsn: 'mysql://root:Password12!@localhost/test'
   db_dsn_postgres: 'postgres://postgres:Password12!@localhost/travis_ci_test'
@@ -45,12 +43,9 @@ install:
   - cd c:\
   - appveyor DownloadFile https://www.sqlite.org/2018/sqlite-tools-win32-x86-3220000.zip -Filename sqlite3.zip
   - 7z x sqlite3.zip -oc:\sqlite3 > nul
-  - cd c:\sqlite3
-  - '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\lib.exe" /def:sqlite3.def /OUT:sqlite3.lib /machine:x64'
   - cd C:\projects\cakephp-database-backup
   - appveyor DownloadFile https://getcomposer.org/composer.phar
   - php composer.phar install --prefer-dist --no-interaction --ansi --no-progress
-  - php -i | grep "ICU version"
 
 test_script:
   - cd C:\projects\cakephp-database-backup
