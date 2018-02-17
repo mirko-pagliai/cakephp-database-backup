@@ -182,7 +182,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
 
         $this->exec('database_backup.backup import ' . $backup);
         $this->assertExitWithSuccess();
-        $this->assertOutputContains('<success>Backup `/tmp/backups/backup.sql` has been imported</success>');
+        $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
     }
 
     /**

@@ -125,7 +125,10 @@ class BackupExportTest extends TestCase
     public function testFilename()
     {
         $this->BackupExport->filename('backup.sql.bz2');
-        $this->assertEquals('/tmp/backups/backup.sql.bz2', $this->getProperty($this->BackupExport, 'filename'));
+        $this->assertEquals(
+            $this->BackupExport->getTarget() . DS . 'backup.sql.bz2',
+            $this->getProperty($this->BackupExport, 'filename')
+        );
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
         $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 

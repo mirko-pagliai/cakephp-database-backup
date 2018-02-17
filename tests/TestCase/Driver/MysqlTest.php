@@ -123,7 +123,7 @@ class MysqlTest extends DriverTestCase
 
         $expected = '[mysqldump]' . PHP_EOL .
             'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
-            'password=""' . PHP_EOL .
+            'password="' . ConnectionManager::config('test')['password'] . '"' . PHP_EOL .
             'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
@@ -144,7 +144,7 @@ class MysqlTest extends DriverTestCase
 
         $expected = '[client]' . PHP_EOL .
             'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
-            'password=""' . PHP_EOL .
+            'password="' . ConnectionManager::config('test')['password'] . '"' . PHP_EOL .
             'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);

@@ -56,9 +56,7 @@ class GlobalFunctionsTest extends TestCase
      */
     public function testWhich()
     {
-        $expected = exec('which cat');
-        $this->assertEquals($expected, which('cat'));
-
+        $this->assertContains('cat', which('cat'));
         $this->assertNull(which('noExistingBin'));
     }
 }

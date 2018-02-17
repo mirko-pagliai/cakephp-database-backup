@@ -61,11 +61,18 @@ class PostgresTest extends DriverTestCase
      */
     public function testGetDbnameAsString()
     {
-        $result = $this->invokeMethod($this->Driver, 'getDbnameAsString');
-        $this->assertEquals('postgresql://postgres@localhost/travis_ci_test', $result);
+        $config = $this->getProperty($this->Driver, 'config');
+        $password = null;
+
+        if (!empty($config['password'])) {
+            $password = ':' . $config['password'];
+        }
+
+        $expected = 'postgresql://postgres' . $password . '@localhost/travis_ci_test';
+
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
 
         //Adds a password to the config
-        $config = $this->getProperty($this->Driver, 'config');
         $this->setProperty($this->Driver, 'config', array_merge($config, ['password' => 'mypassword']));
 
         $result = $this->invokeMethod($this->Driver, 'getDbnameAsString');
@@ -78,9 +85,15 @@ class PostgresTest extends DriverTestCase
      */
     public function testExportExecutable()
     {
-        $expected = $this->getBinary('pg_dump') . ' -Fc -b --dbname=postgresql://postgres@localhost/travis_ci_test';
-        $result = $this->invokeMethod($this->Driver, '_exportExecutable');
-        $this->assertEquals($expected, $result);
+        $config = $this->getProperty($this->Driver, 'config');
+        $password = null;
+
+        if (!empty($config['password'])) {
+            $password = ':' . $config['password'];
+        }
+
+        $expected = $this->getBinary('pg_dump') . ' -Fc -b --dbname=postgresql://postgres' . $password . '@localhost/travis_ci_test';
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
     /**
@@ -89,9 +102,15 @@ class PostgresTest extends DriverTestCase
      */
     public function testImportExecutable()
     {
-        $expected = $this->getBinary('pg_restore') . ' -c -e --dbname=postgresql://postgres@localhost/travis_ci_test';
-        $result = $this->invokeMethod($this->Driver, '_importExecutable');
-        $this->assertEquals($expected, $result);
+        $config = $this->getProperty($this->Driver, 'config');
+        $password = null;
+
+        if (!empty($config['password'])) {
+            $password = ':' . $config['password'];
+        }
+
+        $expected = $this->getBinary('pg_restore') . ' -c -e --dbname=postgresql://postgres' . $password . '@localhost/travis_ci_test';
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 
     /**
