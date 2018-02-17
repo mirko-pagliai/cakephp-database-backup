@@ -8,5 +8,5 @@ services:
   - postgresql95
 
 test_script:
-  - c:\cakephp-database-backup
+  - cd c:\cakephp-database-backup
   - php phpunit
