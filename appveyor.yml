@@ -10,6 +10,8 @@ environment:
   matrix:
     - db: mysql
       db_dsn: 'mysql://root:Password12!@localhost/test'
+    - db: postgresql
+      db_dsn: 'postgres://postgres:Password12!@localhost/travis_ci_test'
 
 services:
   - mysql
