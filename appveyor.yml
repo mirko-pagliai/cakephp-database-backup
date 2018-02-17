@@ -41,6 +41,9 @@ install:
   - echo extension=php_pdo_sqlite.dll >> php.ini
   - cd C:\projects\cakephp-database-backup
   - appveyor DownloadFile https://getcomposer.org/composer.phar
+  - curl -fsS --retry 3 --retry-connrefused -o sqlite3.zip https://sqlite.org/2017/sqlite-dll-win64-x64-3160200.zip
+  - 7z e sqlite3.zip -y
+  - set SQLITE3_LIB_DIR=%APPVEYOR_BUILD_FOLDER%
   - php composer.phar install --prefer-dist --no-interaction --ansi --no-progress
   - php -i | grep "ICU version"
 
