@@ -82,7 +82,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         $this->exec('database_backup.backup export');
         $this->assertExitWithSuccess();
         $this->assertRegExp(
-            '/^\<success\>Backup `\/tmp\/backups\/backup_test_\d+\.sql` has been exported\<\/success\>$/',
+            '/^\<success\>Backup `' . preg_quote(Configure::read(DATABASE_BACKUP . '.target') . DS, '/') . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
             $this->_out->messages()[3]
         );
 

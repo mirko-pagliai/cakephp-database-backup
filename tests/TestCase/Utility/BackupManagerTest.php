@@ -93,7 +93,7 @@ class BackupManagerTest extends TestCase
      * Test for `delete()` method, with a no existing file
      * @test
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[A-z\/:\\]+noExistingFile.sql` not writable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+noExistingFile.sql` not writable$/
      */
     public function testDeleteNoExistingFile()
     {

@@ -158,7 +158,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a file that already exists
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage File `/tmp/backups/backup.sql` already exists
+     * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\]+backup\.sql` already exists$/
      */
     public function testFilenameAlreadyExists()
     {
@@ -171,7 +171,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a no writable directory
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage File or directory `/tmp/backups/noExistingDir` not writable
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+backup\.sql` not writable$/
      * @test
      */
     public function testFilenameNotWritableDirectory()

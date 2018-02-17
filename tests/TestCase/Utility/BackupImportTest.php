@@ -69,29 +69,29 @@ class BackupImportTest extends TestCase
         $backup = $this->BackupExport->filename('backup.sql')->export();
 
         $this->BackupImport->filename($backup);
-        $this->assertEquals('/tmp/backups/backup.sql', $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //Creates a `sql.bz2` backup
         $backup = $this->BackupExport->filename('backup.sql.bz2')->export();
 
         $this->BackupImport->filename($backup);
-        $this->assertEquals('/tmp/backups/backup.sql.bz2', $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //Creates a `sql.gz` backup
         $backup = $this->BackupExport->filename('backup.sql.gz')->export();
 
         $this->BackupImport->filename($backup);
-        $this->assertEquals('/tmp/backups/backup.sql.gz', $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //Relative path
         $this->BackupImport->filename(basename($backup));
-        $this->assertEquals('/tmp/backups/backup.sql.gz', $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
     }
 
     /**
      * Test for `filename()` method, with invalid directory
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[A-z\/:\\]+backup.sql` not readable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+backup\.sql` not readable$/
      * @test
      */
     public function testFilenameWithInvalidDirectory()
