@@ -176,8 +176,10 @@ class MysqlTest extends DriverTestCase
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $config = $this->getProperty($this->Driver, 'config');
-        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
+        $this->setProperty($this->Driver, 'config', array_merge(
+            ConnectionManager::config('test'),
+            ['database' => 'noExisting']
+        ));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
@@ -195,8 +197,10 @@ class MysqlTest extends DriverTestCase
         $this->Driver->export($backup);
 
         //Sets a no existing database
-        $config = $this->getProperty($this->Driver, 'config');
-        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
+        $this->setProperty($this->Driver, 'config', array_merge(
+            ConnectionManager::config('test'),
+            ['database' => 'noExisting']
+        ));
 
         $this->Driver->import($backup);
     }
