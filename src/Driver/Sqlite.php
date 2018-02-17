@@ -47,15 +47,18 @@ class Sqlite extends Driver
      * Called before import
      * @return bool
      * @since 2.1.0
-     * @uses $config
      * @uses $connection
      */
     public function beforeImport()
     {
+        $collection = $this->connection->getSchemaCollection();
+
+        //Drops each table
+        foreach ($collection->listTables() as $table) {
+            array_map([$this->connection, 'execute'], $collection->describe($table)->dropSql($this->connection));
+        }
+
         $this->connection->disconnect();
-
-        unlink($this->config['database']);
-
         $this->connection->connect();
 
         return true;
