@@ -1,7 +1,8 @@
 build: false
 clone_folder: C:\projects\cakephp-database-backup
-max_jobs: 3
 platform: x86
+
+image: Visual Studio 2013
 
 environment:
   db_dsn: 'mysql://root:Password12!@localhost/test'
