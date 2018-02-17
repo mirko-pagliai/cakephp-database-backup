@@ -38,7 +38,7 @@ install:
   - echo extension=php_fileinfo.dll >> php.ini
   - echo extension=php_pdo_mysql.dll >> php.ini
   - echo extension=php_pdo_pgsql.dll >> php.ini
-  - echo extension=php_sqlite.dll >> php.ini
+  - echo extension=php_pdo_sqlite.dll >> php.ini
   - cd C:\projects\cakephp-database-backup
   - appveyor DownloadFile https://getcomposer.org/composer.phar
   - php composer.phar install --prefer-dist --no-interaction --ansi --no-progress
