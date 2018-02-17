@@ -23,6 +23,7 @@ before_test:
   - SET PGUSER=postgres
   - SET PGPASSWORD=Password12!
   - PATH=C:\Program Files\PostgreSQL\9.6\bin\;%PATH%
+  - PATH=C:\sqlite3\;%PATH%
   - psql -c "CREATE DATABASE travis_ci_test;" -U postgres
 
 install:
@@ -40,13 +41,11 @@ install:
   - echo extension=php_pdo_mysql.dll >> php.ini
   - echo extension=php_pdo_pgsql.dll >> php.ini
   - echo extension=php_pdo_sqlite.dll >> php.ini
+  - cd c:\
+  - appveyor DonwloadFile https://www.sqlite.org/2018/sqlite-tools-win32-x86-3220000.zip -Filename sqlite3.zip
+  - 7z x sqlite3.zip -oc:\sqlite3 > nul
   - cd C:\projects\cakephp-database-backup
   - appveyor DownloadFile https://getcomposer.org/composer.phar
-  - curl -fsS --retry 3 --retry-connrefused -o sqlite3.zip https://sqlite.org/2017/sqlite-dll-win64-x64-3160200.zip
-  - 7z e sqlite3.zip -y
-  - set SQLITE3_LIB_DIR=%APPVEYOR_BUILD_FOLDER%
-  - set PATH=%PATH%;%APPVEYOR_BUILD_FOLDER%
-  - '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\lib.exe" /def:sqlite3.def /OUT:sqlite3.lib /machine:x64'
   - php composer.phar install --prefer-dist --no-interaction --ansi --no-progress
   - php -i | grep "ICU version"
 
