@@ -58,6 +58,7 @@ class Sqlite extends Driver
             array_map([$this->connection, 'execute'], $collection->describe($table)->dropSql($this->connection));
         }
 
+        //Needs disconnect and re-connect because the database schema has changed
         $this->connection->disconnect();
         $this->connection->connect();
 
