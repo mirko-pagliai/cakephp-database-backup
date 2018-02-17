@@ -6,7 +6,9 @@ platform: x86
 environment:
   global:
     PHP: "C:/PHP"
-  MYSQL_PASSWORD: 
+    
+matrix:
+    db_dsn: 'mysql://root:Password12!@localhost/test'
 
 services:
   - mysql

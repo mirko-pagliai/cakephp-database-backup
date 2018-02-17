@@ -90,7 +90,11 @@ Cache::setConfig([
     ],
 ]);
 
-ConnectionManager::setConfig('test', ['url' => 'mysql://root@localhost/test']);
+if (!getenv('db_dsn')) {
+    putenv('db_dsn=mysql://root:@localhost/test');
+}
+
+ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:///' . TMP . 'example.sq3']);
 ConnectionManager::setConfig('test_postgres', ['url' => 'postgres://postgres@localhost/travis_ci_test']);
 
