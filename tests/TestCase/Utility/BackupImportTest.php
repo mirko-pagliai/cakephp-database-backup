@@ -91,7 +91,7 @@ class BackupImportTest extends TestCase
     /**
      * Test for `filename()` method, with invalid directory
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage File or directory `/tmp/backups/noExistingDir/backup.sql` not readable
+     * @expectedExceptionMessageRegExp /^File or directory `[A-z\/:\\]+backup.sql` not readable$/
      * @test
      */
     public function testFilenameWithInvalidDirectory()
