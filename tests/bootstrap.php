@@ -99,12 +99,7 @@ if (!getenv('db_dsn_postgres')) {
 
 ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 ConnectionManager::setConfig('test_postgres', ['url' => getenv('db_dsn_postgres')]);
-ConnectionManager::setConfig('test_sqlite', [
-    'className' => 'Cake\Database\Connection',
-    'driver' => 'Cake\Database\Driver\Sqlite',
-    'database' => TMP . 'example.sq3',
-    'mask' => 0777,
-]);
+ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:///' . TMP . 'example.sq3']);
 
 Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups');
