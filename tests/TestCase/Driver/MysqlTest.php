@@ -61,7 +61,7 @@ class MysqlTest extends DriverTestCase
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
 
-        $expected = $this->getBinary('mysqldump') . ' --defaults-file=authFile test';
+        $expected = $this->getBinary('mysqldump') . ' --defaults-file=\'authFile\' test';
         $result = $this->invokeMethod($this->Driver, '_exportExecutable');
         $this->assertEquals($expected, $result);
     }
@@ -74,7 +74,7 @@ class MysqlTest extends DriverTestCase
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
 
-        $expected = $this->getBinary('mysql') . ' --defaults-extra-file=authFile test';
+        $expected = $this->getBinary('mysql') . ' --defaults-extra-file=\'authFile\' test';
         $result = $this->invokeMethod($this->Driver, '_importExecutable');
         $this->assertEquals($expected, $result);
     }
