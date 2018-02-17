@@ -118,7 +118,7 @@ class MysqlTest extends DriverTestCase
     public function testBeforeExport()
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
-
+dd(ConnectionManager::config('test')['password']);
         $this->Driver->beforeExport();
 
         $expected = '[mysqldump]' . PHP_EOL .
