@@ -171,7 +171,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a no writable directory
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+backup\.sql` not writable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not writable$/
      * @test
      */
     public function testFilenameNotWritableDirectory()
