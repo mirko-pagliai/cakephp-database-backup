@@ -133,6 +133,7 @@ abstract class Driver implements EventListenerInterface
     {
         $executable = $this->_exportExecutable();
         $compression = $this->getCompression($filename);
+        $filename = DS == '\\' ? escapeshellarg($filename) : $filename;
 
         if ($compression) {
             $executable .= ' | ' . $this->getBinary($compression);
@@ -157,6 +158,7 @@ abstract class Driver implements EventListenerInterface
     {
         $executable = $this->_importExecutable();
         $compression = $this->getCompression($filename);
+        $filename = DS == '\\' ? escapeshellarg($filename) : $filename;
 
         if ($compression) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;

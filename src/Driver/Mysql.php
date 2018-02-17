@@ -38,7 +38,9 @@ class Mysql extends Driver
      */
     protected function _exportExecutable()
     {
-        return sprintf('%s --defaults-file=%s %s', $this->getBinary('mysqldump'), $this->auth, $this->config['database']);
+        $auth = DS == '\\' ? escapeshellarg($this->auth) : $this->auth;
+
+        return sprintf('%s --defaults-file=%s %s', $this->getBinary('mysqldump'), $auth, $this->config['database']);
     }
 
     /**
@@ -49,7 +51,9 @@ class Mysql extends Driver
      */
     protected function _importExecutable()
     {
-        return sprintf('%s --defaults-extra-file=%s %s', $this->getBinary('mysql'), $this->auth, $this->config['database']);
+        $auth = DS == '\\' ? escapeshellarg($this->auth) : $this->auth;
+
+        return sprintf('%s --defaults-extra-file=%s %s', $this->getBinary('mysql'), $auth, $this->config['database']);
     }
 
     /**
