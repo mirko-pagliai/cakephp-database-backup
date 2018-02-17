@@ -23,7 +23,6 @@ before_test:
   - SET PGUSER=postgres
   - SET PGPASSWORD=Password12!
   - PATH=C:\Program Files\PostgreSQL\9.6\bin\;%PATH%
-  - PATH=C:\sqlite3\;%PATH%
   - psql -c "CREATE DATABASE travis_ci_test;" -U postgres
 
 install:
@@ -44,6 +43,7 @@ install:
   - cd c:\
   - appveyor DownloadFile https://www.sqlite.org/2018/sqlite-tools-win32-x86-3220000.zip -Filename sqlite3.zip
   - 7z x sqlite3.zip -oc:\sqlite3 > nul
+  - PATH=C:\sqlite3\;%PATH%
   - cd C:\projects\cakephp-database-backup
   - appveyor DownloadFile https://getcomposer.org/composer.phar
   - php composer.phar install --prefer-dist --no-interaction --ansi --no-progress
