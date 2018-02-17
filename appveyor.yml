@@ -45,6 +45,7 @@ install:
   - cd c:\
   - appveyor DownloadFile https://www.sqlite.org/2018/sqlite-tools-win32-x86-3220000.zip -Filename sqlite3.zip
   - 7z x sqlite3.zip -oc:\sqlite3 > nul
+  - cd c:\sqlite3
   - '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\lib.exe" /def:sqlite3.def /OUT:sqlite3.lib /machine:x64'
   - cd C:\projects\cakephp-database-backup
   - appveyor DownloadFile https://getcomposer.org/composer.phar
