@@ -20,15 +20,13 @@ install:
   - 7z x php.zip -oc:\php > nul
   - cd c:\php
   - copy php.ini-production php.ini
-
+  - echo date.timezone="UTC" >> php.ini
   - echo extension_dir=ext >> php.ini
   - echo extension=php_openssl.dll >> php.ini
-  - echo extension=php_sqlsrv_56_nts.dll >> php.ini
-  - echo extension=php_pdo_sqlsrv_56_nts.dll >> php.ini
   - echo extension=php_intl.dll >> php.ini
   - echo extension=php_mbstring.dll >> php.ini
   - echo extension=php_fileinfo.dll >> php.ini
-  - echo extension=php_mysql.dll >> php.ini
+  - echo extension=php_pdo_mysql.dll >> php.ini
   - cd C:\projects\cakephp-database-backup
   - appveyor DownloadFile https://getcomposer.org/composer.phar
   - php composer.phar install --prefer-dist --no-interaction --ansi --no-progress
