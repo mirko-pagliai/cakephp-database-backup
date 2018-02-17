@@ -1,0 +1,12 @@
+build: false
+clone_folder: c:\cakephp-database-backup
+max_jobs: 3
+platform: x86
+
+services:
+  - mysql
+  - postgresql95
+
+test_script:
+  - c:\cakephp-database-backup
+  - php phpunit
