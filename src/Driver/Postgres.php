@@ -53,7 +53,7 @@ class Postgres extends Driver
      */
     protected function _exportExecutable()
     {
-        return sprintf('%s -Fc -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
+        return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
     }
 
     /**
@@ -63,6 +63,6 @@ class Postgres extends Driver
      */
     protected function _importExecutable()
     {
-        return sprintf('%s -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
+        return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
     }
 }

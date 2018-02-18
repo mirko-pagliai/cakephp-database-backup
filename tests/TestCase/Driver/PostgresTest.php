@@ -94,7 +94,7 @@ class PostgresTest extends DriverTestCase
         }
 
         $expected = sprintf(
-            '%s -Fc -b --dbname=postgresql://postgres%s@localhost/travis_ci_test',
+            '%s --format=c -b --dbname=postgresql://postgres%s@localhost/travis_ci_test',
             $this->getBinary('pg_dump'),
             $password
         );
@@ -114,7 +114,7 @@ class PostgresTest extends DriverTestCase
         }
 
         $expected = sprintf(
-            '%s -c -e --dbname=postgresql://postgres%s@localhost/travis_ci_test',
+            '%s --format=c -c -e --dbname=postgresql://postgres%s@localhost/travis_ci_test',
             $this->getBinary('pg_restore'),
             $password
         );
