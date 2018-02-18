@@ -1,0 +1,53 @@
+build: false
+clone_folder: C:\projects\cakephp-database-backup
+platform: x86
+
+environment:
+  db_dsn: 'mysql://root:Password12!@localhost/test'
+  db_dsn_postgres: 'postgres://postgres:Password12!@localhost/travis_ci_test'
+  global:
+    PHP: "C:/PHP"
+
+services:
+  - mysql
+  - postgresql
+
+init:
+  - SET PATH=C:\php\;%PATH%
+
+before_test:
+  - SET PATH=C:\Program Files\MySQL\MySQL Server 5.7\bin;%PATH%
+  - mysqladmin --host=localhost --user=root --password=Password12! create test
+  - SET PGUSER=postgres
+  - SET PGPASSWORD=Password12!
+  - PATH=C:\Program Files\PostgreSQL\9.6\bin\;%PATH%
+  - psql -c "CREATE DATABASE travis_ci_test;" -U postgres
+  - set SQLITE3_LIB_DIR=C:\sqlite3\
+  - PATH=C:\sqlite3\;%PATH%
+
+install:
+  - cd c:\
+  - appveyor DownloadFile http://windows.php.net/downloads/releases/php-5.6.33-nts-Win32-VC11-x86.zip -FileName php.zip
+  - 7z x php.zip -oc:\php > nul
+  - cd c:\php
+  - copy php.ini-production php.ini
+  - echo date.timezone="UTC" >> php.ini
+  - echo extension_dir=ext >> php.ini
+  - echo extension=php_openssl.dll >> php.ini
+  - echo extension=php_intl.dll >> php.ini
+  - echo extension=php_mbstring.dll >> php.ini
+  - echo extension=php_fileinfo.dll >> php.ini
+  - echo extension=php_pdo_mysql.dll >> php.ini
+  - echo extension=php_pdo_pgsql.dll >> php.ini
+  - echo extension=php_pdo_sqlite.dll >> php.ini
+  - cd c:\
+  - appveyor DownloadFile https://www.sqlite.org/2018/sqlite-tools-win32-x86-3220000.zip -Filename sqlite3.zip
+  - 7z x sqlite3.zip > nul
+  - rename sqlite-tools-win32-x86-3220000 sqlite3
+  - cd C:\projects\cakephp-database-backup
+  - appveyor DownloadFile https://getcomposer.org/composer.phar
+  - php composer.phar install --prefer-dist --no-interaction --ansi --no-progress
+
+test_script:
+  - cd C:\projects\cakephp-database-backup
+  - vendor\bin\phpunit.bat --exclude-group=onlyUnix

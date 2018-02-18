@@ -33,23 +33,54 @@ class Mysql extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
+     * @uses getConfig()
      * @uses $auth
-     * @uses $config
      */
     protected function _exportExecutable()
     {
-        return sprintf('%s --defaults-file=%s %s', $this->getBinary('mysqldump'), $this->auth, $this->config['database']);
+        return sprintf(
+            '%s --defaults-file=%s %s',
+            $this->getBinary('mysqldump'),
+            escapeshellarg($this->auth),
+            $this->getConfig('database')
+        );
     }
 
     /**
      * Gets the executable command to import the database
      * @return string
+     * @uses getConfig()
      * @uses $auth
-     * @uses $config
      */
     protected function _importExecutable()
     {
-        return sprintf('%s --defaults-extra-file=%s %s', $this->getBinary('mysql'), $this->auth, $this->config['database']);
+        return sprintf(
+            '%s --defaults-extra-file=%s %s',
+            $this->getBinary('mysql'),
+            escapeshellarg($this->auth),
+            $this->getConfig('database')
+        );
+    }
+
+    /**
+     * Internal method to write an auth file
+     * @param string $content Content
+     * @return void
+     * @since 2.2.1
+     * @uses getConfig()
+     * @uses $auth
+     */
+    protected function writeAuthFile($content)
+    {
+        $content = str_replace(
+            ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
+            [$this->getConfig('username'), $this->getConfig('password'), $this->getConfig('host')],
+            $content
+        );
+
+        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
+
+        file_put_contents($this->auth, $content);
     }
 
     /**
@@ -86,19 +117,14 @@ class Mysql extends Driver
      * So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses $auth
-     * @uses $config
+     * @uses writeAuthFile()
      */
     public function beforeExport()
     {
-        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
-
-        file_put_contents($this->auth, sprintf(
-            "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
-            $this->config['username'],
-            empty($this->config['password']) ? null : $this->config['password'],
-            $this->config['host']
-        ));
+        $this->writeAuthFile("[mysqldump]" . PHP_EOL .
+            "user={{USER}}" . PHP_EOL .
+            "password=\"{{PASSWORD}}\"" . PHP_EOL .
+            "host={{HOST}}");
 
         return true;
     }
@@ -115,19 +141,14 @@ class Mysql extends Driver
      *  So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses $auth
-     * @uses $config
+     * @uses writeAuthFile()
      */
     public function beforeImport()
     {
-        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
-
-        file_put_contents($this->auth, sprintf(
-            "[client]\nuser=%s\npassword=\"%s\"\nhost=%s",
-            $this->config['username'],
-            empty($this->config['password']) ? null : $this->config['password'],
-            $this->config['host']
-        ));
+        $this->writeAuthFile("[client]" . PHP_EOL .
+            "user={{USER}}" . PHP_EOL .
+            "password=\"{{PASSWORD}}\"" . PHP_EOL .
+            "host={{HOST}}");
 
         return true;
     }

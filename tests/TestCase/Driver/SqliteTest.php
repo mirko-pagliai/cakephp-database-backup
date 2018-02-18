@@ -61,7 +61,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' /tmp/example.sq3 .dump';
+        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3 .dump';
         $result = $this->invokeMethod($this->Driver, '_exportExecutable');
         $this->assertEquals($expected, $result);
     }
@@ -72,7 +72,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testImportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' /tmp/example.sq3';
+        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3';
         $result = $this->invokeMethod($this->Driver, '_importExecutable');
         $this->assertEquals($expected, $result);
     }
@@ -91,15 +91,11 @@ class SqliteTest extends DriverTestCase
             ->getMock();
 
         $this->Driver->method('_exportExecutableWithCompression')
-             ->will($this->returnCallback(function () {
-                $config = $this->getProperty($this->Driver, 'config');
-
-                return sprintf(
-                    '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
-                    $this->getBinary('sqlite3'),
-                    $config['database']
-                );
-             }));
+            ->will($this->returnValue(sprintf(
+                '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
+                $this->getBinary('sqlite3'),
+                $this->Driver->getConfig('database')
+            )));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
@@ -132,15 +128,11 @@ class SqliteTest extends DriverTestCase
             ->will($this->returnValue(true));
 
         $this->Driver->method('_importExecutableWithCompression')
-             ->will($this->returnCallback(function () {
-                $config = $this->getProperty($this->Driver, 'config');
-
-                return sprintf(
-                    '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
-                    $this->getBinary('sqlite3'),
-                    $config['database']
-                );
-             }));
+            ->will($this->returnValue(sprintf(
+                '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
+                $this->getBinary('sqlite3'),
+                $this->Driver->getConfig('database')
+            )));
 
         $this->Driver->import('noExistingFile');
     }

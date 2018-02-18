@@ -102,7 +102,6 @@ abstract class DriverTestCase extends TestCase
     public function testConstruct()
     {
         $this->assertInstanceof('Cake\Database\Connection', $this->getProperty($this->Driver, 'connection'));
-        $this->assertTrue(is_array($this->getProperty($this->Driver, 'config')));
     }
 
     /**
@@ -140,13 +139,19 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $expected = $basicExecutable . ' > backup.sql' . REDIRECT_TO_DEV_NULL;
+        $expected = sprintf('%s > %s%s', $basicExecutable, escapeshellarg('backup.sql'), REDIRECT_TO_DEV_NULL);
         $this->assertEquals($expected, $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
-            $expected = $basicExecutable . ' | ' . $this->getBinary($compression) . ' > ' . $filename . REDIRECT_TO_DEV_NULL;
+            $expected = sprintf(
+                '%s | %s > %s%s',
+                $basicExecutable,
+                $this->getBinary($compression),
+                escapeshellarg($filename),
+                REDIRECT_TO_DEV_NULL
+            );
             $this->assertEquals($expected, $result);
         }
     }
@@ -162,13 +167,19 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $expected = $basicExecutable . ' < backup.sql' . REDIRECT_TO_DEV_NULL;
+        $expected = $basicExecutable . ' < ' . escapeshellarg('backup.sql') . REDIRECT_TO_DEV_NULL;
         $this->assertEquals($expected, $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
-            $expected = $this->getBinary($compression) . ' -dc ' . $filename . ' | ' . $basicExecutable . REDIRECT_TO_DEV_NULL;
+            $expected = sprintf(
+                '%s -dc %s | %s%s',
+                $this->getBinary($compression),
+                escapeshellarg($filename),
+                $basicExecutable,
+                REDIRECT_TO_DEV_NULL
+            );
             $this->assertEquals($expected, $result);
         }
     }
@@ -208,6 +219,19 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertFalse($this->Driver->export($backup));
         $this->assertFileNotExists($backup);
+    }
+
+    /**
+     * Test for `getConfig()` method
+     * @return void
+     * @test
+     */
+    public function testGetConfig()
+    {
+        $this->assertNotEmpty($this->Driver->getConfig());
+        $this->assertTrue(is_array($this->Driver->getConfig()));
+        $this->assertNotEmpty($this->Driver->getConfig('name'));
+        $this->assertNull($this->Driver->getConfig('noExistingKey'));
     }
 
     /**

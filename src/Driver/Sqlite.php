@@ -26,36 +26,40 @@ class Sqlite extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
-     * @uses $config
+     * @uses getConfig()
      */
     protected function _exportExecutable()
     {
-        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->config['database']);
+        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
 
     /**
      * Gets the executable command to import the database
      * @return string
-     * @uses $config
+     * @uses getConfig()
      */
     protected function _importExecutable()
     {
-        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->config['database']);
+        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
 
     /**
      * Called before import
      * @return bool
      * @since 2.1.0
-     * @uses $config
      * @uses $connection
      */
     public function beforeImport()
     {
+        $collection = $this->connection->getSchemaCollection();
+
+        //Drops each table
+        foreach ($collection->listTables() as $table) {
+            array_map([$this->connection, 'execute'], $collection->describe($table)->dropSql($this->connection));
+        }
+
+        //Needs disconnect and re-connect because the database schema has changed
         $this->connection->disconnect();
-
-        unlink($this->config['database']);
-
         $this->connection->connect();
 
         return true;

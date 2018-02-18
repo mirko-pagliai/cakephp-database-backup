@@ -125,7 +125,10 @@ class BackupExportTest extends TestCase
     public function testFilename()
     {
         $this->BackupExport->filename('backup.sql.bz2');
-        $this->assertEquals('/tmp/backups/backup.sql.bz2', $this->getProperty($this->BackupExport, 'filename'));
+        $this->assertEquals(
+            $this->BackupExport->getTarget() . DS . 'backup.sql.bz2',
+            $this->getProperty($this->BackupExport, 'filename')
+        );
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
         $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 
@@ -155,7 +158,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a file that already exists
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage File `/tmp/backups/backup.sql` already exists
+     * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\]+backup\.sql` already exists$/
      */
     public function testFilenameAlreadyExists()
     {
@@ -168,7 +171,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a no writable directory
      * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage File or directory `/tmp/backups/noExistingDir` not writable
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not writable$/
      * @test
      */
     public function testFilenameNotWritableDirectory()
@@ -243,15 +246,22 @@ class BackupExportTest extends TestCase
         $this->assertFileExists($filename);
         $this->assertEquals('backup.sql.bz2', basename($filename));
 
-        //Exports with a different chmod
-        Configure::write(DATABASE_BACKUP . '.chmod', 0777);
-        $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
-
         //Exports with `send()`
         $recipient = 'recipient@example.com';
         $filename = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
         $log = file_get_contents(LOGS . 'debug.log');
         $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
+    }
+
+    /**
+     * Test for `export()` method, with a different chmod
+     * @group onlyUnix
+     * @test
+     */
+    public function testExportWithDifferendChmod()
+    {
+        Configure::write(DATABASE_BACKUP . '.chmod', 0777);
+        $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
+        $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
     }
 }

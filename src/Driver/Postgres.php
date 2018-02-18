@@ -33,17 +33,23 @@ class Postgres extends Driver
      * postgresql://postgres@localhost/travis_ci_test
      * </code>
      * @return string
-     * @uses $config
+     * @uses getConfig()
      */
     protected function getDbnameAsString()
     {
-        $username = $this->config['username'];
+        $password = $this->getConfig('password');
 
-        if (!empty($this->config['password'])) {
-            $username .= ':' . $this->config['password'];
+        if ($password) {
+            $password = ':' . $password;
         }
 
-        return sprintf('postgresql://%s@%s/%s', $username, $this->config['host'], $this->config['database']);
+        return sprintf(
+            'postgresql://%s%s@%s/%s',
+            $this->getConfig('username'),
+            $password,
+            $this->getConfig('host'),
+            $this->getConfig('database')
+        );
     }
 
     /**
@@ -53,7 +59,7 @@ class Postgres extends Driver
      */
     protected function _exportExecutable()
     {
-        return sprintf('%s -Fc -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
+        return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
     }
 
     /**
@@ -63,6 +69,6 @@ class Postgres extends Driver
      */
     protected function _importExecutable()
     {
-        return sprintf('%s -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
+        return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
     }
 }

@@ -1,7 +1,14 @@
 # 2.x branch
 ## 2.2 branch
 ### 2.2.1
-* fixed to work under Windows.
+* full support for working under Windows;
+* added `Driver::getConfig()` method, removed `Driver::$config` property. This
+    allows you to get the configuration values safely;
+* fixed a bug for export and import executables with Postgres databases;
+* before importing a sqlite backup, each table is dropped, rather than deleting
+    the database file;
+* added `isWin()` global function;
+* tests can have `onlyUnix` or `onlyWindows` group.
 
 ### 2.2.0
 * added `ConsoleIntegrationTestCase` and `TestCaseTrait` classes. Console tests
