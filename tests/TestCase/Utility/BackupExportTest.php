@@ -246,15 +246,24 @@ class BackupExportTest extends TestCase
         $this->assertFileExists($filename);
         $this->assertEquals('backup.sql.bz2', basename($filename));
 
-        //Exports with a different chmod
-        Configure::write(DATABASE_BACKUP . '.chmod', 0777);
-        $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
-
         //Exports with `send()`
         $recipient = 'recipient@example.com';
         $filename = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
         $log = file_get_contents(LOGS . 'debug.log');
         $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
+    }
+
+    /**
+     * Test for `export()` method, with a different chmod
+     * @group onlyUnix
+     * @test
+     */
+    public function testExportWithDifferendChmod()
+    {
+        //Exports with a different chmod
+        $this->skipIf(isWin());
+        Configure::write(DATABASE_BACKUP . '.chmod', 0777);
+        $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
+        $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
     }
 }

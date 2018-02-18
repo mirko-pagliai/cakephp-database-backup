@@ -78,11 +78,13 @@ class BackupShellTest extends ConsoleIntegrationTestCase
      */
     public function testExport()
     {
+        $target = preg_quote(Configure::read(DATABASE_BACKUP . '.target') . DS, '/');
+
         //Exports, without params
         $this->exec('database_backup.backup export');
         $this->assertExitWithSuccess();
         $this->assertRegExp(
-            '/^\<success\>Backup `' . preg_quote(Configure::read(DATABASE_BACKUP . '.target') . DS, '/') . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
+            '/^\<success\>Backup `' . $target. 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
             $this->_out->messages()[3]
         );
 
@@ -92,7 +94,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         $this->exec('database_backup.backup export --compression bzip2');
         $this->assertExitWithSuccess();
         $this->assertRegExp(
-            '/^\<success\>Backup `\/tmp\/backups\/backup_test_\d+\.sql\.bz2` has been exported\<\/success\>$/',
+            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql\.bz2` has been exported\<\/success\>$/',
             $this->_out->messages()[3]
         );
 
@@ -101,7 +103,10 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         //Exports, with `filename` param
         $this->exec('database_backup.backup export --filename backup.sql');
         $this->assertExitWithSuccess();
-        $this->assertOutputContains('<success>Backup `/tmp/backups/backup.sql` has been exported</success>');
+        $this->assertRegExp(
+            '/^\<success\>Backup `' . $target . 'backup.sql` has been exported\<\/success\>$/',
+            $this->_out->messages()[3]
+        );
 
         sleep(1);
 
@@ -109,7 +114,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         $this->exec('database_backup.backup export --rotate 3 -v');
         $this->assertExitWithSuccess();
         $this->assertRegExp(
-            '/^\<success\>Backup `\/tmp\/backups\/backup_test_\d+\.sql` has been exported\<\/success\>$/',
+            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
             $this->_out->messages()[3]
         );
         $this->assertRegExp('/^Backup `backup_test_\d+\.sql` has been deleted$/', $this->_out->messages()[4]);
@@ -121,11 +126,11 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         $this->exec('database_backup.backup export --send mymail@example.com');
         $this->assertExitWithSuccess();
         $this->assertRegExp(
-            '/^\<success\>Backup `\/tmp\/backups\/backup_test_\d+\.sql` has been exported\<\/success\>$/',
+            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
             $this->_out->messages()[3]
         );
         $this->assertRegExp(
-            '/^\<success\>Backup `\/tmp\/backups\/backup_test_\d+\.sql` was sent via mail\<\/success\>$/',
+            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` was sent via mail\<\/success\>$/',
             $this->_out->messages()[4]
         );
     }

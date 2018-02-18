@@ -233,7 +233,9 @@ class BackupExport
 
         $this->driver->export($filename);
 
-        chmod($filename, Configure::read(DATABASE_BACKUP . '.chmod'));
+        if (!isWin()) {
+            chmod($filename, Configure::read(DATABASE_BACKUP . '.chmod'));
+        }
 
         if ($this->emailRecipient) {
             $this->BackupManager->send($filename, $this->emailRecipient);

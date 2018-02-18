@@ -88,7 +88,7 @@ class GlobalFunctionsTest extends TestCase
      */
     public function testWhichOnWindws()
     {
-        $this->assertEquals('/bin/cat', which('cat'));
+        $this->assertEquals('"C:\Program Files\Git\usr\bin\cat.exe"', which('cat'));
         $this->assertNull(which('noExistingBin'));
     }
 }

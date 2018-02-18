@@ -36,7 +36,8 @@ foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlit
     }
 }
 
-//Chmod for backups
+//Chmod for backups.
+//This works only on Unix
 if (!Configure::check(DATABASE_BACKUP . '.chmod')) {
     Configure::write(DATABASE_BACKUP . '.chmod', 0664);
 }
