@@ -128,7 +128,7 @@ class SqliteTest extends DriverTestCase
             ->will($this->returnValue(true));
 
         $this->Driver->method('_importExecutableWithCompression')
-             ->will($this->returnValue(sprintf(
+            ->will($this->returnValue(sprintf(
                 '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
                 $this->getBinary('sqlite3'),
                 $this->Driver->getConfig('database')
