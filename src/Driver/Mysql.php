@@ -63,6 +63,20 @@ class Mysql extends Driver
     }
 
     /**
+     * Internal method to write an auth file
+     * @param string $content Content
+     * @return void
+     * @since 2.2.1
+     * @uses $auth
+     */
+    protected function writeAuthFile($content)
+    {
+        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
+
+        file_put_contents($this->auth, $content);
+    }
+
+    /**
      * Called after export
      * @return void
      * @since 2.1.0
@@ -97,13 +111,11 @@ class Mysql extends Driver
      * @return bool
      * @since 2.1.0
      * @uses getConfig()
-     * @uses $auth
+     * @uses writeAuthFile()
      */
     public function beforeExport()
     {
-        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
-
-        file_put_contents($this->auth, sprintf(
+        $this->writeAuthFile(sprintf(
             "[mysqldump]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
             $this->getConfig('username'),
             $this->getConfig('password'),
@@ -126,13 +138,11 @@ class Mysql extends Driver
      * @return bool
      * @since 2.1.0
      * @uses getConfig()
-     * @uses $auth
+     * @uses writeAuthFile()
      */
     public function beforeImport()
     {
-        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
-
-        file_put_contents($this->auth, sprintf(
+        $this->writeAuthFile(sprintf(
             "[client]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
             $this->getConfig('username'),
             $this->getConfig('password'),
