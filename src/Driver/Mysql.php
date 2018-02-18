@@ -67,10 +67,17 @@ class Mysql extends Driver
      * @param string $content Content
      * @return void
      * @since 2.2.1
+     * @uses getConfig()
      * @uses $auth
      */
     protected function writeAuthFile($content)
     {
+        $content = str_replace(
+            ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
+            [$this->getConfig('username'), $this->getConfig('password'), $this->getConfig('host')],
+            $content
+        );
+
         $this->auth = tempnam(sys_get_temp_dir(), 'auth');
 
         file_put_contents($this->auth, $content);
@@ -110,17 +117,15 @@ class Mysql extends Driver
      * So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses getConfig()
      * @uses writeAuthFile()
      */
     public function beforeExport()
     {
-        $this->writeAuthFile(sprintf(
-            "[mysqldump]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
-            $this->getConfig('username'),
-            $this->getConfig('password'),
-            $this->getConfig('host')
-        ));
+        $this->writeAuthFile("[mysqldump]" . PHP_EOL .
+            "user={{USER}}" . PHP_EOL .
+            "password=\"{{PASSWORD}}\"" .
+            PHP_EOL . "host={{HOST}}"
+        );
 
         return true;
     }
@@ -137,17 +142,15 @@ class Mysql extends Driver
      *  So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses getConfig()
      * @uses writeAuthFile()
      */
     public function beforeImport()
     {
-        $this->writeAuthFile(sprintf(
-            "[client]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
-            $this->getConfig('username'),
-            $this->getConfig('password'),
-            $this->getConfig('host')
-        ));
+        $this->writeAuthFile("[client]" . PHP_EOL .
+            "user={{USER}}" . PHP_EOL .
+            "password=\"{{PASSWORD}}\"" .
+            PHP_EOL . "host={{HOST}}"
+        );
 
         return true;
     }
