@@ -3,7 +3,8 @@
 ### 2.2.1
 * fixed to work under Windows;
 * before importing a sqlite backup, each table is dropped, rather than deleting
-    the database file.
+    the database file;
+* added `isWin()` global function.
 
 ### 2.2.0
 * added `ConsoleIntegrationTestCase` and `TestCaseTrait` classes. Console tests
