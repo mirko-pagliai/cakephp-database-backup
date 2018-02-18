@@ -38,7 +38,12 @@ class Mysql extends Driver
      */
     protected function _exportExecutable()
     {
-        return sprintf('%s --defaults-file=%s %s', $this->getBinary('mysqldump'), $this->auth, $this->config['database']);
+        return sprintf(
+            '%s --defaults-file=%s %s',
+            $this->getBinary('mysqldump'),
+            escapeshellarg($this->auth),
+            $this->config['database']
+        );
     }
 
     /**
@@ -49,7 +54,12 @@ class Mysql extends Driver
      */
     protected function _importExecutable()
     {
-        return sprintf('%s --defaults-extra-file=%s %s', $this->getBinary('mysql'), $this->auth, $this->config['database']);
+        return sprintf(
+            '%s --defaults-extra-file=%s %s',
+            $this->getBinary('mysql'),
+            escapeshellarg($this->auth),
+            $this->config['database']
+        );
     }
 
     /**
@@ -94,7 +104,7 @@ class Mysql extends Driver
         $this->auth = tempnam(sys_get_temp_dir(), 'auth');
 
         file_put_contents($this->auth, sprintf(
-            "[mysqldump]\nuser=%s\npassword=\"%s\"\nhost=%s",
+            "[mysqldump]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
             $this->config['username'],
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']
@@ -123,7 +133,7 @@ class Mysql extends Driver
         $this->auth = tempnam(sys_get_temp_dir(), 'auth');
 
         file_put_contents($this->auth, sprintf(
-            "[client]\nuser=%s\npassword=\"%s\"\nhost=%s",
+            "[client]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
             $this->config['username'],
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']

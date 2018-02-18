@@ -61,9 +61,8 @@ class MysqlTest extends DriverTestCase
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
 
-        $expected = $this->getBinary('mysqldump') . ' --defaults-file=authFile test';
-        $result = $this->invokeMethod($this->Driver, '_exportExecutable');
-        $this->assertEquals($expected, $result);
+        $expected = sprintf('%s --defaults-file=%s test', $this->getBinary('mysqldump'), escapeshellarg('authFile'));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
     /**
@@ -74,9 +73,8 @@ class MysqlTest extends DriverTestCase
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
 
-        $expected = $this->getBinary('mysql') . ' --defaults-extra-file=authFile test';
-        $result = $this->invokeMethod($this->Driver, '_importExecutable');
-        $this->assertEquals($expected, $result);
+        $expected = sprintf('%s --defaults-extra-file=%s test', $this->getBinary('mysql'), escapeshellarg('authFile'));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 
     /**
@@ -120,12 +118,11 @@ class MysqlTest extends DriverTestCase
     public function testBeforeExport()
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
-
         $this->Driver->beforeExport();
 
         $expected = '[mysqldump]' . PHP_EOL .
             'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
-            'password=""' . PHP_EOL .
+            'password="' . ConnectionManager::config('test')['password'] . '"' . PHP_EOL .
             'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
@@ -146,7 +143,7 @@ class MysqlTest extends DriverTestCase
 
         $expected = '[client]' . PHP_EOL .
             'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
-            'password=""' . PHP_EOL .
+            'password="' . ConnectionManager::config('test')['password'] . '"' . PHP_EOL .
             'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
@@ -179,8 +176,10 @@ class MysqlTest extends DriverTestCase
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $config = $this->getProperty($this->Driver, 'config');
-        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
+        $this->setProperty($this->Driver, 'config', array_merge(
+            ConnectionManager::config('test'),
+            ['database' => 'noExisting']
+        ));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
@@ -198,8 +197,10 @@ class MysqlTest extends DriverTestCase
         $this->Driver->export($backup);
 
         //Sets a no existing database
-        $config = $this->getProperty($this->Driver, 'config');
-        $this->setProperty($this->Driver, 'config', array_merge($config, ['database' => 'noExisting']));
+        $this->setProperty($this->Driver, 'config', array_merge(
+            ConnectionManager::config('test'),
+            ['database' => 'noExisting']
+        ));
 
         $this->Driver->import($backup);
     }

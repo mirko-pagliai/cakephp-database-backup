@@ -20,7 +20,7 @@ if (!defined('DATABASE_BACKUP')) {
 
 //Sets the redirect to `/dev/null`. This string can be concatenated to shell commands
 if (!defined('REDIRECT_TO_DEV_NULL')) {
-    define('REDIRECT_TO_DEV_NULL', DS == '\\' ? ' 2>nul' : ' 2>/dev/null');
+    define('REDIRECT_TO_DEV_NULL', isWin() ? ' 2>nul' : ' 2>/dev/null');
 }
 
 //Sets the list of valid compressions
@@ -36,7 +36,8 @@ foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlit
     }
 }
 
-//Chmod for backups
+//Chmod for backups.
+//This works only on Unix
 if (!Configure::check(DATABASE_BACKUP . '.chmod')) {
     Configure::write(DATABASE_BACKUP . '.chmod', 0664);
 }

@@ -138,7 +138,7 @@ abstract class Driver implements EventListenerInterface
             $executable .= ' | ' . $this->getBinary($compression);
         }
 
-        $executable .= ' > ' . $filename;
+        $executable .= ' > ' . escapeshellarg($filename);
 
         if (Configure::read(DATABASE_BACKUP . '.redirectStderrToDevNull')) {
             $executable .= REDIRECT_TO_DEV_NULL;
@@ -157,6 +157,7 @@ abstract class Driver implements EventListenerInterface
     {
         $executable = $this->_importExecutable();
         $compression = $this->getCompression($filename);
+        $filename = escapeshellarg($filename);
 
         if ($compression) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
