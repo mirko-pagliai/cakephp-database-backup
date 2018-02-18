@@ -123,9 +123,8 @@ class Mysql extends Driver
     {
         $this->writeAuthFile("[mysqldump]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
-            "password=\"{{PASSWORD}}\"" .
-            PHP_EOL . "host={{HOST}}"
-        );
+            "password=\"{{PASSWORD}}\"" . PHP_EOL .
+            "host={{HOST}}");
 
         return true;
     }
@@ -148,9 +147,8 @@ class Mysql extends Driver
     {
         $this->writeAuthFile("[client]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
-            "password=\"{{PASSWORD}}\"" .
-            PHP_EOL . "host={{HOST}}"
-        );
+            "password=\"{{PASSWORD}}\"" . PHP_EOL .
+            "host={{HOST}}");
 
         return true;
     }
