@@ -33,17 +33,23 @@ class Postgres extends Driver
      * postgresql://postgres@localhost/travis_ci_test
      * </code>
      * @return string
-     * @uses $config
+     * @uses getConfig()
      */
     protected function getDbnameAsString()
     {
-        $username = $this->config['username'];
+        $password = $this->getConfig('password');
 
-        if (!empty($this->config['password'])) {
-            $username .= ':' . $this->config['password'];
+        if ($password) {
+            $password = ':' . $password;
         }
 
-        return sprintf('postgresql://%s@%s/%s', $username, $this->config['host'], $this->config['database']);
+        return sprintf(
+            'postgresql://%s%s@%s/%s',
+            $this->getConfig('username'),
+            $password,
+            $this->getConfig('host'),
+            $this->getConfig('database')
+        );
     }
 
     /**

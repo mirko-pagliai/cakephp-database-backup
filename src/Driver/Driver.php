@@ -33,22 +33,13 @@ abstract class Driver implements EventListenerInterface
     protected $connection;
 
     /**
-     * Database configuration
-     * @since 2.1.0
-     * @var array
-     */
-    protected $config;
-
-    /**
      * Construct
      * @param \Cake\Datasource\ConnectionInterface $connection A connection object
-     * @uses $config
      * @uses $connection
      */
     public function __construct($connection)
     {
         $this->connection = $connection;
-        $this->config = $connection->config();
 
         //Attachs the object to the event manager
         $this->getEventManager()->on($this);
@@ -201,6 +192,29 @@ abstract class Driver implements EventListenerInterface
         }
 
         return file_exists($filename);
+    }
+
+    /**
+     * Gets a config value or the whole configuration
+     * @param string $key Config key
+     * @return array|string|null Config value, `null` if the key doesn't exist
+     *  or all config values if no key was specified
+     * @since 2.2.1
+     * @uses $connection
+     */
+    final public function getConfig($key = null)
+    {
+        $config = $this->connection->config();
+
+        if (!$key) {
+            return $config;
+        }
+
+        if (!array_key_exists($key, $config)) {
+            return null;
+        }
+
+        return $config[$key];
     }
 
     /**

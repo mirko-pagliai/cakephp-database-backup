@@ -26,21 +26,21 @@ class Sqlite extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
-     * @uses $config
+     * @uses getConfig()
      */
     protected function _exportExecutable()
     {
-        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->config['database']);
+        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
 
     /**
      * Gets the executable command to import the database
      * @return string
-     * @uses $config
+     * @uses getConfig()
      */
     protected function _importExecutable()
     {
-        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->config['database']);
+        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
 
     /**

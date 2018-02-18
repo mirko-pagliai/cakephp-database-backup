@@ -102,7 +102,6 @@ abstract class DriverTestCase extends TestCase
     public function testConstruct()
     {
         $this->assertInstanceof('Cake\Database\Connection', $this->getProperty($this->Driver, 'connection'));
-        $this->assertTrue(is_array($this->getProperty($this->Driver, 'config')));
     }
 
     /**
@@ -220,6 +219,19 @@ abstract class DriverTestCase extends TestCase
 
         $this->assertFalse($this->Driver->export($backup));
         $this->assertFileNotExists($backup);
+    }
+
+    /**
+     * Test for `getConfig()` method
+     * @return void
+     * @test
+     */
+    public function testGetConfig()
+    {
+        $this->assertNotEmpty($this->Driver->getConfig());
+        $this->assertTrue(is_array($this->Driver->getConfig()));
+        $this->assertNotEmpty($this->Driver->getConfig('name'));
+        $this->assertNull($this->Driver->getConfig('noExistingKey'));
     }
 
     /**

@@ -12,7 +12,7 @@
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Datasource\ConnectionManager;
+use Cake\Database\Connection;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
@@ -121,8 +121,8 @@ class MysqlTest extends DriverTestCase
         $this->Driver->beforeExport();
 
         $expected = '[mysqldump]' . PHP_EOL .
-            'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
-            'password="' . ConnectionManager::config('test')['password'] . '"' . PHP_EOL .
+            'user=' . $this->Driver->getConfig('username') . PHP_EOL .
+            'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
@@ -142,8 +142,8 @@ class MysqlTest extends DriverTestCase
         $this->Driver->beforeImport();
 
         $expected = '[client]' . PHP_EOL .
-            'user=' . ConnectionManager::config('test')['username'] . PHP_EOL .
-            'password="' . ConnectionManager::config('test')['password'] . '"' . PHP_EOL .
+            'user=' . $this->Driver->getConfig('username') . PHP_EOL .
+            'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=localhost';
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
@@ -176,10 +176,8 @@ class MysqlTest extends DriverTestCase
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $this->setProperty($this->Driver, 'config', array_merge(
-            ConnectionManager::config('test'),
-            ['database' => 'noExisting']
-        ));
+        $config = array_merge($this->Driver->getConfig(), ['database' => 'noExisting']);
+        $this->setProperty($this->Driver, 'connection', new Connection($config));
 
         $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
@@ -197,10 +195,8 @@ class MysqlTest extends DriverTestCase
         $this->Driver->export($backup);
 
         //Sets a no existing database
-        $this->setProperty($this->Driver, 'config', array_merge(
-            ConnectionManager::config('test'),
-            ['database' => 'noExisting']
-        ));
+        $config = array_merge($this->Driver->getConfig(), ['database' => 'noExisting']);
+        $this->setProperty($this->Driver, 'connection', new Connection($config));
 
         $this->Driver->import($backup);
     }

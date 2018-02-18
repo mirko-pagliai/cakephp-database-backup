@@ -33,8 +33,8 @@ class Mysql extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
+     * @uses getConfig()
      * @uses $auth
-     * @uses $config
      */
     protected function _exportExecutable()
     {
@@ -42,15 +42,15 @@ class Mysql extends Driver
             '%s --defaults-file=%s %s',
             $this->getBinary('mysqldump'),
             escapeshellarg($this->auth),
-            $this->config['database']
+            $this->getConfig('database')
         );
     }
 
     /**
      * Gets the executable command to import the database
      * @return string
+     * @uses getConfig()
      * @uses $auth
-     * @uses $config
      */
     protected function _importExecutable()
     {
@@ -58,7 +58,7 @@ class Mysql extends Driver
             '%s --defaults-extra-file=%s %s',
             $this->getBinary('mysql'),
             escapeshellarg($this->auth),
-            $this->config['database']
+            $this->getConfig('database')
         );
     }
 
@@ -96,8 +96,8 @@ class Mysql extends Driver
      * So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
+     * @uses getConfig()
      * @uses $auth
-     * @uses $config
      */
     public function beforeExport()
     {
@@ -105,9 +105,9 @@ class Mysql extends Driver
 
         file_put_contents($this->auth, sprintf(
             "[mysqldump]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
-            $this->config['username'],
-            empty($this->config['password']) ? null : $this->config['password'],
-            $this->config['host']
+            $this->getConfig('username'),
+            $this->getConfig('password'),
+            $this->getConfig('host')
         ));
 
         return true;
@@ -125,8 +125,8 @@ class Mysql extends Driver
      *  So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
+     * @uses getConfig()
      * @uses $auth
-     * @uses $config
      */
     public function beforeImport()
     {
@@ -134,9 +134,9 @@ class Mysql extends Driver
 
         file_put_contents($this->auth, sprintf(
             "[client]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
-            $this->config['username'],
-            empty($this->config['password']) ? null : $this->config['password'],
-            $this->config['host']
+            $this->getConfig('username'),
+            $this->getConfig('password'),
+            $this->getConfig('host')
         ));
 
         return true;
