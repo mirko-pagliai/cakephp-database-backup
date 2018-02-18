@@ -199,7 +199,7 @@ abstract class Driver implements EventListenerInterface
      * @param string $key Config key
      * @return array|string|null Config value, `null` if the key doesn't exist
      *  or all config values if no key was specified
-     * @since 2.2.1
+     * @since 2.3.0
      * @uses $connection
      */
     final public function getConfig($key = null)
