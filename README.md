@@ -2,6 +2,7 @@
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-database-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-database-backup)
+[![Build status](https://ci.appveyor.com/api/projects/status/imerokwpvy0r51fj/branch/master?svg=true)](https://ci.appveyor.com/project/mirko-pagliai/cakephp-database-backup/branch/master)
 [![Coverage Status](https://img.shields.io/codecov/c/github/mirko-pagliai/cakephp-database-backup.svg?style=flat-square)](https://codecov.io/github/mirko-pagliai/cakephp-database-backup)
 
 *DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.  
@@ -59,6 +60,19 @@ See our wiki:
 * [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility)
 * [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
 * [How to use the BackupShell](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell)
+
+## Tests
+Tests are divided into two groups, `onlyUnix` and `onlyWindows`. This is
+necessary because some commands to be executed in the terminal are only valid
+for an environment.
+
+By default, phpunit is executed like this:
+
+    vendor/bin/phpunit --exclude-group=onlyWindows
+
+On Windows, it must be done this way:
+
+    vendor/bin/phpunit --exclude-group=onlyUnix
 
 ## Versioning
 For transparency and insight into our release cycle and to maintain backward 
