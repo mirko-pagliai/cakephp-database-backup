@@ -84,7 +84,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         $this->exec('database_backup.backup export');
         $this->assertExitWithSuccess();
         $this->assertRegExp(
-            '/^\<success\>Backup `' . $target. 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
+            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
             $this->_out->messages()[3]
         );
 
