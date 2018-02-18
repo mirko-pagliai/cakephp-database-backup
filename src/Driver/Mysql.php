@@ -104,7 +104,7 @@ class Mysql extends Driver
         $this->auth = tempnam(sys_get_temp_dir(), 'auth');
 
         file_put_contents($this->auth, sprintf(
-            "[mysqldump]\r\nuser=%s\r\npassword=\"%s\"\r\nhost=%s",
+            "[mysqldump]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
             $this->config['username'],
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']
@@ -133,7 +133,7 @@ class Mysql extends Driver
         $this->auth = tempnam(sys_get_temp_dir(), 'auth');
 
         file_put_contents($this->auth, sprintf(
-            "[client]\r\nuser=%s\r\npassword=\"%s\"\r\nhost=%s",
+            "[client]" . PHP_EOL . "user=%s" . PHP_EOL . "password=\"%s\"" . PHP_EOL . "host=%s",
             $this->config['username'],
             empty($this->config['password']) ? null : $this->config['password'],
             $this->config['host']
