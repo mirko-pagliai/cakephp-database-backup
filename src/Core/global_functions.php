@@ -61,6 +61,6 @@ if (!function_exists('which')) {
 
         $path = isWin() && !empty($path) ? array_map('escapeshellarg', $path) : $path;
 
-        return $exitCode === 0 && !empty($path[0]) ? escapeshellarg($path[0]) : null;
+        return $exitCode === 0 && !empty($path[0]) ? $path[0] : null;
     }
 }

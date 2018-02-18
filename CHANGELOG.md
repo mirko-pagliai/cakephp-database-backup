@@ -4,7 +4,8 @@
 * fixed to work under Windows;
 * before importing a sqlite backup, each table is dropped, rather than deleting
     the database file;
-* added `isWin()` global function.
+* added `isWin()` global function;
+* tests can have `onlyUnix` or `onlyWindows` group.
 
 ### 2.2.0
 * added `ConsoleIntegrationTestCase` and `TestCaseTrait` classes. Console tests

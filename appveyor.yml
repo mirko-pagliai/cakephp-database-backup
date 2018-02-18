@@ -50,4 +50,4 @@ install:
 
 test_script:
   - cd C:\projects\cakephp-database-backup
-  - vendor\bin\phpunit.bat
+  - vendor\bin\phpunit.bat --exclude-group=onlyUnix
