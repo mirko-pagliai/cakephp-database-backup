@@ -1,6 +1,6 @@
 # 2.x branch
-## 2.2 branch
-### 2.2.1
+## 2.3 branch
+### 2.3.0
 * full support for working under Windows;
 * added `Driver::getConfig()` method, removed `Driver::$config` property. This
     allows you to get the configuration values safely;
@@ -10,6 +10,7 @@
 * added `isWin()` global function;
 * tests can have `onlyUnix` or `onlyWindows` group.
 
+## 2.2 branch
 ### 2.2.0
 * added `ConsoleIntegrationTestCase` and `TestCaseTrait` classes. Console tests
     have been simplified;

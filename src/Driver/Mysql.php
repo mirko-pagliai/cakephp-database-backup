@@ -66,7 +66,7 @@ class Mysql extends Driver
      * Internal method to write an auth file
      * @param string $content Content
      * @return void
-     * @since 2.2.1
+     * @since 2.3.0
      * @uses getConfig()
      * @uses $auth
      */
