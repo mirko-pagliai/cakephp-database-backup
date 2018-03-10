@@ -24,10 +24,14 @@ if (!defined('REDIRECT_TO_DEV_NULL')) {
 }
 
 //Sets the list of valid compressions
-const VALID_COMPRESSIONS = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'];
+if(!defined('VALID_COMPRESSIONS')) {
+    define('VALID_COMPRESSIONS', ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip']);
+}
 
 //Sets the list of valid extensions
-const VALID_EXTENSIONS = ['sql.bz2', 'sql.gz', 'sql'];
+if(!defined('VALID_EXTENSIONS')) {
+    define('VALID_EXTENSIONS', ['sql.bz2', 'sql.gz', 'sql']);
+}
 
 //Binaries
 foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlite3'] as $binary) {
