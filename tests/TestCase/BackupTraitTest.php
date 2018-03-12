@@ -158,6 +158,8 @@ class BackupTraitTest extends TestCase
             'backup.sql.bz2' => 'sql.bz2',
             'backup.sql.gz' => 'sql.gz',
             'text.txt' => null,
+            'text' => null,
+            '.txt' => null,
         ];
 
         foreach ($extensions as $filename => $expectedExtension) {
