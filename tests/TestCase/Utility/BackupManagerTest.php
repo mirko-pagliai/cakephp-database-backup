@@ -235,7 +235,7 @@ class BackupManagerTest extends TestCase
      * Test for `send()` method, with an invalid file
      * @test
      * @expectedException RuntimeException
-     * @expectedExceptionMessage File or directory `/tmp/backups/noExistingFile` not readable
+     * @expectedExceptionMessage File or directory `[\s\w\/:\\]+` not readable
      */
     public function testSendInvalidFile()
     {
