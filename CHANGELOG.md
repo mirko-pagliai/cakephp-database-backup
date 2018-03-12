@@ -1,4 +1,10 @@
 # 2.x branch
+## 2.4 branch
+### 2.4.0
+* `VALID_COMPRESSIONS` and `VALID_EXTENSIONS` constants have been replaced by
+    `getValidCompressions()` and `getValidExtensions()` methods provided by the
+    `BackupTrait` class.
+
 ## 2.3 branch
 ### 2.3.0
 * full support for working under Windows;

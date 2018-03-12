@@ -271,6 +271,7 @@ class BackupShell extends Shell
     /**
      * Gets the option parser instance and configures it
      * @return ConsoleOptionParser
+     * @uses getValidCompressions()
      */
     public function getOptionParser()
     {
@@ -285,7 +286,7 @@ class BackupShell extends Shell
             'parser' => [
                 'options' => [
                     'compression' => [
-                        'choices' => VALID_COMPRESSIONS,
+                        'choices' => $this->getValidCompressions(),
                         'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
                         'short' => 'c',
                     ],

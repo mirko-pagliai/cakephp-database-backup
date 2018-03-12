@@ -15,6 +15,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Event\EventList;
 use Cake\ORM\TableRegistry;
+use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -24,6 +25,8 @@ use DatabaseBackup\TestSuite\TestCase;
  */
 abstract class DriverTestCase extends TestCase
 {
+    use BackupTrait;
+
     /**
      * @var \Cake\ORM\Table
      */
@@ -280,7 +283,7 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportAndImport()
     {
-        foreach (VALID_EXTENSIONS as $extension) {
+        foreach ($this->getValidExtensions() as $extension) {
             $this->loadFixtures();
 
             $backup = $this->getAbsolutePath(sprintf('example.%s', $extension));

@@ -192,4 +192,22 @@ class BackupTraitTest extends TestCase
     {
         $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->getTarget());
     }
+
+    /**
+     * Test for `getValidCompressions()` method
+     * @test
+     */
+    public function testGetValidCompressions()
+    {
+        $this->assertNotEmpty($this->getValidCompressions());
+    }
+
+    /**
+     * Test for `getValidExtensions()` method
+     * @test
+     */
+    public function testGetValidExtensions()
+    {
+        $this->assertNotEmpty($this->getValidExtensions());
+    }
 }
