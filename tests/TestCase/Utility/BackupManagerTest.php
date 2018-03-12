@@ -91,9 +91,9 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `delete()` method, with a no existing file
-     * @test
      * @expectedException RuntimeException
      * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+noExistingFile.sql` not writable$/
+     * @test
      */
     public function testDeleteNoExistingFile()
     {
@@ -178,9 +178,9 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `rotate()` method, with an invalid value
-     * @test
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid rotate value
+     * @test
      */
     public function testRotateWithInvalidValue()
     {
@@ -217,9 +217,9 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `send()` method, with empty sender
-     * @test
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage The email set for "from" is empty.
+     * @test
      */
     public function testSendEmptySender()
     {
@@ -233,9 +233,9 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `send()` method, with an invalid file
-     * @test
      * @expectedException RuntimeException
      * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not readable$/
+     * @test
      */
     public function testSendInvalidFile()
     {
@@ -244,9 +244,9 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `send()` method, with an invalid sender
-     * @test
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid email set for "from". You passed "invalidSender".
+     * @test
      */
     public function testSendInvalidSender()
     {
