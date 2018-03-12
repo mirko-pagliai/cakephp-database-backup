@@ -107,7 +107,7 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `compression()` method, with an invalid type
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid compression type
      * @test
      */
@@ -157,7 +157,7 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with a file that already exists
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException RuntimeException
      * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\]+backup\.sql` already exists$/
      */
     public function testFilenameAlreadyExists()
@@ -170,7 +170,7 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with a no writable directory
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException RuntimeException
      * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not writable$/
      * @test
      */
@@ -181,7 +181,7 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with invalid extension
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid file extension
      * @test
      */
@@ -202,7 +202,7 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `rotate()` method, with an invalid value
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid rotate value
      * @test
      */

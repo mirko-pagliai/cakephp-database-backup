@@ -14,8 +14,9 @@
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
-use Cake\Network\Exception\InternalErrorException;
 use DatabaseBackup\BackupTrait;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Utility to export databases
@@ -102,7 +103,7 @@ class BackupExport
      *  values are `bzip2` and `gzip`. Use `false` for no compression
      * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
-     * @throws InternalErrorException
+     * @throws InvalidArgumentException
      * @uses getValidCompressions()
      * @uses $compression
      * @uses $defaultExtension
@@ -114,7 +115,7 @@ class BackupExport
             $this->extension = array_search($compression, $this->getValidCompressions());
 
             if (!$this->extension) {
-                throw new InternalErrorException(__d('database_backup', 'Invalid compression type'));
+                throw new InvalidArgumentException(__d('database_backup', 'Invalid compression type'));
             }
         } else {
             $this->extension = $this->defaultExtension;
@@ -133,7 +134,8 @@ class BackupExport
      *  contain patterns
      * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
-     * @throws InternalErrorException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      * @uses compression()
      * @uses $config
      * @uses $filename
@@ -156,16 +158,16 @@ class BackupExport
         $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable(dirname($filename))) {
-            throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not writable', dirname($filename)));
+            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not writable', dirname($filename)));
         }
 
         if (file_exists($filename)) {
-            throw new InternalErrorException(__d('database_backup', 'File `{0}` already exists', $filename));
+            throw new RuntimeException(__d('database_backup', 'File `{0}` already exists', $filename));
         }
 
         //Checks for extension
         if (!$this->getExtension($filename)) {
-            throw new InternalErrorException(__d('database_backup', 'Invalid file extension'));
+            throw new InvalidArgumentException(__d('database_backup', 'Invalid file extension'));
         }
 
         //Sets the compression

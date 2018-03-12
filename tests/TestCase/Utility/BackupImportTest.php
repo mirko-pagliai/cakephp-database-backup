@@ -90,7 +90,7 @@ class BackupImportTest extends TestCase
 
     /**
      * Test for `filename()` method, with invalid directory
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException RuntimeException
      * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+backup\.sql` not readable$/
      * @test
      */
@@ -101,7 +101,7 @@ class BackupImportTest extends TestCase
 
     /**
      * Test for `filename()` method, with invalid extension
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid file extension
      * @test
      */
@@ -139,7 +139,7 @@ class BackupImportTest extends TestCase
 
     /**
      * Test for `import()` method, without a filename
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException RuntimeException
      * @expectedExceptionMessage You must first set the filename
      * @test
      */
