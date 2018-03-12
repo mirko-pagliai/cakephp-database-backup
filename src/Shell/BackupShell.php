@@ -20,6 +20,7 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 use DatabaseBackup\Utility\BackupManager;
+use Exception;
 
 /**
  * Shell to handle database backups
@@ -143,7 +144,7 @@ class BackupShell extends Shell
             if ($this->param('rotate')) {
                 $this->rotate($this->param('rotate'));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->abort($e->getMessage());
         }
     }
@@ -162,7 +163,7 @@ class BackupShell extends Shell
             $file = (new BackupImport)->filename($filename)->import();
 
             $this->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->abort($e->getMessage());
         }
     }
@@ -242,7 +243,7 @@ class BackupShell extends Shell
             }
 
             $this->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->abort($e->getMessage());
         }
     }
@@ -263,7 +264,7 @@ class BackupShell extends Shell
             $this->BackupManager->send($filename, $recipient);
 
             $this->success(__d('database_backup', 'Backup `{0}` was sent via mail', rtr($filename)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->abort($e->getMessage());
         }
     }
