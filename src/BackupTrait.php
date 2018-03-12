@@ -135,9 +135,10 @@ trait BackupTrait
     }
 
     /**
-     * Returns the extension of a filename
+     * Returns the extension from a filename
      * @param string $filename Filename
-     * @return string|null Extension or `null` on failure
+     * @return string|null Extension or `null` if the extension is not found or
+     *  if is an invalid extension
      * @uses getValidExtensions()
      */
     public function getExtension($filename)
