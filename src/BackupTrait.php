@@ -40,11 +40,7 @@ trait BackupTrait
      */
     public function getAbsolutePath($path)
     {
-        if (!Folder::isAbsolute($path)) {
-            return $this->getTarget() . DS . $path;
-        }
-
-        return $path;
+        return Folder::isAbsolute($path) ? $path : $this->getTarget() . DS . $path;
     }
 
     /**
@@ -52,17 +48,10 @@ trait BackupTrait
      * @param string $name Binary name
      * @return string
      * @since 2.0.0
-     * @throws InvalidArgumentException
      */
     public function getBinary($name)
     {
-        $binary = Configure::read(DATABASE_BACKUP . '.binaries.' . $name);
-
-        if (!$binary) {
-            throw new InvalidArgumentException(__d('database_backup', '`{0}` executable not available', $name));
-        }
-
-        return $binary;
+        return Configure::readOrFail(DATABASE_BACKUP . '.binaries.' . $name);
     }
 
     /**
@@ -101,9 +90,7 @@ trait BackupTrait
      */
     public function getConnection($name = null)
     {
-        if (!$name) {
-            $name = Configure::read(DATABASE_BACKUP . '.connection');
-        }
+        $name = $name ?: Configure::readOrFail(DATABASE_BACKUP . '.connection');
 
         return ConnectionManager::get($name);
     }
@@ -125,7 +112,7 @@ trait BackupTrait
         }
 
         $className = $this->getClassShortName($connection->getDriver());
-        $driver = App::classname(DATABASE_BACKUP . '.' . $className, 'Driver');
+        $driver = App::classname(sprintf('%s.%s', DATABASE_BACKUP, $className), 'Driver');
 
         if (!$driver) {
             throw new InvalidArgumentException(__d('database_backup', 'The `{0}` driver does not exist', $className));
@@ -145,11 +132,7 @@ trait BackupTrait
     {
         $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
 
-        if (preg_match($regex, $filename, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
+        return preg_match($regex, $filename, $matches) && !empty($matches[1]) ? $matches[1] : null;
     }
 
     /**

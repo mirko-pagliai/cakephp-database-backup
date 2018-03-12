@@ -65,15 +65,13 @@ class BackupTraitTest extends TestCase
 
     /**
      * Test for `getBinary()` method, with a binary not available
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage `bzip2` executable not available
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Expected configuration key "DatabaseBackup.binaries.noExisting" not found.
      * @test
      */
     public function testGetBinaryNotAvailable()
     {
-        Configure::write(DATABASE_BACKUP . '.binaries.bzip2', false);
-
-        $this->getBinary('bzip2');
+        $this->getBinary('noExisting');
     }
 
     /**
