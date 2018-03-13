@@ -121,7 +121,7 @@ class PostgresTest extends DriverTestCase
 
     /**
      * Test for `export()` method on failure
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException RuntimeException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
@@ -136,7 +136,7 @@ class PostgresTest extends DriverTestCase
 
     /**
      * Test for `import()` method on failure
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException RuntimeException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */

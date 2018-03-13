@@ -26,6 +26,13 @@ use ReflectionClass;
 trait BackupTrait
 {
     /**
+     * Valid extensions (as keys) and compressions (as values)
+     * @since 2.4.0
+     * @var array
+     */
+    private static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+
+    /**
      * Returns an absolute path
      * @param string $path Relative or absolute path
      * @return string
@@ -33,11 +40,7 @@ trait BackupTrait
      */
     public function getAbsolutePath($path)
     {
-        if (!Folder::isAbsolute($path)) {
-            return $this->getTarget() . DS . $path;
-        }
-
-        return $path;
+        return Folder::isAbsolute($path) ? $path : $this->getTarget() . DS . $path;
     }
 
     /**
@@ -45,17 +48,10 @@ trait BackupTrait
      * @param string $name Binary name
      * @return string
      * @since 2.0.0
-     * @throws InvalidArgumentException
      */
     public function getBinary($name)
     {
-        $binary = Configure::read(DATABASE_BACKUP . '.binaries.' . $name);
-
-        if (!$binary) {
-            throw new InvalidArgumentException(__d('database_backup', '`{0}` executable not available', $name));
-        }
-
-        return $binary;
+        return Configure::readOrFail(DATABASE_BACKUP . '.binaries.' . $name);
     }
 
     /**
@@ -73,17 +69,18 @@ trait BackupTrait
      * @param string $filename Filename
      * @return string|bool Compression type as string or `false`
      * @uses getExtension()
+     * @uses getValidCompressions()
      */
     public function getCompression($filename)
     {
         //Gets the extension from the filename
         $extension = $this->getExtension($filename);
 
-        if (!array_key_exists($extension, VALID_COMPRESSIONS)) {
+        if (!array_key_exists($extension, $this->getValidCompressions())) {
             return false;
         }
 
-        return VALID_COMPRESSIONS[$extension];
+        return $this->getValidCompressions()[$extension];
     }
 
     /**
@@ -93,9 +90,7 @@ trait BackupTrait
      */
     public function getConnection($name = null)
     {
-        if (!$name) {
-            $name = Configure::read(DATABASE_BACKUP . '.connection');
-        }
+        $name = $name ?: Configure::readOrFail(DATABASE_BACKUP . '.connection');
 
         return ConnectionManager::get($name);
     }
@@ -117,7 +112,7 @@ trait BackupTrait
         }
 
         $className = $this->getClassShortName($connection->getDriver());
-        $driver = App::classname(DATABASE_BACKUP . '.' . $className, 'Driver');
+        $driver = App::classname(sprintf('%s.%s', DATABASE_BACKUP, $className), 'Driver');
 
         if (!$driver) {
             throw new InvalidArgumentException(__d('database_backup', 'The `{0}` driver does not exist', $className));
@@ -127,19 +122,17 @@ trait BackupTrait
     }
 
     /**
-     * Returns the extension of a filename
+     * Returns the extension from a filename
      * @param string $filename Filename
-     * @return string|null Extension or `null` on failure
+     * @return string|null Extension or `null` if the extension is not found or
+     *  if is an invalid extension
+     * @uses getValidExtensions()
      */
     public function getExtension($filename)
     {
-        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', VALID_EXTENSIONS)));
+        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
 
-        if (preg_match($regex, $filename, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
+        return preg_match($regex, $filename, $matches) && !empty($matches[1]) ? $matches[1] : null;
     }
 
     /**
@@ -149,5 +142,27 @@ trait BackupTrait
     public function getTarget()
     {
         return Configure::read(DATABASE_BACKUP . '.target');
+    }
+
+    /**
+     * Returns all valid compressions
+     * @return array
+     * @since 2.4.0
+     * @uses $$validExtensions
+     */
+    public function getValidCompressions()
+    {
+        return array_filter(self::$validExtensions);
+    }
+
+    /**
+     * Returns all valid extensions
+     * @return array
+     * @since 2.4.0
+     * @uses $validExtensions
+     */
+    public function getValidExtensions()
+    {
+        return array_keys(self::$validExtensions);
     }
 }

@@ -17,9 +17,10 @@ use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
-use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Utility to manage database backups
@@ -34,14 +35,14 @@ class BackupManager
      *  The path can be relative to the backup directory
      * @return bool
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
-     * @throws InternalErrorException
+     * @throws RuntimeException
      */
     public function delete($filename)
     {
         $filename = $this->getAbsolutePath($filename);
 
         if (!is_writable($filename)) {
-            throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not writable', $filename));
+            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not writable', $filename));
         }
 
         return unlink($filename);
@@ -99,14 +100,14 @@ class BackupManager
      * @param int $rotate Number of backups that you want to keep
      * @return array Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
-     * @throws InternalErrorException
+     * @throws InvalidArgumentException
      * @uses delete()
      * @uses index()
      */
     public function rotate($rotate)
     {
         if (!isPositive($rotate)) {
-            throw new InternalErrorException(__d('database_backup', 'Invalid rotate value'));
+            throw new InvalidArgumentException(__d('database_backup', 'Invalid rotate value'));
         }
 
         $backupsToBeDeleted = array_slice($this->index(), $rotate);
@@ -126,26 +127,23 @@ class BackupManager
      * @param string $recipient Recipient's email address
      * @return \Cake\Mailer\Email
      * @since 1.1.0
-     * @throws InternalErrorException
      */
     protected function getEmailInstance($backup, $recipient)
     {
-        $sender = Configure::read(DATABASE_BACKUP . '.mailSender');
+        $file = $this->getAbsolutePath($backup);
 
-        if (!$sender) {
-            throw new InternalErrorException(__d('database_backup', 'You must first set the mail sender'));
+        if (!is_readable($file)) {
+            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not readable', $file));
         }
 
-        $backup = $this->getAbsolutePath($backup);
+        $basename = basename($file);
+        $mimetype = mime_content_type($file);
 
         return (new Email)
-            ->setFrom($sender)
+            ->setFrom(Configure::readOrFail(DATABASE_BACKUP . '.mailSender'))
             ->setTo($recipient)
-            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($backup), env('SERVER_NAME', 'localhost')))
-            ->setAttachments([basename($backup) => [
-                'file' => $backup,
-                'mimetype' => mime_content_type($backup),
-            ]]);
+            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', $basename, env('SERVER_NAME', 'localhost')))
+            ->setAttachments([$basename => compact('file', 'mimetype')]);
     }
 
     /**

@@ -91,9 +91,9 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `delete()` method, with a no existing file
-     * @test
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException RuntimeException
      * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+noExistingFile.sql` not writable$/
+     * @test
      */
     public function testDeleteNoExistingFile()
     {
@@ -178,9 +178,9 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `rotate()` method, with an invalid value
-     * @test
-     * @expectedException Cake\Network\Exception\InternalErrorException
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid rotate value
+     * @test
      */
     public function testRotateWithInvalidValue()
     {
@@ -216,15 +216,45 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `send()` method, without a sender
+     * Test for `send()` method, with empty sender
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The email set for "from" is empty.
      * @test
-     * @expectedException Cake\Network\Exception\InternalErrorException
-     * @expectedExceptionMessage You must first set the mail sender
      */
-    public function testSendWithoutSender()
+    public function testSendEmptySender()
     {
+        //Get a backup file
+        $file = $this->createBackup();
+
         Configure::write(DATABASE_BACKUP . '.mailSender', false);
 
-        $this->BackupManager->send('file.sql', 'recipient@example.com');
+        $this->BackupManager->send($file, 'recipient@example.com');
+    }
+
+    /**
+     * Test for `send()` method, with an invalid file
+     * @expectedException RuntimeException
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not readable$/
+     * @test
+     */
+    public function testSendInvalidFile()
+    {
+        $this->BackupManager->send('noExistingFile', 'recipient@example.com');
+    }
+
+    /**
+     * Test for `send()` method, with an invalid sender
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid email set for "from". You passed "invalidSender".
+     * @test
+     */
+    public function testSendInvalidSender()
+    {
+        //Get a backup file
+        $file = $this->createBackup();
+
+        Configure::write(DATABASE_BACKUP . '.mailSender', 'invalidSender');
+
+        $this->BackupManager->send($file, 'recipient@example.com');
     }
 }

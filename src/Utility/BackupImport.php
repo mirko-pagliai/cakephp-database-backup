@@ -13,8 +13,9 @@
  */
 namespace DatabaseBackup\Utility;
 
-use Cake\Network\Exception\InternalErrorException;
 use DatabaseBackup\BackupTrait;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Utility to import databases
@@ -51,7 +52,8 @@ class BackupImport
      * @param string $filename Filename. It can be an absolute path
      * @return \DatabaseBackup\Utility\BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
-     * @throws InternalErrorException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      * @uses $filename
      */
     public function filename($filename)
@@ -59,12 +61,12 @@ class BackupImport
         $filename = $this->getAbsolutePath($filename);
 
         if (!is_readable($filename)) {
-            throw new InternalErrorException(__d('database_backup', 'File or directory `{0}` not readable', $filename));
+            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not readable', $filename));
         }
 
         //Checks for extension
         if (!$this->getExtension($filename)) {
-            throw new InternalErrorException(__d('database_backup', 'Invalid file extension'));
+            throw new InvalidArgumentException(__d('database_backup', 'Invalid file extension'));
         }
 
         $this->filename = $filename;
@@ -76,14 +78,14 @@ class BackupImport
      * Imports the database
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
-     * @throws InternalErrorException
+     * @throws RuntimeException
      * @uses $driver
      * @uses $filename
      */
     public function import()
     {
         if (empty($this->filename)) {
-            throw new InternalErrorException(__d('database_backup', 'You must first set the filename'));
+            throw new RuntimeException(__d('database_backup', 'You must first set the filename'));
         }
 
         //This allows the filename to be set again with a next call of this

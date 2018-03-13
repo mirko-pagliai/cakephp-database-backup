@@ -23,12 +23,6 @@ if (!defined('REDIRECT_TO_DEV_NULL')) {
     define('REDIRECT_TO_DEV_NULL', isWin() ? ' 2>nul' : ' 2>/dev/null');
 }
 
-//Sets the list of valid compressions
-const VALID_COMPRESSIONS = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip'];
-
-//Sets the list of valid extensions
-const VALID_EXTENSIONS = ['sql.bz2', 'sql.gz', 'sql'];
-
 //Binaries
 foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlite3'] as $binary) {
     if (!Configure::check(DATABASE_BACKUP . '.binaries.' . $binary)) {

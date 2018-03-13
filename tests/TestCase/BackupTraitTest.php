@@ -65,15 +65,13 @@ class BackupTraitTest extends TestCase
 
     /**
      * Test for `getBinary()` method, with a binary not available
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage `bzip2` executable not available
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Expected configuration key "DatabaseBackup.binaries.noExisting" not found.
      * @test
      */
     public function testGetBinaryNotAvailable()
     {
-        Configure::write(DATABASE_BACKUP . '.binaries.bzip2', false);
-
-        $this->getBinary('bzip2');
+        $this->getBinary('noExisting');
     }
 
     /**
@@ -158,6 +156,8 @@ class BackupTraitTest extends TestCase
             'backup.sql.bz2' => 'sql.bz2',
             'backup.sql.gz' => 'sql.gz',
             'text.txt' => null,
+            'text' => null,
+            '.txt' => null,
         ];
 
         foreach ($extensions as $filename => $expectedExtension) {
@@ -191,5 +191,23 @@ class BackupTraitTest extends TestCase
     public function testGetTarget()
     {
         $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->getTarget());
+    }
+
+    /**
+     * Test for `getValidCompressions()` method
+     * @test
+     */
+    public function testGetValidCompressions()
+    {
+        $this->assertNotEmpty($this->getValidCompressions());
+    }
+
+    /**
+     * Test for `getValidExtensions()` method
+     * @test
+     */
+    public function testGetValidExtensions()
+    {
+        $this->assertNotEmpty($this->getValidExtensions());
     }
 }

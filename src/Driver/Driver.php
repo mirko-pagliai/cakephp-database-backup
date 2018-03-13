@@ -16,7 +16,7 @@ namespace DatabaseBackup\Driver;
 use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
-use Cake\Network\Exception\InternalErrorException;
+use RuntimeException;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -172,7 +172,7 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterExport: will be triggered after export
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
-     * @throws InternalErrorException
+     * @throws RuntimeException
      * @uses _exportExecutableWithCompression()
      */
     final public function export($filename)
@@ -188,7 +188,7 @@ abstract class Driver implements EventListenerInterface
         $this->dispatchEvent('Backup.afterExport');
 
         if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+            throw new RuntimeException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
         }
 
         return file_exists($filename);
@@ -226,7 +226,7 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterImport: will be triggered after import
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
-     * @throws InternalErrorException
+     * @throws RuntimeException
      * @uses _importExecutableWithCompression()
      */
     final public function import($filename)
@@ -242,7 +242,7 @@ abstract class Driver implements EventListenerInterface
         $this->dispatchEvent('Backup.afterImport');
 
         if ($returnVar !== 0) {
-            throw new InternalErrorException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+            throw new RuntimeException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
         }
 
         return true;
