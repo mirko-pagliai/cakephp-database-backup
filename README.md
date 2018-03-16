@@ -72,7 +72,7 @@ By default, phpunit is executed like this:
 
 On Windows, it must be done this way:
 
-    vendor/bin/phpunit --exclude-group=onlyUnix
+    vendor\bin\phpunit.bat --exclude-group=onlyUnix
 
 ## Versioning
 For transparency and insight into our release cycle and to maintain backward 
