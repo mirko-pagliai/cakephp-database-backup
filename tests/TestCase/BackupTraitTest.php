@@ -75,16 +75,6 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getClassShortName()` method
-     * @test
-     */
-    public function testGetClassShortName()
-    {
-        $this->assertEquals('TestCase', $this->getClassShortName('\Cake\TestSuite\TestCase'));
-        $this->assertEquals('TestCase', $this->getClassShortName('Cake\TestSuite\TestCase'));
-    }
-
-    /**
      * Test for `getCompression()` method
      * @test
      */

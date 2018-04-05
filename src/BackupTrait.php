@@ -55,16 +55,6 @@ trait BackupTrait
     }
 
     /**
-     * Gets the short name for class namespace
-     * @param string $class Class namespace
-     * @return string
-     */
-    public function getClassShortName($class)
-    {
-        return (new ReflectionClass($class))->getShortName();
-    }
-
-    /**
      * Returns the compression type from a filename
      * @param string $filename Filename
      * @return string|bool Compression type as string or `false`
@@ -103,7 +93,6 @@ trait BackupTrait
      * @since 2.0.0
      * @throws InvalidArgumentException
      * @uses getConnection()
-     * @uses getClassShortName()
      */
     public function getDriver(ConnectionInterface $connection = null)
     {
@@ -111,7 +100,7 @@ trait BackupTrait
             $connection = $this->getConnection();
         }
 
-        $className = $this->getClassShortName($connection->getDriver());
+        $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', DATABASE_BACKUP, $className), 'Driver');
 
         if (!$driver) {
