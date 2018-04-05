@@ -18,7 +18,6 @@ use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Cake\Filesystem\Folder;
 use InvalidArgumentException;
-use ReflectionClass;
 
 /**
  * A trait that provides some methods used by all other classes
