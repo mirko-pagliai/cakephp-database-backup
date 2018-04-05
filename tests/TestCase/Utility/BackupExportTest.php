@@ -16,7 +16,7 @@ use Cake\Core\Configure;
 use Cake\Log\Log;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
-use Reflection\ReflectionTrait;
+use Tools\ReflectionTrait;
 
 /**
  * BackupExportTest class

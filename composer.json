@@ -10,20 +10,17 @@
     }],
     "require": {
         "php": ">=5.5.9",
-        "cakephp/cakephp": ">=3.5 <4"
+        "cakephp/cakephp": ">=3.5 <4",
+        "mirko-pagliai/php-tools": "^1.0"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^3.0",
-        "mirko-pagliai/reflection": "^1.0",
         "phpunit/phpunit": "^5.7|^6.0"
     },
     "autoload": {
         "psr-4": {
             "DatabaseBackup\\": "src"
-        },
-        "files": [
-            "src/Core/global_functions.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
