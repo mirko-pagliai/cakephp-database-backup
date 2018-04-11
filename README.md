@@ -46,6 +46,10 @@ also required.
 
 The installation of these binaries may vary depending on your operating system.
 
+Please forward, remember that the database user must have the correct
+permissions (for example, for `mysql` the user must have the `LOCK TABLES`
+permission).
+
 ## Configuration
 The plugin uses some configuration parameters. See our wiki:
 * [Configuration](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration)
