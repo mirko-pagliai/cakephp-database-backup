@@ -13,19 +13,14 @@
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use Cake\Core\Configure;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\DriverTestCase;
-use Reflection\ReflectionTrait;
 
 /**
  * SqliteTest class
  */
 class SqliteTest extends DriverTestCase
 {
-    use BackupTrait;
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Driver\Sqlite
      */

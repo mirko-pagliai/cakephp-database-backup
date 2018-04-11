@@ -13,19 +13,14 @@
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use Cake\Database\Connection;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
-use Reflection\ReflectionTrait;
 
 /**
  * MysqlTest class
  */
 class MysqlTest extends DriverTestCase
 {
-    use BackupTrait;
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Driver\Mysql
      */

@@ -14,19 +14,14 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 
 use Cake\Core\Configure;
 use Cake\Database\Connection;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Postgres;
 use DatabaseBackup\TestSuite\DriverTestCase;
-use Reflection\ReflectionTrait;
 
 /**
  * PostgresTest class
  */
 class PostgresTest extends DriverTestCase
 {
-    use BackupTrait;
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Driver\Postgres
      */

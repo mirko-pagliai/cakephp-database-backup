@@ -1,4 +1,11 @@
 # 2.x branch
+## 2.5 branch
+### 2.5.0
+* now it uses the `mirko-pagliai/php-tools` package. This also replaces
+    `mirko-pagliai/reflection`;
+* removed `BackupTrait::getClassShortName()` method. The
+    `get_class_short_name()` global function will be used instead.
+
 ## 2.4 branch
 ### 2.4.0
 * fixed bug trying to email a nonexistent backup;

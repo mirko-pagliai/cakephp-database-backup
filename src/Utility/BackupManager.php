@@ -106,7 +106,7 @@ class BackupManager
      */
     public function rotate($rotate)
     {
-        if (!isPositive($rotate)) {
+        if (!is_positive($rotate)) {
             throw new InvalidArgumentException(__d('database_backup', 'Invalid rotate value'));
         }
 

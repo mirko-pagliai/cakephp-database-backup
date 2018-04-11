@@ -77,7 +77,7 @@ class BackupShell extends Shell
         parent::_welcome();
 
         $this->out(__d('database_backup', 'Connection: {0}', $this->config['name']));
-        $this->out(__d('database_backup', 'Driver: {0}', $this->getClassShortName($this->driver)));
+        $this->out(__d('database_backup', 'Driver: {0}', get_class_short_name($this->driver)));
         $this->hr();
     }
 

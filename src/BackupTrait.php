@@ -18,7 +18,6 @@ use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Cake\Filesystem\Folder;
 use InvalidArgumentException;
-use ReflectionClass;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -52,16 +51,6 @@ trait BackupTrait
     public function getBinary($name)
     {
         return Configure::readOrFail(DATABASE_BACKUP . '.binaries.' . $name);
-    }
-
-    /**
-     * Gets the short name for class namespace
-     * @param string $class Class namespace
-     * @return string
-     */
-    public function getClassShortName($class)
-    {
-        return (new ReflectionClass($class))->getShortName();
     }
 
     /**
@@ -103,7 +92,6 @@ trait BackupTrait
      * @since 2.0.0
      * @throws InvalidArgumentException
      * @uses getConnection()
-     * @uses getClassShortName()
      */
     public function getDriver(ConnectionInterface $connection = null)
     {
@@ -111,7 +99,7 @@ trait BackupTrait
             $connection = $this->getConnection();
         }
 
-        $className = $this->getClassShortName($connection->getDriver());
+        $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', DATABASE_BACKUP, $className), 'Driver');
 
         if (!$driver) {
@@ -130,9 +118,9 @@ trait BackupTrait
      */
     public function getExtension($filename)
     {
-        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
+        $extension = get_extension($filename);
 
-        return preg_match($regex, $filename, $matches) && !empty($matches[1]) ? $matches[1] : null;
+        return in_array($extension, $this->getValidExtensions()) ? $extension : null;
     }
 
     /**
