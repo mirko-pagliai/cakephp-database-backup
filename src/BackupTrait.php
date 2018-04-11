@@ -118,9 +118,9 @@ trait BackupTrait
      */
     public function getExtension($filename)
     {
-        $regex = sprintf('/\.(%s)$/', implode('|', array_map('preg_quote', $this->getValidExtensions())));
+        $extension = get_extension($filename);
 
-        return preg_match($regex, $filename, $matches) && !empty($matches[1]) ? $matches[1] : null;
+        return in_array($extension, $this->getValidExtensions()) ? $extension : null;
     }
 
     /**
