@@ -4,7 +4,6 @@
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-database-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-database-backup)
 [![Build status](https://ci.appveyor.com/api/projects/status/imerokwpvy0r51fj/branch/master?svg=true)](https://ci.appveyor.com/project/mirko-pagliai/cakephp-database-backup/branch/master)
 [![codecov](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup/branch/master/graph/badge.svg)](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup)
-[![Coverage Status](https://img.shields.io/codecov/c/github/mirko-pagliai/cakephp-database-backup.svg?style=flat-square)](https://codecov.io/github/mirko-pagliai/cakephp-database-backup)
 
 *DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.  
 Currently, the plugin supports *MySql*, *Postgres* and *Sqlite* databases.
