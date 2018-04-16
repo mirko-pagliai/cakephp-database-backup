@@ -96,10 +96,13 @@ if (!getenv('db_dsn')) {
 if (!getenv('db_dsn_postgres')) {
     putenv('db_dsn_postgres=postgres://postgres@localhost/travis_ci_test');
 }
+if (!getenv('db_dsn_sqlite')) {
+    putenv('db_dsn_sqlite=sqlite:///' . TMP . 'example.sq3');
+}
 
 ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 ConnectionManager::setConfig('test_postgres', ['url' => getenv('db_dsn_postgres')]);
-ConnectionManager::setConfig('test_sqlite', ['url' => 'sqlite:///' . TMP . 'example.sq3']);
+ConnectionManager::setConfig('test_sqlite', ['url' => getenv('db_dsn_sqlite')]);
 
 Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups');
