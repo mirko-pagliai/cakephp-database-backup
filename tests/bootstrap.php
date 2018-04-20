@@ -16,7 +16,6 @@ use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Cake\Mailer\Email;
-use Cake\Routing\DispatcherFactory;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -68,7 +67,6 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => [
         'plugins' => [APP . 'Plugin' . DS],
-        'templates' => [APP . 'TestApp' . DS . 'Template' . DS],
     ]
 ]);
 
@@ -117,9 +115,6 @@ Log::setConfig('debug', [
     'levels' => ['notice', 'info', 'debug'],
     'file' => 'debug',
 ]);
-
-DispatcherFactory::add('Routing');
-DispatcherFactory::add('ControllerFactory');
 
 Email::setConfigTransport('debug', ['className' => 'Debug']);
 Email::setConfig('default', ['transport' => 'debug', 'log' => true]);
