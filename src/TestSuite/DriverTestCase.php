@@ -234,7 +234,7 @@ abstract class DriverTestCase extends TestCase
     public function testGetConfig()
     {
         $this->assertNotEmpty($this->Driver->getConfig());
-        $this->assertTrue(is_array($this->Driver->getConfig()));
+        $this->assertIsArray($this->Driver->getConfig());
         $this->assertNotEmpty($this->Driver->getConfig('name'));
         $this->assertNull($this->Driver->getConfig('noExistingKey'));
     }
