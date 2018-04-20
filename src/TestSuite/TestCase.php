@@ -16,6 +16,7 @@ namespace DatabaseBackup\TestSuite;
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\TestSuite\TestCaseTrait;
+use Tools\TestSuite\TestCaseTrait as ToolsTestCaseTrait;
 
 /**
  * TestCase class
@@ -23,6 +24,7 @@ use DatabaseBackup\TestSuite\TestCaseTrait;
 abstract class TestCase extends CakeTestCase
 {
     use TestCaseTrait;
+    use ToolsTestCaseTrait;
 
     /**
      * Setup the test case, backup the static object values so they can be
