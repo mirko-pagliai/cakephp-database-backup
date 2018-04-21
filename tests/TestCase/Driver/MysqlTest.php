@@ -123,7 +123,7 @@ class MysqlTest extends DriverTestCase
         $this->assertFileExists($auth);
         $this->assertEquals($expected, file_get_contents($auth));
 
-        unlink($auth);
+        safe_unlink($auth);
     }
 
     /**
