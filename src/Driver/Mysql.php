@@ -163,7 +163,7 @@ class Mysql extends Driver
     {
         //Deletes the temporary file with the authentication data
         if ($this->auth && file_exists($this->auth)) {
-            unlink($this->auth);
+            safe_unlink($this->auth);
             unset($this->auth);
 
             return true;
