@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.5 branch
+### 2.5.1
+* added `Plugin` class for CakePHP 3.6.
+
 ### 2.5.0
 * now it uses the `mirko-pagliai/php-tools` package. This also replaces
     `mirko-pagliai/reflection`;

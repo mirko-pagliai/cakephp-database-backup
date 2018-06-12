@@ -15,12 +15,15 @@ namespace DatabaseBackup\Test\TestCase\Shell;
 use Cake\Core\Configure;
 use DatabaseBackup\Shell\BackupShell;
 use DatabaseBackup\TestSuite\ConsoleIntegrationTestCase;
+use Tools\TestSuite\TestCaseTrait;
 
 /**
  * BackupShellTest class
  */
 class BackupShellTest extends ConsoleIntegrationTestCase
 {
+    use TestCaseTrait;
+
     /**
      * @var \DatabaseBackup\Shell\BackupShell
      */
@@ -170,8 +173,8 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         foreach ($backups as $backup) {
             $this->assertRegExp('/^backup\.sql(\.(bz2|gz))?$/', $backup[0]);
             $this->assertRegExp('/^sql(\.(bz2|gz))?$/', $backup[1]);
-            $this->assertTrue(in_array($backup[2], ['bzip2', 'gzip', ''], true));
-            $this->assertRegExp('/^\d+(\.\d+)? (Bytes|KB)$/', $backup[3]);
+            $this->assertContains($backup[2], ['bzip2', 'gzip', '']);
+            $this->assertRegExp('/^[\d\.,]+ (Bytes|KB)$/', $backup[3]);
             $this->assertRegExp('/^[\d\/]+, [\d:]+ (A|P)M$/', $backup[4]);
         }
     }
@@ -274,21 +277,30 @@ class BackupShellTest extends ConsoleIntegrationTestCase
     public function testGetOptionParser()
     {
         $parser = $this->BackupShell->getOptionParser();
-
         $this->assertInstanceOf('Cake\Console\ConsoleOptionParser', $parser);
-        $this->assertEquals([
+        $this->assertEquals('Shell to handle database backups', $parser->getDescription());
+        $this->assertArrayKeysEqual(['help', 'quiet', 'verbose'], $parser->options());
+
+        $this->assertArrayKeysEqual([
             'delete_all',
             'export',
             'import',
             'index',
             'rotate',
             'send',
-        ], array_keys($parser->subcommands()));
+        ], $parser->subcommands());
 
-        //Checks "compression" options for the "export" subcommand
-        $this->assertEquals('[-c bzip2|gzip]', $parser->subcommands()['export']->parser()->options()['compression']->usage());
-
-        $this->assertEquals('Shell to handle database backups', $parser->getDescription());
-        $this->assertEquals(['help', 'quiet', 'verbose'], array_keys($parser->options()));
+        //Checks options for the "export" subcommand
+        $exportSubcommandOptions = $parser->subcommands()['export']->parser()->options();
+        $this->assertEquals('[-c bzip2|gzip]', $exportSubcommandOptions['compression']->usage());
+        $this->assertArrayKeysEqual([
+            'compression',
+            'filename',
+            'help',
+            'quiet',
+            'rotate',
+            'send',
+            'verbose',
+        ], $exportSubcommandOptions);
     }
 }
