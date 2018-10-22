@@ -13,7 +13,6 @@
 namespace DatabaseBackup\Test\TestCase\Shell;
 
 use Cake\Core\Configure;
-use Cake\Http\BaseApplication;
 use DatabaseBackup\Shell\BackupShell;
 use DatabaseBackup\TestSuite\ConsoleIntegrationTestCase;
 use Tools\TestSuite\TestCaseTrait;
@@ -38,9 +37,6 @@ class BackupShellTest extends ConsoleIntegrationTestCase
      */
     public function setUp()
     {
-        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
-        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
-
         parent::setUp();
 
         $this->BackupShell = new BackupShell;
@@ -53,7 +49,6 @@ class BackupShellTest extends ConsoleIntegrationTestCase
     public function testWelcome()
     {
         $this->exec('database_backup.backup index');
-
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
     }

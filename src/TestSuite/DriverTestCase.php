@@ -13,7 +13,9 @@
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Core\Configure;
 use Cake\Event\EventList;
+use Cake\Http\BaseApplication;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
@@ -45,9 +47,22 @@ abstract class DriverTestCase extends TestCase
     protected $Driver;
 
     /**
+     * @since 2.5.2
+     * @var object
+     */
+    protected $DriverClass;
+
+    /**
      * @var bool
      */
     public $autoFixtures = false;
+
+    /**
+     * Name of the database connection
+     * @since 2.5.2
+     * @var string
+     */
+    protected $connection;
 
     /**
      * Fixtures
@@ -65,6 +80,11 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
+        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
+        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
+
+        Configure::write(DATABASE_BACKUP . '.connection', $this->connection);
+
         $connection = $this->getConnection();
 
         TableRegistry::clear();
@@ -72,6 +92,7 @@ abstract class DriverTestCase extends TestCase
         $this->Comments = TableRegistry::get('Comments', compact('connection'));
 
         //Enable event tracking
+        $this->Driver = new $this->DriverClass($this->getConnection());
         $this->Driver->getEventManager()->setEventList(new EventList);
     }
 

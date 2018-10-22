@@ -12,10 +12,10 @@
  */
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
-use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Cake\Mailer\Email;
+use Cake\Mailer\TransportFactory;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -104,8 +104,6 @@ Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups');
 Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
-//Plugin::load('DatabaseBackup', ['bootstrap' => true, 'path' => ROOT]);
-
 //Sets debug log
 Log::setConfig('debug', [
     'className' => 'File',
@@ -114,7 +112,13 @@ Log::setConfig('debug', [
     'file' => 'debug',
 ]);
 
-Email::setConfigTransport('debug', ['className' => 'Debug']);
-Email::setConfig('default', ['transport' => 'debug', 'log' => true]);
+$transportName = 'debug';
+$transportConfig = ['className' => 'Debug'];
+if (class_exists('TransportFactory')) {
+    TransportFactory::setConfig($transportName, $transportConfig);
+} else {
+    Email::setConfigTransport($transportName, $transportConfig);
+}
+Email::setConfig('default', ['transport' => $transportName, 'log' => true]);
 
 ini_set('intl.default_locale', 'en_US');

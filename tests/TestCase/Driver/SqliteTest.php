@@ -12,7 +12,6 @@
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Core\Configure;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
@@ -24,31 +23,22 @@ class SqliteTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Sqlite
      */
-    protected $Driver;
+    protected $DriverClass = Sqlite::class;
+
+    /**
+     * Name of the database connection
+     * @var string
+     */
+    protected $connection = 'test_sqlite';
 
     /**
      * Fixtures
      * @var array
      */
     public $fixtures = [
-        'plugin.database_backup.Sqlite/Articles',
-        'plugin.database_backup.Sqlite/Comments',
+        'plugin.DatabaseBackup.Sqlite/Articles',
+        'plugin.DatabaseBackup.Sqlite/Comments',
     ];
-
-    /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
-     * @return void
-     */
-    public function setUp()
-    {
-        Configure::write(DATABASE_BACKUP . '.connection', 'test_sqlite');
-
-        $this->Driver = new Sqlite($this->getConnection());
-
-        parent::setUp();
-    }
 
     /**
      * Test for `_exportExecutable()` method
