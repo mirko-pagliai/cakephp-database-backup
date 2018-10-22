@@ -30,19 +30,6 @@ class BackupShellTest extends ConsoleIntegrationTestCase
     protected $BackupShell;
 
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
-     * @return void
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->BackupShell = new BackupShell;
-    }
-
-    /**
      * Test for `_welcome()` method
      * @test
      */
@@ -80,61 +67,39 @@ class BackupShellTest extends ConsoleIntegrationTestCase
      */
     public function testExport()
     {
-        $target = preg_quote(Configure::read(DATABASE_BACKUP . '.target') . DS, '/');
+        $targetRegex = preg_quote(Configure::read(DATABASE_BACKUP . '.target') . DS, '/');
 
         //Exports, without params
         $this->exec('database_backup.backup export');
         $this->assertExitWithSuccess();
-        $this->assertRegExp(
-            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
-            $this->_out->messages()[3]
-        );
-
-        sleep(1);
+        $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql` has been exported/');
 
         //Exports, with `compression` param
+        sleep(1);
         $this->exec('database_backup.backup export --compression bzip2');
         $this->assertExitWithSuccess();
-        $this->assertRegExp(
-            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql\.bz2` has been exported\<\/success\>$/',
-            $this->_out->messages()[3]
-        );
-
-        sleep(1);
+        $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql\.bz2` has been exported/');
 
         //Exports, with `filename` param
+        sleep(1);
         $this->exec('database_backup.backup export --filename backup.sql');
         $this->assertExitWithSuccess();
-        $this->assertRegExp(
-            '/^\<success\>Backup `' . $target . 'backup.sql` has been exported\<\/success\>$/',
-            $this->_out->messages()[3]
-        );
-
-        sleep(1);
+        $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup.sql` has been exported/');
 
         //Exports, with `rotate` param
+        sleep(1);
         $this->exec('database_backup.backup export --rotate 3 -v');
         $this->assertExitWithSuccess();
-        $this->assertRegExp(
-            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
-            $this->_out->messages()[3]
-        );
-        $this->assertRegExp('/^Backup `backup_test_\d+\.sql` has been deleted$/', $this->_out->messages()[4]);
+        $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql` has been deleted/', $this->_out->messages()[4]);
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
 
-        sleep(1);
-
         //Exports, with `send` param
+        sleep(1);
         $this->exec('database_backup.backup export --send mymail@example.com');
         $this->assertExitWithSuccess();
-        $this->assertRegExp(
-            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` has been exported\<\/success\>$/',
-            $this->_out->messages()[3]
-        );
-        $this->assertRegExp(
-            '/^\<success\>Backup `' . $target . 'backup_test_\d+\.sql` was sent via mail\<\/success\>$/',
-            $this->_out->messages()[4]
-        );
+        $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql` was sent via mail/');
     }
 
     /**
@@ -164,18 +129,10 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Backup files found: 3');
 
-        //Gets and splits the output rows about backup files
-        $backups = collection(array_slice($this->_out->messages(), 7, 3))->map(function ($row) {
-            return preg_split('/\s*\|\s*/', trim($row, '| '));
-        })->toArray();
-
-        foreach ($backups as $backup) {
-            $this->assertRegExp('/^backup\.sql(\.(bz2|gz))?$/', $backup[0]);
-            $this->assertRegExp('/^sql(\.(bz2|gz))?$/', $backup[1]);
-            $this->assertContains($backup[2], ['bzip2', 'gzip', '']);
-            $this->assertRegExp('/^[\d\.,]+ (Bytes|KB)$/', $backup[3]);
-            $this->assertRegExp('/^[\d\/]+, [\d:]+ (A|P)M$/', $backup[4]);
-        }
+        //Checks output about backup files
+        $this->assertOutputRegExp('/backup\.sql\.gz\s+|\s+sql\.gz\s+|\s+gzip\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
+        $this->assertOutputRegExp('/backup\.sql\.bz2\s+|\s+sql\.bz2\s+|\s+bzip2\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
+        $this->assertOutputRegExp('/backup\.sq\s+|\s+sql\s+|\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
     }
 
     /**
@@ -275,7 +232,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
      */
     public function testGetOptionParser()
     {
-        $parser = $this->BackupShell->getOptionParser();
+        $parser = (new BackupShell)->getOptionParser();
         $this->assertInstanceOf('Cake\Console\ConsoleOptionParser', $parser);
         $this->assertEquals('Shell to handle database backups', $parser->getDescription());
         $this->assertArrayKeysEqual(['help', 'quiet', 'verbose'], $parser->options());
