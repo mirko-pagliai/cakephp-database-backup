@@ -48,7 +48,7 @@ abstract class DriverTestCase extends TestCase
     protected $Driver;
 
     /**
-     * @since 2.5.2
+     * @since 2.5.1
      * @var object
      */
     protected $DriverClass;
