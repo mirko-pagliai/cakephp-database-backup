@@ -53,16 +53,12 @@ class BackupImport
      * @return \DatabaseBackup\Utility\BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws InvalidArgumentException
-     * @throws RuntimeException
      * @uses $filename
      */
     public function filename($filename)
     {
         $filename = $this->getAbsolutePath($filename);
-
-        if (!is_readable($filename)) {
-            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not readable', $filename));
-        }
+        is_readable_or_fail($filename);
 
         //Checks for extension
         if (!$this->getExtension($filename)) {

@@ -52,8 +52,6 @@ abstract class TestCase extends CakeTestCase
     {
         parent::tearDown();
 
-        $this->deleteAllBackups();
-
         Configure::write(DATABASE_BACKUP . '.connection', 'test');
     }
 }

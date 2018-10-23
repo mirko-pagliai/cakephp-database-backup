@@ -14,6 +14,7 @@
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
+use Cake\Database\Connection;
 use Cake\Event\EventList;
 use Cake\Http\BaseApplication;
 use Cake\ORM\TableRegistry;
@@ -97,17 +98,6 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->Articles, $this->Comments, $this->Driver);
-    }
-
-    /**
      * Internal method to get all records from the database
      * @return array
      */
@@ -127,7 +117,7 @@ abstract class DriverTestCase extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceof('Cake\Database\Connection', $this->getProperty($this->Driver, 'connection'));
+        $this->assertInstanceof(Connection::class, $this->getProperty($this->Driver, 'connection'));
     }
 
     /**
@@ -233,17 +223,17 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportStoppedByBeforeExport()
     {
-        $this->Driver = $this->getMockBuilder(get_class($this->Driver))
+        $Driver = $this->getMockBuilder(get_class($this->Driver))
             ->setMethods(['beforeExport'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Driver->method('beforeExport')
+        $Driver->method('beforeExport')
              ->will($this->returnValue(false));
 
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertFalse($this->Driver->export($backup));
+        $this->assertFalse($Driver->export($backup));
         $this->assertFileNotExists($backup);
     }
 
@@ -283,18 +273,18 @@ abstract class DriverTestCase extends TestCase
      */
     public function testImportStoppedByBeforeExport()
     {
-        $this->Driver = $this->getMockBuilder(get_class($this->Driver))
+        $Driver = $this->getMockBuilder(get_class($this->Driver))
             ->setMethods(['beforeImport'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Driver->method('beforeImport')
+        $Driver->method('beforeImport')
              ->will($this->returnValue(false));
 
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertTrue($this->Driver->export($backup));
-        $this->assertFalse($this->Driver->import($backup));
+        $this->assertTrue($Driver->export($backup));
+        $this->assertFalse($Driver->import($backup));
     }
 
     /**

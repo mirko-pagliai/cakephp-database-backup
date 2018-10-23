@@ -46,8 +46,6 @@ class ConsoleIntegrationTestCase extends CakeConsoleIntegrationTestCase
         $app->addPlugin('DatabaseBackup')->pluginBootstrap();
 
         $this->BackupExport = new BackupExport;
-
-        $this->deleteAllBackups();
     }
 
     /**

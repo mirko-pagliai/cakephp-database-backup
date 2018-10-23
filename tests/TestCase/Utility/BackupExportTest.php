@@ -170,8 +170,8 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with a no writable directory
-     * @expectedException RuntimeException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not writable$/
+     * @expectedException ErrorException
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` is not writable$/
      * @test
      */
     public function testFilenameNotWritableDirectory()

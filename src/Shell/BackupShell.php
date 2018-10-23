@@ -184,13 +184,11 @@ class BackupShell extends Shell
 
         if ($backups) {
             //Parses backups
-            $backups = collection($backups)
-                ->map(function ($backup) {
-                    $backup->size = Number::toReadableSize($backup->size);
+            $backups = array_map(function ($backup) {
+                $backup->size = Number::toReadableSize($backup->size);
 
-                    return array_values($backup->toArray());
-                })
-                ->toArray();
+                return array_values($backup->toArray());
+            }, $backups);
 
             //Table headers
             $headers = [

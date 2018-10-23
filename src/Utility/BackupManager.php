@@ -35,15 +35,11 @@ class BackupManager
      *  The path can be relative to the backup directory
      * @return bool
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
-     * @throws RuntimeException
      */
     public function delete($filename)
     {
         $filename = $this->getAbsolutePath($filename);
-
-        if (!is_writable($filename)) {
-            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not writable', $filename));
-        }
+        is_writable_or_fail($filename);
 
         return safe_unlink($filename);
     }
@@ -131,10 +127,7 @@ class BackupManager
     protected function getEmailInstance($backup, $recipient)
     {
         $file = $this->getAbsolutePath($backup);
-
-        if (!is_readable($file)) {
-            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not readable', $file));
-        }
+        is_readable_or_fail($file);
 
         $basename = basename($file);
         $mimetype = mime_content_type($file);
