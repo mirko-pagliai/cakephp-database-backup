@@ -14,6 +14,7 @@
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
+use Cake\Http\BaseApplication;
 use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\TestSuite\TestCaseTrait;
 use Tools\TestSuite\TestCaseTrait as ToolsTestCaseTrait;
@@ -36,6 +37,9 @@ abstract class TestCase extends CakeTestCase
     {
         parent::setUp();
 
+        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
+        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
+
         $this->deleteAllBackups();
     }
 
@@ -47,8 +51,6 @@ abstract class TestCase extends CakeTestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        $this->deleteAllBackups();
 
         Configure::write(DATABASE_BACKUP . '.connection', 'test');
     }

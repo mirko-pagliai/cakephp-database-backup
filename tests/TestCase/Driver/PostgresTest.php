@@ -12,7 +12,6 @@
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Core\Configure;
 use Cake\Database\Connection;
 use DatabaseBackup\Driver\Postgres;
 use DatabaseBackup\TestSuite\DriverTestCase;
@@ -25,31 +24,22 @@ class PostgresTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Postgres
      */
-    protected $Driver;
+    protected $DriverClass = Postgres::class;
+
+    /**
+     * Name of the database connection
+     * @var string
+     */
+    protected $connection = 'test_postgres';
 
     /**
      * Fixtures
      * @var array
      */
     public $fixtures = [
-        'plugin.database_backup.Postgres/Articles',
-        'plugin.database_backup.Postgres/Comments',
+        'plugin.DatabaseBackup.Postgres/Articles',
+        'plugin.DatabaseBackup.Postgres/Comments',
     ];
-
-    /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
-     * @return void
-     */
-    public function setUp()
-    {
-        Configure::write(DATABASE_BACKUP . '.connection', 'test_postgres');
-
-        $this->Driver = new Postgres($this->getConnection());
-
-        parent::setUp();
-    }
 
     /**
      * Test for `getDbnameAsString()` method

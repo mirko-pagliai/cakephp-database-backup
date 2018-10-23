@@ -210,11 +210,7 @@ abstract class Driver implements EventListenerInterface
             return $config;
         }
 
-        if (!array_key_exists($key, $config)) {
-            return null;
-        }
-
-        return $config[$key];
+        return array_key_exists($key, $config) ? $config[$key] : null;
     }
 
     /**

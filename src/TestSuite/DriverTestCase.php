@@ -13,7 +13,10 @@
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Core\Configure;
+use Cake\Database\Connection;
 use Cake\Event\EventList;
+use Cake\Http\BaseApplication;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
@@ -45,9 +48,22 @@ abstract class DriverTestCase extends TestCase
     protected $Driver;
 
     /**
+     * @since 2.5.2
+     * @var object
+     */
+    protected $DriverClass;
+
+    /**
      * @var bool
      */
     public $autoFixtures = false;
+
+    /**
+     * Name of the database connection
+     * @since 2.5.2
+     * @var string
+     */
+    protected $connection;
 
     /**
      * Fixtures
@@ -65,6 +81,11 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
+        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
+        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
+
+        Configure::write(DATABASE_BACKUP . '.connection', $this->connection);
+
         $connection = $this->getConnection();
 
         TableRegistry::clear();
@@ -72,18 +93,8 @@ abstract class DriverTestCase extends TestCase
         $this->Comments = TableRegistry::get('Comments', compact('connection'));
 
         //Enable event tracking
+        $this->Driver = new $this->DriverClass($this->getConnection());
         $this->Driver->getEventManager()->setEventList(new EventList);
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->Articles, $this->Comments, $this->Driver);
     }
 
     /**
@@ -106,7 +117,7 @@ abstract class DriverTestCase extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceof('Cake\Database\Connection', $this->getProperty($this->Driver, 'connection'));
+        $this->assertInstanceof(Connection::class, $this->getProperty($this->Driver, 'connection'));
     }
 
     /**
@@ -212,17 +223,17 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportStoppedByBeforeExport()
     {
-        $this->Driver = $this->getMockBuilder(get_class($this->Driver))
+        $Driver = $this->getMockBuilder(get_class($this->Driver))
             ->setMethods(['beforeExport'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Driver->method('beforeExport')
+        $Driver->method('beforeExport')
              ->will($this->returnValue(false));
 
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertFalse($this->Driver->export($backup));
+        $this->assertFalse($Driver->export($backup));
         $this->assertFileNotExists($backup);
     }
 
@@ -262,18 +273,18 @@ abstract class DriverTestCase extends TestCase
      */
     public function testImportStoppedByBeforeExport()
     {
-        $this->Driver = $this->getMockBuilder(get_class($this->Driver))
+        $Driver = $this->getMockBuilder(get_class($this->Driver))
             ->setMethods(['beforeImport'])
             ->setConstructorArgs([$this->getConnection()])
             ->getMock();
 
-        $this->Driver->method('beforeImport')
+        $Driver->method('beforeImport')
              ->will($this->returnValue(false));
 
         $backup = $this->getAbsolutePath('example.sql');
 
-        $this->assertTrue($this->Driver->export($backup));
-        $this->assertFalse($this->Driver->import($backup));
+        $this->assertTrue($Driver->export($backup));
+        $this->assertFalse($Driver->import($backup));
     }
 
     /**

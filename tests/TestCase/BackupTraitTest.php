@@ -34,8 +34,8 @@ class BackupTraitTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'core.articles',
-        'core.comments',
+        'core.Articles',
+        'core.Comments',
     ];
 
     /**

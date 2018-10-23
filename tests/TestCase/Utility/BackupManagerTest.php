@@ -13,6 +13,7 @@
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Mailer\Email;
 use Cake\TestSuite\EmailAssertTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -58,14 +59,12 @@ class BackupManagerTest extends TestCase
     public function testDelete()
     {
         $filename = $this->BackupExport->export();
-
         $this->assertFileExists($filename);
         $this->assertTrue($this->BackupManager->delete($filename));
         $this->assertFileNotExists($filename);
 
-        //Relative path
+        //With a relative path
         $filename = $this->BackupExport->export();
-
         $this->assertFileExists($filename);
         $this->assertTrue($this->BackupManager->delete(basename($filename)));
         $this->assertFileNotExists($filename);
@@ -77,22 +76,16 @@ class BackupManagerTest extends TestCase
      */
     public function testDeleteAll()
     {
-        //Creates some backups
         $this->createSomeBackups(true);
 
-        $this->assertNotEmpty($this->BackupManager->index());
-        $this->assertEquals([
-            'backup.sql.gz',
-            'backup.sql.bz2',
-            'backup.sql',
-        ], $this->BackupManager->deleteAll());
+        $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index());
     }
 
     /**
      * Test for `delete()` method, with a no existing file
-     * @expectedException RuntimeException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+noExistingFile.sql` not writable$/
+     * @expectedException ErrorException
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+noExistingFile.sql` is not writable$/
      * @test
      */
     public function testDeleteNoExistingFile()
@@ -106,32 +99,23 @@ class BackupManagerTest extends TestCase
      */
     public function testIndex()
     {
-        $this->assertEmpty($this->BackupManager->index());
-
         //Creates a text file. This file should be ignored
         file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'text.txt', null);
 
-        $this->assertEmpty($this->BackupManager->index());
-
-        //Creates some backups
         $this->createSomeBackups(true);
-        $files = $this->BackupManager->index();
-        $this->assertEquals(3, count($files));
+
+        $files = collection($this->BackupManager->index());
 
         //Checks compressions
-        $compressions = collection($files)->extract('compression')->toArray();
+        $compressions = $files->extract('compression')->toArray();
         $this->assertEquals(['gzip', 'bzip2', false], $compressions);
 
         //Checks filenames
-        $filenames = collection($files)->extract('filename')->toArray();
-        $this->assertEquals([
-            'backup.sql.gz',
-            'backup.sql.bz2',
-            'backup.sql',
-        ], $filenames);
+        $filenames = $files->extract('filename')->toArray();
+        $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $filenames);
 
         //Checks extensions
-        $extensions = collection($files)->extract('extension')->toArray();
+        $extensions = $files->extract('extension')->toArray();
         $this->assertEquals(['sql.gz', 'sql.bz2', 'sql'], $extensions);
 
         //Checks for properties of each backup object
@@ -150,8 +134,8 @@ class BackupManagerTest extends TestCase
     {
         $this->assertEquals([], $this->BackupManager->rotate(1));
 
-        //Creates some backups
         $this->createSomeBackups(true);
+
         $initialFiles = $this->BackupManager->index();
 
         //Keeps 2 backups. Only 1 backup was deleted
@@ -193,26 +177,19 @@ class BackupManagerTest extends TestCase
      */
     public function testSend()
     {
-        $to = 'recipient@example.com';
-
-        //Get a backup file
         $file = $this->createBackup();
+        $mimetype = mime_content_type($file);
+        $to = 'recipient@example.com';
 
         $instance = new BackupManager;
         $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $to]);
-        $this->assertInstanceof('Cake\Mailer\Email', $this->_email);
+        $this->assertInstanceof(Email::class, $this->_email);
 
         $this->assertEmailFrom(Configure::read(DATABASE_BACKUP . '.mailSender'));
         $this->assertEmailTo($to);
         $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
-        $this->assertEmailAttachmentsContains(basename($file), [
-            'file' => $file,
-            'mimetype' => mime_content_type($file),
-        ]);
-
-        $send = $this->BackupManager->send($file, $to);
-        $this->assertNotEmpty($send);
-        $this->assertEquals(['headers', 'message'], array_keys($send));
+        $this->assertEmailAttachmentsContains(basename($file), compact('file', 'mimetype'));
+        $this->assertArrayKeysEqual(['headers', 'message'], $this->BackupManager->send($file, $to));
     }
 
     /**
@@ -223,18 +200,15 @@ class BackupManagerTest extends TestCase
      */
     public function testSendEmptySender()
     {
-        //Get a backup file
-        $file = $this->createBackup();
-
         Configure::write(DATABASE_BACKUP . '.mailSender', false);
 
-        $this->BackupManager->send($file, 'recipient@example.com');
+        $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
 
     /**
      * Test for `send()` method, with an invalid file
-     * @expectedException RuntimeException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not readable$/
+     * @expectedException ErrorException
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` is not readable$/
      * @test
      */
     public function testSendInvalidFile()
@@ -250,11 +224,8 @@ class BackupManagerTest extends TestCase
      */
     public function testSendInvalidSender()
     {
-        //Get a backup file
-        $file = $this->createBackup();
-
         Configure::write(DATABASE_BACKUP . '.mailSender', 'invalidSender');
 
-        $this->BackupManager->send($file, 'recipient@example.com');
+        $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
 }

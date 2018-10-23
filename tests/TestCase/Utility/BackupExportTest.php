@@ -14,8 +14,10 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Log\Log;
+use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use Tools\ReflectionTrait;
 
 /**
@@ -44,7 +46,7 @@ class BackupExportTest extends TestCase
 
         //Mocks the `send()` method of `BackupManager` class, so that it writes
         //  on the debug log instead of sending a real mail
-        $this->BackupExport->BackupManager = $this->getMockBuilder(get_class($this->BackupExport->BackupManager))
+        $this->BackupExport->BackupManager = $this->getMockBuilder(BackupManager::class)
             ->setMethods(['send'])
             ->getMock();
 
@@ -76,7 +78,6 @@ class BackupExportTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceof(DATABASE_BACKUP . '\Utility\BackupManager', $this->BackupExport->BackupManager);
         $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
 
         $config = $this->getProperty($this->BackupExport, 'config');
@@ -85,7 +86,7 @@ class BackupExportTest extends TestCase
         $this->assertEquals($config['driver'], 'Cake\Database\Driver\Mysql');
 
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'defaultExtension'));
-        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $this->getProperty($this->BackupExport, 'driver'));
+        $this->assertInstanceof(Mysql::class, $this->getProperty($this->BackupExport, 'driver'));
         $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
         $this->assertNull($this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
@@ -169,8 +170,8 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with a no writable directory
-     * @expectedException RuntimeException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` not writable$/
+     * @expectedException ErrorException
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` is not writable$/
      * @test
      */
     public function testFilenameNotWritableDirectory()
@@ -261,6 +262,6 @@ class BackupExportTest extends TestCase
     {
         Configure::write(DATABASE_BACKUP . '.chmod', 0777);
         $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertEquals('0777', substr(sprintf('%o', fileperms($filename)), -4));
+        $this->assertFilePerms($filename, '0777');
     }
 }

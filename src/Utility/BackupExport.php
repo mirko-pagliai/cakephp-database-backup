@@ -89,10 +89,8 @@ class BackupExport
      */
     public function __construct()
     {
-        $this->BackupManager = new BackupManager;
-
         $connection = $this->getConnection();
-
+        $this->BackupManager = new BackupManager;
         $this->config = $connection->config();
         $this->driver = $this->getDriver($connection);
     }
@@ -111,14 +109,14 @@ class BackupExport
      */
     public function compression($compression)
     {
+        $this->extension = $this->defaultExtension;
+
         if ($compression) {
             $this->extension = array_search($compression, $this->getValidCompressions());
 
             if (!$this->extension) {
                 throw new InvalidArgumentException(__d('database_backup', 'Invalid compression type'));
             }
-        } else {
-            $this->extension = $this->defaultExtension;
         }
 
         $this->compression = $compression;
@@ -143,12 +141,7 @@ class BackupExport
     public function filename($filename)
     {
         //Replaces patterns
-        $filename = str_replace([
-            '{$DATABASE}',
-            '{$DATETIME}',
-            '{$HOSTNAME}',
-            '{$TIMESTAMP}',
-        ], [
+        $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
             pathinfo($this->config['database'], PATHINFO_FILENAME),
             date('YmdHis'),
             empty($this->config['host']) ? 'localhost' : $this->config['host'],
@@ -156,11 +149,7 @@ class BackupExport
         ], $filename);
 
         $filename = $this->getAbsolutePath($filename);
-
-        if (!is_writable(dirname($filename))) {
-            throw new RuntimeException(__d('database_backup', 'File or directory `{0}` not writable', dirname($filename)));
-        }
-
+        is_writable_or_fail(dirname($filename));
         if (file_exists($filename)) {
             throw new RuntimeException(__d('database_backup', 'File `{0}` already exists', $filename));
         }

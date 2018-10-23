@@ -38,10 +38,7 @@ class Postgres extends Driver
     protected function getDbnameAsString()
     {
         $password = $this->getConfig('password');
-
-        if ($password) {
-            $password = ':' . $password;
-        }
+        $password = $password ? ':' . $password : $password;
 
         return sprintf(
             'postgresql://%s%s@%s/%s',

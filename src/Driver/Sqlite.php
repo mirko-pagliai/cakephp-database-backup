@@ -51,11 +51,11 @@ class Sqlite extends Driver
      */
     public function beforeImport()
     {
-        $collection = $this->connection->getSchemaCollection();
+        $schemaCollection = $this->connection->getSchemaCollection();
 
         //Drops each table
-        foreach ($collection->listTables() as $table) {
-            array_map([$this->connection, 'execute'], $collection->describe($table)->dropSql($this->connection));
+        foreach ($schemaCollection->listTables() as $table) {
+            array_map([$this->connection, 'execute'], $schemaCollection->describe($table)->dropSql($this->connection));
         }
 
         //Needs disconnect and re-connect because the database schema has changed

@@ -15,6 +15,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Console\Shell;
 use Cake\Core\Configure;
+use Cake\Http\BaseApplication;
 use Cake\TestSuite\ConsoleIntegrationTestCase as CakeConsoleIntegrationTestCase;
 use DatabaseBackup\TestSuite\TestCaseTrait;
 use DatabaseBackup\Utility\BackupExport;
@@ -41,9 +42,10 @@ class ConsoleIntegrationTestCase extends CakeConsoleIntegrationTestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport;
+        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
+        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
 
-        $this->deleteAllBackups();
+        $this->BackupExport = new BackupExport;
     }
 
     /**

@@ -24,29 +24,22 @@ class MysqlTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Mysql
      */
-    protected $Driver;
+    protected $DriverClass = Mysql::class;
+
+    /**
+     * Name of the database connection
+     * @var string
+     */
+    protected $connection = 'test';
 
     /**
      * Fixtures
      * @var array
      */
     public $fixtures = [
-        'core.articles',
-        'core.comments',
+        'core.Articles',
+        'core.Comments',
     ];
-
-    /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
-     * @return void
-     */
-    public function setUp()
-    {
-        $this->Driver = new Mysql($this->getConnection());
-
-        parent::setUp();
-    }
 
     /**
      * Test for `_exportExecutable()` method

@@ -79,9 +79,7 @@ trait BackupTrait
      */
     public function getConnection($name = null)
     {
-        $name = $name ?: Configure::readOrFail(DATABASE_BACKUP . '.connection');
-
-        return ConnectionManager::get($name);
+        return ConnectionManager::get($name ?: Configure::readOrFail(DATABASE_BACKUP . '.connection'));
     }
 
     /**
@@ -95,10 +93,7 @@ trait BackupTrait
      */
     public function getDriver(ConnectionInterface $connection = null)
     {
-        if (!$connection) {
-            $connection = $this->getConnection();
-        }
-
+        $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', DATABASE_BACKUP, $className), 'Driver');
 
