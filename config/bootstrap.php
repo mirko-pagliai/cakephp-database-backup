@@ -53,10 +53,7 @@ if (!Configure::check(DATABASE_BACKUP . '.target')) {
 
 //Checks for the target directory
 $target = Configure::read(DATABASE_BACKUP . '.target');
-
-if (!file_exists($target)) {
-    safe_mkdir($target);
-}
+safe_mkdir($target);
 
 if (!is_writeable($target)) {
     trigger_error(sprintf('Directory %s not writeable', $target), E_USER_ERROR);

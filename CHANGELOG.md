@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.5 branch
 ### 2.5.1
-* added `Plugin` class for CakePHP 3.6.
+* updated for CakePHP 3.6 and 3.7. Added `Plugin` class;
+* many small code fixes.
 
 ### 2.5.0
 * now it uses the `mirko-pagliai/php-tools` package. This also replaces
