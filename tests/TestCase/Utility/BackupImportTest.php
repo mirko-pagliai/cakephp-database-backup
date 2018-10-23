@@ -13,6 +13,7 @@
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
@@ -55,7 +56,7 @@ class BackupImportTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $this->getProperty($this->BackupImport, 'driver'));
+        $this->assertInstanceof(Mysql::class, $this->getProperty($this->BackupImport, 'driver'));
         $this->assertNull($this->getProperty($this->BackupImport, 'filename'));
     }
 
