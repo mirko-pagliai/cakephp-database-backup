@@ -79,7 +79,7 @@ class BackupManagerTest extends TestCase
         $this->createSomeBackups(true);
 
         $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $this->BackupManager->deleteAll());
-        $this->assertEmpty($this->BackupManager->index());
+        $this->assertEmpty($this->BackupManager->index()->toList());
     }
 
     /**
@@ -104,18 +104,18 @@ class BackupManagerTest extends TestCase
 
         $this->createSomeBackups(true);
 
-        $files = collection($this->BackupManager->index());
+        $files = $this->BackupManager->index();
 
         //Checks compressions
-        $compressions = $files->extract('compression')->toArray();
+        $compressions = $files->extract('compression')->toList();
         $this->assertEquals(['gzip', 'bzip2', false], $compressions);
 
         //Checks filenames
-        $filenames = $files->extract('filename')->toArray();
+        $filenames = $files->extract('filename')->toList();
         $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $filenames);
 
         //Checks extensions
-        $extensions = $files->extract('extension')->toArray();
+        $extensions = $files->extract('extension')->toList();
         $this->assertEquals(['sql.gz', 'sql.bz2', 'sql'], $extensions);
 
         //Checks for properties of each backup object
@@ -144,12 +144,11 @@ class BackupManagerTest extends TestCase
 
         //Now there are two files. Only uncompressed file was deleted
         $filesAfterRotate = $this->BackupManager->index();
-        $this->assertEquals(2, count($filesAfterRotate));
-        $this->assertEquals('gzip', $filesAfterRotate[0]->compression);
-        $this->assertEquals('bzip2', $filesAfterRotate[1]->compression);
+        $this->assertEquals(2, $filesAfterRotate->count());
+        $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles, $filesAfterRotate, function ($a, $b) {
+        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function ($a, $b) {
             return strcmp($a->filename, $b->filename);
         });
 

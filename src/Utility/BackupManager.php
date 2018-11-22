@@ -56,7 +56,7 @@ class BackupManager
     {
         $deleted = [];
 
-        foreach ($this->index() as $file) {
+        foreach ($this->index()->toList() as $file) {
             if ($this->delete($file->filename)) {
                 $deleted[] = $file->filename;
             }
@@ -67,7 +67,8 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return array Backups as entities
+     * @return Cake\Collection\Collection Collection of backups . Each backup
+     *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public function index()
@@ -84,8 +85,7 @@ class BackupManager
                     'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $filename))),
                 ]);
             })
-            ->sortBy('datetime')
-            ->toList();
+            ->sortBy('datetime');
     }
 
     /**
@@ -106,14 +106,14 @@ class BackupManager
             throw new InvalidArgumentException(__d('database_backup', 'Invalid rotate value'));
         }
 
-        $backupsToBeDeleted = array_slice($this->index(), $rotate);
+        $backupsToBeDeleted = $this->index()->skip($rotate);
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
             $this->delete($backup->filename);
         }
 
-        return $backupsToBeDeleted;
+        return $backupsToBeDeleted->toArray();
     }
 
     /**

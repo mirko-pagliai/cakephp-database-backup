@@ -180,15 +180,15 @@ class BackupShell extends Shell
         //Gets all backups
         $backups = $this->BackupManager->index();
 
-        $this->out(__d('database_backup', 'Backup files found: {0}', count($backups)));
+        $this->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
 
-        if ($backups) {
+        if (!$backups->isEmpty()) {
             //Parses backups
-            $backups = array_map(function ($backup) {
+            $backups = $backups->map(function ($backup) {
                 $backup->size = Number::toReadableSize($backup->size);
 
                 return array_values($backup->toArray());
-            }, $backups);
+            })->toList();
 
             //Table headers
             $headers = [

@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.6 branch
+### 2.6.0
+* `BackupManager::index()` returns a collection of backups.
+
 ## 2.5 branch
 ### 2.5.2
 * removed `DATABASE_BACKUP` constant.
