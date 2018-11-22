@@ -100,7 +100,7 @@ class BackupManagerTest extends TestCase
     public function testIndex()
     {
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'text.txt', null);
+        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', null);
 
         $this->createSomeBackups(true);
 
@@ -185,7 +185,7 @@ class BackupManagerTest extends TestCase
         $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $to]);
         $this->assertInstanceof(Email::class, $this->_email);
 
-        $this->assertEmailFrom(Configure::read(DATABASE_BACKUP . '.mailSender'));
+        $this->assertEmailFrom(Configure::read('DatabaseBackup.mailSender'));
         $this->assertEmailTo($to);
         $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
         $this->assertEmailAttachmentsContains(basename($file), compact('file', 'mimetype'));
@@ -200,7 +200,7 @@ class BackupManagerTest extends TestCase
      */
     public function testSendEmptySender()
     {
-        Configure::write(DATABASE_BACKUP . '.mailSender', false);
+        Configure::write('DatabaseBackup.mailSender', false);
 
         $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
@@ -224,7 +224,7 @@ class BackupManagerTest extends TestCase
      */
     public function testSendInvalidSender()
     {
-        Configure::write(DATABASE_BACKUP . '.mailSender', 'invalidSender');
+        Configure::write('DatabaseBackup.mailSender', 'invalidSender');
 
         $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }

@@ -67,7 +67,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
      */
     public function testExport()
     {
-        $targetRegex = preg_quote(Configure::read(DATABASE_BACKUP . '.target') . DS, '/');
+        $targetRegex = preg_quote(Configure::read('DatabaseBackup.target') . DS, '/');
 
         //Exports, without params
         $this->exec('database_backup.backup export');
@@ -220,7 +220,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
      */
     public function testSendWithoutSenderInConfiguration()
     {
-        Configure::write(DATABASE_BACKUP . '.mailSender', false);
+        Configure::write('DatabaseBackup.mailSender', false);
 
         $this->exec('database_backup.backup send file.sql recipient@example.com');
         $this->assertExitWithError();

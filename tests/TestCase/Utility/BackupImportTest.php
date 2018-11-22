@@ -105,7 +105,7 @@ class BackupImportTest extends TestCase
      */
     public function testFilenameWithInvalidExtension()
     {
-        file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'backup.txt', null);
+        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'backup.txt', null);
 
         $this->BackupImport->filename('backup.txt');
     }

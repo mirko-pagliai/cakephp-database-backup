@@ -59,7 +59,7 @@ class ConsoleIntegrationTestCase extends CakeConsoleIntegrationTestCase
 
         $this->deleteAllBackups();
 
-        Configure::write(DATABASE_BACKUP . '.connection', 'test');
+        Configure::write('DatabaseBackup.connection', 'test');
     }
 
     /**

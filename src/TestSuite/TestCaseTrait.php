@@ -59,6 +59,6 @@ trait TestCaseTrait
      */
     public function deleteAllBackups()
     {
-        safe_unlink_recursive(Configure::read(DATABASE_BACKUP . '.target'));
+        safe_unlink_recursive(Configure::read('DatabaseBackup.target'));
     }
 }
