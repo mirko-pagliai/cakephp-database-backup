@@ -60,7 +60,6 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * Name of the database connection
-     * @since 2.5.2
      * @var string
      */
     protected $connection;
