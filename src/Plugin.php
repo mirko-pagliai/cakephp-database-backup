@@ -14,10 +14,32 @@
 namespace DatabaseBackup;
 
 use Cake\Core\BasePlugin;
+use DatabaseBackup\Command\DeleteAllCommand;
+use DatabaseBackup\Command\ExportCommand;
+use DatabaseBackup\Command\ImportCommand;
+use DatabaseBackup\Command\IndexCommand;
+use DatabaseBackup\Command\RotateCommand;
+use DatabaseBackup\Command\SendCommand;
 
 /**
  * Plugin class
  */
 class Plugin extends BasePlugin
 {
+    /**
+     * Add console commands for the plugin
+     * @param Cake\Console\CommandCollection $commands The command collection to update
+     * @return Cake\Console\CommandCollection
+     */
+    public function console($commands)
+    {
+        $commands->add('database_backup.delete_all', DeleteAllCommand::class);
+        $commands->add('database_backup.export', ExportCommand::class);
+        $commands->add('database_backup.import', ImportCommand::class);
+        $commands->add('database_backup.index', IndexCommand::class);
+        $commands->add('database_backup.rotate', RotateCommand::class);
+        $commands->add('database_backup.send', SendCommand::class);
+
+        return $commands;
+    }
 }

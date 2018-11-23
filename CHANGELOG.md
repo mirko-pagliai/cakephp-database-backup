@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.6 branch
 ### 2.6.0
+* `BackupShell` has been replaced with console commands. Every method of the
+    previous class is now a `Command` class;
 * `BackupManager::index()` returns a collection of backups.
 
 ## 2.5 branch

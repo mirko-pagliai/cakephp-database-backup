@@ -1,0 +1,68 @@
+<?php
+/**
+ * This file is part of cakephp-database-backup.
+ *
+ * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright   Copyright (c) Mirko Pagliai
+ * @link        https://github.com/mirko-pagliai/cakephp-database-backup
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ * @since       2.6.0
+ */
+namespace DatabaseBackup\Command;
+
+use Cake\Console\Arguments;
+use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleOptionParser;
+use DatabaseBackup\Console\Command;
+use DatabaseBackup\Utility\BackupImport;
+use Exception;
+
+/**
+ * Imports a database backup
+ */
+class ImportCommand extends Command
+{
+    /**
+     * Hook method for defining this command's option parser
+     * @param ConsoleOptionParser $parser The parser to be defined
+     * @return ConsoleOptionParser
+     */
+    protected function buildOptionParser(ConsoleOptionParser $parser)
+    {
+        $parser->setDescription(__d('database_backup', 'Imports a database backup'));
+        $parser->addArgument('filename', [
+            'help' => __d('database_backup', 'Filename. It can be an absolute path'),
+            'required' => true,
+        ]);
+
+        return $parser;
+    }
+
+    /**
+     * Imports a database backup
+     * @param Arguments $args The command arguments
+     * @param ConsoleIo $io The console io
+     * @return null|int The exit code or null for success
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#import
+     * @uses DatabaseBackup\Utility\BackupImport::filename()
+     * @uses DatabaseBackup\Utility\BackupImport::import()
+     */
+    public function execute(Arguments $args, ConsoleIo $io)
+    {
+        parent::execute($args, $io);
+
+        try {
+            $file = (new BackupImport)->filename($args->getArgument('filename'))->import();
+
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
+        } catch (Exception $e) {
+            $io->error($e->getMessage());
+            $this->abort();
+        }
+
+        return null;
+    }
+}

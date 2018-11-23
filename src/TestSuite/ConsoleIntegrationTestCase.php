@@ -45,17 +45,9 @@ class ConsoleIntegrationTestCase extends CakeConsoleIntegrationTestCase
         $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
         $app->addPlugin('DatabaseBackup')->pluginBootstrap();
 
-        $this->BackupExport = new BackupExport;
-    }
+        $this->useCommandRunner();
 
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     * @uses deleteAllBackups()
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
+        $this->BackupExport = new BackupExport;
 
         $this->deleteAllBackups();
 
