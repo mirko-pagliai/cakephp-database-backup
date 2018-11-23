@@ -41,7 +41,7 @@ class DeleteAllCommand extends Command
      * @param Arguments $args The command arguments
      * @param ConsoleIo $io The console io
      * @return null|int The exit code or null for success
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#deleteAll
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#delete_all
      * @uses DatabaseBackup\Utility\BackupManager::deleteAll()
      */
     public function execute(Arguments $args, ConsoleIo $io)
