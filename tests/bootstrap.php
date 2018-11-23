@@ -114,7 +114,7 @@ Log::setConfig('debug', [
 
 $transportName = 'debug';
 $transportConfig = ['className' => 'Debug'];
-if (class_exists('TransportFactory')) {
+if (class_exists(TransportFactory::class)) {
     TransportFactory::setConfig($transportName, $transportConfig);
 } else {
     Email::setConfigTransport($transportName, $transportConfig);
