@@ -27,7 +27,7 @@ before_test:
 
 install:
   - cd c:\
-  - curl -fsS -o php.zip https://windows.php.net/downloads/releases/php-5.6.38-nts-Win32-VC11-x86.zip
+  - curl -fsS -o php.zip https://windows.php.net/downloads/releases/php-5.6.39-nts-Win32-VC11-x86.zip
   - 7z x php.zip -oc:\php > nul
   - cd c:\php
   - copy php.ini-production php.ini
