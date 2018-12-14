@@ -18,7 +18,7 @@ You can install the plugin via composer:
 
     $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 
-**NOTE: the latest version available requires at least CakePHP 3.6**.
+**NOTE: the latest version available requires at least CakePHP 3.7**.
 
 Instead, the [cakephp3.2](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3.2)
 branch is compatible with all previous versions of CakePHP from version 3.2. 

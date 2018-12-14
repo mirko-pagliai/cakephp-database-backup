@@ -16,7 +16,6 @@ namespace DatabaseBackup\TestSuite;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Event\EventList;
-use Cake\Http\BaseApplication;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
@@ -79,9 +78,6 @@ abstract class DriverTestCase extends TestCase
     public function setUp()
     {
         parent::setUp();
-
-        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
-        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
 
         Configure::write('DatabaseBackup.connection', $this->connection);
 

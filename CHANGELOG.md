@@ -4,7 +4,8 @@
 * `BackupShell` has been replaced with console commands. Every method of the
     previous class is now a `Command` class;
 * `BackupManager::index()` returns a collection of backups;
-* removed `DATABASE_BACKUP` constant.
+* removed `DATABASE_BACKUP` constant;
+* updated for CakePHP 3.7.
 
 ## 2.5 branch
 ### 2.5.1
