@@ -1,4 +1,11 @@
 # 2.x branch
+## 2.6 branch
+### 2.6.0
+* `BackupShell` has been replaced with console commands. Every method of the
+    previous class is now a `Command` class;
+* `BackupManager::index()` returns a collection of backups;
+* removed `DATABASE_BACKUP` constant.
+
 ## 2.5 branch
 ### 2.5.1
 * updated for CakePHP 3.6 and 3.7. Added `Plugin` class;
@@ -16,7 +23,7 @@
 * `VALID_COMPRESSIONS` and `VALID_EXTENSIONS` constants have been replaced by
     `getValidCompressions()` and `getValidExtensions()` methods provided by the
     `BackupTrait` class;
-* replaced `InternalErrorException` with `InvalidArgumentException` and 
+* replaced `InternalErrorException` with `InvalidArgumentException` and
     `RuntimeException`. This allows compatibility with CakePHP 3.6 branch.
 
 ## 2.3 branch

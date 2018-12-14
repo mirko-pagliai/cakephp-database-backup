@@ -48,10 +48,10 @@ class BackupTraitTest extends TestCase
         $this->assertEquals('/file.txt', $result);
 
         $result = $this->getAbsolutePath('file.txt');
-        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
+        $this->assertEquals(Configure::read('DatabaseBackup.target') . DS . 'file.txt', $result);
 
-        $result = $this->getAbsolutePath(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt');
-        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target') . DS . 'file.txt', $result);
+        $result = $this->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt');
+        $this->assertEquals(Configure::read('DatabaseBackup.target') . DS . 'file.txt', $result);
     }
 
     /**
@@ -102,7 +102,7 @@ class BackupTraitTest extends TestCase
 
         foreach ([
             null,
-            Configure::read(DATABASE_BACKUP . '.connection'),
+            Configure::read('DatabaseBackup.connection'),
             'fake',
         ] as $name) {
             $connection = $this->getConnection($name);
@@ -129,10 +129,10 @@ class BackupTraitTest extends TestCase
     public function testGetDriver()
     {
         $driver = $this->getDriver(ConnectionManager::get('test'));
-        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
+        $this->assertInstanceof('DatabaseBackup\Driver\Mysql', $driver);
 
         $driver = $this->getDriver();
-        $this->assertInstanceof(DATABASE_BACKUP . '\Driver\Mysql', $driver);
+        $this->assertInstanceof('DatabaseBackup\Driver\Mysql', $driver);
     }
 
     /**
@@ -183,7 +183,7 @@ class BackupTraitTest extends TestCase
      */
     public function testGetTarget()
     {
-        $this->assertEquals(Configure::read(DATABASE_BACKUP . '.target'), $this->getTarget());
+        $this->assertEquals(Configure::read('DatabaseBackup.target'), $this->getTarget());
     }
 
     /**

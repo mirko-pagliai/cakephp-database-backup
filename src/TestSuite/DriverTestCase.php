@@ -60,7 +60,6 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * Name of the database connection
-     * @since 2.5.2
      * @var string
      */
     protected $connection;
@@ -84,7 +83,7 @@ abstract class DriverTestCase extends TestCase
         $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
         $app->addPlugin('DatabaseBackup')->pluginBootstrap();
 
-        Configure::write(DATABASE_BACKUP . '.connection', $this->connection);
+        Configure::write('DatabaseBackup.connection', $this->connection);
 
         $connection = $this->getConnection();
 

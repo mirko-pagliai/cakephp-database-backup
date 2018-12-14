@@ -50,7 +50,7 @@ trait BackupTrait
      */
     public function getBinary($name)
     {
-        return Configure::readOrFail(DATABASE_BACKUP . '.binaries.' . $name);
+        return Configure::readOrFail('DatabaseBackup.binaries.' . $name);
     }
 
     /**
@@ -79,7 +79,7 @@ trait BackupTrait
      */
     public function getConnection($name = null)
     {
-        return ConnectionManager::get($name ?: Configure::readOrFail(DATABASE_BACKUP . '.connection'));
+        return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
 
     /**
@@ -95,7 +95,7 @@ trait BackupTrait
     {
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
-        $driver = App::classname(sprintf('%s.%s', DATABASE_BACKUP, $className), 'Driver');
+        $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
 
         if (!$driver) {
             throw new InvalidArgumentException(__d('database_backup', 'The `{0}` driver does not exist', $className));
@@ -124,7 +124,7 @@ trait BackupTrait
      */
     public function getTarget()
     {
-        return Configure::read(DATABASE_BACKUP . '.target');
+        return Configure::read('DatabaseBackup.target');
     }
 
     /**
