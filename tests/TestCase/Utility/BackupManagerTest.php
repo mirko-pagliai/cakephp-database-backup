@@ -79,7 +79,7 @@ class BackupManagerTest extends TestCase
         $this->createSomeBackups(true);
 
         $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $this->BackupManager->deleteAll());
-        $this->assertEmpty($this->BackupManager->index());
+        $this->assertEmpty($this->BackupManager->index()->toList());
     }
 
     /**
@@ -100,22 +100,22 @@ class BackupManagerTest extends TestCase
     public function testIndex()
     {
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'text.txt', null);
+        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', null);
 
         $this->createSomeBackups(true);
 
-        $files = collection($this->BackupManager->index());
+        $files = $this->BackupManager->index();
 
         //Checks compressions
-        $compressions = $files->extract('compression')->toArray();
+        $compressions = $files->extract('compression')->toList();
         $this->assertEquals(['gzip', 'bzip2', false], $compressions);
 
         //Checks filenames
-        $filenames = $files->extract('filename')->toArray();
+        $filenames = $files->extract('filename')->toList();
         $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $filenames);
 
         //Checks extensions
-        $extensions = $files->extract('extension')->toArray();
+        $extensions = $files->extract('extension')->toList();
         $this->assertEquals(['sql.gz', 'sql.bz2', 'sql'], $extensions);
 
         //Checks for properties of each backup object
@@ -144,12 +144,11 @@ class BackupManagerTest extends TestCase
 
         //Now there are two files. Only uncompressed file was deleted
         $filesAfterRotate = $this->BackupManager->index();
-        $this->assertEquals(2, count($filesAfterRotate));
-        $this->assertEquals('gzip', $filesAfterRotate[0]->compression);
-        $this->assertEquals('bzip2', $filesAfterRotate[1]->compression);
+        $this->assertEquals(2, $filesAfterRotate->count());
+        $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles, $filesAfterRotate, function ($a, $b) {
+        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function ($a, $b) {
             return strcmp($a->filename, $b->filename);
         });
 
@@ -185,7 +184,7 @@ class BackupManagerTest extends TestCase
         $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $to]);
         $this->assertInstanceof(Email::class, $this->_email);
 
-        $this->assertEmailFrom(Configure::read(DATABASE_BACKUP . '.mailSender'));
+        $this->assertEmailFrom(Configure::read('DatabaseBackup.mailSender'));
         $this->assertEmailTo($to);
         $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
         $this->assertEmailAttachmentsContains(basename($file), compact('file', 'mimetype'));
@@ -200,7 +199,7 @@ class BackupManagerTest extends TestCase
      */
     public function testSendEmptySender()
     {
-        Configure::write(DATABASE_BACKUP . '.mailSender', false);
+        Configure::write('DatabaseBackup.mailSender', false);
 
         $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
@@ -224,7 +223,7 @@ class BackupManagerTest extends TestCase
      */
     public function testSendInvalidSender()
     {
-        Configure::write(DATABASE_BACKUP . '.mailSender', 'invalidSender');
+        Configure::write('DatabaseBackup.mailSender', 'invalidSender');
 
         $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
