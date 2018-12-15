@@ -13,13 +13,16 @@
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Core\Configure;
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestCase;
+use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * SendCommandTest class
  */
-class SendCommandTest extends ConsoleIntegrationTestCase
+class SendCommandTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @var string
      */

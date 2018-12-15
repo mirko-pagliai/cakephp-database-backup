@@ -4,6 +4,8 @@
 * `BackupShell` has been replaced with console commands. Every method of the
     previous class is now a `Command` class;
 * `BackupManager::index()` returns a collection of backups;
+* `ConsoleIntegrationTestCase` has been replaced by `ConsoleIntegrationTestTrait`.
+    `TestCaseTrait` has been removed and its methods moved to `TestCase`;
 * removed `DATABASE_BACKUP` constant;
 * updated for CakePHP 3.7.
 

@@ -12,13 +12,16 @@
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestCase;
+use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * DeleteAllCommandTest class
  */
-class DeleteAllCommandTest extends ConsoleIntegrationTestCase
+class DeleteAllCommandTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @var string
      */

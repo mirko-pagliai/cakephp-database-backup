@@ -12,13 +12,16 @@
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestCase;
+use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * RotateCommandTest class
  */
-class RotateCommandTest extends ConsoleIntegrationTestCase
+class RotateCommandTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @var string
      */

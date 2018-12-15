@@ -68,8 +68,7 @@ class BackupExportTest extends TestCase
     {
         parent::tearDown();
 
-        //Deletes debug log
-        safe_unlink(LOGS . 'debug.log');
+        safe_unlink_recursive(LOGS, 'empty');
     }
 
     /**
@@ -158,7 +157,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a file that already exists
      * @expectedException RuntimeException
-     * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\]+backup\.sql` already exists$/
+     * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\\-]+backup\.sql` already exists$/
      */
     public function testFilenameAlreadyExists()
     {
@@ -171,7 +170,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a no writable directory
      * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` is not writable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+` is not writable$/
      * @test
      */
     public function testFilenameNotWritableDirectory()

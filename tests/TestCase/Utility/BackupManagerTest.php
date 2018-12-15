@@ -85,7 +85,7 @@ class BackupManagerTest extends TestCase
     /**
      * Test for `delete()` method, with a no existing file
      * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+noExistingFile.sql` is not writable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+noExistingFile.sql` is not writable$/
      * @test
      */
     public function testDeleteNoExistingFile()
@@ -192,22 +192,9 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `send()` method, with empty sender
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The email set for "from" is empty.
-     * @test
-     */
-    public function testSendEmptySender()
-    {
-        Configure::write('DatabaseBackup.mailSender', false);
-
-        $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
-    }
-
-    /**
      * Test for `send()` method, with an invalid file
      * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` is not readable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+` is not readable$/
      * @test
      */
     public function testSendInvalidFile()

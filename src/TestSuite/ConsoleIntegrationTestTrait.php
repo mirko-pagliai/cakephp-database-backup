@@ -9,23 +9,22 @@
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @since       2.2.0
+ * @since       2.6.0
  */
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Console\Shell;
-use Cake\TestSuite\ConsoleIntegrationTestTrait;
-use DatabaseBackup\TestSuite\TestCaseTrait;
+use Cake\TestSuite\ConsoleIntegrationTestTrait as CakeConsoleIntegrationTestTrait;
 use DatabaseBackup\Utility\BackupExport;
-use DatabaseBackup\TestSuite\TestCase;
 
 /**
- * ConsoleIntegrationTestCase class
+ * ConsoleIntegrationTestTrait class
  */
-class ConsoleIntegrationTestCase extends TestCase
+trait ConsoleIntegrationTestTrait
 {
-    use ConsoleIntegrationTestTrait;
-    use TestCaseTrait;
+    use CakeConsoleIntegrationTestTrait {
+        CakeConsoleIntegrationTestTrait::tearDown as cakeTearDown;
+    }
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport

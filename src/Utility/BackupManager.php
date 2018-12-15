@@ -20,7 +20,6 @@ use Cake\Mailer\Email;
 use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
-use RuntimeException;
 
 /**
  * Utility to manage database backups
