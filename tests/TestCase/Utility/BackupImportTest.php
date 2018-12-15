@@ -37,9 +37,7 @@ class BackupImportTest extends TestCase
     protected $BackupImport;
 
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
+     * Called before every test method
      * @return void
      */
     public function setUp()
@@ -89,7 +87,7 @@ class BackupImportTest extends TestCase
     /**
      * Test for `filename()` method, with invalid directory
      * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+backup\.sql` is not readable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+backup\.sql` is not readable$/
      * @test
      */
     public function testFilenameWithInvalidDirectory()
@@ -105,7 +103,7 @@ class BackupImportTest extends TestCase
      */
     public function testFilenameWithInvalidExtension()
     {
-        file_put_contents(Configure::read(DATABASE_BACKUP . '.target') . DS . 'backup.txt', null);
+        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'backup.txt', null);
 
         $this->BackupImport->filename('backup.txt');
     }

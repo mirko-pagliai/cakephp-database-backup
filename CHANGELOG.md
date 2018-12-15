@@ -1,7 +1,18 @@
 # 2.x branch
+## 2.6 branch
+### 2.6.0
+* `BackupShell` has been replaced with console commands. Every method of the
+    previous class is now a `Command` class;
+* `BackupManager::index()` returns a collection of backups;
+* `ConsoleIntegrationTestCase` has been replaced by `ConsoleIntegrationTestTrait`.
+    `TestCaseTrait` has been removed and its methods moved to `TestCase`;
+* removed `DATABASE_BACKUP` constant;
+* updated for CakePHP 3.7.
+
 ## 2.5 branch
 ### 2.5.1
-* added `Plugin` class for CakePHP 3.6.
+* updated for CakePHP 3.6 and 3.7. Added `Plugin` class;
+* many small code fixes.
 
 ### 2.5.0
 * now it uses the `mirko-pagliai/php-tools` package. This also replaces
@@ -15,7 +26,7 @@
 * `VALID_COMPRESSIONS` and `VALID_EXTENSIONS` constants have been replaced by
     `getValidCompressions()` and `getValidExtensions()` methods provided by the
     `BackupTrait` class;
-* replaced `InternalErrorException` with `InvalidArgumentException` and 
+* replaced `InternalErrorException` with `InvalidArgumentException` and
     `RuntimeException`. This allows compatibility with CakePHP 3.6 branch.
 
 ## 2.3 branch

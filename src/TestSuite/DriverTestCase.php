@@ -16,7 +16,6 @@ namespace DatabaseBackup\TestSuite;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Event\EventList;
-use Cake\Http\BaseApplication;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
@@ -60,7 +59,6 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * Name of the database connection
-     * @since 2.5.2
      * @var string
      */
     protected $connection;
@@ -72,19 +70,14 @@ abstract class DriverTestCase extends TestCase
     public $fixtures;
 
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
+     * Called before every test method
      * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
-        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
-
-        Configure::write(DATABASE_BACKUP . '.connection', $this->connection);
+        Configure::write('DatabaseBackup.connection', $this->connection);
 
         $connection = $this->getConnection();
 

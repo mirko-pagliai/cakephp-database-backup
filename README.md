@@ -9,7 +9,8 @@
 Currently, the plugin supports *MySql*, *Postgres* and *Sqlite* databases.
 
 Did you like this plugin? Its development requires a lot of time for me.  
-Please consider the possibility of making [a donation](//paypal.me/mirkopagliai): even a coffee is enough! Thank you.
+Please consider the possibility of making [a donation](//paypal.me/mirkopagliai):
+even a coffee is enough! Thank you.
 
 [![Make a donation](https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_carte.jpg)](//paypal.me/mirkopagliai)
 
@@ -18,7 +19,7 @@ You can install the plugin via composer:
 
     $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 
-**NOTE: the latest version available requires at least CakePHP 3.5**.
+**NOTE: the latest version available requires at least CakePHP 3.7**.
 
 Instead, the [cakephp3.2](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3.2)
 branch is compatible with all previous versions of CakePHP from version 3.2. 

@@ -20,7 +20,6 @@ use Cake\Mailer\Email;
 use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
-use RuntimeException;
 
 /**
  * Utility to manage database backups
@@ -56,7 +55,7 @@ class BackupManager
     {
         $deleted = [];
 
-        foreach ($this->index() as $file) {
+        foreach ($this->index()->toList() as $file) {
             if ($this->delete($file->filename)) {
                 $deleted[] = $file->filename;
             }
@@ -67,7 +66,8 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return array Backups as entities
+     * @return Cake\Collection\Collection Collection of backups . Each backup
+     *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public function index()
@@ -84,8 +84,7 @@ class BackupManager
                     'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $filename))),
                 ]);
             })
-            ->sortBy('datetime')
-            ->toList();
+            ->sortBy('datetime');
     }
 
     /**
@@ -106,14 +105,14 @@ class BackupManager
             throw new InvalidArgumentException(__d('database_backup', 'Invalid rotate value'));
         }
 
-        $backupsToBeDeleted = array_slice($this->index(), $rotate);
+        $backupsToBeDeleted = $this->index()->skip($rotate);
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
             $this->delete($backup->filename);
         }
 
-        return $backupsToBeDeleted;
+        return $backupsToBeDeleted->toArray();
     }
 
     /**
@@ -133,7 +132,7 @@ class BackupManager
         $mimetype = mime_content_type($file);
 
         return (new Email)
-            ->setFrom(Configure::readOrFail(DATABASE_BACKUP . '.mailSender'))
+            ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
             ->setTo($recipient)
             ->setSubject(__d('database_backup', 'Database backup {0} from {1}', $basename, env('SERVER_NAME', 'localhost')))
             ->setAttachments([$basename => compact('file', 'mimetype')]);

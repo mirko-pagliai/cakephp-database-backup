@@ -33,9 +33,7 @@ class BackupExportTest extends TestCase
     protected $BackupExport;
 
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
+     * Called before every test method
      * @return void
      */
     public function setUp()
@@ -61,15 +59,14 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Teardown any static object changes and restore them
+     * Called after every test method
      * @return void
      */
     public function tearDown()
     {
         parent::tearDown();
 
-        //Deletes debug log
-        safe_unlink(LOGS . 'debug.log');
+        safe_unlink_recursive(LOGS, 'empty');
     }
 
     /**
@@ -158,7 +155,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a file that already exists
      * @expectedException RuntimeException
-     * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\]+backup\.sql` already exists$/
+     * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\\-]+backup\.sql` already exists$/
      */
     public function testFilenameAlreadyExists()
     {
@@ -171,7 +168,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `filename()` method, with a no writable directory
      * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\]+` is not writable$/
+     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+` is not writable$/
      * @test
      */
     public function testFilenameNotWritableDirectory()
@@ -260,7 +257,7 @@ class BackupExportTest extends TestCase
      */
     public function testExportWithDifferendChmod()
     {
-        Configure::write(DATABASE_BACKUP . '.chmod', 0777);
+        Configure::write('DatabaseBackup.chmod', 0777);
         $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
         $this->assertFilePerms($filename, '0777');
     }

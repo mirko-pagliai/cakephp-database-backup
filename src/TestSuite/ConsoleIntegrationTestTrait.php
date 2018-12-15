@@ -9,23 +9,22 @@
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @since       2.2.0
+ * @since       2.6.0
  */
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Console\Shell;
-use Cake\Core\Configure;
-use Cake\Http\BaseApplication;
-use Cake\TestSuite\ConsoleIntegrationTestCase as CakeConsoleIntegrationTestCase;
-use DatabaseBackup\TestSuite\TestCaseTrait;
+use Cake\TestSuite\ConsoleIntegrationTestTrait as CakeConsoleIntegrationTestTrait;
 use DatabaseBackup\Utility\BackupExport;
 
 /**
- * ConsoleIntegrationTestCase class
+ * ConsoleIntegrationTestTrait class
  */
-class ConsoleIntegrationTestCase extends CakeConsoleIntegrationTestCase
+trait ConsoleIntegrationTestTrait
 {
-    use TestCaseTrait;
+    use CakeConsoleIntegrationTestTrait {
+        CakeConsoleIntegrationTestTrait::tearDown as cakeTearDown;
+    }
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport
@@ -33,33 +32,15 @@ class ConsoleIntegrationTestCase extends CakeConsoleIntegrationTestCase
     protected $BackupExport;
 
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
+     * Called before every test method
      * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
-        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
-
+        $this->useCommandRunner();
         $this->BackupExport = new BackupExport;
-    }
-
-    /**
-     * Teardown any static object changes and restore them
-     * @return void
-     * @uses deleteAllBackups()
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        $this->deleteAllBackups();
-
-        Configure::write(DATABASE_BACKUP . '.connection', 'test');
     }
 
     /**

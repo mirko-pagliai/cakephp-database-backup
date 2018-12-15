@@ -14,10 +14,8 @@
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
-use Cake\Http\BaseApplication;
 use Cake\TestSuite\TestCase as CakeTestCase;
-use DatabaseBackup\TestSuite\TestCaseTrait;
-use Tools\TestSuite\TestCaseTrait as ToolsTestCaseTrait;
+use Tools\TestSuite\TestCaseTrait;
 
 /**
  * TestCase class
@@ -25,26 +23,21 @@ use Tools\TestSuite\TestCaseTrait as ToolsTestCaseTrait;
 abstract class TestCase extends CakeTestCase
 {
     use TestCaseTrait;
-    use ToolsTestCaseTrait;
 
     /**
-     * Setup the test case, backup the static object values so they can be
-     * restored. Specifically backs up the contents of Configure and paths in
-     *  App if they have not already been backed up
+     * Called before every test method
      * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $app = $this->getMockForAbstractClass(BaseApplication::class, ['']);
-        $app->addPlugin('DatabaseBackup')->pluginBootstrap();
-
-        $this->deleteAllBackups();
+        Configure::write('DatabaseBackup.connection', 'test');
+        $this->loadPlugins(['DatabaseBackup']);
     }
 
     /**
-     * Teardown any static object changes and restore them
+     * Called after every test method
      * @return void
      * @uses deleteAllBackups()
      */
@@ -52,6 +45,48 @@ abstract class TestCase extends CakeTestCase
     {
         parent::tearDown();
 
-        Configure::write(DATABASE_BACKUP . '.connection', 'test');
+        $this->deleteAllBackups();
+    }
+
+    /**
+     * Internal method to create a backup file
+     * @return string
+     */
+    protected function createBackup()
+    {
+        return $this->BackupExport->filename('backup.sql')->export();
+    }
+
+    /**
+     * Internal method to creates some backup files
+     * @param bool $sleep If `true`, waits a second for each backup
+     * @return array
+     */
+    protected function createSomeBackups($sleep = false)
+    {
+        $files[] = $this->BackupExport->filename('backup.sql')->export();
+
+        if ($sleep) {
+            sleep(1);
+        }
+
+        $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
+
+        if ($sleep) {
+            sleep(1);
+        }
+
+        $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
+
+        return $files;
+    }
+
+    /**
+     * Internal method to deletes all backups
+     * @return void
+     */
+    public function deleteAllBackups()
+    {
+        safe_unlink_recursive(Configure::read('DatabaseBackup.target'));
     }
 }
