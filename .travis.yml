@@ -17,9 +17,6 @@ matrix:
     - php: 7.0
       env: COVERAGE=1
 
-    - php: 7.0
-      env: CAKEPHP_VERSION="3.6.*"
-
 services:
   - mysql
   - postgresql
@@ -30,7 +27,6 @@ addons:
 install:
   - composer self-update
   - composer install --prefer-dist --no-interaction
-  - if [[ ! -z "$CAKEPHP_VERSION" ]]; then composer require --update-with-dependencies cakephp/cakephp:${CAKEPHP_VERSION}; fi
 
 before_script:
   - mysql -e 'create database test;'
