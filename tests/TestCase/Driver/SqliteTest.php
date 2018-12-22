@@ -64,7 +64,7 @@ class SqliteTest extends DriverTestCase
 
     /**
      * Test for `export()` method on failure
-     * @expectedException RuntimeException
+     * @expectedException ErrorException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
@@ -98,7 +98,7 @@ class SqliteTest extends DriverTestCase
 
     /**
      * Test for `import()` method on failure
-     * @expectedException RuntimeException
+     * @expectedException ErrorException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */

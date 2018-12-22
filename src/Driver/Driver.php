@@ -172,7 +172,6 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterExport: will be triggered after export
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
-     * @throws RuntimeException
      * @uses _exportExecutableWithCompression()
      */
     final public function export($filename)
@@ -187,9 +186,7 @@ abstract class Driver implements EventListenerInterface
 
         $this->dispatchEvent('Backup.afterExport');
 
-        if ($returnVar !== 0) {
-            throw new RuntimeException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
-        }
+        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         return file_exists($filename);
     }
@@ -222,7 +219,6 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterImport: will be triggered after import
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
-     * @throws RuntimeException
      * @uses _importExecutableWithCompression()
      */
     final public function import($filename)
@@ -237,9 +233,7 @@ abstract class Driver implements EventListenerInterface
 
         $this->dispatchEvent('Backup.afterImport');
 
-        if ($returnVar !== 0) {
-            throw new RuntimeException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
-        }
+        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         return true;
     }

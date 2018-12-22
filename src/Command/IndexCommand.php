@@ -17,6 +17,7 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\I18n\Number;
+use Cake\ORM\Entity;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 
@@ -59,7 +60,7 @@ class IndexCommand extends Command
         }
 
         //Parses backups
-        $backups = $backups->map(function ($backup) {
+        $backups = $backups->map(function (Entity $backup) {
             $backup->size = Number::toReadableSize($backup->size);
 
             return array_values($backup->toArray());

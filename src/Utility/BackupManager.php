@@ -101,9 +101,7 @@ class BackupManager
      */
     public function rotate($rotate)
     {
-        if (!is_positive($rotate)) {
-            throw new InvalidArgumentException(__d('database_backup', 'Invalid rotate value'));
-        }
+        is_true_or_fail(is_positive($rotate), __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
 
         $backupsToBeDeleted = $this->index()->skip($rotate);
 

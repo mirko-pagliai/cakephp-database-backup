@@ -96,10 +96,7 @@ trait BackupTrait
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-
-        if (!$driver) {
-            throw new InvalidArgumentException(__d('database_backup', 'The `{0}` driver does not exist', $className));
-        }
+        is_true_or_fail($driver, __d('database_backup', 'The `{0}` driver does not exist', $className), InvalidArgumentException::class);
 
         return new $driver($connection);
     }

@@ -154,7 +154,7 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with a file that already exists
-     * @expectedException RuntimeException
+     * @expectedException ErrorException
      * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\\-]+backup\.sql` already exists$/
      */
     public function testFilenameAlreadyExists()
@@ -167,8 +167,8 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with a no writable directory
-     * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+` is not writable$/
+     * @expectedException \Tools\Exception\NotWritableException
+     * @expectedExceptionMessage File or directory is not writable
      * @test
      */
     public function testFilenameNotWritableDirectory()

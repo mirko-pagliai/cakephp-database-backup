@@ -82,8 +82,8 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `delete()` method, with a no existing file
-     * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+noExistingFile.sql` is not writable$/
+     * @expectedException Tools\Exception\NotWritableException
+     * @expectedExceptionMessage File or directory is not writable
      * @test
      */
     public function testDeleteNoExistingFile()
@@ -191,8 +191,8 @@ class BackupManagerTest extends TestCase
 
     /**
      * Test for `send()` method, with an invalid file
-     * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+` is not readable$/
+     * @expectedException Tools\Exception\NotReadableException
+     * @expectedExceptionMessage File or directory is not readable
      * @test
      */
     public function testSendInvalidFile()
