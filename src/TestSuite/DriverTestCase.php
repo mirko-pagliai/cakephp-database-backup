@@ -78,9 +78,7 @@ abstract class DriverTestCase extends TestCase
         parent::setUp();
 
         Configure::write('DatabaseBackup.connection', $this->connection);
-
         $connection = $this->getConnection();
-
         TableRegistry::clear();
         $this->Articles = TableRegistry::get('Articles', compact('connection'));
         $this->Comments = TableRegistry::get('Comments', compact('connection'));
@@ -94,13 +92,28 @@ abstract class DriverTestCase extends TestCase
      * Internal method to get all records from the database
      * @return array
      */
-    final protected function allRecords()
+    final protected function getAllRecords()
     {
         foreach (['Articles', 'Comments'] as $name) {
             $records[$name] = $this->$name->find()->enableHydration(false)->toArray();
         }
 
         return $records;
+    }
+
+    /**
+     * Internal method to mock a driver
+     * @param array $methods The list of methods to mock
+     * @return \DatabaseBackup\Driver\Driver|\PHPUnit_Framework_MockObject_MockObject
+     * @since 2.6.1
+     * @uses $Driver
+     */
+    final protected function getMockForDriver(array $methods)
+    {
+        return $this->getMockBuilder(get_class($this->Driver))
+            ->setMethods($methods)
+            ->setConstructorArgs([$this->getConnection()])
+            ->getMock();
     }
 
     /**
@@ -201,7 +214,6 @@ abstract class DriverTestCase extends TestCase
     public function testExport()
     {
         $backup = $this->getAbsolutePath('example.sql');
-
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
         $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
@@ -216,16 +228,10 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportStoppedByBeforeExport()
     {
-        $Driver = $this->getMockBuilder(get_class($this->Driver))
-            ->setMethods(['beforeExport'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $Driver->method('beforeExport')
-             ->will($this->returnValue(false));
+        $Driver = $this->getMockForDriver(['beforeExport']);
+        $Driver->method('beforeExport')->will($this->returnValue(false));
 
         $backup = $this->getAbsolutePath('example.sql');
-
         $this->assertFalse($Driver->export($backup));
         $this->assertFileNotExists($backup);
     }
@@ -251,7 +257,6 @@ abstract class DriverTestCase extends TestCase
     public function testImport()
     {
         $backup = $this->getAbsolutePath('example.sql');
-
         $this->assertTrue($this->Driver->export($backup));
         $this->assertTrue($this->Driver->import($backup));
         $this->assertEventFired('Backup.beforeImport', $this->Driver->getEventManager());
@@ -266,16 +271,10 @@ abstract class DriverTestCase extends TestCase
      */
     public function testImportStoppedByBeforeExport()
     {
-        $Driver = $this->getMockBuilder(get_class($this->Driver))
-            ->setMethods(['beforeImport'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $Driver->method('beforeImport')
-             ->will($this->returnValue(false));
+        $Driver = $this->getMockForDriver(['beforeImport']);
+        $Driver->method('beforeImport')->will($this->returnValue(false));
 
         $backup = $this->getAbsolutePath('example.sql');
-
         $this->assertTrue($Driver->export($backup));
         $this->assertFalse($Driver->import($backup));
     }
@@ -295,7 +294,7 @@ abstract class DriverTestCase extends TestCase
             $backup = $this->getAbsolutePath(sprintf('example.%s', $extension));
 
             //Initial records. 3 articles and 6 comments
-            $initial = $this->allRecords();
+            $initial = $this->getAllRecords();
             $this->assertEquals(3, count($initial['Articles']));
             $this->assertEquals(6, count($initial['Comments']));
 
@@ -307,7 +306,7 @@ abstract class DriverTestCase extends TestCase
             $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);
 
             //Records after delete. 2 articles and 5 comments
-            $afterDelete = $this->allRecords();
+            $afterDelete = $this->getAllRecords();
             $this->assertEquals(count($afterDelete['Articles']), count($initial['Articles']) - 1);
             $this->assertEquals(count($afterDelete['Comments']), count($initial['Comments']) - 1);
 
@@ -315,7 +314,7 @@ abstract class DriverTestCase extends TestCase
             $this->assertTrue($this->Driver->import($backup));
 
             //Now initial records are the same of final records
-            $final = $this->allRecords();
+            $final = $this->getAllRecords();
             $this->assertEquals($initial, $final);
 
             //Gets the difference (`$diff`) between records after delete
