@@ -24,7 +24,6 @@ use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use Tools\Exception\NotReadableException;
 use Tools\Exception\NotWritableException;
-use Tools\ReflectionTrait;
 
 /**
  * BackupManagerTest class
@@ -33,7 +32,6 @@ class BackupManagerTest extends TestCase
 {
     use BackupTrait;
     use EmailAssertTrait;
-    use ReflectionTrait;
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport

@@ -21,15 +21,12 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use Tools\Exception\NotWritableException;
-use Tools\ReflectionTrait;
 
 /**
  * BackupExportTest class
  */
 class BackupExportTest extends TestCase
 {
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */

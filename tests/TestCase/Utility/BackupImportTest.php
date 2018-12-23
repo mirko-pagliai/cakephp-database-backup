@@ -19,15 +19,12 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 use InvalidArgumentException;
 use Tools\Exception\NotReadableException;
-use Tools\ReflectionTrait;
 
 /**
  * BackupImportTest class
  */
 class BackupImportTest extends TestCase
 {
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */

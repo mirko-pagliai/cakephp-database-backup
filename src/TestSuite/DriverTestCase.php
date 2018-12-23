@@ -19,7 +19,6 @@ use Cake\Event\EventList;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
-use Tools\ReflectionTrait;
 
 /**
  * DriverTestCase class.
@@ -29,7 +28,6 @@ use Tools\ReflectionTrait;
 abstract class DriverTestCase extends TestCase
 {
     use BackupTrait;
-    use ReflectionTrait;
 
     /**
      * @var \Cake\ORM\Table

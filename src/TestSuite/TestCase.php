@@ -15,6 +15,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase as CakeTestCase;
+use Tools\ReflectionTrait;
 use Tools\TestSuite\TestCaseTrait;
 
 /**
@@ -22,6 +23,7 @@ use Tools\TestSuite\TestCaseTrait;
  */
 abstract class TestCase extends CakeTestCase
 {
+    use ReflectionTrait;
     use TestCaseTrait;
 
     /**
