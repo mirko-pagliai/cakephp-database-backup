@@ -53,15 +53,15 @@ class BackupManager
      */
     public function deleteAll()
     {
-        $deleted = [];
+        $files = [];
 
         foreach ($this->index()->toList() as $file) {
             if ($this->delete($file->filename)) {
-                $deleted[] = $file->filename;
+                $files[] = $file->filename;
             }
         }
 
-        return $deleted;
+        return $files;
     }
 
     /**
@@ -125,7 +125,6 @@ class BackupManager
     {
         $file = $this->getAbsolutePath($backup);
         is_readable_or_fail($file);
-
         $basename = basename($file);
         $mimetype = mime_content_type($file);
 

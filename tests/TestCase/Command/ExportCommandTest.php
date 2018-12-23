@@ -24,20 +24,16 @@ class ExportCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
-     * @var string
-     */
-    protected static $command = 'database_backup.export -v';
-
-    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
+        $command = 'database_backup.export -v';
         $targetRegex = preg_quote(Configure::read('DatabaseBackup.target') . DS, '/');
 
         //Exports, without params
-        $this->exec(self::$command);
+        $this->exec($command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
@@ -45,19 +41,19 @@ class ExportCommandTest extends TestCase
 
         //Exports, with `compression` param
         sleep(1);
-        $this->exec(self::$command . ' --compression bzip2');
+        $this->exec($command . ' --compression bzip2');
         $this->assertExitWithSuccess();
         $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql\.bz2` has been exported/');
 
         //Exports, with `filename` param
         sleep(1);
-        $this->exec(self::$command . ' --filename backup.sql');
+        $this->exec($command . ' --filename backup.sql');
         $this->assertExitWithSuccess();
         $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup.sql` has been exported/');
 
         //Exports, with `rotate` param
         sleep(1);
-        $this->exec(self::$command . ' --rotate 3 -v');
+        $this->exec($command . ' --rotate 3 -v');
         $this->assertExitWithSuccess();
         $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql` has been exported/');
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql` has been deleted/');
@@ -65,19 +61,13 @@ class ExportCommandTest extends TestCase
 
         //Exports, with `send` param
         sleep(1);
-        $this->exec(self::$command . ' --send mymail@example.com');
+        $this->exec($command . ' --send mymail@example.com');
         $this->assertExitWithSuccess();
         $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql` has been exported/');
         $this->assertOutputRegExp('/Backup `' . $targetRegex . 'backup_test_\d+\.sql` was sent via mail/');
-    }
 
-    /**
-     * Test for `execute()` method, with an invalid option value
-     * @test
-     */
-    public function testExecuteInvalidOptionValue()
-    {
-        $this->exec(self::$command . ' --filename /noExistingDir/backup.sql');
+        //With an invalid option value
+        $this->exec($command . ' --filename /noExistingDir/backup.sql');
         $this->assertExitWithError();
     }
 }

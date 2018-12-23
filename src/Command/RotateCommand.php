@@ -58,19 +58,19 @@ class RotateCommand extends Command
 
         try {
             //Gets deleted files
-            $deleted = (new BackupManager)->rotate($args->getArgument('keep'));
+            $files = (new BackupManager)->rotate($args->getArgument('keep'));
 
-            if (empty($deleted)) {
+            if (!$files) {
                 $io->verbose(__d('database_backup', 'No backup has been deleted'));
 
                 return null;
             }
 
-            foreach ($deleted as $file) {
+            foreach ($files as $file) {
                 $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->filename));
             }
 
-            $io->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
+            $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();

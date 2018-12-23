@@ -93,27 +93,27 @@ class ExportCommand extends Command
             //Exports
             $file = $instance->export();
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
+            $verbose = $args->getOption('verbose');
+            $quiet = $args->getOption('quiet');
 
             //Sends via email
             if ($args->hasOption('send')) {
                 $SendCommand = new SendCommand;
-                $sendArgs = new Arguments(
+                $SendCommand->execute(new Arguments(
                     [$file, $args->getOption('send')],
-                    ['verbose' => $args->getOption('verbose'), 'quiet' => $args->getOption('quiet')],
+                    compact('verbose', 'quiet'),
                     $SendCommand->getOptionParser()->argumentNames()
-                );
-                $SendCommand->execute($sendArgs, $io);
+                ), $io);
             }
 
             //Rotates
             if ($args->hasOption('rotate')) {
                 $RotateCommand = new RotateCommand;
-                $rotateArgs = new Arguments(
+                $RotateCommand->execute(new Arguments(
                     [$args->getOption('rotate')],
-                    ['verbose' => $args->getOption('verbose'), 'quiet' => $args->getOption('quiet')],
+                    compact('verbose', 'quiet'),
                     $RotateCommand->getOptionParser()->argumentNames()
-                );
-                $RotateCommand->execute($rotateArgs, $io);
+                ), $io);
             }
         } catch (Exception $e) {
             $io->error($e->getMessage());

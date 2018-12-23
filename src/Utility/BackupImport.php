@@ -71,12 +71,13 @@ class BackupImport
      * Imports the database
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
+     * @throws InvalidArgumentException
      * @uses $driver
      * @uses $filename
      */
     public function import()
     {
-        is_true_or_fail($this->filename, __d('database_backup', 'You must first set the filename'));
+        is_true_or_fail(!empty($this->filename), __d('database_backup', 'You must first set the filename'), InvalidArgumentException::class);
 
         //This allows the filename to be set again with a next call of this
         //  method

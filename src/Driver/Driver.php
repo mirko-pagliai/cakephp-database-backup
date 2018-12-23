@@ -16,7 +16,6 @@ namespace DatabaseBackup\Driver;
 use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
-use RuntimeException;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -128,7 +127,6 @@ abstract class Driver implements EventListenerInterface
         if ($compression) {
             $executable .= ' | ' . $this->getBinary($compression);
         }
-
         $executable .= ' > ' . escapeshellarg($filename);
 
         if (Configure::read('DatabaseBackup.redirectStderrToDevNull')) {
@@ -183,10 +181,9 @@ abstract class Driver implements EventListenerInterface
         }
 
         exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
+        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterExport');
-
-        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         return file_exists($filename);
     }
@@ -203,11 +200,7 @@ abstract class Driver implements EventListenerInterface
     {
         $config = $this->connection->config();
 
-        if (!$key) {
-            return $config;
-        }
-
-        return array_key_exists($key, $config) ? $config[$key] : null;
+        return $key ? (array_key_exists($key, $config) ? $config[$key] : null) : $config;
     }
 
     /**
@@ -230,10 +223,9 @@ abstract class Driver implements EventListenerInterface
         }
 
         exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
+        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterImport');
-
-        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         return true;
     }

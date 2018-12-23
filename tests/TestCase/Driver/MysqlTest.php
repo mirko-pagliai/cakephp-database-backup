@@ -47,9 +47,8 @@ class MysqlTest extends DriverTestCase
      */
     public function testExportExecutable()
     {
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-
         $expected = sprintf('%s --defaults-file=%s test', $this->getBinary('mysqldump'), escapeshellarg('authFile'));
+        $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
@@ -59,9 +58,8 @@ class MysqlTest extends DriverTestCase
      */
     public function testImportExecutable()
     {
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-
         $expected = sprintf('%s --defaults-extra-file=%s test', $this->getBinary('mysql'), escapeshellarg('authFile'));
+        $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 
@@ -71,15 +69,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterExport()
     {
-        $this->Driver = $this->getMockBuilder(Mysql::class)
-            ->setMethods(['deleteAuthFile'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $this->Driver->expects($this->once())
-            ->method('deleteAuthFile');
-
-        $this->Driver->afterExport();
+        $driver = $this->getMockForDriver(['deleteAuthFile']);
+        $driver->expects($this->once())->method('deleteAuthFile');
+        $this->assertNull($driver->afterExport());
     }
 
     /**
@@ -88,15 +80,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterImport()
     {
-        $this->Driver = $this->getMockBuilder(Mysql::class)
-            ->setMethods(['deleteAuthFile'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $this->Driver->expects($this->once())
-            ->method('deleteAuthFile');
-
-        $this->Driver->afterImport();
+        $driver = $this->getMockForDriver(['deleteAuthFile']);
+        $driver->expects($this->once())->method('deleteAuthFile');
+        $this->assertNull($driver->afterImport());
     }
 
     /**
@@ -106,7 +92,7 @@ class MysqlTest extends DriverTestCase
     public function testBeforeExport()
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
-        $this->Driver->beforeExport();
+        $this->assertTrue($this->Driver->beforeExport());
 
         $expected = '[mysqldump]' . PHP_EOL .
             'user=' . $this->Driver->getConfig('username') . PHP_EOL .
@@ -126,8 +112,7 @@ class MysqlTest extends DriverTestCase
     public function testBeforeImport()
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
-
-        $this->Driver->beforeImport();
+        $this->assertTrue($this->Driver->beforeImport());
 
         $expected = '[client]' . PHP_EOL .
             'user=' . $this->Driver->getConfig('username') . PHP_EOL .
@@ -146,10 +131,8 @@ class MysqlTest extends DriverTestCase
     {
         $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
 
-        //Creates auth file
         $auth = tempnam(sys_get_temp_dir(), 'auth');
         $this->setProperty($this->Driver, 'auth', $auth);
-
         $this->assertFileExists($auth);
         $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
         $this->assertFileNotExists($auth);
@@ -164,9 +147,8 @@ class MysqlTest extends DriverTestCase
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $config = array_merge($this->Driver->getConfig(), ['database' => 'noExisting']);
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
-
         $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
 
@@ -179,13 +161,11 @@ class MysqlTest extends DriverTestCase
     public function testImportOnFailure()
     {
         $backup = $this->getAbsolutePath('example.sql');
-
         $this->Driver->export($backup);
 
         //Sets a no existing database
-        $config = array_merge($this->Driver->getConfig(), ['database' => 'noExisting']);
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
-
         $this->Driver->import($backup);
     }
 }

@@ -66,16 +66,10 @@ abstract class TestCase extends CakeTestCase
     {
         $files[] = $this->BackupExport->filename('backup.sql')->export();
 
-        if ($sleep) {
-            sleep(1);
-        }
-
+        $sleep ? sleep(1) : null;
         $files[] = $this->BackupExport->filename('backup.sql.bz2')->export();
 
-        if ($sleep) {
-            sleep(1);
-        }
-
+        $sleep ? sleep(1) : null;
         $files[] = $this->BackupExport->filename('backup.sql.gz')->export();
 
         return $files;

@@ -65,11 +65,7 @@ trait BackupTrait
         //Gets the extension from the filename
         $extension = $this->getExtension($filename);
 
-        if (!array_key_exists($extension, $this->getValidCompressions())) {
-            return false;
-        }
-
-        return $this->getValidCompressions()[$extension];
+        return array_key_exists($extension, $this->getValidCompressions()) ? $this->getValidCompressions()[$extension] : false;
     }
 
     /**

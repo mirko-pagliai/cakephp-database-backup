@@ -22,9 +22,7 @@ use DatabaseBackup\Utility\BackupExport;
  */
 trait ConsoleIntegrationTestTrait
 {
-    use CakeConsoleIntegrationTestTrait {
-        CakeConsoleIntegrationTestTrait::tearDown as cakeTearDown;
-    }
+    use CakeConsoleIntegrationTestTrait;
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport

@@ -228,10 +228,9 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportStoppedByBeforeExport()
     {
+        $backup = $this->getAbsolutePath('example.sql');
         $Driver = $this->getMockForDriver(['beforeExport']);
         $Driver->method('beforeExport')->will($this->returnValue(false));
-
-        $backup = $this->getAbsolutePath('example.sql');
         $this->assertFalse($Driver->export($backup));
         $this->assertFileNotExists($backup);
     }
@@ -271,10 +270,9 @@ abstract class DriverTestCase extends TestCase
      */
     public function testImportStoppedByBeforeExport()
     {
+        $backup = $this->getAbsolutePath('example.sql');
         $Driver = $this->getMockForDriver(['beforeImport']);
         $Driver->method('beforeImport')->will($this->returnValue(false));
-
-        $backup = $this->getAbsolutePath('example.sql');
         $this->assertTrue($Driver->export($backup));
         $this->assertFalse($Driver->import($backup));
     }
@@ -290,7 +288,6 @@ abstract class DriverTestCase extends TestCase
     {
         foreach ($this->getValidExtensions() as $extension) {
             $this->loadFixtures();
-
             $backup = $this->getAbsolutePath(sprintf('example.%s', $extension));
 
             //Initial records. 3 articles and 6 comments
@@ -298,10 +295,8 @@ abstract class DriverTestCase extends TestCase
             $this->assertEquals(3, count($initial['Articles']));
             $this->assertEquals(6, count($initial['Comments']));
 
-            //Exports backup
+            //Exports backup and deletes article with ID 2 and comment with ID 4
             $this->assertTrue($this->Driver->export($backup));
-
-            //Deletes article with ID 2 and comment with ID 4
             $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
             $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);
 
@@ -310,17 +305,14 @@ abstract class DriverTestCase extends TestCase
             $this->assertEquals(count($afterDelete['Articles']), count($initial['Articles']) - 1);
             $this->assertEquals(count($afterDelete['Comments']), count($initial['Comments']) - 1);
 
-            //Imports backup
+            //Imports backup. Now initial records are the same of final records
             $this->assertTrue($this->Driver->import($backup));
-
-            //Now initial records are the same of final records
             $final = $this->getAllRecords();
             $this->assertEquals($initial, $final);
 
             //Gets the difference (`$diff`) between records after delete
             //  (`$deleted`)and records after import (`$final`)
             $diff = $final;
-
             foreach ($final as $model => $finalValues) {
                 foreach ($finalValues as $finalKey => $finalValue) {
                     foreach ($afterDelete[$model] as $deletedValue) {
@@ -330,7 +322,6 @@ abstract class DriverTestCase extends TestCase
                     }
                 }
             }
-
             $this->assertEquals(1, count($diff['Articles']));
             $this->assertEquals(1, count($diff['Comments']));
 

@@ -23,37 +23,28 @@ class RotateCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
-     * @var string
-     */
-    protected static $command = 'database_backup.rotate -v';
-
-    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $this->exec(self::$command . ' 1 -v');
+        $command = 'database_backup.rotate -v';
+
+        $this->exec($command . ' 1');
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('No backup has been deleted');
 
         $this->createSomeBackups(true);
-        $this->exec(self::$command . ' 1 -v');
+        $this->exec($command . ' 1');
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Backup `backup.sql.bz2` has been deleted');
         $this->assertOutputContains('Backup `backup.sql` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 2</success>');
-    }
 
-    /**
-     * Test for `execute()` method, with an invalid value
-     * @test
-     */
-    public function testExecuteInvalidValue()
-    {
-        $this->exec(self::$command . ' string');
+        //With an invalid value
+        $this->exec($command . ' string');
         $this->assertExitWithError();
     }
 }

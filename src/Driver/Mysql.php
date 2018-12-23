@@ -65,7 +65,7 @@ class Mysql extends Driver
     /**
      * Internal method to write an auth file
      * @param string $content Content
-     * @return void
+     * @return bool
      * @since 2.3.0
      * @uses getConfig()
      * @uses $auth
@@ -80,7 +80,7 @@ class Mysql extends Driver
 
         $this->auth = tempnam(sys_get_temp_dir(), 'auth');
 
-        file_put_contents($this->auth, $content);
+        return file_put_contents($this->auth, $content) !== false;
     }
 
     /**
@@ -121,12 +121,10 @@ class Mysql extends Driver
      */
     public function beforeExport()
     {
-        $this->writeAuthFile("[mysqldump]" . PHP_EOL .
+        return $this->writeAuthFile("[mysqldump]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
             "password=\"{{PASSWORD}}\"" . PHP_EOL .
             "host={{HOST}}");
-
-        return true;
     }
 
     /**
@@ -145,12 +143,10 @@ class Mysql extends Driver
      */
     public function beforeImport()
     {
-        $this->writeAuthFile("[client]" . PHP_EOL .
+        return $this->writeAuthFile("[client]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
             "password=\"{{PASSWORD}}\"" . PHP_EOL .
             "host={{HOST}}");
-
-        return true;
     }
 
     /**
@@ -161,14 +157,14 @@ class Mysql extends Driver
      */
     protected function deleteAuthFile()
     {
-        //Deletes the temporary file with the authentication data
-        if ($this->auth && file_exists($this->auth)) {
-            safe_unlink($this->auth);
-            unset($this->auth);
-
-            return true;
+        if (!$this->auth || !file_exists($this->auth)) {
+            return false;
         }
 
-        return false;
+        //Deletes the temporary file with the authentication data
+        safe_unlink($this->auth);
+        unset($this->auth);
+
+        return true;
     }
 }
