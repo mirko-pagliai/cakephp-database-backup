@@ -39,6 +39,7 @@ define('CACHE', TMP . 'cache' . DS);
 define('LOGS', TMP . 'cakephp_log' . DS);
 define('SESSIONS', TMP . 'sessions' . DS);
 
+@mkdir(TMP);
 @mkdir(LOGS);
 @mkdir(SESSIONS);
 @mkdir(CACHE);
