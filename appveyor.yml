@@ -41,7 +41,7 @@ install:
   - echo extension=php_pdo_pgsql.dll >> php.ini
   - echo extension=php_pdo_sqlite.dll >> php.ini
   - cd c:\
-  - appveyor DownloadFile https://www.sqlite.org/2018/sqlite-tools-win32-x86-3220000.zip -Filename sqlite3.zip
+  - appveyor DownloadFile https://www.sqlite.org/2018/sqlite-tools-win32-x86-3260000.zip -Filename sqlite3.zip
   - 7z x sqlite3.zip > nul
   - rename sqlite-tools-win32-x86-3220000 sqlite3
   - cd C:\projects\cakephp-database-backup
