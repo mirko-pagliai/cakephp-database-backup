@@ -50,21 +50,12 @@ class IndexCommand extends Command
 
         //Gets all backups
         $backups = (new BackupManager)->index();
-
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
 
         if ($backups->isEmpty()) {
             return null;
         }
 
-        //Parses backups
-        $backups = $backups->map(function (Entity $backup) {
-            $backup->size = Number::toReadableSize($backup->size);
-
-            return array_values($backup->toArray());
-        })->toList();
-
-        //Table headers
         $headers = [
             __d('database_backup', 'Filename'),
             __d('database_backup', 'Extension'),
@@ -72,8 +63,10 @@ class IndexCommand extends Command
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
         ];
-
-        $io->helper('table')->output(array_merge([$headers], $backups));
+        $cells = $backups->map(function (Entity $backup) {
+            return $backup->set('size', Number::toReadableSize($backup->size))->toArray();
+        });
+        $io->helper('table')->output(array_merge([$headers], $cells->toList()));
 
         return null;
     }

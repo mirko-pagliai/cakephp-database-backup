@@ -13,8 +13,8 @@
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Core\Configure;
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use MeTools\TestSuite\ConsoleIntegrationTestTrait;
 
 /**
  * ExportCommandTest class

@@ -40,7 +40,7 @@ class BackupManager
         $filename = $this->getAbsolutePath($filename);
         is_writable_or_fail($filename);
 
-        return @unlink($filename);
+        return unlink($filename);
     }
 
     /**
@@ -53,15 +53,9 @@ class BackupManager
      */
     public function deleteAll()
     {
-        $files = [];
-
-        foreach ($this->index()->toList() as $file) {
-            if ($this->delete($file->filename)) {
-                $files[] = $file->filename;
-            }
-        }
-
-        return $files;
+        return array_filter(array_map(function ($file) {
+            return $this->delete($file->filename) ? $file->filename : false;
+        }, $this->index()->toList()));
     }
 
     /**
@@ -102,7 +96,6 @@ class BackupManager
     public function rotate($rotate)
     {
         is_true_or_fail(is_positive($rotate), __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
-
         $backupsToBeDeleted = $this->index()->skip($rotate);
 
         //Deletes
@@ -126,13 +119,12 @@ class BackupManager
         $file = $this->getAbsolutePath($backup);
         is_readable_or_fail($file);
         $basename = basename($file);
-        $mimetype = mime_content_type($file);
 
         return (new Email)
             ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
             ->setTo($recipient)
             ->setSubject(__d('database_backup', 'Database backup {0} from {1}', $basename, env('SERVER_NAME', 'localhost')))
-            ->setAttachments([$basename => compact('file', 'mimetype')]);
+            ->setAttachments([$basename => compact('file') + ['mimetype' => mime_content_type($file)]]);
     }
 
     /**

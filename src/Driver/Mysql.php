@@ -13,7 +13,6 @@
  */
 namespace DatabaseBackup\Driver;
 
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -21,8 +20,6 @@ use DatabaseBackup\Driver\Driver;
  */
 class Mysql extends Driver
 {
-    use BackupTrait;
-
     /**
      * Temporary file with the database authentication data
      * @since 2.1.0
@@ -78,9 +75,9 @@ class Mysql extends Driver
             $content
         );
 
-        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
+        $this->auth = create_tmp_file($content, null, 'auth');
 
-        return file_put_contents($this->auth, $content) !== false;
+        return $this->auth !== false;
     }
 
     /**

@@ -12,8 +12,8 @@
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use MeTools\TestSuite\ConsoleIntegrationTestTrait;
 
 /**
  * RotateCommandTest class

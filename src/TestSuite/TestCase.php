@@ -15,6 +15,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Utility\BackupExport;
 use MeTools\TestSuite\TestCase as BaseTestCase;
 
 /**
@@ -23,6 +24,24 @@ use MeTools\TestSuite\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     use BackupTrait;
+
+    /**
+     * @var \DatabaseBackup\Utility\BackupExport
+     */
+    protected $BackupExport;
+
+    /**
+     * Called before every test method
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        if (!$this->BackupExport) {
+            $this->BackupExport = new BackupExport;
+        }
+    }
 
     /**
      * Called after every test method

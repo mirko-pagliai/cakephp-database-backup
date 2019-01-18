@@ -16,6 +16,7 @@ namespace DatabaseBackup\Driver;
 use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
+use DatabaseBackup\BackupTrait;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -23,7 +24,7 @@ use Cake\Event\EventListenerInterface;
  */
 abstract class Driver implements EventListenerInterface
 {
-    use EventDispatcherTrait;
+    use BackupTrait, EventDispatcherTrait;
 
     /**
      * A connection object

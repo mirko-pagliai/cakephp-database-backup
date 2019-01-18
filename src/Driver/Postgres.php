@@ -13,7 +13,6 @@
  */
 namespace DatabaseBackup\Driver;
 
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -21,8 +20,6 @@ use DatabaseBackup\Driver\Driver;
  */
 class Postgres extends Driver
 {
-    use BackupTrait;
-
     /**
      * Gets the value for the `--dbname` option for export and import
      *  executables as string. It contains the connection string with username,
@@ -37,12 +34,10 @@ class Postgres extends Driver
      */
     protected function getDbnameAsString()
     {
-        $password = $this->getConfig('password');
-
         return sprintf(
             'postgresql://%s%s@%s/%s',
             $this->getConfig('username'),
-            $password ? ':' . $password : null,
+            $this->getConfig('password') ? ':' . $this->getConfig('password') : null,
             $this->getConfig('host'),
             $this->getConfig('database')
         );
