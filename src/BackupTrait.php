@@ -65,11 +65,7 @@ trait BackupTrait
         //Gets the extension from the filename
         $extension = $this->getExtension($filename);
 
-        if (!array_key_exists($extension, $this->getValidCompressions())) {
-            return false;
-        }
-
-        return $this->getValidCompressions()[$extension];
+        return array_key_exists($extension, $this->getValidCompressions()) ? $this->getValidCompressions()[$extension] : false;
     }
 
     /**
@@ -96,10 +92,7 @@ trait BackupTrait
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-
-        if (!$driver) {
-            throw new InvalidArgumentException(__d('database_backup', 'The `{0}` driver does not exist', $className));
-        }
+        is_true_or_fail($driver, __d('database_backup', 'The `{0}` driver does not exist', $className), InvalidArgumentException::class);
 
         return new $driver($connection);
     }

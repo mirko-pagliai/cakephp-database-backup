@@ -13,20 +13,20 @@
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Database\Driver\Mysql as CakeMySql;
 use Cake\Log\Log;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
-use Tools\ReflectionTrait;
+use InvalidArgumentException;
+use Tools\Exception\NotWritableException;
 
 /**
  * BackupExportTest class
  */
 class BackupExportTest extends TestCase
 {
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
@@ -66,7 +66,7 @@ class BackupExportTest extends TestCase
     {
         parent::tearDown();
 
-        safe_unlink_recursive(LOGS, 'empty');
+        @unlink_recursive(LOGS, 'empty');
     }
 
     /**
@@ -80,7 +80,7 @@ class BackupExportTest extends TestCase
         $config = $this->getProperty($this->BackupExport, 'config');
         $this->assertEquals($config['scheme'], 'mysql');
         $this->assertEquals($config['database'], 'test');
-        $this->assertEquals($config['driver'], 'Cake\Database\Driver\Mysql');
+        $this->assertEquals($config['driver'], CakeMySql::class);
 
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'defaultExtension'));
         $this->assertInstanceof(Mysql::class, $this->getProperty($this->BackupExport, 'driver'));
@@ -100,16 +100,10 @@ class BackupExportTest extends TestCase
         $this->BackupExport->compression('bzip2');
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
         $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
-    }
 
-    /**
-     * Test for `compression()` method, with an invalid type
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid compression type
-     * @test
-     */
-    public function testCompressionWithInvalidType()
-    {
+        //With an invalid type
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid compression type');
         $this->BackupExport->compression('invalidType');
     }
 
@@ -150,29 +144,10 @@ class BackupExportTest extends TestCase
         //Filename with `{$TIMESTAMP}` pattern
         $this->BackupExport->filename('{$TIMESTAMP}.sql');
         $this->assertRegExp('/^[0-9]{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
-    }
 
-    /**
-     * Test for `filename()` method, with a file that already exists
-     * @expectedException RuntimeException
-     * @expectedExceptionMessageRegExp /^File `[\s\w\/:\\\-]+backup\.sql` already exists$/
-     */
-    public function testFilenameAlreadyExists()
-    {
-        $this->BackupExport->filename('backup.sql')->export();
-
-        //Again, same filename
-        $this->BackupExport->filename('backup.sql')->export();
-    }
-
-    /**
-     * Test for `filename()` method, with a no writable directory
-     * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+` is not writable$/
-     * @test
-     */
-    public function testFilenameNotWritableDirectory()
-    {
+        //With a no writable directory
+        $this->expectException(NotWritableException::class);
+        $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir') . '` is not writable');
         $this->BackupExport->filename('noExistingDir' . DS . 'backup.sql');
     }
 
@@ -195,16 +170,10 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->rotate(10);
         $this->assertEquals(10, $this->getProperty($this->BackupExport, 'rotate'));
-    }
 
-    /**
-     * Test for `rotate()` method, with an invalid value
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid rotate value
-     * @test
-     */
-    public function testRotateWithInvalidValue()
-    {
+        //With an invalid value
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupExport->rotate(-1)->export();
     }
 
@@ -214,11 +183,10 @@ class BackupExportTest extends TestCase
      */
     public function testSend()
     {
-        $recipient = 'recipient@example.com';
-
         $this->BackupExport->send();
         $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
 
+        $recipient = 'recipient@example.com';
         $this->BackupExport->send($recipient);
         $this->assertEquals($recipient, $this->getProperty($this->BackupExport, 'emailRecipient'));
     }
@@ -248,6 +216,10 @@ class BackupExportTest extends TestCase
         $filename = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
         $log = file_get_contents(LOGS . 'debug.log');
         $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
+
+        //With a file that already exists
+        $this->expectExceptionMessage('File `' . $this->BackupExport->getAbsolutePath('backup.sql.bz2') . '` already exists');
+        $this->BackupExport->filename('backup.sql.bz2')->export();
     }
 
     /**

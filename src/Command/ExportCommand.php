@@ -34,31 +34,29 @@ class ExportCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Exports a database backup'));
-        $parser->addOptions([
-            'compression' => [
-                'choices' => $this->getValidCompressions(),
-                'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
-                'short' => 'c',
-            ],
-            'filename' => [
-                'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
-                    'patterns. The compression type will be automatically setted'),
-                'short' => 'f',
-            ],
-            'rotate' => [
-                'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups you ' .
-                    'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
-                'short' => 'r',
-            ],
-            'send' => [
-                'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
-                    'to indicate the recipient\'s email address'),
-                'short' => 's',
-            ],
-        ]);
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Exports a database backup'))
+            ->addOptions([
+                'compression' => [
+                    'choices' => $this->getValidCompressions(),
+                    'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
+                    'short' => 'c',
+                ],
+                'filename' => [
+                    'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
+                        'patterns. The compression type will be automatically setted'),
+                    'short' => 'f',
+                ],
+                'rotate' => [
+                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups you ' .
+                        'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
+                    'short' => 'r',
+                ],
+                'send' => [
+                    'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
+                        'to indicate the recipient\'s email address'),
+                    'short' => 's',
+                ],
+            ]);
     }
 
     /**
@@ -93,27 +91,27 @@ class ExportCommand extends Command
             //Exports
             $file = $instance->export();
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
+            $verbose = $args->getOption('verbose');
+            $quiet = $args->getOption('quiet');
 
             //Sends via email
             if ($args->hasOption('send')) {
                 $SendCommand = new SendCommand;
-                $sendArgs = new Arguments(
+                $SendCommand->execute(new Arguments(
                     [$file, $args->getOption('send')],
-                    ['verbose' => $args->getOption('verbose'), 'quiet' => $args->getOption('quiet')],
+                    compact('verbose', 'quiet'),
                     $SendCommand->getOptionParser()->argumentNames()
-                );
-                $SendCommand->execute($sendArgs, $io);
+                ), $io);
             }
 
             //Rotates
             if ($args->hasOption('rotate')) {
                 $RotateCommand = new RotateCommand;
-                $rotateArgs = new Arguments(
+                $RotateCommand->execute(new Arguments(
                     [$args->getOption('rotate')],
-                    ['verbose' => $args->getOption('verbose'), 'quiet' => $args->getOption('quiet')],
+                    compact('verbose', 'quiet'),
                     $RotateCommand->getOptionParser()->argumentNames()
-                );
-                $RotateCommand->execute($rotateArgs, $io);
+                ), $io);
             }
         } catch (Exception $e) {
             $io->error($e->getMessage());

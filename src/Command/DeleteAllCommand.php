@@ -31,9 +31,7 @@ class DeleteAllCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Deletes all database backups'));
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Deletes all database backups'));
     }
 
     /**
@@ -48,18 +46,20 @@ class DeleteAllCommand extends Command
     {
         parent::execute($args, $io);
 
-        $deleted = (new BackupManager)->deleteAll();
+        $files = (new BackupManager)->deleteAll();
 
-        if (!$deleted) {
+        if (!$files) {
             $io->verbose(__d('database_backup', 'No backup has been deleted'));
 
             return null;
         }
 
-        foreach ($deleted as $file) {
+        foreach ($files as $file) {
             $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', rtr($file)));
         }
 
-        $io->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
+        $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
+
+        return null;
     }
 }

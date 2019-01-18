@@ -17,6 +17,7 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\I18n\Number;
+use Cake\ORM\Entity;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 
@@ -32,9 +33,7 @@ class IndexCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Lists database backups'));
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Lists database backups'));
     }
 
     /**
@@ -51,21 +50,12 @@ class IndexCommand extends Command
 
         //Gets all backups
         $backups = (new BackupManager)->index();
-
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
 
         if ($backups->isEmpty()) {
             return null;
         }
 
-        //Parses backups
-        $backups = $backups->map(function ($backup) {
-            $backup->size = Number::toReadableSize($backup->size);
-
-            return array_values($backup->toArray());
-        })->toList();
-
-        //Table headers
         $headers = [
             __d('database_backup', 'Filename'),
             __d('database_backup', 'Extension'),
@@ -73,7 +63,11 @@ class IndexCommand extends Command
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
         ];
+        $cells = $backups->map(function (Entity $backup) {
+            return $backup->set('size', Number::toReadableSize($backup->size))->toArray();
+        });
+        $io->helper('table')->output(array_merge([$headers], $cells->toList()));
 
-        $io->helper('table')->output(array_merge([$headers], $backups));
+        return null;
     }
 }

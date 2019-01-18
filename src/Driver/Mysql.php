@@ -13,7 +13,6 @@
  */
 namespace DatabaseBackup\Driver;
 
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -21,8 +20,6 @@ use DatabaseBackup\Driver\Driver;
  */
 class Mysql extends Driver
 {
-    use BackupTrait;
-
     /**
      * Temporary file with the database authentication data
      * @since 2.1.0
@@ -65,7 +62,7 @@ class Mysql extends Driver
     /**
      * Internal method to write an auth file
      * @param string $content Content
-     * @return void
+     * @return bool
      * @since 2.3.0
      * @uses getConfig()
      * @uses $auth
@@ -78,9 +75,9 @@ class Mysql extends Driver
             $content
         );
 
-        $this->auth = tempnam(sys_get_temp_dir(), 'auth');
+        $this->auth = create_tmp_file($content, null, 'auth');
 
-        file_put_contents($this->auth, $content);
+        return $this->auth !== false;
     }
 
     /**
@@ -121,12 +118,10 @@ class Mysql extends Driver
      */
     public function beforeExport()
     {
-        $this->writeAuthFile("[mysqldump]" . PHP_EOL .
+        return $this->writeAuthFile("[mysqldump]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
             "password=\"{{PASSWORD}}\"" . PHP_EOL .
             "host={{HOST}}");
-
-        return true;
     }
 
     /**
@@ -145,12 +140,10 @@ class Mysql extends Driver
      */
     public function beforeImport()
     {
-        $this->writeAuthFile("[client]" . PHP_EOL .
+        return $this->writeAuthFile("[client]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
             "password=\"{{PASSWORD}}\"" . PHP_EOL .
             "host={{HOST}}");
-
-        return true;
     }
 
     /**
@@ -161,14 +154,14 @@ class Mysql extends Driver
      */
     protected function deleteAuthFile()
     {
-        //Deletes the temporary file with the authentication data
-        if ($this->auth && file_exists($this->auth)) {
-            safe_unlink($this->auth);
-            unset($this->auth);
-
-            return true;
+        if (!$this->auth || !file_exists($this->auth)) {
+            return false;
         }
 
-        return false;
+        //Deletes the temporary file with the authentication data
+        @unlink($this->auth);
+        unset($this->auth);
+
+        return true;
     }
 }

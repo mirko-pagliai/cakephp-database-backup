@@ -32,13 +32,11 @@ class ImportCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Imports a database backup'));
-        $parser->addArgument('filename', [
-            'help' => __d('database_backup', 'Filename. It can be an absolute path'),
-            'required' => true,
-        ]);
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Imports a database backup'))
+            ->addArgument('filename', [
+                'help' => __d('database_backup', 'Filename. It can be an absolute path'),
+                'required' => true,
+            ]);
     }
 
     /**
@@ -56,7 +54,6 @@ class ImportCommand extends Command
 
         try {
             $file = (new BackupImport)->filename($args->getArgument('filename'))->import();
-
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());

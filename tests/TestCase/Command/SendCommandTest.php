@@ -13,8 +13,8 @@
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Core\Configure;
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use MeTools\TestSuite\ConsoleIntegrationTestTrait;
 
 /**
  * SendCommandTest class
@@ -24,42 +24,27 @@ class SendCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
-     * @var string
-     */
-    protected static $command = 'database_backup.send -v';
-
-    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
+        $command = 'database_backup.send -v';
         $file = $this->createBackup();
-        $this->exec(self::$command . ' ' . $file . ' recipient@example.com');
+
+        $this->exec($command . ' ' . $file . ' recipient@example.com');
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('<success>Backup `' . $file . '` was sent via mail</success>');
-    }
 
-    /**
-     * Test for `execute()` method, with a no existing filename
-     * @test
-     */
-    public function testExecuteWithNoExistingFilename()
-    {
-        $this->exec(self::$command . ' /noExistingDir/backup.sql');
+        //With a no existing filename
+        $this->exec($command . ' /noExistingDir/backup.sql');
         $this->assertExitWithError();
-    }
 
-    /**
-     * Test for `execute()` method, without a sender in the configuration
-     * @test
-     */
-    public function testExecuteWithoutSenderInConfiguration()
-    {
+        //Without a sender in the configuration
         Configure::write('DatabaseBackup.mailSender', false);
-        $this->exec(self::$command . ' file.sql recipient@example.com');
+        $this->exec($command . ' file.sql recipient@example.com');
         $this->assertExitWithError();
     }
 }

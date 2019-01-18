@@ -14,14 +14,14 @@
 namespace DatabaseBackup\Console;
 
 use Cake\Console\Arguments;
-use Cake\Console\Command as CakeCommand;
 use Cake\Console\ConsoleIo;
 use DatabaseBackup\BackupTrait;
+use MeTools\Console\Command as BaseCommand;
 
 /**
  * Base class for console commands
  */
-class Command extends CakeCommand
+class Command extends BaseCommand
 {
     use BackupTrait;
 

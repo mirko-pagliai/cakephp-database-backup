@@ -17,15 +17,14 @@ use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
-use Tools\ReflectionTrait;
+use InvalidArgumentException;
+use Tools\Exception\NotReadableException;
 
 /**
  * BackupImportTest class
  */
 class BackupImportTest extends TestCase
 {
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
@@ -82,16 +81,10 @@ class BackupImportTest extends TestCase
         //With a relative path
         $this->BackupImport->filename(basename($backup));
         $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
-    }
 
-    /**
-     * Test for `filename()` method, with invalid directory
-     * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+backup\.sql` is not readable$/
-     * @test
-     */
-    public function testFilenameWithInvalidDirectory()
-    {
+        //With an invalid directory
+        $this->expectException(NotReadableException::class);
+        $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir' . DS . 'backup.sql') . '` is not readable');
         $this->BackupImport->filename('noExistingDir' . DS . 'backup.sql');
     }
 
@@ -128,16 +121,10 @@ class BackupImportTest extends TestCase
         $backup = $this->BackupExport->compression('gzip')->export();
         $filename = $this->BackupImport->filename($backup)->import();
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
-    }
 
-    /**
-     * Test for `import()` method, without a filename
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage You must first set the filename
-     * @test
-     */
-    public function testImportWithoutFilename()
-    {
+        //Without filename
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
     }
 }

@@ -13,7 +13,6 @@
  */
 namespace DatabaseBackup\Driver;
 
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -21,8 +20,6 @@ use DatabaseBackup\Driver\Driver;
  */
 class Sqlite extends Driver
 {
-    use BackupTrait;
-
     /**
      * Gets the executable command to export the database
      * @return string

@@ -48,19 +48,13 @@ class PostgresTest extends DriverTestCase
     public function testGetDbnameAsString()
     {
         $password = $this->Driver->getConfig('password');
-
-        if ($password) {
-            $password = ':' . $password;
-        }
-
-        $expected = 'postgresql://postgres' . $password . '@localhost/travis_ci_test';
+        $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@localhost/travis_ci_test';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
 
         //Adds a password to the config
-        $config = array_merge($this->Driver->getConfig(), ['password' => 'mypassword']);
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-
         $expected = 'postgresql://postgres:mypassword@localhost/travis_ci_test';
+        $config = ['password' => 'mypassword'] + $this->Driver->getConfig();
+        $this->setProperty($this->Driver, 'connection', new Connection($config));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
     }
 
@@ -71,15 +65,10 @@ class PostgresTest extends DriverTestCase
     public function testExportExecutable()
     {
         $password = $this->Driver->getConfig('password');
-
-        if ($password) {
-            $password = ':' . $password;
-        }
-
         $expected = sprintf(
             '%s --format=c -b --dbname=postgresql://postgres%s@localhost/travis_ci_test',
             $this->getBinary('pg_dump'),
-            $password
+            $password ? ':' . $password : null
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
@@ -91,50 +80,42 @@ class PostgresTest extends DriverTestCase
     public function testImportExecutable()
     {
         $password = $this->Driver->getConfig('password');
-
-        if ($password) {
-            $password = ':' . $password;
-        }
-
         $expected = sprintf(
             '%s --format=c -c -e --dbname=postgresql://postgres%s@localhost/travis_ci_test',
             $this->getBinary('pg_restore'),
-            $password
+            $password ? ':' . $password : null
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 
     /**
      * Test for `export()` method on failure
-     * @expectedException RuntimeException
+     * @expectedException ErrorException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testExportOnFailure()
     {
         //Sets a no existing database
-        $config = array_merge($this->Driver->getConfig(), ['database' => 'noExisting']);
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
-
         $this->Driver->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
      * Test for `import()` method on failure
-     * @expectedException RuntimeException
+     * @expectedException ErrorException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()
     {
         $backup = $this->getAbsolutePath('example.sql');
-
         $this->Driver->export($backup);
 
         //Sets a no existing database
-        $config = array_merge($this->Driver->getConfig(), ['database' => 'noExisting']);
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
-
         $this->Driver->import($backup);
     }
 }

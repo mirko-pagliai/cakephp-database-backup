@@ -15,7 +15,7 @@ use Cake\Core\Configure;
 
 //Sets the redirect to `/dev/null`. This string can be concatenated to shell commands
 if (!defined('REDIRECT_TO_DEV_NULL')) {
-    define('REDIRECT_TO_DEV_NULL', is_win() ? ' 2>nul' : ' 2>/dev/null');
+    define('REDIRECT_TO_DEV_NULL', IS_WIN ? ' 2>nul' : ' 2>/dev/null');
 }
 
 //Binaries
@@ -48,7 +48,7 @@ if (!Configure::check('DatabaseBackup.target')) {
 
 //Checks for the target directory
 $target = Configure::read('DatabaseBackup.target');
-safe_mkdir($target);
+@mkdir($target);
 
 if (!is_writeable($target)) {
     trigger_error(sprintf('Directory %s not writeable', $target), E_USER_ERROR);

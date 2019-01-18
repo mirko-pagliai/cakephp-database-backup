@@ -47,8 +47,7 @@ class SqliteTest extends DriverTestCase
     public function testExportExecutable()
     {
         $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3 .dump';
-        $result = $this->invokeMethod($this->Driver, '_exportExecutable');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
     /**
@@ -58,31 +57,25 @@ class SqliteTest extends DriverTestCase
     public function testImportExecutable()
     {
         $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3';
-        $result = $this->invokeMethod($this->Driver, '_importExecutable');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 
     /**
      * Test for `export()` method on failure
-     * @expectedException RuntimeException
+     * @expectedException ErrorException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testExportOnFailure()
     {
-        $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['_exportExecutableWithCompression'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $this->Driver->method('_exportExecutableWithCompression')
+        $driver = $this->getMockForDriver(['_exportExecutableWithCompression']);
+        $driver->method('_exportExecutableWithCompression')
             ->will($this->returnValue(sprintf(
                 '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
                 $this->getBinary('sqlite3'),
-                $this->Driver->getConfig('database')
+                $driver->getConfig('database')
             )));
-
-        $this->Driver->export($this->getAbsolutePath('example.sql'));
+        $driver->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
@@ -98,27 +91,20 @@ class SqliteTest extends DriverTestCase
 
     /**
      * Test for `import()` method on failure
-     * @expectedException RuntimeException
+     * @expectedException ErrorException
      * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()
     {
-        $this->Driver = $this->getMockBuilder(Sqlite::class)
-            ->setMethods(['_importExecutableWithCompression', 'beforeImport'])
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-
-        $this->Driver->method('beforeImport')
-            ->will($this->returnValue(true));
-
-        $this->Driver->method('_importExecutableWithCompression')
+        $driver = $this->getMockForDriver(['_importExecutableWithCompression', 'beforeImport']);
+        $driver->method('beforeImport')->will($this->returnValue(true));
+        $driver->method('_importExecutableWithCompression')
             ->will($this->returnValue(sprintf(
                 '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
                 $this->getBinary('sqlite3'),
-                $this->Driver->getConfig('database')
+                $driver->getConfig('database')
             )));
-
-        $this->Driver->import('noExistingFile');
+        $driver->import('noExistingFile');
     }
 }

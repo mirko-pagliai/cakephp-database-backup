@@ -12,8 +12,8 @@
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use MeTools\TestSuite\ConsoleIntegrationTestTrait;
 
 /**
  * IndexCommandTest class
@@ -23,24 +23,21 @@ class IndexCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
-     * @var string
-     */
-    protected static $command = 'database_backup.index -v';
-
-    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $this->exec(self::$command);
+        $command = 'database_backup.index -v';
+
+        $this->exec($command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('Backup files found: 0');
 
         $this->createSomeBackups(true);
-        $this->exec(self::$command);
+        $this->exec($command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Backup files found: 3');
         $this->assertOutputRegExp('/backup\.sql\.gz\s+|\s+sql\.gz\s+|\s+gzip\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');

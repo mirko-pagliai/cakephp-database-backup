@@ -1,5 +1,14 @@
 # 2.x branch
 ## 2.6 branch
+### 2.6.1
+* added `DriverTestCase::getMockForDriver()` method;
+* `DriverTestCase::allRecords()` method renamed as `getAllRecords()`;
+* many small code fixes;
+* requires `me-tools` package for dev;
+* removed `ConsoleIntegrationTestTrait`, because it is now sufficient to use the
+    same trait provided by `me-tools`;
+* updated for `php-tools` 1.1.12.
+
 ### 2.6.0
 * `BackupShell` has been replaced with console commands. Every method of the
     previous class is now a `Command` class;

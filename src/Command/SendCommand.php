@@ -32,19 +32,17 @@ class SendCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Send a database backup via mail'));
-        $parser->addArguments([
-            'filename' => [
-                'help' => __d('database_backup', 'Filename. It can be an absolute path'),
-                'required' => true,
-            ],
-            'recipient' => [
-                'help' => __d('database_backup', 'Recipient\'s email address'),
-                'required' => true,
-            ],
-        ]);
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Send a database backup via mail'))
+            ->addArguments([
+                'filename' => [
+                    'help' => __d('database_backup', 'Filename. It can be an absolute path'),
+                    'required' => true,
+                ],
+                'recipient' => [
+                    'help' => __d('database_backup', 'Recipient\'s email address'),
+                    'required' => true,
+                ],
+            ]);
     }
 
     /**
@@ -61,7 +59,6 @@ class SendCommand extends Command
 
         try {
             (new BackupManager)->send($args->getArgument('filename'), $args->getArgument('recipient'));
-
             $io->success(__d('database_backup', 'Backup `{0}` was sent via mail', rtr($args->getArgument('filename'))));
         } catch (Exception $e) {
             $io->error($e->getMessage());

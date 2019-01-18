@@ -12,8 +12,8 @@
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use MeTools\TestSuite\ConsoleIntegrationTestTrait;
 
 /**
  * DeleteAllCommandTest class
@@ -23,24 +23,21 @@ class DeleteAllCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
-     * @var string
-     */
-    protected static $command = 'database_backup.delete_all -v';
-
-    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $this->exec(self::$command);
+        $command = 'database_backup.delete_all -v';
+
+        $this->exec($command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('No backup has been deleted');
 
         $this->createSomeBackups(true);
-        $this->exec(self::$command);
+        $this->exec($command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Backup `backup.sql.gz` has been deleted');
         $this->assertOutputContains('Backup `backup.sql.bz2` has been deleted');

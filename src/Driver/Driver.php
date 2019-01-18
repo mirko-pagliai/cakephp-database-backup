@@ -16,7 +16,7 @@ namespace DatabaseBackup\Driver;
 use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
-use RuntimeException;
+use DatabaseBackup\BackupTrait;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -24,7 +24,7 @@ use RuntimeException;
  */
 abstract class Driver implements EventListenerInterface
 {
-    use EventDispatcherTrait;
+    use BackupTrait, EventDispatcherTrait;
 
     /**
      * A connection object
@@ -128,7 +128,6 @@ abstract class Driver implements EventListenerInterface
         if ($compression) {
             $executable .= ' | ' . $this->getBinary($compression);
         }
-
         $executable .= ' > ' . escapeshellarg($filename);
 
         if (Configure::read('DatabaseBackup.redirectStderrToDevNull')) {
@@ -172,7 +171,6 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterExport: will be triggered after export
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
-     * @throws RuntimeException
      * @uses _exportExecutableWithCompression()
      */
     final public function export($filename)
@@ -184,12 +182,9 @@ abstract class Driver implements EventListenerInterface
         }
 
         exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
+        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterExport');
-
-        if ($returnVar !== 0) {
-            throw new RuntimeException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
-        }
 
         return file_exists($filename);
     }
@@ -206,11 +201,7 @@ abstract class Driver implements EventListenerInterface
     {
         $config = $this->connection->config();
 
-        if (!$key) {
-            return $config;
-        }
-
-        return array_key_exists($key, $config) ? $config[$key] : null;
+        return $key ? (array_key_exists($key, $config) ? $config[$key] : null) : $config;
     }
 
     /**
@@ -222,7 +213,6 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterImport: will be triggered after import
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
-     * @throws RuntimeException
      * @uses _importExecutableWithCompression()
      */
     final public function import($filename)
@@ -234,12 +224,9 @@ abstract class Driver implements EventListenerInterface
         }
 
         exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
+        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterImport');
-
-        if ($returnVar !== 0) {
-            throw new RuntimeException(__d('database_backup', 'Failed with exit code `{0}`', $returnVar));
-        }
 
         return true;
     }

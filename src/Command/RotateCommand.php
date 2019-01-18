@@ -32,13 +32,11 @@ class RotateCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Rotates backups'));
-        $parser->addArgument('keep', [
-            'help' => __d('database_backup', 'Number of backups you want to keep. So, it will delete all backups that are older'),
-            'required' => true,
-        ]);
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Rotates backups'))
+            ->addArgument('keep', [
+                'help' => __d('database_backup', 'Number of backups you want to keep. So, it will delete all backups that are older'),
+                'required' => true,
+            ]);
     }
 
     /**
@@ -58,22 +56,24 @@ class RotateCommand extends Command
 
         try {
             //Gets deleted files
-            $deleted = (new BackupManager)->rotate($args->getArgument('keep'));
+            $files = (new BackupManager)->rotate($args->getArgument('keep'));
 
-            if (empty($deleted)) {
+            if (!$files) {
                 $io->verbose(__d('database_backup', 'No backup has been deleted'));
 
                 return null;
             }
 
-            foreach ($deleted as $file) {
+            foreach ($files as $file) {
                 $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->filename));
             }
 
-            $io->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));
+            $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();
         }
+
+        return null;
     }
 }

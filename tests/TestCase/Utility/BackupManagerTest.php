@@ -13,12 +13,16 @@
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
+use Cake\ORM\Entity;
 use Cake\TestSuite\EmailAssertTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
-use Tools\ReflectionTrait;
+use InvalidArgumentException;
+use Tools\Exception\NotReadableException;
+use Tools\Exception\NotWritableException;
 
 /**
  * BackupManagerTest class
@@ -26,7 +30,6 @@ use Tools\ReflectionTrait;
 class BackupManagerTest extends TestCase
 {
     use EmailAssertTrait;
-    use ReflectionTrait;
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport
@@ -78,17 +81,11 @@ class BackupManagerTest extends TestCase
 
         $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
-    }
 
-    /**
-     * Test for `delete()` method, with a no existing file
-     * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+noExistingFile.sql` is not writable$/
-     * @test
-     */
-    public function testDeleteNoExistingFile()
-    {
-        $this->BackupManager->delete('noExistingFile.sql');
+        //With a no existing file
+        $this->expectException(NotWritableException::class);
+        $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` is not writable');
+        $this->BackupManager->delete('noExistingFile');
     }
 
     /**
@@ -118,9 +115,9 @@ class BackupManagerTest extends TestCase
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
-            $this->assertInstanceOf('Cake\ORM\Entity', $file);
+            $this->assertInstanceOf(Entity::class, $file);
             $this->assertTrue(is_positive($file->size));
-            $this->assertInstanceOf('Cake\I18n\FrozenTime', $file->datetime);
+            $this->assertInstanceOf(FrozenTime::class, $file->datetime);
         }
     }
 
@@ -155,16 +152,10 @@ class BackupManagerTest extends TestCase
 
         //The difference is the same
         $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
-    }
 
-    /**
-     * Test for `rotate()` method, with an invalid value
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid rotate value
-     * @test
-     */
-    public function testRotateWithInvalidValue()
-    {
+        //With an invalid value
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupManager->rotate(-1);
     }
 
@@ -187,29 +178,23 @@ class BackupManagerTest extends TestCase
         $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
         $this->assertEmailAttachmentsContains(basename($file), compact('file', 'mimetype'));
         $this->assertArrayKeysEqual(['headers', 'message'], $this->BackupManager->send($file, $to));
+
+        //With an invalid sender
+        @unlink($file);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid email set for "from". You passed "invalidSender".');
+        Configure::write('DatabaseBackup.mailSender', 'invalidSender');
+        $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
 
     /**
      * Test for `send()` method, with an invalid file
-     * @expectedException ErrorException
-     * @expectedExceptionMessageRegExp /^File or directory `[\s\w\/:\\\-]+` is not readable$/
      * @test
      */
     public function testSendInvalidFile()
     {
+        $this->expectException(NotReadableException::class);
+        $this->expectExceptionMessage('File or directory `' . Configure::read('DatabaseBackup.target') . DS . 'noExistingFile` is not readable');
         $this->BackupManager->send('noExistingFile', 'recipient@example.com');
-    }
-
-    /**
-     * Test for `send()` method, with an invalid sender
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid email set for "from". You passed "invalidSender".
-     * @test
-     */
-    public function testSendInvalidSender()
-    {
-        Configure::write('DatabaseBackup.mailSender', 'invalidSender');
-
-        $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
 }
