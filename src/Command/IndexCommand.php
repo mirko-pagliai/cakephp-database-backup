@@ -33,9 +33,7 @@ class IndexCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Lists database backups'));
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Lists database backups'));
     }
 
     /**
@@ -76,5 +74,7 @@ class IndexCommand extends Command
         ];
 
         $io->helper('table')->output(array_merge([$headers], $backups));
+
+        return null;
     }
 }

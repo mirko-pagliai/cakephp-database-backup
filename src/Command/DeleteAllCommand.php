@@ -31,9 +31,7 @@ class DeleteAllCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Deletes all database backups'));
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Deletes all database backups'));
     }
 
     /**
@@ -61,5 +59,7 @@ class DeleteAllCommand extends Command
         }
 
         $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
+
+        return null;
     }
 }

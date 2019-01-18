@@ -32,13 +32,11 @@ class RotateCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Rotates backups'));
-        $parser->addArgument('keep', [
-            'help' => __d('database_backup', 'Number of backups you want to keep. So, it will delete all backups that are older'),
-            'required' => true,
-        ]);
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Rotates backups'))
+            ->addArgument('keep', [
+                'help' => __d('database_backup', 'Number of backups you want to keep. So, it will delete all backups that are older'),
+                'required' => true,
+            ]);
     }
 
     /**
@@ -75,5 +73,7 @@ class RotateCommand extends Command
             $io->error($e->getMessage());
             $this->abort();
         }
+
+        return null;
     }
 }

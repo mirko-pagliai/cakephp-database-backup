@@ -34,31 +34,29 @@ class ExportCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->setDescription(__d('database_backup', 'Exports a database backup'));
-        $parser->addOptions([
-            'compression' => [
-                'choices' => $this->getValidCompressions(),
-                'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
-                'short' => 'c',
-            ],
-            'filename' => [
-                'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
-                    'patterns. The compression type will be automatically setted'),
-                'short' => 'f',
-            ],
-            'rotate' => [
-                'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups you ' .
-                    'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
-                'short' => 'r',
-            ],
-            'send' => [
-                'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
-                    'to indicate the recipient\'s email address'),
-                'short' => 's',
-            ],
-        ]);
-
-        return $parser;
+        return $parser->setDescription(__d('database_backup', 'Exports a database backup'))
+            ->addOptions([
+                'compression' => [
+                    'choices' => $this->getValidCompressions(),
+                    'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
+                    'short' => 'c',
+                ],
+                'filename' => [
+                    'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
+                        'patterns. The compression type will be automatically setted'),
+                    'short' => 'f',
+                ],
+                'rotate' => [
+                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups you ' .
+                        'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
+                    'short' => 'r',
+                ],
+                'send' => [
+                    'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
+                        'to indicate the recipient\'s email address'),
+                    'short' => 's',
+                ],
+            ]);
     }
 
     /**
