@@ -17,7 +17,6 @@ use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Event\EventList;
 use Cake\ORM\TableRegistry;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -27,8 +26,6 @@ use DatabaseBackup\TestSuite\TestCase;
  */
 abstract class DriverTestCase extends TestCase
 {
-    use BackupTrait;
-
     /**
      * @var \Cake\ORM\Table
      */

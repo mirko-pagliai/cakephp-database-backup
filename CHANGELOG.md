@@ -4,7 +4,8 @@
 * added `DriverTestCase::getMockForDriver()` method;
 * `DriverTestCase::allRecords()` method renamed as `getAllRecords()`;
 * many small code fixes;
-* updated for `php-tools` 1.1.12.
+* updated for `php-tools` 1.1.12;
+* requires `me-tools` package for dev.
 
 ### 2.6.0
 * `BackupShell` has been replaced with console commands. Every method of the

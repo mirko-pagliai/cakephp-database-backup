@@ -35,8 +35,8 @@ define('WEBROOT_DIR', 'webroot');
 define('WWW_ROOT', APP . 'webroot' . DS);
 define('TMP', sys_get_temp_dir() . DS . 'cakephp-database-backup' . DS);
 define('CONFIG', APP . 'config' . DS);
-define('CACHE', TMP);
-define('LOGS', TMP);
+define('CACHE', TMP . 'cache' . DS);
+define('LOGS', TMP . 'cakephp_log' . DS);
 define('SESSIONS', TMP . 'sessions' . DS);
 
 @mkdir(LOGS);
@@ -120,5 +120,7 @@ if (class_exists(TransportFactory::class)) {
     Email::setConfigTransport($transportName, $transportConfig);
 }
 Email::setConfig('default', ['transport' => $transportName, 'log' => true]);
+
+Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 ini_set('intl.default_locale', 'en_US');

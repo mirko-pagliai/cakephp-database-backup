@@ -17,7 +17,6 @@ use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
 use Cake\ORM\Entity;
 use Cake\TestSuite\EmailAssertTrait;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -30,7 +29,6 @@ use Tools\Exception\NotWritableException;
  */
 class BackupManagerTest extends TestCase
 {
-    use BackupTrait;
     use EmailAssertTrait;
 
     /**
