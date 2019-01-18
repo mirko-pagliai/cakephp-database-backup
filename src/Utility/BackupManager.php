@@ -40,7 +40,7 @@ class BackupManager
         $filename = $this->getAbsolutePath($filename);
         is_writable_or_fail($filename);
 
-        return safe_unlink($filename);
+        return @unlink($filename);
     }
 
     /**

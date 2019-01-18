@@ -83,6 +83,6 @@ abstract class TestCase extends CakeTestCase
      */
     public function deleteAllBackups()
     {
-        safe_unlink_recursive(Configure::read('DatabaseBackup.target'));
+        @unlink_recursive(Configure::read('DatabaseBackup.target'));
     }
 }

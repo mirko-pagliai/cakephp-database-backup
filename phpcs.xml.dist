@@ -8,11 +8,12 @@
     <rule ref="Generic.Commenting.Todo">
         <severity>0</severity>
     </rule>
-
+    <rule ref="Generic.PHP.NoSilencedErrors.Discouraged">
+        <severity>0</severity>
+    </rule>
     <rule ref="Internal.NoCodeFound">
         <severity>0</severity>
     </rule>
-
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
         <exclude-pattern>/webroot</exclude-pattern>
     </rule>

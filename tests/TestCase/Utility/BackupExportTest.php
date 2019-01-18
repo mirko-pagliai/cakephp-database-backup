@@ -66,7 +66,7 @@ class BackupExportTest extends TestCase
     {
         parent::tearDown();
 
-        safe_unlink_recursive(LOGS, 'empty');
+        @unlink_recursive(LOGS, 'empty');
     }
 
     /**

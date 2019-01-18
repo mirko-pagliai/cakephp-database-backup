@@ -215,7 +215,7 @@ class BackupExport
 
         $this->driver->export($filename);
 
-        if (!is_win()) {
+        if (!IS_WIN) {
             chmod($filename, Configure::read('DatabaseBackup.chmod'));
         }
 
