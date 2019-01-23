@@ -72,6 +72,8 @@ See our wiki:
 * [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
 * [How to use the BackupShell](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell)
 
+And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
+
 ## Tests
 Tests are divided into two groups, `onlyUnix` and `onlyWindows`. This is
 necessary because some commands to be executed in the terminal are only valid
