@@ -17,7 +17,9 @@ even a coffee is enough! Thank you.
 ## Installation
 You can install the plugin via composer:
 
-    $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
+```bash
+$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
+```
 
 **NOTE: the latest version available requires at least CakePHP 3.7**.
 
@@ -25,11 +27,15 @@ Instead, the [cakephp3.2](//github.com/mirko-pagliai/cakephp-database-backup/tre
 branch is compatible with all previous versions of CakePHP from version 3.2. 
 In this case, you can install the package as well:
 
-    $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp3.2
-    
+```bash
+$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp3.2
+```
+
 After installation, you have to edit `APP/config/bootstrap.php` to load the plugin:
 
-    Plugin::load('DatabaseBackup', ['bootstrap' => true]);
+```php
+Plugin::load('DatabaseBackup', ['bootstrap' => true]);
+```
 
 For more information on how to load the plugin, please refer to the 
 [Cookbook](http://book.cakephp.org/3.0/en/plugins.html#loading-a-plugin).
@@ -37,7 +43,9 @@ For more information on how to load the plugin, please refer to the
 By default the plugin uses the `APP/backups` directory to save the backups 
 files. So you have to create the directory and make it writable:
 
-    $ mkdir backups/ && chmod 775 backups/
+```bash
+$ mkdir backups/ && chmod 775 backups/
+```
 
 If you want to use a different directory, read below.
 
@@ -81,11 +89,15 @@ for an environment.
 
 By default, phpunit is executed like this:
 
-    vendor/bin/phpunit --exclude-group=onlyWindows
+```bash
+vendor/bin/phpunit --exclude-group=onlyWindows
+```
 
 On Windows, it must be done this way:
 
-    vendor\bin\phpunit.bat --exclude-group=onlyUnix
+```bash
+vendor\bin\phpunit.bat --exclude-group=onlyUnix
+```
 
 ## Versioning
 For transparency and insight into our release cycle and to maintain backward 
