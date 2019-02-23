@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.6 branch
+### 2.6.2
+* added [API](//mirko-pagliai.github.io/cakephp-database-backup).
+
 ### 2.6.1
 * added `DriverTestCase::getMockForDriver()` method;
 * `DriverTestCase::allRecords()` method renamed as `getAllRecords()`;
