@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.6 branch
 ### 2.6.2
+* updated for `php-tools` 1.2 and `me-tools` 2.18.7.
 * added [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
 ### 2.6.1

@@ -231,6 +231,6 @@ class BackupExportTest extends TestCase
     {
         Configure::write('DatabaseBackup.chmod', 0777);
         $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertFilePerms($filename, '0777');
+        $this->assertFilePerms(0777, $filename);
     }
 }

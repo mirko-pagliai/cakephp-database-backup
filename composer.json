@@ -11,11 +11,11 @@
     "require": {
         "php": ">=5.5.9",
         "cakephp/cakephp": "^3.7",
-        "mirko-pagliai/php-tools": "^1.1.12"
+        "mirko-pagliai/php-tools": "^1.2"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^3.0",
-        "mirko-pagliai/me-tools": "^2.18.3",
+        "mirko-pagliai/me-tools": "^2.18.7",
         "phpunit/phpunit": "^5.7|^6.0"
     },
     "autoload": {
