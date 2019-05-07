@@ -18,6 +18,7 @@ use Cake\Database\Connection;
 use Cake\Event\EventList;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\TestSuite\TestCase;
+use ErrorException;
 
 /**
  * DriverTestCase class.
@@ -130,8 +131,18 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `export()` method on failure
      * @return void
+     * @since 2.6.2
+     * @test
      */
-    abstract public function testExportOnFailure();
+    public function testExportOnFailure()
+    {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
+        //Sets a no existing database
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
+        $this->setProperty($this->Driver, 'connection', new Connection($config));
+        $this->Driver->export($this->getAbsolutePath('example.sql'));
+    }
 
     /**
      * Test for `_importExecutable()` method
@@ -142,8 +153,21 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `import()` method on failure
      * @return void
+     * @since 2.6.2
+     * @test
      */
-    abstract public function testImportOnFailure();
+    public function testImportOnFailure()
+    {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
+        $backup = $this->getAbsolutePath('example.sql');
+        $this->Driver->export($backup);
+
+        //Sets a no existing database
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
+        $this->setProperty($this->Driver, 'connection', new Connection($config));
+        $this->Driver->import($backup);
+    }
 
     /**
      * Test for `_exportExecutableWithCompression()` method

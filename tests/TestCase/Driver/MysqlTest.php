@@ -12,7 +12,6 @@
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Database\Connection;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
@@ -136,36 +135,5 @@ class MysqlTest extends DriverTestCase
         $this->assertFileExists($auth);
         $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
         $this->assertFileNotExists($auth);
-    }
-
-    /**
-     * Test for `export()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `2`
-     * @test
-     */
-    public function testExportOnFailure()
-    {
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `1`
-     * @test
-     */
-    public function testImportOnFailure()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $this->Driver->export($backup);
-
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->import($backup);
     }
 }
