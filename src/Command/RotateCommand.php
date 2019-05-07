@@ -27,8 +27,8 @@ class RotateCommand extends Command
 {
     /**
      * Hook method for defining this command's option parser
-     * @param ConsoleOptionParser $parser The parser to be defined
-     * @return ConsoleOptionParser
+     * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
+     * @return \Cake\Console\ConsoleOptionParser
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
@@ -44,8 +44,8 @@ class RotateCommand extends Command
      *
      * You have to indicate the number of backups you want to keep. So, it will
      *  delete all backups that are older. By default, no backup will be deleted
-     * @param Arguments $args The command arguments
-     * @param ConsoleIo $io The console io
+     * @param \Cake\Console\Arguments $args The command arguments
+     * @param \Cake\Console\ConsoleIo $io The console io
      * @return null|int The exit code or null for success
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#rotate
      * @uses DatabaseBackup\Utility\BackupManager::rotate()
@@ -56,7 +56,7 @@ class RotateCommand extends Command
 
         try {
             //Gets deleted files
-            $files = (new BackupManager)->rotate($args->getArgument('keep'));
+            $files = (new BackupManager())->rotate($args->getArgument('keep'));
 
             if (!$files) {
                 $io->verbose(__d('database_backup', 'No backup has been deleted'));

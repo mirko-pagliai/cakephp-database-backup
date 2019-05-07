@@ -49,8 +49,8 @@ class BackupManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport;
-        $this->BackupManager = new BackupManager;
+        $this->BackupExport = new BackupExport();
+        $this->BackupManager = new BackupManager();
     }
 
     /**
@@ -169,7 +169,7 @@ class BackupManagerTest extends TestCase
         $mimetype = mime_content_type($file);
         $to = 'recipient@example.com';
 
-        $instance = new BackupManager;
+        $instance = new BackupManager();
         $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $to]);
         $this->assertInstanceof(Email::class, $this->_email);
 

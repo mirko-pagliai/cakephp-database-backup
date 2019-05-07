@@ -28,8 +28,8 @@ class IndexCommand extends Command
 {
     /**
      * Hook method for defining this command's option parser
-     * @param ConsoleOptionParser $parser The parser to be defined
-     * @return ConsoleOptionParser
+     * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
+     * @return \Cake\Console\ConsoleOptionParser
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
@@ -38,8 +38,8 @@ class IndexCommand extends Command
 
     /**
      * Lists database backups
-     * @param Arguments $args The command arguments
-     * @param ConsoleIo $io The console io
+     * @param \Cake\Console\Arguments $args The command arguments
+     * @param \Cake\Console\ConsoleIo $io The console io
      * @return null|int The exit code or null for success
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#index
      * @uses DatabaseBackup\Utility\BackupManager::index()
@@ -49,7 +49,7 @@ class IndexCommand extends Command
         parent::execute($args, $io);
 
         //Gets all backups
-        $backups = (new BackupManager)->index();
+        $backups = (new BackupManager())->index();
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
 
         if ($backups->isEmpty()) {

@@ -81,7 +81,7 @@ abstract class DriverTestCase extends TestCase
 
         //Enable event tracking
         $this->Driver = new $this->DriverClass($this->getConnection());
-        $this->Driver->getEventManager()->setEventList(new EventList);
+        $this->Driver->getEventManager()->setEventList(new EventList());
     }
 
     /**

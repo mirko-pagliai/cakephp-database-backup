@@ -64,8 +64,9 @@ trait BackupTrait
     {
         //Gets the extension from the filename
         $extension = $this->getExtension($filename);
+        $keyExists = array_key_exists($extension, $this->getValidCompressions());
 
-        return array_key_exists($extension, $this->getValidCompressions()) ? $this->getValidCompressions()[$extension] : false;
+        return $keyExists ? $this->getValidCompressions()[$extension] : false;
     }
 
     /**
@@ -84,7 +85,7 @@ trait BackupTrait
      * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
      * @return object A driver instance
      * @since 2.0.0
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @uses getConnection()
      */
     public function getDriver(ConnectionInterface $connection = null)
@@ -92,7 +93,11 @@ trait BackupTrait
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-        is_true_or_fail($driver, __d('database_backup', 'The `{0}` driver does not exist', $className), InvalidArgumentException::class);
+        is_true_or_fail(
+            $driver,
+            __d('database_backup', 'The `{0}` driver does not exist', $className),
+            InvalidArgumentException::class
+        );
 
         return new $driver($connection);
     }

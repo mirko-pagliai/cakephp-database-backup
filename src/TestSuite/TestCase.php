@@ -38,9 +38,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        if (!$this->BackupExport) {
-            $this->BackupExport = new BackupExport;
-        }
+        $this->BackupExport = $this->BackupExport ?: new BackupExport();
     }
 
     /**
