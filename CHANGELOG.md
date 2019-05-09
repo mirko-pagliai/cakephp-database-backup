@@ -3,6 +3,7 @@
 ### 2.6.2
 * the `DriverTestCase` class now implements `testExportOnFailure()` and
     `testImportOnFailure()` test methods;
+* improved printing of the backup table for the `IndexCommand`;
 * updated for `php-tools` 1.2 and `me-tools` 2.18.7.
 * added [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
