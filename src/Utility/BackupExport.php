@@ -31,7 +31,7 @@ class BackupExport
 
     /**
      * Compression type
-     * @var bool|string|null
+     * @var string|null
      */
     protected $compression = null;
 
@@ -57,9 +57,9 @@ class BackupExport
 
     /**
      * Recipient of the email, if you want to send the backup via mail
-     * @var bool|string
+     * @var string|null
      */
-    protected $emailRecipient = false;
+    protected $emailRecipient = null;
 
     /**
      * Filename extension
@@ -96,8 +96,8 @@ class BackupExport
 
     /**
      * Sets the compression
-     * @param bool|string $compression Compression type as string. Supported
-     *  values are `bzip2` and `gzip`. Use `false` for no compression
+     * @param string|null $compression Compression type name. Supported
+     *  values are `bzip2` and `gzip`. Use `null` for no compression
      * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws \InvalidArgumentException
@@ -182,12 +182,12 @@ class BackupExport
 
     /**
      * Sets the recipient's email address to send the backup file via mail
-     * @param bool|string $recipient Recipient's email address or `false` to disable
+     * @param string|null $recipient Recipient's email address or `null` to disable
      * @return \DatabaseBackup\Utility\BackupExport
      * @since 1.1.0
      * @uses $emailRecipient
      */
-    public function send($recipient = false)
+    public function send($recipient = null)
     {
         $this->emailRecipient = $recipient;
 
