@@ -52,6 +52,16 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
+     * Test for `_exportExecutableWithCompression()` method
+     * @test
+     */
+    public function testExportExecutableWithCompression()
+    {
+        $this->setProperty($this->Driver, 'auth', 'authFile');
+        parent::testExportExecutableWithCompression();
+    }
+
+    /**
      * Test for `_importExecutable()` method
      * @test
      */
@@ -60,6 +70,16 @@ class MysqlTest extends DriverTestCase
         $expected = sprintf('%s --defaults-extra-file=%s test', $this->getBinary('mysql'), escapeshellarg('authFile'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
+    }
+
+    /**
+     * Test for `_importExecutableWithCompression()` method
+     * @test
+     */
+    public function testImportExecutableWithCompression()
+    {
+        $this->setProperty($this->Driver, 'auth', 'authFile');
+        parent::testImportExecutableWithCompression();
     }
 
     /**
