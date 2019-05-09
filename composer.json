@@ -9,14 +9,15 @@
         "email": "mirko.pagliai@gmail.com"
     }],
     "require": {
-        "php": ">=5.5.9",
-        "cakephp/cakephp": "^3.7",
+        "php": ">=7.2",
+        "cakephp/cakephp": "4.x-dev",
+        "cakephp/chronos": "2.x-dev as 2.0.0",
         "mirko-pagliai/php-tools": "^1.2"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "^3.0",
-        "mirko-pagliai/me-tools": "^2.18.7",
-        "phpunit/phpunit": "^5.7|^6.0"
+        "cakephp/cakephp-codesniffer": "dev-next",
+        "mirko-pagliai/me-tools": "dev-cakephp4",
+        "phpunit/phpunit": "^8.0"
     },
     "autoload": {
         "psr-4": {

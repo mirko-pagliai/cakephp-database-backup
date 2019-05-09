@@ -118,7 +118,7 @@ class BackupManager
      * @return \Cake\Mailer\Email
      * @since 1.1.0
      */
-    protected function getEmailInstance($backup, $recipient)
+    protected function getEmailInstance(string $backup, string $recipient): Email
     {
         $file = $this->getAbsolutePath($backup);
         is_readable_or_fail($file);
@@ -141,7 +141,7 @@ class BackupManager
      * @since 1.1.0
      * @uses getEmailInstance()
      */
-    public function send($filename, $recipient)
+    public function send(string $filename, string $recipient): array
     {
         return $this->getEmailInstance($filename, $recipient)->send();
     }

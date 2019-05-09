@@ -30,7 +30,7 @@ class ImportCommand extends Command
      * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
      * @return \Cake\Console\ConsoleOptionParser
      */
-    protected function buildOptionParser(ConsoleOptionParser $parser)
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser->setDescription(__d('database_backup', 'Imports a database backup'))
             ->addArgument('filename', [
@@ -43,12 +43,12 @@ class ImportCommand extends Command
      * Imports a database backup
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return null|int The exit code or null for success
+     * @return int|null The exit code or null for success
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#import
      * @uses DatabaseBackup\Utility\BackupImport::filename()
      * @uses DatabaseBackup\Utility\BackupImport::import()
      */
-    public function execute(Arguments $args, ConsoleIo $io)
+    public function execute(Arguments $args, ConsoleIo $io): ?int
     {
         parent::execute($args, $io);
 

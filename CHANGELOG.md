@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.7 branch
+### 2.7.0
+* updated for `cakephp` 4 and `phpunit` 8.
+
 ## 2.6 branch
 ### 2.6.2
 * the `DriverTestCase` class now implements `testExportOnFailure()` and

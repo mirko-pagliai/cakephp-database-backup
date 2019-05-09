@@ -15,6 +15,7 @@ namespace DatabaseBackup\Test\TestCase;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Database\Driver\Mysql as CakeMysql;
+use Cake\Database\Driver\Sqlserver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\BackupTrait;
@@ -122,12 +123,12 @@ class BackupTraitTest extends TestCase
 
         //With a no existing driver
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The `InvalidArgumentException` driver does not exist');
+        $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
         $connection = $this->getMockBuilder(get_class($this->getConnection()))
             ->setMethods(['getDriver'])
             ->setConstructorArgs([$this->getConnection()->config()])
             ->getMock();
-        $connection->method('getDriver')->will($this->returnValue(new InvalidArgumentException()));
+        $connection->method('getDriver')->will($this->returnValue(new Sqlserver()));
         $this->getDriver($connection);
     }
 

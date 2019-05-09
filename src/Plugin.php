@@ -13,6 +13,7 @@
  */
 namespace DatabaseBackup;
 
+use Cake\Console\CommandCollection;
 use Cake\Core\BasePlugin;
 use DatabaseBackup\Command\DeleteAllCommand;
 use DatabaseBackup\Command\ExportCommand;
@@ -31,7 +32,7 @@ class Plugin extends BasePlugin
      * @param \Cake\Console\CommandCollection $commands The command collection to update
      * @return \Cake\Console\CommandCollection
      */
-    public function console($commands)
+    public function console(CommandCollection $commands): CommandCollection
     {
         $commands->add('database_backup.delete_all', DeleteAllCommand::class);
         $commands->add('database_backup.export', ExportCommand::class);

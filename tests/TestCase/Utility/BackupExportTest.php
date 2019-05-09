@@ -36,7 +36,7 @@ class BackupExportTest extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -54,7 +54,9 @@ class BackupExportTest extends TestCase
                     return '`' . $arg . '`';
                 }, func_get_args()));
 
-                return Log::write('debug', 'Called `send()` with args: ' . $args);
+                Log::write('debug', 'Called `send()` with args: ' . $args);
+
+                return func_get_args();
             }));
     }
 
@@ -62,7 +64,7 @@ class BackupExportTest extends TestCase
      * Called after every test method
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
