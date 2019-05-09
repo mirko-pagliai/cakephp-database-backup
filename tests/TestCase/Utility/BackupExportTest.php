@@ -87,7 +87,7 @@ class BackupExportTest extends TestCase
 
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'defaultExtension'));
         $this->assertInstanceof(Mysql::class, $this->getProperty($this->BackupExport, 'driver'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
+        $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
         $this->assertNull($this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
         $this->assertEquals(0, $this->getProperty($this->BackupExport, 'rotate'));
@@ -180,7 +180,7 @@ class BackupExportTest extends TestCase
     public function testSend()
     {
         $this->BackupExport->send();
-        $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
+        $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
 
         $recipient = 'recipient@example.com';
         $this->BackupExport->send($recipient);

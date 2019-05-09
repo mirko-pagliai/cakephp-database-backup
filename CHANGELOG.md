@@ -5,6 +5,10 @@
 
 ## 2.6 branch
 ### 2.6.2
+* `BackupExport::compression()` takes a compression type name as string or
+    `null` to disable compression;
+* `BackupExport::send()` takes a recipient's email address as string or `null`
+    to disable sending backup;
 * the `DriverTestCase` class now implements `testExportOnFailure()` and
     `testImportOnFailure()` test methods;
 * improved printing of the backup table for the `IndexCommand`;
