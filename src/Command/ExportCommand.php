@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -114,8 +115,7 @@ class ExportCommand extends Command
                     $RotateCommand->getOptionParser()->argumentNames()
                 ), $io);
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();
         }
