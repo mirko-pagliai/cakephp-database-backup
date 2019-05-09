@@ -192,7 +192,7 @@ abstract class Driver implements EventListenerInterface
 
     /**
      * Gets a config value or the whole configuration
-     * @param string $key Config key
+     * @param string|null $key Config key or `null` to get all config values
      * @return array|string|null Config value, `null` if the key doesn't exist
      *  or all config values if no key was specified
      * @since 2.3.0
