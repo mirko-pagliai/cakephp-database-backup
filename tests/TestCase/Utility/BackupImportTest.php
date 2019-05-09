@@ -102,7 +102,7 @@ class BackupImportTest extends TestCase
     public function testImport()
     {
         //Exports and imports with no compression
-        $backup = $this->BackupExport->compression(false)->export();
+        $backup = $this->BackupExport->compression(null)->export();
         $filename = $this->BackupImport->filename($backup)->import();
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
 
