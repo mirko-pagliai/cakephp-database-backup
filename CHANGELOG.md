@@ -9,6 +9,7 @@
     `null` to disable compression;
 * `BackupExport::send()` takes a recipient's email address as string or `null`
     to disable sending backup;
+* `BackupTrait::getCompression()` returns `null` with no compression;
 * the `DriverTestCase` class now implements `testExportOnFailure()` and
     `testImportOnFailure()` test methods;
 * improved printing of the backup table for the `IndexCommand`;

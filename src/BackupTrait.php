@@ -57,7 +57,7 @@ trait BackupTrait
     /**
      * Returns the compression type from a filename
      * @param string $filename Filename
-     * @return string|bool Compression type as string or `false`
+     * @return string|null Compression type as string or `null`
      * @uses getExtension()
      * @uses getValidCompressions()
      */
@@ -67,7 +67,7 @@ trait BackupTrait
         $extension = $this->getExtension($filename);
         $keyExists = array_key_exists($extension, $this->getValidCompressions());
 
-        return $keyExists ? $this->getValidCompressions()[$extension] : false;
+        return $keyExists ? $this->getValidCompressions()[$extension] : null;
     }
 
     /**
