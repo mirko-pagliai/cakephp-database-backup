@@ -14,6 +14,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
+use Cake\Collection\Collection;
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\I18n\FrozenTime;
@@ -36,7 +37,7 @@ class BackupManager
      * @return bool
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
      */
-    public function delete($filename)
+    public function delete(string $filename): bool
     {
         $filename = $this->getAbsolutePath($filename);
         is_writable_or_fail($filename);
@@ -52,7 +53,7 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public function deleteAll()
+    public function deleteAll(): array
     {
         return array_filter(array_map(function ($file) {
             return $this->delete($file->filename) ? $file->filename : false;
@@ -65,7 +66,7 @@ class BackupManager
      *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public function index()
+    public function index(): Collection
     {
         $target = $this->getTarget();
 
@@ -94,7 +95,7 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public function rotate($rotate)
+    public function rotate(int $rotate): array
     {
         is_true_or_fail(
             is_positive($rotate),

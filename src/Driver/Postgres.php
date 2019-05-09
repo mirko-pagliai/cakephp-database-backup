@@ -33,7 +33,7 @@ class Postgres extends Driver
      * @return string
      * @uses getConfig()
      */
-    protected function getDbnameAsString()
+    protected function getDbnameAsString(): string
     {
         return sprintf(
             'postgresql://%s%s@%s/%s',
@@ -49,7 +49,7 @@ class Postgres extends Driver
      * @return string
      * @uses getDbnameAsString()
      */
-    protected function _exportExecutable()
+    protected function _exportExecutable(): string
     {
         return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
     }
@@ -59,7 +59,7 @@ class Postgres extends Driver
      * @return string
      * @uses getDbnameAsString()
      */
-    protected function _importExecutable()
+    protected function _importExecutable(): string
     {
         return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
     }

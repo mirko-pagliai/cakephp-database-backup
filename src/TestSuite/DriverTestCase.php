@@ -89,7 +89,7 @@ abstract class DriverTestCase extends TestCase
      * Internal method to get all records from the database
      * @return array
      */
-    final protected function getAllRecords()
+    final protected function getAllRecords(): array
     {
         foreach (['Articles', 'Comments'] as $name) {
             $records[$name] = $this->$name->find()->enableHydration(false)->toArray();
@@ -101,11 +101,11 @@ abstract class DriverTestCase extends TestCase
     /**
      * Internal method to mock a driver
      * @param array $methods The list of methods to mock
-     * @return \DatabaseBackup\Driver\Driver|\PHPUnit_Framework_MockObject_MockObject
+     * @return \MockBuilder
      * @since 2.6.1
      * @uses $Driver
      */
-    final protected function getMockForDriver(array $methods)
+    final protected function getMockForDriver(array $methods): object
     {
         return $this->getMockBuilder(get_class($this->Driver))
             ->setMethods($methods)

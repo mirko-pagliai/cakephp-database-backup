@@ -26,7 +26,7 @@ class Sqlite extends Driver
      * @return string
      * @uses getConfig()
      */
-    protected function _exportExecutable()
+    protected function _exportExecutable(): string
     {
         return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
@@ -36,7 +36,7 @@ class Sqlite extends Driver
      * @return string
      * @uses getConfig()
      */
-    protected function _importExecutable()
+    protected function _importExecutable(): string
     {
         return sprintf('%s %s', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
@@ -47,7 +47,7 @@ class Sqlite extends Driver
      * @since 2.1.0
      * @uses $connection
      */
-    public function beforeImport()
+    public function beforeImport(): bool
     {
         $schemaCollection = $this->connection->getSchemaCollection();
 

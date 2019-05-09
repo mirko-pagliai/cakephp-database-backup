@@ -34,7 +34,7 @@ class Mysql extends Driver
      * @uses getConfig()
      * @uses $auth
      */
-    protected function _exportExecutable()
+    protected function _exportExecutable(): string
     {
         return sprintf(
             '%s --defaults-file=%s %s',
@@ -50,7 +50,7 @@ class Mysql extends Driver
      * @uses getConfig()
      * @uses $auth
      */
-    protected function _importExecutable()
+    protected function _importExecutable(): string
     {
         return sprintf(
             '%s --defaults-extra-file=%s %s',
@@ -68,7 +68,7 @@ class Mysql extends Driver
      * @uses getConfig()
      * @uses $auth
      */
-    protected function writeAuthFile($content)
+    protected function writeAuthFile(string $content): bool
     {
         $content = str_replace(
             ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
@@ -87,7 +87,7 @@ class Mysql extends Driver
      * @since 2.1.0
      * @uses deleteAuthFile()
      */
-    public function afterExport()
+    public function afterExport(): void
     {
         $this->deleteAuthFile();
     }
@@ -98,7 +98,7 @@ class Mysql extends Driver
      * @since 2.1.0
      * @uses deleteAuthFile()
      */
-    public function afterImport()
+    public function afterImport(): void
     {
         $this->deleteAuthFile();
     }
@@ -117,7 +117,7 @@ class Mysql extends Driver
      * @since 2.1.0
      * @uses writeAuthFile()
      */
-    public function beforeExport()
+    public function beforeExport(): bool
     {
         return $this->writeAuthFile("[mysqldump]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
@@ -139,7 +139,7 @@ class Mysql extends Driver
      * @since 2.1.0
      * @uses writeAuthFile()
      */
-    public function beforeImport()
+    public function beforeImport(): bool
     {
         return $this->writeAuthFile("[client]" . PHP_EOL .
             "user={{USER}}" . PHP_EOL .
@@ -153,7 +153,7 @@ class Mysql extends Driver
      * @since 2.1.0
      * @uses $auth
      */
-    protected function deleteAuthFile()
+    protected function deleteAuthFile(): bool
     {
         if (!$this->auth || !file_exists($this->auth)) {
             return false;

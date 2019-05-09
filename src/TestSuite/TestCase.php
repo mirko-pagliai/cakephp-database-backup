@@ -59,7 +59,7 @@ abstract class TestCase extends BaseTestCase
      * @param string $filename Filename
      * @return string
      */
-    protected function createBackup($filename = 'backup.sql')
+    protected function createBackup(string $filename = 'backup.sql'): string
     {
         return $this->BackupExport->filename($filename)->export();
     }
@@ -70,7 +70,7 @@ abstract class TestCase extends BaseTestCase
      * @return array
      * @uses createBackup()
      */
-    protected function createSomeBackups($sleep = false)
+    protected function createSomeBackups(bool $sleep = false): array
     {
         $files[] = $this->createBackup();
 

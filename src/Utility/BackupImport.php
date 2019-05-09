@@ -50,12 +50,12 @@ class BackupImport
     /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
-     * @return \DatabaseBackup\Utility\BackupImport
+     * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws \InvalidArgumentException
      * @uses $filename
      */
-    public function filename($filename)
+    public function filename(string $filename)
     {
         $filename = $this->getAbsolutePath($filename);
         is_readable_or_fail($filename);
@@ -80,7 +80,7 @@ class BackupImport
      * @uses $driver
      * @uses $filename
      */
-    public function import()
+    public function import(): string
     {
         is_true_or_fail(
             !empty($this->filename),

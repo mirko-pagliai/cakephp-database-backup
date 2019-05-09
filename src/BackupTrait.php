@@ -38,7 +38,7 @@ trait BackupTrait
      * @return string
      * @uses getTarget()
      */
-    public function getAbsolutePath($path)
+    public function getAbsolutePath(string $path): string
     {
         return Folder::isAbsolute($path) ? $path : $this->getTarget() . DS . $path;
     }
@@ -49,7 +49,7 @@ trait BackupTrait
      * @return string
      * @since 2.0.0
      */
-    public function getBinary($name)
+    public function getBinary(string $name): string
     {
         return Configure::readOrFail('DatabaseBackup.binaries.' . $name);
     }
@@ -61,7 +61,7 @@ trait BackupTrait
      * @uses getExtension()
      * @uses getValidCompressions()
      */
-    public function getCompression($filename)
+    public function getCompression(string $filename): ?string
     {
         //Gets the extension from the filename
         $extension = $this->getExtension($filename);
@@ -75,7 +75,7 @@ trait BackupTrait
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface A connection object
      */
-    public function getConnection($name = null)
+    public function getConnection(?string $name = null): ConnectionInterface
     {
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
@@ -89,7 +89,7 @@ trait BackupTrait
      * @throws \InvalidArgumentException
      * @uses getConnection()
      */
-    public function getDriver(?ConnectionInterface $connection = null)
+    public function getDriver(?ConnectionInterface $connection = null): object
     {
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
@@ -110,7 +110,7 @@ trait BackupTrait
      *  if is an invalid extension
      * @uses getValidExtensions()
      */
-    public function getExtension($filename)
+    public function getExtension(string $filename): ?string
     {
         $extension = get_extension($filename);
 
@@ -121,7 +121,7 @@ trait BackupTrait
      * Returns the target path
      * @return string
      */
-    public function getTarget()
+    public function getTarget(): string
     {
         return Configure::read('DatabaseBackup.target');
     }
@@ -132,7 +132,7 @@ trait BackupTrait
      * @since 2.4.0
      * @uses $$validExtensions
      */
-    public function getValidCompressions()
+    public function getValidCompressions(): array
     {
         return array_filter(self::$validExtensions);
     }
@@ -143,7 +143,7 @@ trait BackupTrait
      * @since 2.4.0
      * @uses $validExtensions
      */
-    public function getValidExtensions()
+    public function getValidExtensions(): array
     {
         return array_keys(self::$validExtensions);
     }
