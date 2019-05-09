@@ -83,9 +83,9 @@ class ExportCommand extends Command
             //Sets the output filename or the compression type.
             //Regarding the `rotate` option, the `BackupShell::rotate()` method
             //  will be called at the end, instead of `BackupExport::rotate()`
-            if ($args->hasOption('filename')) {
+            if ($args->getOption('filename')) {
                 $instance->filename($args->getOption('filename'));
-            } elseif ($args->hasOption('compression')) {
+            } elseif ($args->getOption('compression')) {
                 $instance->compression($args->getOption('compression'));
             }
 
@@ -96,7 +96,7 @@ class ExportCommand extends Command
             $quiet = $args->getOption('quiet');
 
             //Sends via email
-            if ($args->hasOption('send')) {
+            if ($args->getOption('send')) {
                 $SendCommand = new SendCommand();
                 $SendCommand->execute(new Arguments(
                     [$file, $args->getOption('send')],
@@ -106,7 +106,7 @@ class ExportCommand extends Command
             }
 
             //Rotates
-            if ($args->hasOption('rotate')) {
+            if ($args->getOption('rotate')) {
                 $RotateCommand = new RotateCommand();
                 $RotateCommand->execute(new Arguments(
                     [$args->getOption('rotate')],
