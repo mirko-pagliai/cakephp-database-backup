@@ -101,7 +101,7 @@ class BackupManager
             __d('database_backup', 'Invalid rotate value'),
             InvalidArgumentException::class
         );
-        $backupsToBeDeleted = $this->index()->skip($rotate);
+        $backupsToBeDeleted = $this->index()->skip((int)$rotate);
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
