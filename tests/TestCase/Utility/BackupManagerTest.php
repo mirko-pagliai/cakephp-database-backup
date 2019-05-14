@@ -166,16 +166,12 @@ class BackupManagerTest extends TestCase
     public function testSend()
     {
         $file = $this->createBackup();
-        $mimetype = mime_content_type($file);
         $to = 'recipient@example.com';
-
-        $this->_email = $this->invokeMethod($this->BackupManager, 'getEmailInstance', [$file, $to]);
         $this->BackupManager->send($file, $to);
-
         $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
         $this->assertMailSentTo($to);
         $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
-        $this->assertSame([basename($file) => compact('file', 'mimetype')], $this->_email->getAttachments());
+        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
 
         //With an invalid sender
         $this->expectException(InvalidArgumentException::class);
