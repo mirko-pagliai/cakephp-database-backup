@@ -5,6 +5,7 @@
 
 ## 2.6 branch
 ### 2.6.2
+* added `BackupTrait::getDriverName()` method;
 * `BackupExport::compression()` takes a compression type name as string or
     `null` to disable compression;
 * `BackupExport::send()` takes a recipient's email address as string or `null`

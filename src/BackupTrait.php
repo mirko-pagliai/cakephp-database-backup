@@ -81,18 +81,19 @@ trait BackupTrait
     }
 
     /**
-     * Gets the driver containing all methods to export/import database backups
-     *  according to the database engine
+     * Gets the driver instance containing all methods to export/import database
+     *  backups, according to the database engine
      * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
-     * @return object A driver instance
+     * @return object The driver instance
      * @since 2.0.0
      * @throws \InvalidArgumentException
      * @uses getConnection()
+     * @uses getDriverName()
      */
     public function getDriver(?ConnectionInterface $connection = null): object
     {
         $connection = $connection ?: $this->getConnection();
-        $className = get_class_short_name($connection->getDriver());
+        $className = $this->getDriverName($connection);
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
         is_true_or_fail(
             $driver,
@@ -101,6 +102,20 @@ trait BackupTrait
         );
 
         return new $driver($connection);
+    }
+
+    /**
+     * Gets the driver name, according to the database engine
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
+     * @return string The driver name
+     * @since 2.6.2
+     * @uses getConnection()
+     */
+    public function getDriverName(ConnectionInterface $connection = null)
+    {
+        $connection = $connection ?: $this->getConnection();
+
+        return get_class_short_name(get_class($connection->getDriver()));
     }
 
     /**
