@@ -132,6 +132,17 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * Test for `getDriverName()` method
+     * @test
+     */
+    public function testGetDriverName()
+    {
+        foreach ([ConnectionManager::get('test'), null] as $driver) {
+            $this->assertEquals('Mysql', $this->getDriverName($driver));
+        }
+    }
+
+    /**
      * Test for `getExtension()` method
      * @test
      */

@@ -29,15 +29,14 @@ class Command extends BaseCommand
      * Implement this method with your command's logic
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return null|int The exit code or null for success
+     * @return int|null The exit code or null for success
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
         $config = $this->getConnection()->config();
-        $driver = $this->getDriver($this->getConnection());
 
         $io->out(__d('database_backup', 'Connection: {0}', $config['name']));
-        $io->out(__d('database_backup', 'Driver: {0}', get_class_short_name($driver)));
+        $io->out(__d('database_backup', 'Driver: {0}', $this->getDriverName($this->getConnection())));
         $io->hr();
 
         return null;
