@@ -111,7 +111,7 @@ trait BackupTrait
      * @since 2.6.2
      * @uses getConnection()
      */
-    public function getDriverName(ConnectionInterface $connection = null)
+    public function getDriverName(?ConnectionInterface $connection = null): string
     {
         $connection = $connection ?: $this->getConnection();
 
