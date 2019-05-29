@@ -1,6 +1,16 @@
 # 2.x branch
 ## 2.6 branch
 ### 2.6.2
+* added `BackupTrait::getDriverName()` method;
+* `BackupExport::compression()` takes a compression type name as string or
+    `null` to disable compression;
+* `BackupExport::send()` takes a recipient's email address as string or `null`
+    to disable sending backup;
+* `BackupTrait::getCompression()` returns `null` with no compression;
+* the `DriverTestCase` class now implements `testExportOnFailure()` and
+    `testImportOnFailure()` test methods;
+* improved printing of the backup table for the `IndexCommand`;
+* updated for `php-tools` 1.2 and `me-tools` 2.18.7.
 * added [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
 ### 2.6.1

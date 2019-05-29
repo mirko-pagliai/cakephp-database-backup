@@ -11,6 +11,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration
  */
+
 use Cake\Core\Configure;
 
 //Sets the redirect to `/dev/null`. This string can be concatenated to shell commands

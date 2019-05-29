@@ -28,8 +28,8 @@ class Plugin extends BasePlugin
 {
     /**
      * Add console commands for the plugin
-     * @param Cake\Console\CommandCollection $commands The command collection to update
-     * @return Cake\Console\CommandCollection
+     * @param \Cake\Console\CommandCollection $commands The command collection to update
+     * @return \Cake\Console\CommandCollection
      */
     public function console($commands)
     {

@@ -40,7 +40,7 @@ class BackupExportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport;
+        $this->BackupExport = new BackupExport();
 
         //Mocks the `send()` method of `BackupManager` class, so that it writes
         //  on the debug log instead of sending a real mail
@@ -84,7 +84,7 @@ class BackupExportTest extends TestCase
 
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'defaultExtension'));
         $this->assertInstanceof(Mysql::class, $this->getProperty($this->BackupExport, 'driver'));
-        $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
+        $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
         $this->assertNull($this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
         $this->assertEquals(0, $this->getProperty($this->BackupExport, 'rotate'));
@@ -135,7 +135,7 @@ class BackupExportTest extends TestCase
 
         //Filename with `{$DATETIME}` pattern
         $this->BackupExport->filename('{$DATETIME}.sql');
-        $this->assertRegExp('/^[0-9]{14}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertRegExp('/^\d{14}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
 
         //Filename with `{$HOSTNAME}` pattern
         $this->BackupExport->filename('{$HOSTNAME}.sql');
@@ -143,22 +143,15 @@ class BackupExportTest extends TestCase
 
         //Filename with `{$TIMESTAMP}` pattern
         $this->BackupExport->filename('{$TIMESTAMP}.sql');
-        $this->assertRegExp('/^[0-9]{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertRegExp('/^\d{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
 
         //With a no writable directory
         $this->expectException(NotWritableException::class);
         $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir') . '` is not writable');
-        $this->BackupExport->filename('noExistingDir' . DS . 'backup.sql');
-    }
 
-    /**
-     * Test for `filename()` method, with invalid extension
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid file extension
-     * @test
-     */
-    public function testFilenameWithInvalidExtension()
-    {
+        //With invalid extension
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid file extension');
         $this->BackupExport->filename('backup.txt');
     }
 
@@ -184,7 +177,7 @@ class BackupExportTest extends TestCase
     public function testSend()
     {
         $this->BackupExport->send();
-        $this->assertFalse($this->getProperty($this->BackupExport, 'emailRecipient'));
+        $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
 
         $recipient = 'recipient@example.com';
         $this->BackupExport->send($recipient);
@@ -199,12 +192,12 @@ class BackupExportTest extends TestCase
     {
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
+        $this->assertRegExp('/^backup_test_\d{14}\.sql$/', basename($filename));
 
         //Exports with `compression()`
         $filename = $this->BackupExport->compression('bzip2')->export();
         $this->assertFileExists($filename);
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
+        $this->assertRegExp('/^backup_test_\d{14}\.sql\.bz2$/', basename($filename));
 
         //Exports with `filename()`
         $filename = $this->BackupExport->filename('backup.sql.bz2')->export();
@@ -231,6 +224,6 @@ class BackupExportTest extends TestCase
     {
         Configure::write('DatabaseBackup.chmod', 0777);
         $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertFilePerms($filename, '0777');
+        $this->assertFilePerms(0777, $filename);
     }
 }

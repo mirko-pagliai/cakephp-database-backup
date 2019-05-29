@@ -21,6 +21,7 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * BackupTraitTest class
@@ -62,16 +63,10 @@ class BackupTraitTest extends TestCase
     public function testGetBinary()
     {
         $this->assertEquals(which('mysql'), $this->getBinary('mysql'));
-    }
 
-    /**
-     * Test for `getBinary()` method, with a binary not available
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Expected configuration key "DatabaseBackup.binaries.noExisting" not found.
-     * @test
-     */
-    public function testGetBinaryNotAvailable()
-    {
+        //With a binary not available
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Expected configuration key "DatabaseBackup.binaries.noExisting" not found');
         $this->getBinary('noExisting');
     }
 
@@ -132,8 +127,19 @@ class BackupTraitTest extends TestCase
             ->setMethods(['getDriver'])
             ->setConstructorArgs([$this->getConnection()->config()])
             ->getMock();
-        $connection->method('getDriver')->will($this->returnValue(new InvalidArgumentException));
+        $connection->method('getDriver')->will($this->returnValue(new InvalidArgumentException()));
         $this->getDriver($connection);
+    }
+
+    /**
+     * Test for `getDriverName()` method
+     * @test
+     */
+    public function testGetDriverName()
+    {
+        foreach ([ConnectionManager::get('test'), null] as $driver) {
+            $this->assertEquals('Mysql', $this->getDriverName($driver));
+        }
     }
 
     /**

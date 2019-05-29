@@ -56,7 +56,7 @@ trait BackupTrait
     /**
      * Returns the compression type from a filename
      * @param string $filename Filename
-     * @return string|bool Compression type as string or `false`
+     * @return string|null Compression type as string or `null`
      * @uses getExtension()
      * @uses getValidCompressions()
      */
@@ -64,8 +64,9 @@ trait BackupTrait
     {
         //Gets the extension from the filename
         $extension = $this->getExtension($filename);
+        $keyExists = array_key_exists($extension, $this->getValidCompressions());
 
-        return array_key_exists($extension, $this->getValidCompressions()) ? $this->getValidCompressions()[$extension] : false;
+        return $keyExists ? $this->getValidCompressions()[$extension] : null;
     }
 
     /**
@@ -79,22 +80,41 @@ trait BackupTrait
     }
 
     /**
-     * Gets the driver containing all methods to export/import database backups
-     *  according to the database engine
+     * Gets the driver instance containing all methods to export/import database
+     *  backups, according to the database engine
      * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
-     * @return object A driver instance
+     * @return object The driver instance
      * @since 2.0.0
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @uses getConnection()
+     * @uses getDriverName()
      */
     public function getDriver(ConnectionInterface $connection = null)
     {
         $connection = $connection ?: $this->getConnection();
-        $className = get_class_short_name($connection->getDriver());
+        $className = $this->getDriverName($connection);
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-        is_true_or_fail($driver, __d('database_backup', 'The `{0}` driver does not exist', $className), InvalidArgumentException::class);
+        is_true_or_fail(
+            $driver,
+            __d('database_backup', 'The `{0}` driver does not exist', $className),
+            InvalidArgumentException::class
+        );
 
         return new $driver($connection);
+    }
+
+    /**
+     * Gets the driver name, according to the database engine
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
+     * @return string The driver name
+     * @since 2.6.2
+     * @uses getConnection()
+     */
+    public function getDriverName(ConnectionInterface $connection = null)
+    {
+        $connection = $connection ?: $this->getConnection();
+
+        return get_class_short_name(get_class($connection->getDriver()));
     }
 
     /**

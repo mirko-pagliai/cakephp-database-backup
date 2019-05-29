@@ -18,6 +18,7 @@ use Cake\Database\Connection;
 use Cake\Event\EventList;
 use Cake\ORM\TableRegistry;
 use DatabaseBackup\TestSuite\TestCase;
+use ErrorException;
 
 /**
  * DriverTestCase class.
@@ -80,7 +81,7 @@ abstract class DriverTestCase extends TestCase
 
         //Enable event tracking
         $this->Driver = new $this->DriverClass($this->getConnection());
-        $this->Driver->getEventManager()->setEventList(new EventList);
+        $this->Driver->getEventManager()->setEventList(new EventList());
     }
 
     /**
@@ -122,86 +123,6 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_exportExecutable()` method
-     * @return void
-     */
-    abstract public function testExportExecutable();
-
-    /**
-     * Test for `export()` method on failure
-     * @return void
-     */
-    abstract public function testExportOnFailure();
-
-    /**
-     * Test for `_importExecutable()` method
-     * @return void
-     */
-    abstract public function testImportExecutable();
-
-    /**
-     * Test for `import()` method on failure
-     * @return void
-     */
-    abstract public function testImportOnFailure();
-
-    /**
-     * Test for `_exportExecutableWithCompression()` method
-     * @return void
-     * @test
-     */
-    public function testExportExecutableWithCompression()
-    {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $expected = sprintf('%s > %s%s', $basicExecutable, escapeshellarg('backup.sql'), REDIRECT_TO_DEV_NULL);
-        $this->assertEquals($expected, $result);
-
-        //Gzip and Bzip2 compressions
-        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
-            $expected = sprintf(
-                '%s | %s > %s%s',
-                $basicExecutable,
-                $this->getBinary($compression),
-                escapeshellarg($filename),
-                REDIRECT_TO_DEV_NULL
-            );
-            $this->assertEquals($expected, $result);
-        }
-    }
-
-    /**
-     * Test for `_importExecutableWithCompression()` method
-     * @return void
-     * @test
-     */
-    public function testImportExecutableWithCompression()
-    {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $expected = $basicExecutable . ' < ' . escapeshellarg('backup.sql') . REDIRECT_TO_DEV_NULL;
-        $this->assertEquals($expected, $result);
-
-        //Gzip and Bzip2 compressions
-        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
-            $expected = sprintf(
-                '%s -dc %s | %s%s',
-                $this->getBinary($compression),
-                escapeshellarg($filename),
-                $basicExecutable,
-                REDIRECT_TO_DEV_NULL
-            );
-            $this->assertEquals($expected, $result);
-        }
-    }
-
-    /**
      * Test for `export()` method
      * @return void
      * @test
@@ -213,63 +134,6 @@ abstract class DriverTestCase extends TestCase
         $this->assertFileExists($backup);
         $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->Driver->getEventManager());
-    }
-
-    /**
-     * Test for `export()` method. Export is stopped because the
-     *  `beforeExport()` method returns `false`
-     * @return void
-     * @test
-     */
-    public function testExportStoppedByBeforeExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(['beforeExport']);
-        $Driver->method('beforeExport')->will($this->returnValue(false));
-        $this->assertFalse($Driver->export($backup));
-        $this->assertFileNotExists($backup);
-    }
-
-    /**
-     * Test for `getConfig()` method
-     * @return void
-     * @test
-     */
-    public function testGetConfig()
-    {
-        $this->assertNotEmpty($this->Driver->getConfig());
-        $this->assertIsArray($this->Driver->getConfig());
-        $this->assertNotEmpty($this->Driver->getConfig('name'));
-        $this->assertNull($this->Driver->getConfig('noExistingKey'));
-    }
-
-    /**
-     * Test for `import()` method
-     * @return void
-     * @test
-     */
-    public function testImport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $this->assertTrue($this->Driver->export($backup));
-        $this->assertTrue($this->Driver->import($backup));
-        $this->assertEventFired('Backup.beforeImport', $this->Driver->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $this->Driver->getEventManager());
-    }
-
-    /**
-     * Test for `import()` method. Import is stopped because the
-     *  `beforeImport()` method returns `false`
-     * @return void
-     * @test
-     */
-    public function testImportStoppedByBeforeExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(['beforeImport']);
-        $Driver->method('beforeImport')->will($this->returnValue(false));
-        $this->assertTrue($Driver->export($backup));
-        $this->assertFalse($Driver->import($backup));
     }
 
     /**
@@ -324,5 +188,165 @@ abstract class DriverTestCase extends TestCase
             $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
             $this->assertEquals(4, collection($diff['Comments'])->extract('id')->first());
         }
+    }
+
+    /**
+     * Test for `_exportExecutable()` method
+     * @return void
+     */
+    abstract public function testExportExecutable();
+
+    /**
+     * Test for `_exportExecutableWithCompression()` method
+     * @return void
+     * @test
+     */
+    public function testExportExecutableWithCompression()
+    {
+        $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
+
+        //No compression
+        $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
+        $expected = sprintf('%s > %s%s', $basicExecutable, escapeshellarg('backup.sql'), REDIRECT_TO_DEV_NULL);
+        $this->assertEquals($expected, $result);
+
+        //Gzip and Bzip2 compressions
+        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
+            $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
+            $expected = sprintf(
+                '%s | %s > %s%s',
+                $basicExecutable,
+                $this->getBinary($compression),
+                escapeshellarg($filename),
+                REDIRECT_TO_DEV_NULL
+            );
+            $this->assertEquals($expected, $result);
+        }
+    }
+
+    /**
+     * Test for `export()` method on failure
+     * @return void
+     * @since 2.6.2
+     * @test
+     */
+    public function testExportOnFailure()
+    {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
+        //Sets a no existing database
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
+        $this->setProperty($this->Driver, 'connection', new Connection($config));
+        $this->Driver->export($this->getAbsolutePath('example.sql'));
+    }
+
+    /**
+     * Test for `export()` method. Export is stopped because the
+     *  `beforeExport()` method returns `false`
+     * @return void
+     * @test
+     */
+    public function testExportStoppedByBeforeExport()
+    {
+        $backup = $this->getAbsolutePath('example.sql');
+        $Driver = $this->getMockForDriver(['beforeExport']);
+        $Driver->method('beforeExport')->will($this->returnValue(false));
+        $this->assertFalse($Driver->export($backup));
+        $this->assertFileNotExists($backup);
+    }
+
+    /**
+     * Test for `getConfig()` method
+     * @return void
+     * @test
+     */
+    public function testGetConfig()
+    {
+        $this->assertNotEmpty($this->Driver->getConfig());
+        $this->assertIsArray($this->Driver->getConfig());
+        $this->assertNotEmpty($this->Driver->getConfig('name'));
+        $this->assertNull($this->Driver->getConfig('noExistingKey'));
+    }
+
+    /**
+     * Test for `import()` method
+     * @return void
+     * @test
+     */
+    public function testImport()
+    {
+        $backup = $this->getAbsolutePath('example.sql');
+        $this->assertTrue($this->Driver->export($backup));
+        $this->assertTrue($this->Driver->import($backup));
+        $this->assertEventFired('Backup.beforeImport', $this->Driver->getEventManager());
+        $this->assertEventFired('Backup.afterImport', $this->Driver->getEventManager());
+    }
+
+    /**
+     * Test for `_importExecutable()` method
+     * @return void
+     */
+    abstract public function testImportExecutable();
+
+    /**
+     * Test for `_importExecutableWithCompression()` method
+     * @return void
+     * @test
+     */
+    public function testImportExecutableWithCompression()
+    {
+        $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
+
+        //No compression
+        $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
+        $expected = $basicExecutable . ' < ' . escapeshellarg('backup.sql') . REDIRECT_TO_DEV_NULL;
+        $this->assertEquals($expected, $result);
+
+        //Gzip and Bzip2 compressions
+        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
+            $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
+            $expected = sprintf(
+                '%s -dc %s | %s%s',
+                $this->getBinary($compression),
+                escapeshellarg($filename),
+                $basicExecutable,
+                REDIRECT_TO_DEV_NULL
+            );
+            $this->assertEquals($expected, $result);
+        }
+    }
+
+    /**
+     * Test for `import()` method on failure
+     * @return void
+     * @since 2.6.2
+     * @test
+     */
+    public function testImportOnFailure()
+    {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
+        $backup = $this->getAbsolutePath('example.sql');
+        $this->Driver->export($backup);
+
+        //Sets a no existing database
+        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
+        $this->setProperty($this->Driver, 'connection', new Connection($config));
+        $this->Driver->import($backup);
+    }
+
+    /**
+     * Test for `import()` method. Import is stopped because the
+     *  `beforeImport()` method returns `false`
+     * @return void
+     * @test
+     */
+    public function testImportStoppedByBeforeExport()
+    {
+        $backup = $this->getAbsolutePath('example.sql');
+        $Driver = $this->getMockForDriver(['beforeImport']);
+        $Driver->method('beforeImport')->will($this->returnValue(false));
+        $this->assertTrue($Driver->export($backup));
+        $this->assertFalse($Driver->import($backup));
     }
 }

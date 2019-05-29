@@ -12,7 +12,6 @@
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Database\Connection;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
@@ -53,6 +52,16 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
+     * Test for `_exportExecutableWithCompression()` method
+     * @test
+     */
+    public function testExportExecutableWithCompression()
+    {
+        $this->setProperty($this->Driver, 'auth', 'authFile');
+        parent::testExportExecutableWithCompression();
+    }
+
+    /**
      * Test for `_importExecutable()` method
      * @test
      */
@@ -61,6 +70,16 @@ class MysqlTest extends DriverTestCase
         $expected = sprintf('%s --defaults-extra-file=%s test', $this->getBinary('mysql'), escapeshellarg('authFile'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
+    }
+
+    /**
+     * Test for `_importExecutableWithCompression()` method
+     * @test
+     */
+    public function testImportExecutableWithCompression()
+    {
+        $this->setProperty($this->Driver, 'auth', 'authFile');
+        parent::testImportExecutableWithCompression();
     }
 
     /**
@@ -136,36 +155,5 @@ class MysqlTest extends DriverTestCase
         $this->assertFileExists($auth);
         $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
         $this->assertFileNotExists($auth);
-    }
-
-    /**
-     * Test for `export()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `2`
-     * @test
-     */
-    public function testExportOnFailure()
-    {
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `1`
-     * @test
-     */
-    public function testImportOnFailure()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $this->Driver->export($backup);
-
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->import($backup);
     }
 }

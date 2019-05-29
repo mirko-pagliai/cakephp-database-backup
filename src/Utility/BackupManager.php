@@ -60,7 +60,7 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return Cake\Collection\Collection Collection of backups . Each backup
+     * @return \Cake\Collection\Collection Collection of backups. Each backup
      *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
@@ -89,14 +89,18 @@ class BackupManager
      * @param int $rotate Number of backups that you want to keep
      * @return array Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @uses delete()
      * @uses index()
      */
     public function rotate($rotate)
     {
-        is_true_or_fail(is_positive($rotate), __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
-        $backupsToBeDeleted = $this->index()->skip($rotate);
+        is_true_or_fail(
+            is_positive($rotate),
+            __d('database_backup', 'Invalid rotate value'),
+            InvalidArgumentException::class
+        );
+        $backupsToBeDeleted = $this->index()->skip((int)$rotate);
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
@@ -119,11 +123,12 @@ class BackupManager
         $file = $this->getAbsolutePath($backup);
         is_readable_or_fail($file);
         $basename = basename($file);
+        $server = env('SERVER_NAME', 'localhost');
 
-        return (new Email)
+        return (new Email())
             ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
             ->setTo($recipient)
-            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', $basename, env('SERVER_NAME', 'localhost')))
+            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', $basename, $server))
             ->setAttachments([$basename => compact('file') + ['mimetype' => mime_content_type($file)]]);
     }
 

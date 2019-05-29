@@ -29,8 +29,8 @@ class ExportCommand extends Command
 {
     /**
      * Hook method for defining this command's option parser
-     * @param ConsoleOptionParser $parser The parser to be defined
-     * @return ConsoleOptionParser
+     * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
+     * @return \Cake\Console\ConsoleOptionParser
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
@@ -47,8 +47,9 @@ class ExportCommand extends Command
                     'short' => 'f',
                 ],
                 'rotate' => [
-                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups you ' .
-                        'want to keep. So, it will delete all backups that are older. By default, no backup will be deleted'),
+                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups' .
+                        'you ìwant to keep. So, it will delete all backups that are older. By default, no backup' .
+                        'will be deleted'),
                     'short' => 'r',
                 ],
                 'send' => [
@@ -63,8 +64,8 @@ class ExportCommand extends Command
      * Exports a database backup.
      *
      * This command uses `RotateCommand` and `SendCommand`.
-     * @param Arguments $args The command arguments
-     * @param ConsoleIo $io The console io
+     * @param \Cake\Console\Arguments $args The command arguments
+     * @param \Cake\Console\ConsoleIo $io The console io
      * @return null|int The exit code or null for success
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
      * @uses DatabaseBackup\Command\RotateCommand::execute()
@@ -78,13 +79,13 @@ class ExportCommand extends Command
         parent::execute($args, $io);
 
         try {
-            $instance = new BackupExport;
+            $instance = new BackupExport();
             //Sets the output filename or the compression type.
             //Regarding the `rotate` option, the `BackupShell::rotate()` method
             //  will be called at the end, instead of `BackupExport::rotate()`
-            if ($args->hasOption('filename')) {
+            if ($args->getOption('filename')) {
                 $instance->filename($args->getOption('filename'));
-            } elseif ($args->hasOption('compression')) {
+            } elseif ($args->getOption('compression')) {
                 $instance->compression($args->getOption('compression'));
             }
 
@@ -95,8 +96,8 @@ class ExportCommand extends Command
             $quiet = $args->getOption('quiet');
 
             //Sends via email
-            if ($args->hasOption('send')) {
-                $SendCommand = new SendCommand;
+            if ($args->getOption('send')) {
+                $SendCommand = new SendCommand();
                 $SendCommand->execute(new Arguments(
                     [$file, $args->getOption('send')],
                     compact('verbose', 'quiet'),
@@ -105,8 +106,8 @@ class ExportCommand extends Command
             }
 
             //Rotates
-            if ($args->hasOption('rotate')) {
-                $RotateCommand = new RotateCommand;
+            if ($args->getOption('rotate')) {
+                $RotateCommand = new RotateCommand();
                 $RotateCommand->execute(new Arguments(
                     [$args->getOption('rotate')],
                     compact('verbose', 'quiet'),

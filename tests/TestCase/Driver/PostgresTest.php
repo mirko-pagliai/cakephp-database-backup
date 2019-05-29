@@ -87,35 +87,4 @@ class PostgresTest extends DriverTestCase
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
-
-    /**
-     * Test for `export()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `1`
-     * @test
-     */
-    public function testExportOnFailure()
-    {
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `1`
-     * @test
-     */
-    public function testImportOnFailure()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $this->Driver->export($backup);
-
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->import($backup);
-    }
 }

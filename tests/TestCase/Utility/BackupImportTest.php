@@ -43,8 +43,8 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport;
-        $this->BackupImport = new BackupImport;
+        $this->BackupExport = new BackupExport();
+        $this->BackupImport = new BackupImport();
     }
 
     /**
@@ -86,18 +86,11 @@ class BackupImportTest extends TestCase
         $this->expectException(NotReadableException::class);
         $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir' . DS . 'backup.sql') . '` is not readable');
         $this->BackupImport->filename('noExistingDir' . DS . 'backup.sql');
-    }
 
-    /**
-     * Test for `filename()` method, with invalid extension
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid file extension
-     * @test
-     */
-    public function testFilenameWithInvalidExtension()
-    {
+        //With invalid extension
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid file extension');
         file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'backup.txt', null);
-
         $this->BackupImport->filename('backup.txt');
     }
 
@@ -108,7 +101,7 @@ class BackupImportTest extends TestCase
     public function testImport()
     {
         //Exports and imports with no compression
-        $backup = $this->BackupExport->compression(false)->export();
+        $backup = $this->BackupExport->compression(null)->export();
         $filename = $this->BackupImport->filename($backup)->import();
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
 

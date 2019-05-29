@@ -62,20 +62,18 @@ class SqliteTest extends DriverTestCase
 
     /**
      * Test for `export()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testExportOnFailure()
     {
-        $driver = $this->getMockForDriver(['_exportExecutableWithCompression']);
-        $driver->method('_exportExecutableWithCompression')
+        $this->Driver = $this->getMockForDriver(['_exportExecutableWithCompression']);
+        $this->Driver->method('_exportExecutableWithCompression')
             ->will($this->returnValue(sprintf(
                 '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
                 $this->getBinary('sqlite3'),
-                $driver->getConfig('database')
+                $this->Driver->getConfig('database')
             )));
-        $driver->export($this->getAbsolutePath('example.sql'));
+        parent::testExportOnFailure();
     }
 
     /**
@@ -91,20 +89,17 @@ class SqliteTest extends DriverTestCase
 
     /**
      * Test for `import()` method on failure
-     * @expectedException ErrorException
-     * @expectedExceptionMessage Failed with exit code `1`
      * @test
      */
     public function testImportOnFailure()
     {
-        $driver = $this->getMockForDriver(['_importExecutableWithCompression', 'beforeImport']);
-        $driver->method('beforeImport')->will($this->returnValue(true));
-        $driver->method('_importExecutableWithCompression')
-            ->will($this->returnValue(sprintf(
-                '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
-                $this->getBinary('sqlite3'),
-                $driver->getConfig('database')
-            )));
-        $driver->import('noExistingFile');
+        $this->Driver = $this->getMockForDriver(['_importExecutableWithCompression', 'beforeImport']);
+        $this->Driver->method('beforeImport')->will($this->returnValue(true));
+        $this->Driver->method('_importExecutableWithCompression')->will($this->returnValue(sprintf(
+            '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
+            $this->getBinary('sqlite3'),
+            $this->Driver->getConfig('database')
+        )));
+        parent::testImportOnFailure();
     }
 }
