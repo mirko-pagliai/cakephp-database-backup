@@ -46,7 +46,7 @@ class RotateCommand extends Command
      *  delete all backups that are older. By default, no backup will be deleted
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return null|int The exit code or null for success
+     * @return int|null The exit code or null for success
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#rotate
      * @uses DatabaseBackup\Utility\BackupManager::rotate()
      */
