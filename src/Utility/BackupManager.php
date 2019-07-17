@@ -55,7 +55,7 @@ class BackupManager
      */
     public function deleteAll(): array
     {
-        return array_filter(array_map(function ($file) {
+        return array_filter(array_map(function (Entity $file) {
             return $this->delete($file->filename) ? $file->filename : false;
         }, $this->index()->toList()));
     }
@@ -71,7 +71,7 @@ class BackupManager
         $target = $this->getTarget();
 
         return collection((new Folder($target))->find('.+\.sql(\.(gz|bz2))?'))
-            ->map(function ($filename) use ($target) {
+            ->map(function (string $filename) use ($target) {
                 return new Entity([
                     'filename' => $filename,
                     'extension' => $this->getExtension($filename),
