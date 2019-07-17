@@ -36,6 +36,7 @@ class BackupManager
      *  The path can be relative to the backup directory
      * @return bool
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
+     * @throws \Tools\Exception\NotWritableException
      */
     public function delete(string $filename): bool
     {
@@ -56,7 +57,7 @@ class BackupManager
     public function deleteAll(): array
     {
         return array_filter(array_map(function (Entity $file) {
-            return $this->delete($file->filename) ? $file->filename : false;
+            return !$this->delete($file->filename) ?: $file->filename;
         }, $this->index()->toList()));
     }
 
@@ -119,6 +120,7 @@ class BackupManager
      * @param string $recipient Recipient's email address
      * @return \Cake\Mailer\Email
      * @since 1.1.0
+     * @throws \Tools\Exception\NotReadableException
      */
     protected function getEmailInstance(string $backup, string $recipient): Email
     {

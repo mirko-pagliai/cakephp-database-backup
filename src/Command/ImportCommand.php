@@ -46,8 +46,8 @@ class ImportCommand extends Command
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return int|null The exit code or null for success
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#import
-     * @uses DatabaseBackup\Utility\BackupImport::filename()
-     * @uses DatabaseBackup\Utility\BackupImport::import()
+     * @uses \DatabaseBackup\Utility\BackupImport::filename()
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function execute(Arguments $args, ConsoleIo $io): ?int
     {

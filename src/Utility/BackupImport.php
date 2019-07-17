@@ -53,6 +53,7 @@ class BackupImport
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws \InvalidArgumentException
+     * @throws \Tools\Exception\NotReadableException
      * @uses $filename
      */
     public function filename(string $filename)
