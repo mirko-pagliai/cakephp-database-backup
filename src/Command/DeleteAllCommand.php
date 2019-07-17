@@ -40,7 +40,7 @@ class DeleteAllCommand extends Command
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return int|null The exit code or null for success
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#delete_all
-     * @uses DatabaseBackup\Utility\BackupManager::deleteAll()
+     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
