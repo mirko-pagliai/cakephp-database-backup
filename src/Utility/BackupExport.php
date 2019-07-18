@@ -131,7 +131,9 @@ class BackupExport
      *  contain patterns
      * @return \DatabaseBackup\Utility\BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
+     * @throws \Exception
      * @throws \InvalidArgumentException
+     * @throws \Tools\Exception\NotWritableException
      * @uses compression()
      * @uses $config
      * @uses $filename

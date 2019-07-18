@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.6 branch
+### 2.6.3
+* little fixes.
+
 ### 2.6.2
 * added `BackupTrait::getDriverName()` method;
 * `BackupExport::compression()` takes a compression type name as string or

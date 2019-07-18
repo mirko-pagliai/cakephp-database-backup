@@ -171,6 +171,7 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterExport: will be triggered after export
      * @param string $filename Filename where you want to export the database
      * @return bool true on success
+     * @throws \Exception
      * @uses _exportExecutableWithCompression()
      */
     final public function export($filename)
@@ -213,6 +214,7 @@ abstract class Driver implements EventListenerInterface
      * - Backup.afterImport: will be triggered after import
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
+     * @throws \Exception
      * @uses _importExecutableWithCompression()
      */
     final public function import($filename)
