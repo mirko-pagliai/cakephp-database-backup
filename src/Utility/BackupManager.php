@@ -56,7 +56,7 @@ class BackupManager
     public function deleteAll()
     {
         return array_filter(array_map(function ($file) {
-            return !$this->delete($file->filename) ?: $file->filename;
+            return !$this->delete($file->get('filename')) ?: $file->get('filename');
         }, $this->index()->toList()));
     }
 
@@ -68,7 +68,9 @@ class BackupManager
      */
     public function index()
     {
-        $finder = (new Finder())->files()->name('/.+\.sql(\.(gz|bz2))?$/')->in($this->getTarget());
+        $finder = new Finder();
+        $finder = $finder->files()->name('/.+\.sql(\.(gz|bz2))?$/')->in($this->getTarget())
+            ->sortByModifiedTime()->reverseSorting();
 
         return collection($finder)->map(function (SplFileInfo $file) {
             return new Entity([
@@ -78,7 +80,7 @@ class BackupManager
                 'size' => $file->getSize(),
                 'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
             ]);
-        })->sortBy('datetime');
+        })->buffered();
     }
 
     /**
@@ -104,7 +106,7 @@ class BackupManager
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
-            $this->delete($backup->filename);
+            $this->delete($backup->get('filename'));
         }
 
         return $backupsToBeDeleted->toArray();
