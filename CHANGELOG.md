@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.6 branch
+### 2.6.4
+* improved exception message when no binary file is found.
+
 ### 2.6.3
 * little fixes.
 
