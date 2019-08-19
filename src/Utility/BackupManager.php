@@ -69,18 +69,19 @@ class BackupManager
     public function index()
     {
         $finder = new Finder();
-        $finder = $finder->files()->name('/.+\.sql(\.(gz|bz2))?$/')->in($this->getTarget())
-            ->sortByModifiedTime()->reverseSorting();
+        $finder = $finder->files()->name('/.+\.sql(\.(gz|bz2))?$/')->in($this->getTarget());
 
-        return collection($finder)->map(function (SplFileInfo $file) {
-            return new Entity([
-                'filename' => $file->getFilename(),
-                'extension' => $this->getExtension($file->getFilename()),
-                'compression' => $this->getCompression($file->getFilename()),
-                'size' => $file->getSize(),
-                'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
-            ]);
-        })->buffered();
+        return collection($finder)
+            ->map(function (SplFileInfo $file) {
+                return new Entity([
+                    'filename' => $file->getFilename(),
+                    'extension' => $this->getExtension($file->getFilename()),
+                    'compression' => $this->getCompression($file->getFilename()),
+                    'size' => $file->getSize(),
+                    'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
+                ]);
+            })
+            ->sortBy('datetime');
     }
 
     /**
