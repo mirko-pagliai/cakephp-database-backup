@@ -56,7 +56,7 @@ class BackupManager
     public function deleteAll()
     {
         return array_filter(array_map(function ($file) {
-            return !$this->delete($file->filename) ?: $file->filename;
+            return !$this->delete($file->get('filename')) ?: $file->get('filename');
         }, $this->index()->toList()));
     }
 
@@ -104,7 +104,7 @@ class BackupManager
 
         //Deletes
         foreach ($backupsToBeDeleted as $backup) {
-            $this->delete($backup->filename);
+            $this->delete($backup->get('filename'));
         }
 
         return $backupsToBeDeleted->toArray();
