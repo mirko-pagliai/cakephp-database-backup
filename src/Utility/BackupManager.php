@@ -14,12 +14,13 @@
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
-use Cake\Filesystem\Folder;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
 use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Utility to manage database backups
@@ -67,19 +68,17 @@ class BackupManager
      */
     public function index()
     {
-        $target = $this->getTarget();
+        $finder = (new Finder())->files()->name('/.+\.sql(\.(gz|bz2))?$/')->in($this->getTarget());
 
-        return collection((new Folder($target))->find('.+\.sql(\.(gz|bz2))?'))
-            ->map(function ($filename) use ($target) {
-                return new Entity([
-                    'filename' => $filename,
-                    'extension' => $this->getExtension($filename),
-                    'compression' => $this->getCompression($filename),
-                    'size' => filesize($target . DS . $filename),
-                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $filename))),
-                ]);
-            })
-            ->sortBy('datetime');
+        return collection($finder)->map(function (SplFileInfo $file) {
+            return new Entity([
+                'filename' => $file->getFilename(),
+                'extension' => $this->getExtension($file->getFilename()),
+                'compression' => $this->getCompression($file->getFilename()),
+                'size' => $file->getSize(),
+                'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
+            ]);
+        })->sortBy('datetime');
     }
 
     /**

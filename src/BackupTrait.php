@@ -16,7 +16,6 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use Cake\Filesystem\Folder;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -40,7 +39,7 @@ trait BackupTrait
      */
     public function getAbsolutePath($path)
     {
-        return Folder::isAbsolute($path) ? $path : $this->getTarget() . DS . $path;
+        return is_absolute($path) ? $path : $this->getTarget() . DS . $path;
     }
 
     /**
