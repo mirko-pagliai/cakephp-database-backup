@@ -101,13 +101,9 @@ class BackupManager
             InvalidArgumentException::class
         );
         $backupsToBeDeleted = $this->index()->skip((int)$rotate);
+        array_map([$this, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 
-        //Deletes
-        foreach ($backupsToBeDeleted as $backup) {
-            $this->delete($backup->get('filename'));
-        }
-
-        return $backupsToBeDeleted->toArray();
+        return $backupsToBeDeleted->toList();
     }
 
     /**
