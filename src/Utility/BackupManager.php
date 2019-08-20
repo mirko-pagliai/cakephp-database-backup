@@ -55,9 +55,9 @@ class BackupManager
      */
     public function deleteAll()
     {
-        return array_filter(array_map(function ($file) {
-            return !$this->delete($file->get('filename')) ?: $file->get('filename');
-        }, $this->index()->toList()));
+        return array_filter(array_map(function ($filename) {
+            return !$this->delete($filename) ?: $filename;
+        }, $this->index()->extract('filename')->toList()));
     }
 
     /**
