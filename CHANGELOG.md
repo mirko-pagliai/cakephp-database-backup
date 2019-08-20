@@ -4,6 +4,12 @@
 * updated for `cakephp` 4 and `phpunit` 8.
 
 ## 2.6 branch
+### 2.6.4
+* little fixes for `BackupManager` class;
+* added tests for lower dependencies;
+* improved exception message when no binary file is found;
+* no longer uses the `Folder` class.
+
 ### 2.6.3
 * little fixes.
 

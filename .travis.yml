@@ -9,8 +9,11 @@ matrix:
 
   include:
     - php: 7.2
+      env: dependencies=lowest
+    - php: 7.3
+      env: dependencies=lowest
+    - php: 7.2
       env: PHPCS=1
-
     - php: 7.2
       env: COVERAGE=1
 
@@ -22,8 +25,10 @@ addons:
   postgresql: "9.4"
 
 install:
-  - composer self-update
+  - composer self-update -q
   - composer install --prefer-dist --no-interaction
+  - if [ "$dependencies" = "lowest" ]; then composer update --prefer-lowest -n; fi;
+  - composer show -i
 
 before_script:
   - mysql -e 'create database test;'

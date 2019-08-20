@@ -16,12 +16,13 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Collection\Collection;
 use Cake\Core\Configure;
-use Cake\Filesystem\Folder;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
 use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Utility to manage database backups
@@ -56,9 +57,9 @@ class BackupManager
      */
     public function deleteAll(): array
     {
-        return array_filter(array_map(function (Entity $file) {
-            return !$this->delete($file->filename) ?: $file->filename;
-        }, $this->index()->toList()));
+        return array_filter(array_map(function (string $filename) {
+            return !$this->delete($filename) ?: $filename;
+        }, $this->index()->extract('filename')->toList()));
     }
 
     /**
@@ -69,19 +70,17 @@ class BackupManager
      */
     public function index(): Collection
     {
-        $target = $this->getTarget();
+        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in($this->getTarget());
 
-        return collection((new Folder($target))->find('.+\.sql(\.(gz|bz2))?'))
-            ->map(function (string $filename) use ($target) {
-                return new Entity([
-                    'filename' => $filename,
-                    'extension' => $this->getExtension($filename),
-                    'compression' => $this->getCompression($filename),
-                    'size' => filesize($target . DS . $filename),
-                    'datetime' => new FrozenTime(date('Y-m-d H:i:s', filemtime($target . DS . $filename))),
-                ]);
-            })
-            ->sortBy('datetime');
+        return collection($finder)->map(function (SplFileInfo $file) {
+            return new Entity([
+                'filename' => $file->getFilename(),
+                'extension' => $this->getExtension($file->getFilename()),
+                'compression' => $this->getCompression($file->getFilename()),
+                'size' => $file->getSize(),
+                'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
+            ]);
+        })->sortBy('datetime');
     }
 
     /**
@@ -104,13 +103,9 @@ class BackupManager
             InvalidArgumentException::class
         );
         $backupsToBeDeleted = $this->index()->skip((int)$rotate);
+        array_map([$this, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 
-        //Deletes
-        foreach ($backupsToBeDeleted as $backup) {
-            $this->delete($backup->filename);
-        }
-
-        return $backupsToBeDeleted->toArray();
+        return $backupsToBeDeleted->toList();
     }
 
     /**

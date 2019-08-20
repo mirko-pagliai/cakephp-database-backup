@@ -27,7 +27,7 @@ before_test:
 
 install:
   - cd c:\
-  - curl -fsS -o php.zip https://windows.php.net/downloads/releases/php-7.2.20-nts-Win32-VC15-x86.zip
+  - curl -fsS -o php.zip https://windows.php.net/downloads/releases/php-7.2.21-nts-Win32-VC15-x86.zip
   - 7z x php.zip -oc:\php > nul
   - cd c:\php
   - copy php.ini-production php.ini
