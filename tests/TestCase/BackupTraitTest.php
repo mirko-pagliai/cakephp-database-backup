@@ -66,7 +66,7 @@ class BackupTraitTest extends TestCase
 
         //With a binary not available
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Expected configuration key "DatabaseBackup.binaries.noExisting" not found');
+        $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
         $this->getBinary('noExisting');
     }
 

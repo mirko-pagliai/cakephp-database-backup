@@ -47,10 +47,10 @@ abstract class TestCase extends BaseTestCase
      */
     public function tearDown()
     {
-        parent::tearDown();
-
         //Deletes all backup files
-        @unlink_recursive(Configure::read('DatabaseBackup.target'));
+        unlink_recursive(Configure::read('DatabaseBackup.target'));
+
+        parent::tearDown();
     }
 
     /**

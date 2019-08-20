@@ -16,8 +16,8 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use Cake\Filesystem\Folder;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -39,7 +39,7 @@ trait BackupTrait
      */
     public function getAbsolutePath($path)
     {
-        return Folder::isAbsolute($path) ? $path : $this->getTarget() . DS . $path;
+        return is_absolute($path) ? $path : $this->getTarget() . DS . $path;
     }
 
     /**
@@ -47,10 +47,14 @@ trait BackupTrait
      * @param string $name Binary name
      * @return string
      * @since 2.0.0
+     * @throws \RuntimeException
      */
     public function getBinary($name)
     {
-        return Configure::readOrFail('DatabaseBackup.binaries.' . $name);
+        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
+        is_true_or_fail($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
+
+        return $binary;
     }
 
     /**
@@ -144,7 +148,7 @@ trait BackupTrait
      * Returns all valid compressions
      * @return array
      * @since 2.4.0
-     * @uses $$validExtensions
+     * @uses $validExtensions
      */
     public function getValidCompressions()
     {
