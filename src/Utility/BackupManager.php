@@ -68,9 +68,7 @@ class BackupManager
      */
     public function index()
     {
-        $finder = new Finder();
-        $finder = $finder->files()->name('/.+\.sql(\.(gz|bz2))?$/')->in($this->getTarget())
-            ->sortByModifiedTime()->reverseSorting();
+        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in($this->getTarget());
 
         return collection($finder)->map(function (SplFileInfo $file) {
             return new Entity([
@@ -80,7 +78,7 @@ class BackupManager
                 'size' => $file->getSize(),
                 'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
             ]);
-        })->buffered();
+        })->sortBy('datetime');
     }
 
     /**
