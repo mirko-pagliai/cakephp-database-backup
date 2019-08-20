@@ -15,7 +15,7 @@
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^3.0",
-        "mirko-pagliai/me-tools": "^2.18.7",
+        "mirko-pagliai/me-tools": "^2.18.11",
         "phpunit/phpunit": "^5.7.14|^6.0"
     },
     "autoload": {
