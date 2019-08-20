@@ -33,13 +33,11 @@ class Plugin extends BasePlugin
      */
     public function console($commands)
     {
-        $commands->add('database_backup.delete_all', DeleteAllCommand::class);
-        $commands->add('database_backup.export', ExportCommand::class);
-        $commands->add('database_backup.import', ImportCommand::class);
-        $commands->add('database_backup.index', IndexCommand::class);
-        $commands->add('database_backup.rotate', RotateCommand::class);
-        $commands->add('database_backup.send', SendCommand::class);
-
-        return $commands;
+        return $commands->add('database_backup.delete_all', DeleteAllCommand::class)
+            ->add('database_backup.export', ExportCommand::class)
+            ->add('database_backup.import', ImportCommand::class)
+            ->add('database_backup.index', IndexCommand::class)
+            ->add('database_backup.rotate', RotateCommand::class)
+            ->add('database_backup.send', SendCommand::class);
     }
 }

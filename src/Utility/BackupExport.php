@@ -216,22 +216,15 @@ class BackupExport
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 
-        //This allows the filename to be set again with a next call of this
-        //  method
+        //This allows the filename to be set again with a next call of this method
         $filename = $this->filename;
         unset($this->filename);
 
         $this->driver->export($filename);
         (new Filesystem())->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
-        if ($this->emailRecipient) {
-            $this->BackupManager->send($filename, $this->emailRecipient);
-        }
-
-        //Rotates backups
-        if ($this->rotate) {
-            $this->BackupManager->rotate($this->rotate);
-        }
+        $this->emailRecipient ? $this->BackupManager->send($filename, $this->emailRecipient) : null;
+        $this->rotate ? $this->BackupManager->rotate($this->rotate) : null;
 
         return $filename;
     }
