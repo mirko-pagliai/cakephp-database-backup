@@ -17,7 +17,6 @@ namespace DatabaseBackup\TestSuite;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Event\EventList;
-use Cake\ORM\TableRegistry;
 use DatabaseBackup\TestSuite\TestCase;
 use ErrorException;
 
@@ -39,13 +38,13 @@ abstract class DriverTestCase extends TestCase
     protected $Comments;
 
     /**
-     * @var object
+     * @var \DatabaseBackup\Driver\Driver
      */
     protected $Driver;
 
     /**
      * @since 2.5.1
-     * @var object
+     * @var string
      */
     protected $DriverClass;
 
@@ -76,12 +75,11 @@ abstract class DriverTestCase extends TestCase
 
         Configure::write('DatabaseBackup.connection', $this->connection);
         $connection = $this->getConnection();
-        TableRegistry::clear();
-        $this->Articles = TableRegistry::get('Articles', compact('connection'));
-        $this->Comments = TableRegistry::get('Comments', compact('connection'));
+        $this->Articles = $this->getTable('Articles', compact('connection'));
+        $this->Comments = $this->getTable('Comments', compact('connection'));
 
         //Enable event tracking
-        $this->Driver = new $this->DriverClass($this->getConnection());
+        $this->Driver = new $this->DriverClass($connection);
         $this->Driver->getEventManager()->setEventList(new EventList());
     }
 
@@ -325,9 +323,10 @@ abstract class DriverTestCase extends TestCase
      */
     public function testImportOnFailure()
     {
+        $backup = $this->getAbsolutePath('example.sql');
+
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
-        $backup = $this->getAbsolutePath('example.sql');
         $this->Driver->export($backup);
 
         //Sets a no existing database

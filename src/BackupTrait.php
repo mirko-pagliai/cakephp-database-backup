@@ -149,7 +149,7 @@ trait BackupTrait
      * Returns all valid compressions
      * @return array
      * @since 2.4.0
-     * @uses $$validExtensions
+     * @uses $validExtensions
      */
     public function getValidCompressions(): array
     {
