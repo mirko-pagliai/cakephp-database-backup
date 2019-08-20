@@ -16,6 +16,7 @@ namespace DatabaseBackup\Utility;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Utility to export databases
@@ -211,10 +212,7 @@ class BackupExport
     public function export()
     {
         if (empty($this->filename)) {
-            if (empty($this->extension)) {
-                $this->extension = $this->defaultExtension;
-            }
-
+            $this->extension = $this->extension ?: $this->defaultExtension;
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 
@@ -226,7 +224,7 @@ class BackupExport
         $this->driver->export($filename);
 
         if (!IS_WIN) {
-            chmod($filename, Configure::read('DatabaseBackup.chmod'));
+            (new Filesystem())->chmod($filename, Configure::read('DatabaseBackup.chmod'));
         }
 
         if ($this->emailRecipient) {

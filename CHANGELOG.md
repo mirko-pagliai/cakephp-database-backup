@@ -1,7 +1,7 @@
 # 2.x branch
 ## 2.6 branch
 ### 2.6.4
-* little fixes for `BackupManager` class;
+* little fixes for `BackupManager` and `BackupExport` classes;
 * added tests for lower dependencies;
 * improved exception message when no binary file is found;
 * no longer uses the `Folder` class.
