@@ -40,17 +40,14 @@ class Application extends BaseApplication
      */
     public function middleware($middlewareQueue)
     {
-        $middlewareQueue->add(new RoutingMiddleware($this));
-
-        return $middlewareQueue;
+        return $middlewareQueue->add(new RoutingMiddleware($this));
     }
 
     /**
      * Define the routes for an application
-     * @param \Cake\Routing\RouteBuilder $routes A route builder to add routes into
      * @return void
      */
-    public function routes($routes)
+    public function routes()
     {
         //Do nothing
     }
