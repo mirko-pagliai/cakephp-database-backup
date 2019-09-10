@@ -45,9 +45,10 @@ class Application extends BaseApplication
 
     /**
      * Define the routes for an application
+     * @param \Cake\Routing\RouteBuilder $routes A route builder to add routes into
      * @return void
      */
-    public function routes()
+    public function routes($routes)
     {
         //Do nothing
     }
