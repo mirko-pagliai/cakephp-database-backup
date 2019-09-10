@@ -217,7 +217,7 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `export()` method, with a different chmod
-     * @group onlyUnix
+     * @requires OS Linux
      * @test
      */
     public function testExportWithDifferendChmod()
