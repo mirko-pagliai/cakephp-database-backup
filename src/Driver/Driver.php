@@ -146,14 +146,12 @@ abstract class Driver implements EventListenerInterface
      */
     protected function _importExecutableWithCompression(string $filename): string
     {
-        $executable = $this->_importExecutable();
         $compression = $this->getCompression($filename);
         $filename = escapeshellarg($filename);
 
+        $executable = $this->_importExecutable() . ' < ' . $filename;
         if ($compression) {
-            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $executable;
-        } else {
-            $executable .= ' < ' . $filename;
+            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $this->_importExecutable();
         }
 
         if (Configure::read('DatabaseBackup.redirectStderrToDevNull')) {

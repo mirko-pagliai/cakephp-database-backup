@@ -19,6 +19,7 @@ use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -40,7 +41,7 @@ trait BackupTrait
      */
     public function getAbsolutePath(string $path): string
     {
-        return is_absolute($path) ? $path : $this->getTarget() . DS . $path;
+        return (new Filesystem())->isAbsolutePath($path) ? $path : $this->getTarget() . DS . $path;
     }
 
     /**
