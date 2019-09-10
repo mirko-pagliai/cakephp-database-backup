@@ -4,6 +4,7 @@
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-database-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-database-backup)
 [![Build status](https://ci.appveyor.com/api/projects/status/imerokwpvy0r51fj/branch/master?svg=true)](https://ci.appveyor.com/project/mirko-pagliai/cakephp-database-backup/branch/master)
 [![codecov](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup/branch/master/graph/badge.svg)](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup)
+[![CodeFactor](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/badge/develop)](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/overview/develop)
 
 *DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.  
 Currently, the plugin supports *MySql*, *Postgres* and *Sqlite* databases.
@@ -51,9 +52,9 @@ If you want to use a different directory, read below.
 
 ## Requirements
 *DatabaseBackup* requires:
-* `mysql` and `mysqldump` for *MySql* databases;
-* `pg_dump` and `pg_restore` for *Postgres* databases;
-* `sqlite3` for *Sqlite* databases.
+*   `mysql` and `mysqldump` for *MySql* databases;
+*   `pg_dump` and `pg_restore` for *Postgres* databases;
+*   `sqlite3` for *Sqlite* databases.
 
 **Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are 
 also required.
@@ -66,7 +67,7 @@ permission).
 
 ## Configuration
 The plugin uses some configuration parameters. See our wiki:
-* [Configuration](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration)
+*   [Configuration](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration)
 
 If you want to send backup files by email, remember to set up your application
 correctly so that it can send emails. For more information on how to configure
@@ -74,11 +75,11 @@ your application, see the [Cookbook](https://book.cakephp.org/3.0/en/core-librar
 
 ## How to use
 See our wiki:
-* [Export backups as cron jobs](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Export-backups-as-cron-jobs)
-* [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility)
-* [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility)
-* [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
-* [How to use the BackupShell](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell)
+*   [Export backups as cron jobs](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Export-backups-as-cron-jobs)
+*   [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility)
+*   [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility)
+*   [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
+*   [How to use the BackupShell](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell)
 
 And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
 

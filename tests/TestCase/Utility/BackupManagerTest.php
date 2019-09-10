@@ -143,8 +143,8 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function ($a, $b) {
-            return strcmp($a->filename, $b->filename);
+        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function ($first, $second) {
+            return strcmp($first->filename, $second->filename);
         });
 
         //Again, only 1 backup was deleted
@@ -167,17 +167,17 @@ class BackupManagerTest extends TestCase
     {
         $file = $this->createBackup();
         $mimetype = mime_content_type($file);
-        $to = 'recipient@example.com';
+        $recipient = 'recipient@example.com';
 
         $instance = new BackupManager();
-        $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $to]);
+        $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $recipient]);
         $this->assertInstanceof(Email::class, $this->_email);
 
         $this->assertEmailFrom(Configure::read('DatabaseBackup.mailSender'));
-        $this->assertEmailTo($to);
+        $this->assertEmailTo($recipient);
         $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
         $this->assertEmailAttachmentsContains(basename($file), compact('file', 'mimetype'));
-        $this->assertArrayKeysEqual(['headers', 'message'], $this->BackupManager->send($file, $to));
+        $this->assertArrayKeysEqual(['headers', 'message'], $this->BackupManager->send($file, $recipient));
 
         //With an invalid sender
         @unlink($file);
