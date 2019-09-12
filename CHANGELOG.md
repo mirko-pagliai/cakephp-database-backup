@@ -4,6 +4,9 @@
 * updated for `cakephp` 4 and `phpunit` 8.
 
 ## 2.6 branch
+### 2.6.5
+* little fixes.
+
 ### 2.6.4
 * little fixes for `BackupManager` and `BackupExport` classes;
 * added tests for lower dependencies;
