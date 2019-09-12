@@ -83,23 +83,6 @@ See our wiki:
 
 And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
-## Tests
-Tests are divided into two groups, `onlyUnix` and `onlyWindows`. This is
-necessary because some commands to be executed in the terminal are only valid
-for an environment.
-
-By default, phpunit is executed like this:
-
-```bash
-vendor/bin/phpunit --exclude-group=onlyWindows
-```
-
-On Windows, it must be done this way:
-
-```bash
-vendor\bin\phpunit.bat --exclude-group=onlyUnix
-```
-
 ## Versioning
 For transparency and insight into our release cycle and to maintain backward 
 compatibility, *DatabaseBackup* will be maintained under the 
