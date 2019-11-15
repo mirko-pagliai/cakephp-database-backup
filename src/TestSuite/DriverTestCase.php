@@ -27,27 +27,32 @@ use ErrorException;
 abstract class DriverTestCase extends TestCase
 {
     /**
+     * `Articles` table
      * @var \Cake\ORM\Table
      */
     protected $Articles;
 
     /**
+     * `Comments` table
      * @var \Cake\ORM\Table
      */
     protected $Comments;
 
     /**
+     * `Driver` instance
      * @var \DatabaseBackup\Driver\Driver
      */
     protected $Driver;
 
     /**
+     * Driver class
      * @since 2.5.1
      * @var string
      */
     protected $DriverClass;
 
     /**
+     * Auto fixtures
      * @var bool
      */
     public $autoFixtures = false;
