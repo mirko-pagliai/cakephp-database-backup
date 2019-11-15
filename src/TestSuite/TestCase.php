@@ -27,6 +27,7 @@ abstract class TestCase extends BaseTestCase
     use BackupTrait;
 
     /**
+     * `BackupManager` instance
      * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
