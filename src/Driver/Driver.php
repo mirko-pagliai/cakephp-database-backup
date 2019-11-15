@@ -25,7 +25,8 @@ use DatabaseBackup\BackupTrait;
  */
 abstract class Driver implements EventListenerInterface
 {
-    use BackupTrait, EventDispatcherTrait;
+    use BackupTrait;
+    use EventDispatcherTrait;
 
     /**
      * A connection object
