@@ -39,7 +39,7 @@ trait BackupTrait
     public function getAbsolutePath($path)
     {
         if (!(new Filesystem())->isAbsolutePath($path)) {
-            $path = add_slash_term(Configure::read('DatabaseBackup.target')) . $path;
+            return add_slash_term(Configure::read('DatabaseBackup.target')) . $path;
         }
 
         return $path;
