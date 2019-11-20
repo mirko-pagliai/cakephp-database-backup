@@ -1,7 +1,7 @@
 # 2.x branch
 ## 2.7 branch
 ### 2.7.0
-* `BackupTrait::getTarget()` has been removed.
+* `BackupTrait::getTarget()` and `BackupTrait::getDriverName()` have been removed.
 
 ## 2.6 branch
 ### 2.6.6
