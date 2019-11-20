@@ -23,6 +23,16 @@ use RuntimeException;
  */
 class DriverTest extends TestCase
 {
+    /**
+     * `Driver` instance
+     * @var \DatabaseBackup\Driver\Driver
+     */
+    protected $Driver;
+
+    /**
+     * Called before every test method
+     * @return void
+     */
     public function setUp()
     {
         parent::setUp();
