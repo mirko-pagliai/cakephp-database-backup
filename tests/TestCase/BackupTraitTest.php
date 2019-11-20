@@ -21,7 +21,6 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
-use RuntimeException;
 
 /**
  * BackupTraitTest class
