@@ -99,7 +99,7 @@ trait BackupTrait
     public function getDriver(ConnectionInterface $connection = null)
     {
         $connection = $connection ?: $this->getConnection();
-        $className = get_class_short_name(get_class($connection->getDriver()));
+        $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
         is_true_or_fail(
             $driver,
