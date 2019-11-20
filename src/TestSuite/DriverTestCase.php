@@ -219,7 +219,7 @@ abstract class DriverTestCase extends TestCase
             $expected = sprintf(
                 '%s | %s > %s%s',
                 $basicExecutable,
-                $this->getBinary($compression),
+                $this->Driver->getBinary($compression),
                 escapeshellarg($filename),
                 REDIRECT_TO_DEV_NULL
             );
@@ -310,7 +310,7 @@ abstract class DriverTestCase extends TestCase
             $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
             $expected = sprintf(
                 '%s -dc %s | %s%s',
-                $this->getBinary($compression),
+                $this->Driver->getBinary($compression),
                 escapeshellarg($filename),
                 $basicExecutable,
                 REDIRECT_TO_DEV_NULL

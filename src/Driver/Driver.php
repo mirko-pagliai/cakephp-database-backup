@@ -17,6 +17,7 @@ use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
+use RuntimeException;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -120,6 +121,7 @@ abstract class Driver implements EventListenerInterface
      * @param string $filename Filename where you want to export the database
      * @return string
      * @uses _exportExecutable()
+     * @uses getBinary()
      */
     protected function _exportExecutableWithCompression($filename)
     {
@@ -143,6 +145,7 @@ abstract class Driver implements EventListenerInterface
      * @param string $filename Filename from which you want to import the database
      * @return string
      * @uses _importExecutable()
+     * @uses getBinary()
      */
     protected function _importExecutableWithCompression($filename)
     {
@@ -187,6 +190,20 @@ abstract class Driver implements EventListenerInterface
         $this->dispatchEvent('Backup.afterExport');
 
         return file_exists($filename);
+    }
+
+    /**
+     * Gets a binary path
+     * @param string $name Binary name
+     * @return string
+     * @throws \RuntimeException
+     */
+    public function getBinary($name)
+    {
+        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
+        is_true_or_fail($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
+
+        return $binary;
     }
 
     /**

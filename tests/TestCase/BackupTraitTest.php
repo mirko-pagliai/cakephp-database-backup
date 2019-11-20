@@ -57,20 +57,6 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getBinary()` method
-     * @test
-     */
-    public function testGetBinary()
-    {
-        $this->assertEquals(which('mysql'), $this->getBinary('mysql'));
-
-        //With a binary not available
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
-        $this->getBinary('noExisting');
-    }
-
-    /**
      * Test for `getCompression()` method
      * @test
      */

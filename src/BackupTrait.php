@@ -17,7 +17,6 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use InvalidArgumentException;
-use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -44,21 +43,6 @@ trait BackupTrait
         }
 
         return $path;
-    }
-
-    /**
-     * Gets a binary path
-     * @param string $name Binary name
-     * @return string
-     * @since 2.0.0
-     * @throws \RuntimeException
-     */
-    public function getBinary($name)
-    {
-        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-        is_true_or_fail($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
-
-        return $binary;
     }
 
     /**

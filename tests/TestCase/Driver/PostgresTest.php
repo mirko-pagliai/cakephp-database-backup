@@ -67,7 +67,7 @@ class PostgresTest extends DriverTestCase
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(
             '%s --format=c -b --dbname=postgresql://postgres%s@localhost/travis_ci_test',
-            $this->getBinary('pg_dump'),
+            $this->Driver->getBinary('pg_dump'),
             $password ? ':' . $password : null
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
@@ -82,7 +82,7 @@ class PostgresTest extends DriverTestCase
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(
             '%s --format=c -c -e --dbname=postgresql://postgres%s@localhost/travis_ci_test',
-            $this->getBinary('pg_restore'),
+            $this->Driver->getBinary('pg_restore'),
             $password ? ':' . $password : null
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));

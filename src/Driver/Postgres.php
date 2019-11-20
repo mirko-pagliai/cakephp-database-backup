@@ -46,6 +46,7 @@ class Postgres extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
+     * @uses getBinary()
      * @uses getDbnameAsString()
      */
     protected function _exportExecutable()
@@ -56,6 +57,7 @@ class Postgres extends Driver
     /**
      * Gets the executable command to import the database
      * @return string
+     * @uses getBinary()
      * @uses getDbnameAsString()
      */
     protected function _importExecutable()

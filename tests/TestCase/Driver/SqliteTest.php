@@ -46,7 +46,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3 .dump';
+        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'example.sq3 .dump';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
@@ -56,7 +56,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testImportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3';
+        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'example.sq3';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 
@@ -70,7 +70,7 @@ class SqliteTest extends DriverTestCase
         $this->Driver->method('_exportExecutableWithCompression')
             ->will($this->returnValue(sprintf(
                 '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
-                $this->getBinary('sqlite3'),
+                $this->Driver->getBinary('sqlite3'),
                 $this->Driver->getConfig('database')
             )));
         parent::testExportOnFailure();
@@ -97,7 +97,7 @@ class SqliteTest extends DriverTestCase
         $this->Driver->method('beforeImport')->will($this->returnValue(true));
         $this->Driver->method('_importExecutableWithCompression')->will($this->returnValue(sprintf(
             '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
-            $this->getBinary('sqlite3'),
+            $this->Driver->getBinary('sqlite3'),
             $this->Driver->getConfig('database')
         )));
         parent::testImportOnFailure();
