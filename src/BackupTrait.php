@@ -40,7 +40,7 @@ trait BackupTrait
      */
     public function getAbsolutePath($path)
     {
-        return (new Filesystem())->isAbsolutePath($path) ? $path : $this->getTarget() . DS . $path;
+        return (new Filesystem())->isAbsolutePath($path) ? $path : add_slash_term($this->getTarget()) . $path;
     }
 
     /**
