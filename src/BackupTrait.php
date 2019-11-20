@@ -119,7 +119,7 @@ trait BackupTrait
     {
         $connection = $connection ?: $this->getConnection();
 
-        return get_class_short_name(get_class($connection->getDriver()));
+        return get_class_short_name($connection->getDriver());
     }
 
     /**
