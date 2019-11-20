@@ -160,13 +160,4 @@ class BackupTraitTest extends TestCase
     {
         $this->assertNotEmpty($this->getValidCompressions());
     }
-
-    /**
-     * Test for `getValidExtensions()` method
-     * @test
-     */
-    public function testGetValidExtensions()
-    {
-        $this->assertNotEmpty($this->getValidExtensions());
-    }
 }

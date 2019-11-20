@@ -30,7 +30,7 @@ trait BackupTrait
      * @since 2.4.0
      * @var array
      */
-    private static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+    protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
     /**
      * Returns an absolute path
@@ -115,13 +115,13 @@ trait BackupTrait
      * @param string $filename Filename
      * @return string|null Extension or `null` if the extension is not found or
      *  if is an invalid extension
-     * @uses getValidExtensions()
+     * @uses $validExtensions
      */
     public function getExtension($filename)
     {
         $extension = get_extension($filename);
 
-        return in_array($extension, $this->getValidExtensions()) ? $extension : null;
+        return in_array($extension, array_keys(self::$validExtensions)) ? $extension : null;
     }
 
     /**
@@ -133,16 +133,5 @@ trait BackupTrait
     public function getValidCompressions()
     {
         return array_filter(self::$validExtensions);
-    }
-
-    /**
-     * Returns all valid extensions
-     * @return array
-     * @since 2.4.0
-     * @uses $validExtensions
-     */
-    public function getValidExtensions()
-    {
-        return array_keys(self::$validExtensions);
     }
 }
