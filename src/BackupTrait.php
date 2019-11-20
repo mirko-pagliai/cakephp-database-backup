@@ -26,7 +26,7 @@ use Symfony\Component\Filesystem\Filesystem;
 trait BackupTrait
 {
     /**
-     * Valid extensions (as keys) and compressions (as values)
+     * Valid extensions. Names as keys and compressions as values
      * @since 2.4.0
      * @var array
      */
