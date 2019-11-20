@@ -61,45 +61,12 @@ class SqliteTest extends DriverTestCase
     }
 
     /**
-     * Test for `export()` method on failure
-     * @test
-     */
-    public function testExportOnFailure()
-    {
-        $this->Driver = $this->getMockForDriver(['_exportExecutableWithCompression']);
-        $this->Driver->method('_exportExecutableWithCompression')
-            ->will($this->returnValue(sprintf(
-                '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
-                $this->getBinary('sqlite3'),
-                $this->Driver->getConfig('database')
-            )));
-        parent::testExportOnFailure();
-    }
-
-    /**
      * Test for `import()` method
      * @test
      */
     public function testImport()
     {
         $this->loadFixtures();
-
         parent::testImport();
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @test
-     */
-    public function testImportOnFailure()
-    {
-        $this->Driver = $this->getMockForDriver(['_importExecutableWithCompression', 'beforeImport']);
-        $this->Driver->method('beforeImport')->will($this->returnValue(true));
-        $this->Driver->method('_importExecutableWithCompression')->will($this->returnValue(sprintf(
-            '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
-            $this->getBinary('sqlite3'),
-            $this->Driver->getConfig('database')
-        )));
-        parent::testImportOnFailure();
     }
 }
