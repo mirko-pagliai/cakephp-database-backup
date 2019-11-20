@@ -5,13 +5,13 @@
     "type": "cakephp-plugin",
     "license": "MIT",
     "authors": [{
-        "name": "Mirko Pagliai",
-        "email": "mirko.pagliai@gmail.com"
-    }],
+            "name": "Mirko Pagliai",
+            "email": "mirko.pagliai@gmail.com"
+        }],
     "require": {
         "php": ">=5.5.9",
         "cakephp/cakephp": "^3.7",
-        "mirko-pagliai/php-tools": "^1.2.8"
+        "mirko-pagliai/php-tools": "^1.2.15"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^3.0",
