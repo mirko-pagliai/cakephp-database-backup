@@ -36,11 +36,14 @@ trait BackupTrait
      * Returns an absolute path
      * @param string $path Relative or absolute path
      * @return string
-     * @uses getTarget()
      */
     public function getAbsolutePath($path)
     {
-        return (new Filesystem())->isAbsolutePath($path) ? $path : add_slash_term($this->getTarget()) . $path;
+        if (!(new Filesystem())->isAbsolutePath($path)) {
+            $path = add_slash_term(Configure::read('DatabaseBackup.target')) . $path;
+        }
+
+        return $path;
     }
 
     /**
@@ -134,15 +137,6 @@ trait BackupTrait
         $extension = get_extension($filename);
 
         return in_array($extension, $this->getValidExtensions()) ? $extension : null;
-    }
-
-    /**
-     * Returns the target path
-     * @return string
-     */
-    public function getTarget()
-    {
-        return Configure::read('DatabaseBackup.target');
     }
 
     /**
