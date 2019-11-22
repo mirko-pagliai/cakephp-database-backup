@@ -53,7 +53,7 @@ trait BackupTrait
     public function getBinary($name)
     {
         $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-        is_true_or_fail($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
+        is_true_or_fail($binary, __d('database_backup', 'Binary for `{0}` could not be found. You have to set its path manually', $name), RuntimeException::class);
 
         return $binary;
     }
