@@ -15,10 +15,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
-use Cake\Database\Connection;
 use Cake\Event\EventList;
 use DatabaseBackup\TestSuite\TestCase;
-use ErrorException;
 
 /**
  * DriverTestCase class.
@@ -99,31 +97,6 @@ abstract class DriverTestCase extends TestCase
         }
 
         return $records;
-    }
-
-    /**
-     * Internal method to mock a driver
-     * @param array $methods The list of methods to mock
-     * @return \MockBuilder
-     * @since 2.6.1
-     * @uses $Driver
-     */
-    final protected function getMockForDriver(array $methods): object
-    {
-        return $this->getMockBuilder(get_class($this->Driver))
-            ->setMethods($methods)
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-    }
-
-    /**
-     * Test for `__construct()` method
-     * @return void
-     * @test
-     */
-    public function testConstruct()
-    {
-        $this->assertInstanceof(Connection::class, $this->getProperty($this->Driver, 'connection'));
     }
 
     /**
@@ -229,50 +202,6 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `export()` method on failure
-     * @return void
-     * @since 2.6.2
-     * @test
-     */
-    public function testExportOnFailure()
-    {
-        $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `export()` method. Export is stopped because the
-     *  `beforeExport()` method returns `false`
-     * @return void
-     * @test
-     */
-    public function testExportStoppedByBeforeExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(['beforeExport']);
-        $Driver->method('beforeExport')->will($this->returnValue(false));
-        $this->assertFalse($Driver->export($backup));
-        $this->assertFileNotExists($backup);
-    }
-
-    /**
-     * Test for `getConfig()` method
-     * @return void
-     * @test
-     */
-    public function testGetConfig()
-    {
-        $this->assertNotEmpty($this->Driver->getConfig());
-        $this->assertIsArray($this->Driver->getConfig());
-        $this->assertNotEmpty($this->Driver->getConfig('name'));
-        $this->assertNull($this->Driver->getConfig('noExistingKey'));
-    }
-
-    /**
      * Test for `import()` method
      * @return void
      * @test
@@ -318,40 +247,5 @@ abstract class DriverTestCase extends TestCase
             );
             $this->assertEquals($expected, $result);
         }
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @return void
-     * @since 2.6.2
-     * @test
-     */
-    public function testImportOnFailure()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-
-        $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
-        $this->Driver->export($backup);
-
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->import($backup);
-    }
-
-    /**
-     * Test for `import()` method. Import is stopped because the
-     *  `beforeImport()` method returns `false`
-     * @return void
-     * @test
-     */
-    public function testImportStoppedByBeforeExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(['beforeImport']);
-        $Driver->method('beforeImport')->will($this->returnValue(false));
-        $this->assertTrue($Driver->export($backup));
-        $this->assertFalse($Driver->import($backup));
     }
 }

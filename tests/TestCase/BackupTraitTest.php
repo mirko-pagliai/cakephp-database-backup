@@ -166,15 +166,6 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getTarget()` method
-     * @test
-     */
-    public function testGetTarget()
-    {
-        $this->assertEquals(Configure::read('DatabaseBackup.target'), $this->getTarget());
-    }
-
-    /**
      * Test for `getValidCompressions()` method
      * @test
      */
