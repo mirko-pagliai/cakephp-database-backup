@@ -89,7 +89,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterExport()
     {
-        $driver = $this->getMockForDriver(MySql::class, ['deleteAuthFile']);
+        $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
         $driver->expects($this->once())->method('deleteAuthFile');
         $this->assertNull($driver->afterExport());
     }
@@ -100,7 +100,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterImport()
     {
-        $driver = $this->getMockForDriver(MySql::class, ['deleteAuthFile']);
+        $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
         $driver->expects($this->once())->method('deleteAuthFile');
         $this->assertNull($driver->afterImport());
     }
