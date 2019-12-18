@@ -47,8 +47,8 @@ class ExportCommand extends Command
                     'short' => 'f',
                 ],
                 'rotate' => [
-                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups' .
-                        'you ìwant to keep. So, it will delete all backups that are older. By default, no backup' .
+                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups ' .
+                        'you want to keep. So, it will delete all backups that are older. By default, no backup ' .
                         'will be deleted'),
                     'short' => 'r',
                 ],
