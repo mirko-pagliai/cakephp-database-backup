@@ -1,10 +1,10 @@
 # LANGUAGE translation of cakephp-database-backup plugin
-# Copyright 2017 Mirko Pagliai <mirko.pagliai@gmail.com>
+# Copyright Mirko Pagliai <mirko.pagliai@gmail.com>
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2017-06-23 12:08+0200\n"
+"POT-Creation-Date: 2019-12-18 16:44+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -12,166 +12,153 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/BackupTrait.php:65
-msgid "`{0}` executable not available"
+#: BackupTrait.php:56
+msgid "Binary for `{0}` could not be found. You have to set its path manually"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/BackupTrait.php:115
+#: BackupTrait.php:104
 msgid "The `{0}` driver does not exist"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Driver/Mysql.php:156;183
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Driver/Sqlite.php:97;119
-msgid "{0} failed with exit code `{1}`"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:88
-msgid "Connection: {0}"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:89
-msgid "Driver: {0}"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:106;251
-msgid "No backup has been deleted"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:112;257
-msgid "Backup `{0}` has been deleted"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:115;260
-msgid "Deleted backup files: {0}"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:151
-msgid "Backup `{0}` has been exported"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:180
-msgid "Backup `{0}` has been imported"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:198
-msgid "Backup files found: {0}"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:212
-msgid "Filename"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:213
-msgid "Extension"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:214
-msgid "Compression"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:215
-msgid "Size"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:216
-msgid "Datetime"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:281
-msgid "Backup `{0}` was sent via mail"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:295
-msgid "Shell to handle database backups"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:297
+#: Command/DeleteAllCommand.php:34
 msgid "Deletes all database backups"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:300
+#: Command/DeleteAllCommand.php:52
+#: Command/RotateCommand.php:62
+msgid "No backup has been deleted"
+msgstr ""
+
+#: Command/DeleteAllCommand.php:58
+#: Command/RotateCommand.php:68
+msgid "Backup `{0}` has been deleted"
+msgstr ""
+
+#: Command/DeleteAllCommand.php:61
+#: Command/RotateCommand.php:71
+msgid "Deleted backup files: {0}"
+msgstr ""
+
+#: Command/ExportCommand.php:37
 msgid "Exports a database backup"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:305
+#: Command/ExportCommand.php:41
 msgid "Compression type. By default, no compression will be used"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:309
+#: Command/ExportCommand.php:45
 msgid "Filename. It can be an absolute path and may contain patterns. The compression type will be automatically setted"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:314
+#: Command/ExportCommand.php:50
 msgid "Rotates backups. You have to indicate the number of backups you want to keep. So, it will delete all backups that are older. By default, no backup will be deleted"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:319
+#: Command/ExportCommand.php:56
 msgid "Sends the backup file via email. You have to indicate the recipient's email address"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:327
-msgid "Lists database backups"
+#: Command/ExportCommand.php:94
+msgid "Backup `{0}` has been exported"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:330
+#: Command/ImportCommand.php:35
 msgid "Imports a database backup"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:334;359
+#: Command/ImportCommand.php:37
+#: Command/SendCommand.php:38
 msgid "Filename. It can be an absolute path"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:342
+#: Command/ImportCommand.php:57
+msgid "Backup `{0}` has been imported"
+msgstr ""
+
+#: Command/IndexCommand.php:36
+msgid "Lists database backups"
+msgstr ""
+
+#: Command/IndexCommand.php:53
+msgid "Backup files found: {0}"
+msgstr ""
+
+#: Command/IndexCommand.php:60
+msgid "Filename"
+msgstr ""
+
+#: Command/IndexCommand.php:61
+msgid "Extension"
+msgstr ""
+
+#: Command/IndexCommand.php:62
+msgid "Compression"
+msgstr ""
+
+#: Command/IndexCommand.php:63
+msgid "Size"
+msgstr ""
+
+#: Command/IndexCommand.php:64
+msgid "Datetime"
+msgstr ""
+
+#: Command/RotateCommand.php:35
 msgid "Rotates backups"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:346
+#: Command/RotateCommand.php:37
 msgid "Number of backups you want to keep. So, it will delete all backups that are older"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:355
+#: Command/SendCommand.php:35
 msgid "Send a database backup via mail"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Shell/BackupShell.php:363
+#: Command/SendCommand.php:42
 msgid "Recipient's email address"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupExport.php:116
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupImport.php:77
+#: Command/SendCommand.php:62
+msgid "Backup `{0}` was sent via mail"
+msgstr ""
+
+#: Console/Command.php:38
+msgid "Connection: {0}"
+msgstr ""
+
+#: Console/Command.php:39
+msgid "Driver: {0}"
+msgstr ""
+
+#: Driver/Driver.php:185
+#: Driver/Driver.php:228
+msgid "Failed with exit code `{0}`"
+msgstr ""
+
+#: Utility/BackupExport.php:119
 msgid "Invalid compression type"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupExport.php:156
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupManager.php:72
-msgid "File or directory `{0}` not writable"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupExport.php:160
+#: Utility/BackupExport.php:155
 msgid "File `{0}` already exists"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupExport.php:165
+#: Utility/BackupExport.php:160
+#: Utility/BackupImport.php:66
 msgid "Invalid file extension"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupImport.php:73
-msgid "File or directory `{0}` not readable"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupImport.php:96
+#: Utility/BackupImport.php:87
 msgid "You must first set the filename"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupManager.php:138
+#: Utility/BackupManager.php:100
 msgid "Invalid rotate value"
 msgstr ""
 
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupManager.php:164
-msgid "You must first set the mail sender"
-msgstr ""
-
-#: /home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/BackupManager.php:172
+#: Utility/BackupManager.php:128
 msgid "Database backup {0} from {1}"
 msgstr ""
 
