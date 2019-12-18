@@ -26,6 +26,7 @@ abstract class TestCase extends BaseTestCase
     use BackupTrait;
 
     /**
+     * `BackupManager` instance
      * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
@@ -80,5 +81,19 @@ abstract class TestCase extends BaseTestCase
         $files[] = $this->createBackup('backup.sql.gz');
 
         return $files;
+    }
+
+    /**
+     * Internal method to mock a driver
+     * @param string $className Driver class name
+     * @param array $methods The list of methods to mock
+     * @return \DatabaseBackup\Driver\Driver|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getMockForDriver($className, array $methods)
+    {
+        return $this->getMockBuilder($className)
+            ->setMethods($methods)
+            ->setConstructorArgs([$this->getConnection('test')])
+            ->getMock();
     }
 }

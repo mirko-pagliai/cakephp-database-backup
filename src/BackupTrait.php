@@ -26,7 +26,7 @@ use Symfony\Component\Filesystem\Filesystem;
 trait BackupTrait
 {
     /**
-     * Valid extensions (as keys) and compressions (as values)
+     * Valid extensions. Names as keys and compressions as values
      * @since 2.4.0
      * @var array
      */
@@ -40,7 +40,7 @@ trait BackupTrait
      */
     public function getAbsolutePath($path)
     {
-        return (new Filesystem())->isAbsolutePath($path) ? $path : $this->getTarget() . DS . $path;
+        return (new Filesystem())->isAbsolutePath($path) ? $path : add_slash_term($this->getTarget()) . $path;
     }
 
     /**
@@ -53,7 +53,7 @@ trait BackupTrait
     public function getBinary($name)
     {
         $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-        is_true_or_fail($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
+        is_true_or_fail($binary, __d('database_backup', 'Binary for `{0}` could not be found. You have to set its path manually', $name), RuntimeException::class);
 
         return $binary;
     }
@@ -119,7 +119,7 @@ trait BackupTrait
     {
         $connection = $connection ?: $this->getConnection();
 
-        return get_class_short_name(get_class($connection->getDriver()));
+        return get_class_short_name($connection->getDriver());
     }
 
     /**
