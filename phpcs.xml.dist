@@ -4,4 +4,8 @@
     <file>.</file>
 
     <rule ref="./vendor/mirko-pagliai/php-tools/sniffer-ruleset.xml"/>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace.UseFromSameNamespace">
+        <severity>0</severity>
+    </rule>
 </ruleset>

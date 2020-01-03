@@ -47,7 +47,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testExportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3 .dump';
+        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'example.sq3 .dump';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
@@ -57,7 +57,7 @@ class SqliteTest extends DriverTestCase
      */
     public function testImportExecutable()
     {
-        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3';
+        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'example.sq3';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 

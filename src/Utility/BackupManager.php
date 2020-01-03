@@ -70,7 +70,7 @@ class BackupManager
      */
     public function index(): Collection
     {
-        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in($this->getTarget());
+        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::read('DatabaseBackup.target'));
 
         return collection($finder)->map(function (SplFileInfo $file) {
             return new Entity([
