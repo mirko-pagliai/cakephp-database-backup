@@ -10,12 +10,12 @@
         }],
     "require": {
         "php": ">=7.2",
-        "cakephp/cakephp": "4.x-dev",
-        "mirko-pagliai/php-tools": "dev-php7"
+        "cakephp/cakephp": "^4.0",
+        "mirko-pagliai/php-tools": "^1.3"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "dev-next",
-        "mirko-pagliai/me-tools": "dev-cakephp4",
+        "cakephp/cakephp-codesniffer": "^4.0",
+        "mirko-pagliai/me-tools": "^2.19",
         "phpunit/phpunit": "^8.0"
     },
     "autoload": {
