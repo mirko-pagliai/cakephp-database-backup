@@ -123,7 +123,8 @@ abstract class DriverTestCase extends TestCase
     {
         foreach (self::$validExtensions as $extension) {
             $this->loadFixtures();
-            $backup = $this->getAbsolutePath(sprintf('example.%s', $extension));
+            $backup = uniqid('example_');
+            $backup = $this->getAbsolutePath($extension ? $backup . '.' . $extension : $backup);
 
             //Initial records. 3 articles and 6 comments
             $initial = $this->getAllRecords();
