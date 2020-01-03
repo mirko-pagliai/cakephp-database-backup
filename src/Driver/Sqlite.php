@@ -23,6 +23,7 @@ class Sqlite extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
+     * @uses getBinary()
      * @uses getConfig()
      */
     protected function _exportExecutable()
@@ -33,6 +34,7 @@ class Sqlite extends Driver
     /**
      * Gets the executable command to import the database
      * @return string
+     * @uses getBinary()
      * @uses getConfig()
      */
     protected function _importExecutable()

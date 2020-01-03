@@ -18,6 +18,7 @@ use Cake\Database\Connection;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use ErrorException;
+use RuntimeException;
 
 /**
  * DriverTest class
@@ -80,6 +81,20 @@ class DriverTest extends TestCase
         $Driver->method('beforeExport')->will($this->returnValue(false));
         $this->assertFalse($Driver->export($backup));
         $this->assertFileNotExists($backup);
+    }
+
+    /**
+     * Test for `getBinary()` method
+     * @test
+     */
+    public function testGetBinary()
+    {
+        $this->assertEquals(which('mysql'), $this->invokeMethod($this->Driver, 'getBinary', ['mysql']));
+
+        //With a binary not available
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
+        $this->invokeMethod($this->Driver, 'getBinary', ['noExisting']);
     }
 
     /**

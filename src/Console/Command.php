@@ -36,7 +36,7 @@ class Command extends BaseCommand
         $config = $this->getConnection()->config();
 
         $io->out(__d('database_backup', 'Connection: {0}', $config['name']));
-        $io->out(__d('database_backup', 'Driver: {0}', $this->getDriverName($this->getConnection())));
+        $io->out(__d('database_backup', 'Driver: {0}', get_class_short_name($this->getConnection()->getDriver())));
         $io->hr();
 
         return null;

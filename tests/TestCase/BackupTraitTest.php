@@ -21,7 +21,6 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
-use RuntimeException;
 
 /**
  * BackupTraitTest class
@@ -54,20 +53,6 @@ class BackupTraitTest extends TestCase
         $this->assertEquals(Configure::read('DatabaseBackup.target') . DS . 'file.txt', $this->getAbsolutePath('file.txt'));
         $expected = Configure::read('DatabaseBackup.target') . DS . 'file.txt';
         $this->assertEquals($expected, $this->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
-    }
-
-    /**
-     * Test for `getBinary()` method
-     * @test
-     */
-    public function testGetBinary()
-    {
-        $this->assertEquals(which('mysql'), $this->getBinary('mysql'));
-
-        //With a binary not available
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
-        $this->getBinary('noExisting');
     }
 
     /**
@@ -132,17 +117,6 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getDriverName()` method
-     * @test
-     */
-    public function testGetDriverName()
-    {
-        foreach ([ConnectionManager::get('test'), null] as $driver) {
-            $this->assertEquals('Mysql', $this->getDriverName($driver));
-        }
-    }
-
-    /**
      * Test for `getExtension()` method
      * @test
      */
@@ -170,14 +144,5 @@ class BackupTraitTest extends TestCase
     public function testGetValidCompressions()
     {
         $this->assertNotEmpty($this->getValidCompressions());
-    }
-
-    /**
-     * Test for `getValidExtensions()` method
-     * @test
-     */
-    public function testGetValidExtensions()
-    {
-        $this->assertNotEmpty($this->getValidExtensions());
     }
 }

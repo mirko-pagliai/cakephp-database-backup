@@ -1,4 +1,10 @@
 # 2.x branch
+## 2.7 branch
+### 2.7.0
+* `BackupTrait::getBinary()` method has been moved to `Driver` abstract class;
+* `BackupTrait::getTarget()`, `BackupTrait::getDriverName()` and
+    `BackupTrait::getValidExtensions()` methods have been removed.
+
 ## 2.6 branch
 ### 2.6.6
 * tests have been optimized and speeded up;

@@ -121,9 +121,10 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportAndImport()
     {
-        foreach ($this->getValidExtensions() as $extension) {
+        foreach (self::$validExtensions as $extension) {
             $this->loadFixtures();
-            $backup = $this->getAbsolutePath(sprintf('example.%s', $extension));
+            $backup = uniqid('example_');
+            $backup = $this->getAbsolutePath($extension ? $backup . '.' . $extension : $backup);
 
             //Initial records. 3 articles and 6 comments
             $initial = $this->getAllRecords();
@@ -192,7 +193,7 @@ abstract class DriverTestCase extends TestCase
             $expected = sprintf(
                 '%s | %s > %s%s',
                 $basicExecutable,
-                $this->getBinary($compression),
+                $this->Driver->getBinary($compression),
                 escapeshellarg($filename),
                 REDIRECT_TO_DEV_NULL
             );
@@ -239,7 +240,7 @@ abstract class DriverTestCase extends TestCase
             $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
             $expected = sprintf(
                 '%s -dc %s | %s%s',
-                $this->getBinary($compression),
+                $this->Driver->getBinary($compression),
                 escapeshellarg($filename),
                 $basicExecutable,
                 REDIRECT_TO_DEV_NULL
