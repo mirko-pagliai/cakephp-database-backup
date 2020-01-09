@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.8 branch
+### 2.8.0
+* updated for `cakephp` 4 and `phpunit` 8.
+
 ## 2.7 branch
 ### 2.7.0
 * `BackupTrait::getBinary()` method has been moved to `Driver` abstract class;

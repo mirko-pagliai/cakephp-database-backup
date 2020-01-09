@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -13,6 +14,7 @@
  */
 namespace DatabaseBackup\Utility;
 
+use Cake\Collection\Collection;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
@@ -37,7 +39,7 @@ class BackupManager
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws \Tools\Exception\NotWritableException
      */
-    public function delete($filename)
+    public function delete(string $filename): bool
     {
         $filename = $this->getAbsolutePath($filename);
         is_writable_or_fail($filename);
@@ -53,9 +55,9 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public function deleteAll()
+    public function deleteAll(): array
     {
-        return array_filter(array_map(function ($filename) {
+        return array_filter(array_map(function (string $filename) {
             return !$this->delete($filename) ?: $filename;
         }, $this->index()->extract('filename')->toList()));
     }
@@ -66,7 +68,7 @@ class BackupManager
      *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public function index()
+    public function index(): Collection
     {
         $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::read('DatabaseBackup.target'));
 
@@ -93,7 +95,7 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public function rotate($rotate)
+    public function rotate(int $rotate): array
     {
         is_true_or_fail(
             is_positive($rotate),
@@ -115,7 +117,7 @@ class BackupManager
      * @since 1.1.0
      * @throws \Tools\Exception\NotReadableException
      */
-    protected function getEmailInstance($backup, $recipient)
+    protected function getEmailInstance(string $backup, string $recipient): Email
     {
         $file = $this->getAbsolutePath($backup);
         is_readable_or_fail($file);
@@ -138,7 +140,7 @@ class BackupManager
      * @since 1.1.0
      * @uses getEmailInstance()
      */
-    public function send($filename, $recipient)
+    public function send(string $filename, string $recipient): array
     {
         return $this->getEmailInstance($filename, $recipient)->send();
     }

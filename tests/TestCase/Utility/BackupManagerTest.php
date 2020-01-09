@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -14,9 +15,8 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
-use Cake\Mailer\Email;
 use Cake\ORM\Entity;
-use Cake\TestSuite\EmailAssertTrait;
+use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -29,7 +29,7 @@ use Tools\Exception\NotWritableException;
  */
 class BackupManagerTest extends TestCase
 {
-    use EmailAssertTrait;
+    use EmailTrait;
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport
@@ -45,7 +45,7 @@ class BackupManagerTest extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -166,23 +166,17 @@ class BackupManagerTest extends TestCase
     public function testSend()
     {
         $file = $this->createBackup();
-        $mimetype = mime_content_type($file);
         $recipient = 'recipient@example.com';
-
-        $instance = new BackupManager();
-        $this->_email = $this->invokeMethod($instance, 'getEmailInstance', [$file, $recipient]);
-        $this->assertInstanceof(Email::class, $this->_email);
-
-        $this->assertEmailFrom(Configure::read('DatabaseBackup.mailSender'));
-        $this->assertEmailTo($recipient);
-        $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
-        $this->assertEmailAttachmentsContains(basename($file), compact('file', 'mimetype'));
-        $this->assertArrayKeysEqual(['headers', 'message'], $this->BackupManager->send($file, $recipient));
+        $this->BackupManager->send($file, $recipient);
+        $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
+        $this->assertMailSentTo($recipient);
+        $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
+        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
 
         //With an invalid sender
-        @unlink($file);
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid email set for "from". You passed "invalidSender".');
+        @unlink($file);
         Configure::write('DatabaseBackup.mailSender', 'invalidSender');
         $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
