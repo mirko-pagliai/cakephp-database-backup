@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -100,7 +101,7 @@ class BackupExport
      * Sets the compression
      * @param string|null $compression Compression type name. Supported
      *  values are `bzip2` and `gzip`. Use `null` for no compression
-     * @return \DatabaseBackup\Utility\BackupExport
+     * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws \InvalidArgumentException
      * @uses getValidCompressions()
@@ -108,7 +109,7 @@ class BackupExport
      * @uses $defaultExtension
      * @uses $extension
      */
-    public function compression($compression)
+    public function compression(?string $compression)
     {
         $this->extension = $this->defaultExtension;
 
@@ -131,7 +132,7 @@ class BackupExport
      * The compression type will be automatically setted by the filename.
      * @param string $filename Filename. It can be an absolute path and may
      *  contain patterns
-     * @return \DatabaseBackup\Utility\BackupExport
+     * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws \Exception
      * @throws \InvalidArgumentException
@@ -140,7 +141,7 @@ class BackupExport
      * @uses $config
      * @uses $filename
      */
-    public function filename($filename)
+    public function filename(string $filename)
     {
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
@@ -173,11 +174,11 @@ class BackupExport
      * Sets the number of backups you want to keep. So, it will delete all
      * backups that are older
      * @param int $rotate Number of backups you want to keep
-     * @return \DatabaseBackup\Utility\BackupExport
+     * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
      * @uses $rotate
      */
-    public function rotate($rotate)
+    public function rotate(int $rotate)
     {
         $this->rotate = $rotate;
 
@@ -187,11 +188,11 @@ class BackupExport
     /**
      * Sets the recipient's email address to send the backup file via mail
      * @param string|null $recipient Recipient's email address or `null` to disable
-     * @return \DatabaseBackup\Utility\BackupExport
+     * @return $this
      * @since 1.1.0
      * @uses $emailRecipient
      */
-    public function send($recipient = null)
+    public function send(?string $recipient = null)
     {
         $this->emailRecipient = $recipient;
 
@@ -210,7 +211,7 @@ class BackupExport
      * @uses $extension
      * @uses $rotate
      */
-    public function export()
+    public function export(): string
     {
         if (empty($this->filename)) {
             $this->extension = $this->extension ?: $this->defaultExtension;

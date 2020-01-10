@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -14,7 +15,9 @@
 namespace App;
 
 use Cake\Http\BaseApplication;
+use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use Cake\Routing\RouteBuilder;
 use DatabaseBackup\Plugin as DatabaseBackup;
 
 /**
@@ -28,7 +31,7 @@ class Application extends BaseApplication
     /**
      * Load all the application configuration and bootstrap logic
      */
-    public function bootstrap()
+    public function bootstrap(): void
     {
         $this->addPlugin(DatabaseBackup::class);
     }
@@ -38,7 +41,7 @@ class Application extends BaseApplication
      * @param \Cake\Http\MiddlewareQueue $middlewareQueue The middleware queue to set in your App Class
      * @return \Cake\Http\MiddlewareQueue
      */
-    public function middleware($middlewareQueue)
+    public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
         return $middlewareQueue->add(new RoutingMiddleware($this));
     }
@@ -48,7 +51,7 @@ class Application extends BaseApplication
      * @param \Cake\Routing\RouteBuilder $routes A route builder to add routes into
      * @return void
      */
-    public function routes($routes)
+    public function routes(RouteBuilder $routes): void
     {
         //Do nothing
     }

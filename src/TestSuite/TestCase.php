@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -35,7 +36,7 @@ abstract class TestCase extends BaseTestCase
      * Called before every test method
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +47,7 @@ abstract class TestCase extends BaseTestCase
      * Called after every test method
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         //Deletes all backup files
         unlink_recursive(Configure::read('DatabaseBackup.target'));
@@ -59,7 +60,7 @@ abstract class TestCase extends BaseTestCase
      * @param string $filename Filename
      * @return string
      */
-    protected function createBackup($filename = 'backup.sql')
+    protected function createBackup(string $filename = 'backup.sql'): string
     {
         return $this->BackupExport->filename($filename)->export();
     }
@@ -70,7 +71,7 @@ abstract class TestCase extends BaseTestCase
      * @return array
      * @uses createBackup()
      */
-    protected function createSomeBackups($sleep = false)
+    protected function createSomeBackups(bool $sleep = false): array
     {
         $files[] = $this->createBackup();
 

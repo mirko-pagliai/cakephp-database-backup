@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -17,6 +18,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
+use Cake\TestSuite\TestEmailTransport;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -115,13 +117,8 @@ Log::setConfig('debug', [
 ]);
 
 $transportName = 'debug';
-$transportConfig = ['className' => 'Debug'];
-if (class_exists(TransportFactory::class)) {
-    TransportFactory::setConfig($transportName, $transportConfig);
-} else {
-    Email::setConfigTransport($transportName, $transportConfig);
-}
-Email::setConfig('default', ['transport' => $transportName, 'log' => true]);
+TransportFactory::setConfig($transportName, ['className' => TestEmailTransport::class]);
+Email::setConfig('default', ['transport' => $transportName]);
 
 Configure::write('pluginsToLoad', ['DatabaseBackup']);
 

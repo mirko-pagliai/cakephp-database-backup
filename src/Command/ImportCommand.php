@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -30,7 +31,7 @@ class ImportCommand extends Command
      * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
      * @return \Cake\Console\ConsoleOptionParser
      */
-    protected function buildOptionParser(ConsoleOptionParser $parser)
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser->setDescription(__d('database_backup', 'Imports a database backup'))
             ->addArgument('filename', [
@@ -48,7 +49,7 @@ class ImportCommand extends Command
      * @uses \DatabaseBackup\Utility\BackupImport::filename()
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
-    public function execute(Arguments $args, ConsoleIo $io)
+    public function execute(Arguments $args, ConsoleIo $io): ?int
     {
         parent::execute($args, $io);
 
