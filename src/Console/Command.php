@@ -14,9 +14,9 @@
 namespace DatabaseBackup\Console;
 
 use Cake\Console\Arguments;
+use Cake\Console\Command as BaseCommand;
 use Cake\Console\ConsoleIo;
 use DatabaseBackup\BackupTrait;
-use MeTools\Console\Command as BaseCommand;
 
 /**
  * Base class for console commands
