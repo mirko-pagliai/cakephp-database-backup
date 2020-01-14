@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.8 branch
+### 2.8.1
+* fixed I18n translations.
+
 ### 2.8.0
 * updated for `cakephp` 4 and `phpunit` 8.
 
