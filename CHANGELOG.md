@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.7 branch
+### 2.7.1
+* fixed [bug for `Command` class](https://github.com/mirko-pagliai/cakephp-database-backup/pull/54).
+
 ### 2.7.0
 * `BackupTrait::getBinary()` method has been moved to `Driver` abstract class;
 * `BackupTrait::getTarget()`, `BackupTrait::getDriverName()` and
