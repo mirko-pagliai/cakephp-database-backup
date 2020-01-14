@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.8 branch
 ### 2.8.1
-* fixed I18n translations.
+* fixed I18n translations;
+* fixed [bug for `Command` class](https://github.com/mirko-pagliai/cakephp-database-backup/pull/54).
 
 ### 2.8.0
 * updated for `cakephp` 4 and `phpunit` 8.
