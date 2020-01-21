@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -96,4 +97,3 @@ Log::setConfig('debug', [
 ]);
 TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
 Email::setConfig('default', ['transport' => 'debug']);
-
