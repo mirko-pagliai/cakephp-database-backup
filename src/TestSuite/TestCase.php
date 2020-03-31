@@ -75,17 +75,13 @@ abstract class TestCase extends BaseTestCase
     {
         $timestamp = time();
 
-        foreach ([
-            'sql' => $timestamp - 2,
-            'sql.bz2' => $timestamp - 1,
-            'sql.gz' => $timestamp,
-        ] as $extension => $timestamp) {
+        foreach (['sql.gz', 'sql.bz2', 'sql'] as $extension) {
             $file = $this->createBackup('backup_test_' . (string)$timestamp . '.' . $extension);
-            touch($file, $timestamp);
+            touch($file, $timestamp--);
             $files[] = $file;
         }
 
-        return $files;
+        return array_reverse($files);
     }
 
     /**
