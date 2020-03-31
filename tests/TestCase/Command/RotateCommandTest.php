@@ -25,28 +25,44 @@ class RotateCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * @var string
+     */
+    protected $command = 'database_backup.rotate -v';
+
+    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $command = 'database_backup.rotate -v';
+        $this->createSomeBackups();
+        $this->exec($this->command . ' 1');
+        $this->assertExitWithSuccess();
+        $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql\.bz2` has been deleted/');
+        $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql` has been deleted/');
+        $this->assertOutputContains('<success>Deleted backup files: 2</success>');
+    }
 
-        $this->exec($command . ' 1');
+    /**
+     * Test for `execute()` method, with an invalid value
+     * @test
+     */
+    public function testExecuteInvalidValue()
+    {
+        $this->exec($this->command . ' string');
+        $this->assertExitWithError();
+    }
+
+    /**
+     * Test for `execute()` method, with no backups
+     * @test
+     */
+    public function testExecuteNoBackups()
+    {
+        $this->exec($this->command . ' 1');
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('No backup has been deleted');
-
-        $this->createSomeBackups(true);
-        $this->exec($command . ' 1');
-        $this->assertExitWithSuccess();
-        $this->assertOutputContains('Backup `backup.sql.bz2` has been deleted');
-        $this->assertOutputContains('Backup `backup.sql` has been deleted');
-        $this->assertOutputContains('<success>Deleted backup files: 2</success>');
-
-        //With an invalid value
-        $this->exec($command . ' string');
-        $this->assertExitWithError();
     }
 }

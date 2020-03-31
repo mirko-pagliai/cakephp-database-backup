@@ -26,27 +26,42 @@ class SendCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * @var string
+     */
+    protected $command = 'database_backup.send -v';
+
+    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $command = 'database_backup.send -v';
         $file = $this->createBackup();
-
-        $this->exec($command . ' ' . $file . ' recipient@example.com');
+        $this->exec($this->command . ' ' . $file . ' recipient@example.com');
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('<success>Backup `' . $file . '` was sent via mail</success>');
+    }
 
-        //With a no existing filename
-        $this->exec($command . ' /noExistingDir/backup.sql');
+    /**
+     * Test for `execute()` method, with no existing file
+     * @test
+     */
+    public function testExecuteNoExistingFile()
+    {
+        $this->exec($this->command . ' /noExistingDir/backup.sql');
         $this->assertExitWithError();
+    }
 
-        //Without a sender in the configuration
+    /**
+     * Test for `execute()` method, with no sender configuration
+     * @test
+     */
+    public function testExecuteNoSender()
+    {
         Configure::write('DatabaseBackup.mailSender', false);
-        $this->exec($command . ' file.sql recipient@example.com');
+        $this->exec($this->command . ' file.sql recipient@example.com');
         $this->assertExitWithError();
     }
 }

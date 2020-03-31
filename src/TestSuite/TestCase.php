@@ -68,19 +68,22 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Internal method to creates some backup files
-     * @param bool $sleep If `true`, waits a second for each backup
      * @return array
      * @uses createBackup()
      */
-    protected function createSomeBackups(bool $sleep = false): array
+    protected function createSomeBackups(): array
     {
-        $files[] = $this->createBackup();
+        $timestamp = time();
 
-        $sleep ? sleep(1) : null;
-        $files[] = $this->createBackup('backup.sql.bz2');
-
-        $sleep ? sleep(1) : null;
-        $files[] = $this->createBackup('backup.sql.gz');
+        foreach ([
+            'sql' => $timestamp - 2,
+            'sql.bz2' => $timestamp - 1,
+            'sql.gz' => $timestamp,
+        ] as $extension => $timestamp) {
+            $file = $this->createBackup('backup_test_' . (string)$timestamp . '.' . $extension);
+            touch($file, $timestamp);
+            $files[] = $file;
+        }
 
         return $files;
     }

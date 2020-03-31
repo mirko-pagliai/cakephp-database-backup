@@ -25,22 +25,31 @@ class ImportCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * @var string
+     */
+    protected $command = 'database_backup.import -v';
+
+    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $command = 'database_backup.import -v';
         $backup = $this->createBackup();
-
-        $this->exec($command . ' ' . $backup);
+        $this->exec($this->command . ' ' . $backup);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
+    }
 
-        //With a no existing filename
-        $this->exec($command . ' /noExistingDir/backup.sql');
+    /**
+     * Test for `execute()` method, with a no existing file
+     * @test
+     */
+    public function testExecuteNoExistingFile()
+    {
+        $this->exec($this->command . ' /noExistingDir/backup.sql');
         $this->assertExitWithError();
     }
 }
