@@ -39,7 +39,7 @@ class ExportCommandTest extends TestCase
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
-        $this->assertOutputRegExp('/Backup `[\w\-\/]+\/backup_test_\d+\.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\d\-\/\\\:]+\/backup_test_\d+\.sql` has been exported/');
     }
 
     /**
@@ -50,7 +50,7 @@ class ExportCommandTest extends TestCase
     {
         $this->exec($this->command . ' --compression bzip2');
         $this->assertExitWithSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/]+\/backup_test_\d+\.sql\.bz2` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\d\-\/\\\:]+\/backup_test_\d+\.sql\.bz2` has been exported/');
     }
 
     /**
@@ -61,7 +61,7 @@ class ExportCommandTest extends TestCase
     {
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitWithSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/]+\/backup.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\d\-\/\\\:]+\/backup.sql` has been exported/');
     }
 
     /**
@@ -73,7 +73,7 @@ class ExportCommandTest extends TestCase
         $files = $this->createSomeBackups();
         $this->exec($this->command . ' --rotate 3 -v');
         $this->assertExitWithSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/]+\/backup_test_\d+\.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\d\-\/\\\:]+\/backup_test_\d+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename(array_value_first($files)) . '` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
     }
@@ -86,8 +86,8 @@ class ExportCommandTest extends TestCase
     {
         $this->exec($this->command . ' --send mymail@example.com');
         $this->assertExitWithSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/]+\/backup_test_\d+\.sql` has been exported/');
-        $this->assertOutputRegExp('/Backup `[\w\-\/]+\/backup_test_\d+\.sql` was sent via mail/');
+        $this->assertOutputRegExp('/Backup `[\w\d\-\/\\\:]+\/backup_test_\d+\.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\d\-\/\\\:]+\/backup_test_\d+\.sql` was sent via mail/');
     }
 
     /**
