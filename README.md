@@ -22,10 +22,6 @@ You can install the plugin via composer:
 $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 ```
 
-```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-assets:dev-cakephp3
-```
-
 Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3)
 branch is compatible with all previous versions of CakePHP from version 3.5.1.
 In this case, you can install the package as well:
