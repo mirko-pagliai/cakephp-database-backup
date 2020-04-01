@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -77,9 +78,8 @@ class BackupManagerTest extends TestCase
      */
     public function testDeleteAll()
     {
-        $this->createSomeBackups(true);
-
-        $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $this->BackupManager->deleteAll());
+        $createdFiles = $this->createSomeBackups();
+        $this->assertEquals(array_reverse(array_map('basename', $createdFiles)), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
         //With a no existing file
@@ -95,10 +95,9 @@ class BackupManagerTest extends TestCase
     public function testIndex()
     {
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', null);
+        create_file(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
 
-        $this->createSomeBackups(true);
-
+        $createdFiles = $this->createSomeBackups();
         $files = $this->BackupManager->index();
 
         //Checks compressions
@@ -107,7 +106,7 @@ class BackupManagerTest extends TestCase
 
         //Checks filenames
         $filenames = $files->extract('filename')->toList();
-        $this->assertEquals(['backup.sql.gz', 'backup.sql.bz2', 'backup.sql'], $filenames);
+        $this->assertEquals(array_reverse(array_map('basename', $createdFiles)), $filenames);
 
         //Checks extensions
         $extensions = $files->extract('extension')->toList();
@@ -129,7 +128,7 @@ class BackupManagerTest extends TestCase
     {
         $this->assertEquals([], $this->BackupManager->rotate(1));
 
-        $this->createSomeBackups(true);
+        $this->createSomeBackups();
 
         $initialFiles = $this->BackupManager->index();
 

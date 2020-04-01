@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -24,25 +25,35 @@ class DeleteAllCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * @var string
+     */
+    protected $command = 'database_backup.delete_all -v';
+
+    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $command = 'database_backup.delete_all -v';
+        $files = $this->createSomeBackups();
+        $this->exec($this->command);
+        $this->assertExitWithSuccess();
+        foreach ($files as $file) {
+            $this->assertOutputContains('Backup `' . basename($file) . '` has been deleted');
+        }
+        $this->assertOutputContains('<success>Deleted backup files: 3</success>');
+    }
 
-        $this->exec($command);
+    /**
+     * Test for `execute()` method, with no backups
+     * @test
+     */
+    public function testExecuteNoBackups()
+    {
+        $this->exec($this->command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('No backup has been deleted');
-
-        $this->createSomeBackups(true);
-        $this->exec($command);
-        $this->assertExitWithSuccess();
-        $this->assertOutputContains('Backup `backup.sql.gz` has been deleted');
-        $this->assertOutputContains('Backup `backup.sql.bz2` has been deleted');
-        $this->assertOutputContains('Backup `backup.sql` has been deleted');
-        $this->assertOutputContains('<success>Deleted backup files: 3</success>');
     }
 }

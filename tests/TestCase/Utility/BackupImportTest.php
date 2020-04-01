@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -91,7 +92,7 @@ class BackupImportTest extends TestCase
         //With invalid extension
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid file extension');
-        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'backup.txt', null);
+        create_file(Configure::read('DatabaseBackup.target') . DS . 'backup.txt');
         $this->BackupImport->filename('backup.txt');
     }
 

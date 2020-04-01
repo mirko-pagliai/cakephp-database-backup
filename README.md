@@ -4,7 +4,7 @@
 [![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-database-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-database-backup)
 [![Build status](https://ci.appveyor.com/api/projects/status/imerokwpvy0r51fj/branch/master?svg=true)](https://ci.appveyor.com/project/mirko-pagliai/cakephp-database-backup/branch/master)
 [![codecov](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup/branch/master/graph/badge.svg)](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup)
-[![CodeFactor](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/badge/develop)](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/overview/develop)
+[![CodeFactor](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/badge)](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup)
 
 *DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.
 Currently, the plugin supports *MySql*, *Postgres* and *Sqlite* databases.
@@ -20,10 +20,6 @@ You can install the plugin via composer:
 
 ```bash
 $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
-```
-
-```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-assets:dev-cakephp3
 ```
 
 Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3)

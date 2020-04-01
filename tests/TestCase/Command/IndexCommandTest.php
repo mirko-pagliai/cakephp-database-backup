@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -24,25 +25,35 @@ class IndexCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * @var string
+     */
+    protected $command = 'database_backup.index -v';
+
+    /**
      * Test for `execute()` method
      * @test
      */
     public function testExecute()
     {
-        $command = 'database_backup.index -v';
-
-        $this->exec($command);
-        $this->assertExitWithSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputContains('Driver: Mysql');
-        $this->assertOutputContains('Backup files found: 0');
-
-        $this->createSomeBackups(true);
-        $this->exec($command);
+        $this->createSomeBackups();
+        $this->exec($this->command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Backup files found: 3');
         $this->assertOutputRegExp('/backup\.sql\.gz\s+|\s+sql\.gz\s+|\s+gzip\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
         $this->assertOutputRegExp('/backup\.sql\.bz2\s+|\s+sql\.bz2\s+|\s+bzip2\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
         $this->assertOutputRegExp('/backup\.sq\s+|\s+sql\s+|\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
+    }
+
+    /**
+     * Test for `execute()` method, with no backups
+     * @test
+     */
+    public function testExecuteNoBackups()
+    {
+        $this->exec($this->command);
+        $this->assertExitWithSuccess();
+        $this->assertOutputContains('Connection: test');
+        $this->assertOutputContains('Driver: Mysql');
+        $this->assertOutputContains('Backup files found: 0');
     }
 }
