@@ -95,7 +95,7 @@ class BackupManagerTest extends TestCase
     public function testIndex()
     {
         //Creates a text file. This file should be ignored
-        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', null);
+        create_file(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
 
         $createdFiles = $this->createSomeBackups();
         $files = $this->BackupManager->index();
