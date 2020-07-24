@@ -122,10 +122,10 @@ class Mysql extends Driver
      */
     public function beforeExport(): bool
     {
-        return $this->writeAuthFile("[mysqldump]" . PHP_EOL .
-            "user={{USER}}" . PHP_EOL .
-            "password=\"{{PASSWORD}}\"" . PHP_EOL .
-            "host={{HOST}}");
+        return $this->writeAuthFile('[mysqldump]' . PHP_EOL .
+            'user={{USER}}' . PHP_EOL .
+            'password="{{PASSWORD}}"' . PHP_EOL .
+            'host={{HOST}}');
     }
 
     /**
@@ -144,10 +144,10 @@ class Mysql extends Driver
      */
     public function beforeImport(): bool
     {
-        return $this->writeAuthFile("[client]" . PHP_EOL .
-            "user={{USER}}" . PHP_EOL .
-            "password=\"{{PASSWORD}}\"" . PHP_EOL .
-            "host={{HOST}}");
+        return $this->writeAuthFile('[client]' . PHP_EOL .
+            'user={{USER}}' . PHP_EOL .
+            'password="{{PASSWORD}}"' . PHP_EOL .
+            'host={{HOST}}');
     }
 
     /**
