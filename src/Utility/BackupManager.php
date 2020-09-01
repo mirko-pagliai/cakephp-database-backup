@@ -24,6 +24,7 @@ use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Tools\Exceptionist;
 
 /**
  * Utility to manage database backups
@@ -38,12 +39,13 @@ class BackupManager
      *  The path can be relative to the backup directory
      * @return bool
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
+     * @throws \Tools\Exception\FileNotExistsException
      * @throws \Tools\Exception\NotWritableException
      */
     public function delete(string $filename): bool
     {
         $filename = $this->getAbsolutePath($filename);
-        is_writable_or_fail($filename);
+        Exceptionist::isWritable($filename);
 
         return unlink($filename);
     }
@@ -98,7 +100,7 @@ class BackupManager
      */
     public function rotate(int $rotate): array
     {
-        is_true_or_fail(
+        Exceptionist::isTrue(
             is_positive($rotate),
             __d('database_backup', 'Invalid rotate value'),
             InvalidArgumentException::class
@@ -121,7 +123,7 @@ class BackupManager
     protected function getEmailInstance(string $backup, string $recipient): Email
     {
         $file = $this->getAbsolutePath($backup);
-        is_readable_or_fail($file);
+        Exceptionist::isReadable($file);
         $basename = basename($file);
         $server = env('SERVER_NAME', 'localhost');
 
