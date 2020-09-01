@@ -17,6 +17,7 @@ namespace DatabaseBackup\Utility;
 
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
+use Tools\Exceptionist;
 
 /**
  * Utility to import databases
@@ -60,10 +61,10 @@ class BackupImport
     public function filename(string $filename)
     {
         $filename = $this->getAbsolutePath($filename);
-        is_readable_or_fail($filename);
+        Exceptionist::isReadable($filename);
 
         //Checks for extension
-        is_true_or_fail(
+        Exceptionist::isTrue(
             $this->getExtension($filename),
             __d('database_backup', 'Invalid file extension'),
             InvalidArgumentException::class
@@ -84,7 +85,7 @@ class BackupImport
      */
     public function import(): string
     {
-        is_true_or_fail(
+        Exceptionist::isTrue(
             !empty($this->filename),
             __d('database_backup', 'You must first set the filename'),
             InvalidArgumentException::class

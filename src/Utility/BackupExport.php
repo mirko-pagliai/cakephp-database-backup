@@ -19,6 +19,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
+use Tools\Exceptionist;
 
 /**
  * Utility to export databases
@@ -116,7 +117,7 @@ class BackupExport
 
         if ($compression) {
             $this->extension = array_search($compression, $this->getValidCompressions());
-            is_true_or_fail(
+            Exceptionist::isTrue(
                 $this->extension,
                 __d('database_backup', 'Invalid compression type'),
                 InvalidArgumentException::class
@@ -153,11 +154,11 @@ class BackupExport
         ], $filename);
 
         $filename = $this->getAbsolutePath($filename);
-        is_writable_or_fail(dirname($filename));
-        is_true_or_fail(!file_exists($filename), __d('database_backup', 'File `{0}` already exists', $filename));
+        Exceptionist::isWritable(dirname($filename));
+        Exceptionist::isTrue(!file_exists($filename), __d('database_backup', 'File `{0}` already exists', $filename));
 
         //Checks for extension
-        is_true_or_fail(
+        Exceptionist::isTrue(
             $this->getExtension($filename),
             __d('database_backup', 'Invalid file extension'),
             InvalidArgumentException::class

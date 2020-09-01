@@ -86,7 +86,7 @@ class BackupImportTest extends TestCase
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);
-        $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir' . DS . 'backup.sql') . '` is not readable');
+        $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir' . DS . 'backup.sql') . '` does not exist');
         $this->BackupImport->filename('noExistingDir' . DS . 'backup.sql');
 
         //With invalid extension

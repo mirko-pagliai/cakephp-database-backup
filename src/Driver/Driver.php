@@ -20,6 +20,7 @@ use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
 use RuntimeException;
+use Tools\Exceptionist;
 
 /**
  * Represents a driver containing all methods to export/import database backups
@@ -187,7 +188,7 @@ abstract class Driver implements EventListenerInterface
         }
 
         exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
-        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterExport');
 
@@ -203,7 +204,7 @@ abstract class Driver implements EventListenerInterface
     public function getBinary($name)
     {
         $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-        is_true_or_fail($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
+        Exceptionist::isTrue($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
 
         return $binary;
     }
@@ -244,7 +245,7 @@ abstract class Driver implements EventListenerInterface
         }
 
         exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
-        is_true_or_fail($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterImport');
 

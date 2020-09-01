@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.8 branch
+### 2.8.2
+* updated for `php-tools` 1.4.1.
+
 ### 2.8.1
 * fixed I18n translations;
 * fixed [bug for `Command` class](https://github.com/mirko-pagliai/cakephp-database-backup/pull/54).

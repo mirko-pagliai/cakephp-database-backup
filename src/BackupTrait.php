@@ -20,6 +20,7 @@ use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
+use Tools\Exceptionist;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -87,7 +88,7 @@ trait BackupTrait
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-        is_true_or_fail(
+        Exceptionist::isTrue(
             $driver,
             __d('database_backup', 'The `{0}` driver does not exist', $className),
             InvalidArgumentException::class
