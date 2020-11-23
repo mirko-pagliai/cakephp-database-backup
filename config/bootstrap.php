@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
+use Tools\Filesystem;
 
 //Sets the redirect to `/dev/null`. This string can be concatenated to shell commands
 if (!defined('REDIRECT_TO_DEV_NULL')) {
@@ -46,13 +47,12 @@ if (!Configure::check('DatabaseBackup.redirectStderrToDevNull')) {
 
 //Default target directory
 if (!Configure::check('DatabaseBackup.target')) {
-    Configure::write('DatabaseBackup.target', ROOT . DS . 'backups');
+    Configure::write('DatabaseBackup.target', (new Filesystem())->addSlashTerm(ROOT) . 'backups');
 }
 
 //Checks for the target directory
 $target = Configure::read('DatabaseBackup.target');
-@mkdir($target);
-
+@mkdir($target, 0777);
 if (!is_writeable($target)) {
     trigger_error(sprintf('Directory %s not writeable', $target), E_USER_ERROR);
 }

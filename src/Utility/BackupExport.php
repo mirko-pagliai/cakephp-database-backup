@@ -18,8 +18,8 @@ namespace DatabaseBackup\Utility;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
-use Symfony\Component\Filesystem\Filesystem;
 use Tools\Exceptionist;
+use Tools\Filesystem;
 
 /**
  * Utility to export databases
@@ -117,11 +117,7 @@ class BackupExport
 
         if ($compression) {
             $this->extension = array_search($compression, $this->getValidCompressions());
-            Exceptionist::isTrue(
-                $this->extension,
-                __d('database_backup', 'Invalid compression type'),
-                InvalidArgumentException::class
-            );
+            Exceptionist::isTrue($this->extension, __d('database_backup', 'Invalid compression type'), InvalidArgumentException::class);
         }
         $this->compression = $compression;
 
@@ -149,7 +145,7 @@ class BackupExport
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
             pathinfo($this->config['database'], PATHINFO_FILENAME),
             date('YmdHis'),
-            empty($this->config['host']) ? 'localhost' : $this->config['host'],
+            $this->config['host'] ?? 'localhost',
             time(),
         ], $filename);
 
@@ -158,11 +154,7 @@ class BackupExport
         Exceptionist::isTrue(!file_exists($filename), __d('database_backup', 'File `{0}` already exists', $filename));
 
         //Checks for extension
-        Exceptionist::isTrue(
-            $this->getExtension($filename),
-            __d('database_backup', 'Invalid file extension'),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid file extension'), InvalidArgumentException::class);
 
         //Sets the compression
         $this->compression($this->getCompression($filename));
@@ -216,7 +208,7 @@ class BackupExport
     public function export(): string
     {
         if (empty($this->filename)) {
-            $this->extension = $this->extension ?: $this->defaultExtension;
+            $this->extension = $this->extension ?? $this->defaultExtension;
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 

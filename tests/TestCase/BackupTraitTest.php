@@ -52,7 +52,7 @@ class BackupTraitTest extends TestCase
      */
     public function testGetAbsolutePath()
     {
-        $this->assertEquals('/file.txt', $this->getAbsolutePath('/file.txt'));
+        $this->assertEquals(DS . 'file.txt', $this->getAbsolutePath(DS . 'file.txt'));
         $this->assertEquals(Configure::read('DatabaseBackup.target') . DS . 'file.txt', $this->getAbsolutePath('file.txt'));
         $expected = Configure::read('DatabaseBackup.target') . DS . 'file.txt';
         $this->assertEquals($expected, $this->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
@@ -92,7 +92,6 @@ class BackupTraitTest extends TestCase
             $this->assertInstanceof(CakeMysql::class, $connection->getDriver());
         }
 
-        //With an invalid connection
         $this->expectException(MissingDatasourceConfigException::class);
         $this->expectExceptionMessage('The datasource configuration "noExisting" was not found');
         $this->getConnection('noExisting');

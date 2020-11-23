@@ -56,7 +56,7 @@ class ImportCommand extends Command
 
         try {
             $file = (new BackupImport())->filename($args->getArgument('filename'))->import();
-            $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->Filesystem->rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();

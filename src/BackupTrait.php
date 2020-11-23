@@ -19,8 +19,8 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use InvalidArgumentException;
-use Symfony\Component\Filesystem\Filesystem;
 use Tools\Exceptionist;
+use Tools\Filesystem;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -41,8 +41,9 @@ trait BackupTrait
      */
     public function getAbsolutePath(string $path): string
     {
-        if (!(new Filesystem())->isAbsolutePath($path)) {
-            return add_slash_term(Configure::read('DatabaseBackup.target')) . $path;
+        $Filesystem = new Filesystem();
+        if (!$Filesystem->isAbsolutePath($path)) {
+            return $Filesystem->addSlashTerm(Configure::read('DatabaseBackup.target')) . $path;
         }
 
         return $path;
@@ -88,11 +89,7 @@ trait BackupTrait
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-        Exceptionist::isTrue(
-            $driver,
-            __d('database_backup', 'The `{0}` driver does not exist', $className),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isTrue($driver, __d('database_backup', 'The `{0}` driver does not exist', $className), InvalidArgumentException::class);
 
         return new $driver($connection);
     }
@@ -106,7 +103,7 @@ trait BackupTrait
      */
     public function getExtension(string $filename): ?string
     {
-        $extension = get_extension($filename);
+        $extension = (new Filesystem())->getExtension($filename);
 
         return in_array($extension, array_keys(self::$validExtensions)) ? $extension : null;
     }

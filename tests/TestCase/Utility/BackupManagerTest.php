@@ -23,6 +23,7 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use Tools\Exception\NotReadableException;
+use Tools\Filesystem;
 
 /**
  * BackupManagerTest class
@@ -49,8 +50,8 @@ class BackupManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport();
-        $this->BackupManager = new BackupManager();
+        $this->BackupExport = $this->BackupExport ?? new BackupExport();
+        $this->BackupManager = $this->BackupManager ?? new BackupManager();
     }
 
     /**
@@ -81,7 +82,6 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(array_reverse(array_map('basename', $createdFiles)), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
-        //With a no existing file
         $this->expectException(NotReadableException::class);
         $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` does not exist');
         $this->BackupManager->delete('noExistingFile');
@@ -94,7 +94,7 @@ class BackupManagerTest extends TestCase
     public function testIndex()
     {
         //Creates a text file. This file should be ignored
-        create_file(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
+        (new Filesystem())->createFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
 
         $createdFiles = $this->createSomeBackups();
         $files = $this->BackupManager->index();
@@ -133,11 +133,11 @@ class BackupManagerTest extends TestCase
 
         //Keeps 2 backups. Only 1 backup was deleted
         $rotate = $this->BackupManager->rotate(2);
-        $this->assertEquals(1, count($rotate));
+        $this->assertCount(1, $rotate);
 
         //Now there are two files. Only uncompressed file was deleted
         $filesAfterRotate = $this->BackupManager->index();
-        $this->assertEquals(2, $filesAfterRotate->count());
+        $this->assertCount(2, $filesAfterRotate);
         $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
@@ -146,12 +146,11 @@ class BackupManagerTest extends TestCase
         });
 
         //Again, only 1 backup was deleted
-        $this->assertEquals(1, count($diff));
+        $this->assertCount(1, $diff);
 
         //The difference is the same
         $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
 
-        //With an invalid value
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupManager->rotate(-1);

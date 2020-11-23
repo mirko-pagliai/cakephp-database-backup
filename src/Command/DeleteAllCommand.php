@@ -57,7 +57,7 @@ class DeleteAllCommand extends Command
         }
 
         foreach ($files as $file) {
-            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', rtr($file)));
+            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $this->Filesystem->rtr($file)));
         }
 
         $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));

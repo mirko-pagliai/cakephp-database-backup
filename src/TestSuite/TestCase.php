@@ -19,12 +19,15 @@ use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupExport;
 use MeTools\TestSuite\TestCase as BaseTestCase;
+use Tools\Filesystem;
+use Tools\TestSuite\BackwardCompatibilityTrait;
 
 /**
  * TestCase class
  */
 abstract class TestCase extends BaseTestCase
 {
+    use BackwardCompatibilityTrait;
     use BackupTrait;
 
     /**
@@ -41,7 +44,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?: new BackupExport();
+        $this->BackupExport = $this->BackupExport ?? new BackupExport();
     }
 
     /**
@@ -51,7 +54,7 @@ abstract class TestCase extends BaseTestCase
     public function tearDown(): void
     {
         //Deletes all backup files
-        unlink_recursive(Configure::read('DatabaseBackup.target'));
+        (new Filesystem())->unlinkRecursive(Configure::read('DatabaseBackup.target'));
 
         parent::tearDown();
     }

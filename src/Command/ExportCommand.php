@@ -93,7 +93,7 @@ class ExportCommand extends Command
 
             //Exports
             $file = $instance->export();
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->Filesystem->rtr($file)));
             $verbose = $args->getOption('verbose');
             $quiet = $args->getOption('quiet');
 

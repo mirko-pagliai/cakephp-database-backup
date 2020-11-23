@@ -45,9 +45,8 @@ class BackupManager
     public function delete(string $filename): bool
     {
         $filename = $this->getAbsolutePath($filename);
-        Exceptionist::isWritable($filename);
 
-        return unlink($filename);
+        return unlink(Exceptionist::isWritable($filename));
     }
 
     /**
@@ -100,11 +99,7 @@ class BackupManager
      */
     public function rotate(int $rotate): array
     {
-        Exceptionist::isTrue(
-            is_positive($rotate),
-            __d('database_backup', 'Invalid rotate value'),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
         $backupsToBeDeleted = $this->index()->skip((int)$rotate);
         array_map([$this, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 

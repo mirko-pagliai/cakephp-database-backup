@@ -19,7 +19,6 @@ use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
-use RuntimeException;
 use Tools\Exceptionist;
 
 /**
@@ -182,7 +181,6 @@ abstract class Driver implements EventListenerInterface
     final public function export(string $filename): bool
     {
         $beforeExport = $this->dispatchEvent('Backup.beforeExport');
-
         if ($beforeExport->isStopped()) {
             return false;
         }
@@ -199,14 +197,13 @@ abstract class Driver implements EventListenerInterface
      * Gets a binary path
      * @param string $name Binary name
      * @return string
-     * @throws \RuntimeException
+     * @throws \ErrorException
      */
     public function getBinary($name)
     {
         $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-        Exceptionist::isTrue($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
 
-        return $binary;
+        return Exceptionist::isTrue($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
     }
 
     /**
@@ -239,7 +236,6 @@ abstract class Driver implements EventListenerInterface
     final public function import(string $filename): bool
     {
         $beforeImport = $this->dispatchEvent('Backup.beforeImport');
-
         if ($beforeImport->isStopped()) {
             return false;
         }

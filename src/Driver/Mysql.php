@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 use DatabaseBackup\Driver\Driver;
+use Tools\Filesystem;
 
 /**
  * Mysql driver to export/import database backups
@@ -79,7 +80,7 @@ class Mysql extends Driver
             $content
         );
 
-        $this->auth = create_tmp_file($content, null, 'auth');
+        $this->auth = (new Filesystem())->createTmpFile($content, null, 'auth');
 
         return $this->auth !== false;
     }
