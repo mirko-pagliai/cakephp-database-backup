@@ -76,7 +76,7 @@ class Mysql extends Driver
     {
         $content = str_replace(
             ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
-            [$this->getConfig('username'), $this->getConfig('password'), $this->getConfig('host')],
+            [(string)$this->getConfig('username'), (string)$this->getConfig('password'), (string)$this->getConfig('host')],
             $content
         );
 

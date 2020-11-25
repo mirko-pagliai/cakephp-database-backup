@@ -101,7 +101,7 @@ class ExportCommand extends Command
             if ($args->getOption('send')) {
                 $SendCommand = new SendCommand();
                 $SendCommand->execute(new Arguments(
-                    [$file, $args->getOption('send')],
+                    [$file, (string)$args->getOption('send')],
                     compact('verbose', 'quiet'),
                     $SendCommand->getOptionParser()->argumentNames()
                 ), $io);
@@ -111,7 +111,7 @@ class ExportCommand extends Command
             if ($args->getOption('rotate')) {
                 $RotateCommand = new RotateCommand();
                 $RotateCommand->execute(new Arguments(
-                    [$args->getOption('rotate')],
+                    [(string)$args->getOption('rotate')],
                     compact('verbose', 'quiet'),
                     $RotateCommand->getOptionParser()->argumentNames()
                 ), $io);

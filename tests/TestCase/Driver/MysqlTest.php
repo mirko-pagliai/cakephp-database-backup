@@ -23,7 +23,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class MysqlTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Mysql
+     * @var string
      */
     protected $DriverClass = Mysql::class;
 
@@ -92,7 +92,7 @@ class MysqlTest extends DriverTestCase
     {
         $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
         $driver->expects($this->once())->method('deleteAuthFile');
-        $this->assertNull($driver->afterExport());
+        $driver->afterExport();
     }
 
     /**
@@ -103,7 +103,7 @@ class MysqlTest extends DriverTestCase
     {
         $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
         $driver->expects($this->once())->method('deleteAuthFile');
-        $this->assertNull($driver->afterImport());
+        $driver->afterImport();
     }
 
     /**

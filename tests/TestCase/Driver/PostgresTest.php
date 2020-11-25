@@ -24,7 +24,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class PostgresTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Postgres
+     * @var string
      */
     protected $DriverClass = Postgres::class;
 

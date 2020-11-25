@@ -15,7 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
-use Cake\Collection\Collection;
+use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
@@ -66,11 +66,11 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return \Cake\Collection\Collection Collection of backups. Each backup
+     * @return \Cake\Collection\CollectionInterface Collection of backups. Each backup
      *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public function index(): Collection
+    public function index(): CollectionInterface
     {
         $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::read('DatabaseBackup.target'));
 

@@ -31,5 +31,28 @@
             "Cake\\Test\\": "vendor/cakephp/cakephp/tests",
             "DatabaseBackup\\Test\\": "tests"
         }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@update-lowest",
+            "@test",
+            "@composer update",
+            "@test",
+            "@stan-setup",
+            "@stan"
+        ],
+        "cs-check": "phpcs --standard=phpcs.xml.dist",
+        "cs-fix": "phpcbf --standard=phpcs.xml.dist",
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "phpstan": "phpstan.phar analyse",
+        "psalm": "psalm.phar",
+        "stan": [
+            "@phpstan",
+            "@psalm"
+        ],
+        "stan-setup": "cp composer.json composer.backup && composer require --dev phpstan/phpstan:^0.12 psalm/phar:^3.18 && mv composer.backup composer.json",
+        "update-lowest": "@composer update --prefer-lowest"
     }
 }

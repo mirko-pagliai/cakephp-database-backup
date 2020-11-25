@@ -34,7 +34,7 @@ class BackupImportTest extends TestCase
     protected $BackupExport;
 
     /**
-     * @var \DatabaseBackup\Utility\$BackupImport
+     * @var \DatabaseBackup\Utility\BackupImport
      */
     protected $BackupImport;
 
