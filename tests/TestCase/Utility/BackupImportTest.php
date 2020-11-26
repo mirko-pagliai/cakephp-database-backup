@@ -21,6 +21,7 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 use InvalidArgumentException;
 use Tools\Exception\NotReadableException;
+use Tools\Filesystem;
 
 /**
  * BackupImportTest class
@@ -33,7 +34,7 @@ class BackupImportTest extends TestCase
     protected $BackupExport;
 
     /**
-     * @var \DatabaseBackup\Utility\$BackupImport
+     * @var \DatabaseBackup\Utility\BackupImport
      */
     protected $BackupImport;
 
@@ -45,8 +46,8 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport();
-        $this->BackupImport = new BackupImport();
+        $this->BackupExport = $this->BackupExport ?? new BackupExport();
+        $this->BackupImport = $this->BackupImport ?? new BackupImport();
     }
 
     /**
@@ -92,7 +93,8 @@ class BackupImportTest extends TestCase
         //With invalid extension
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid file extension');
-        create_file(Configure::read('DatabaseBackup.target') . DS . 'backup.txt');
+        $Filesystem = new Filesystem();
+        $Filesystem->createFile($Filesystem->addSlashTerm(Configure::read('DatabaseBackup.target')) . 'backup.txt');
         $this->BackupImport->filename('backup.txt');
     }
 
@@ -117,7 +119,6 @@ class BackupImportTest extends TestCase
         $filename = $this->BackupImport->filename($backup)->import();
         $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
 
-        //Without filename
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();

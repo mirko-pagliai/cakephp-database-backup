@@ -39,15 +39,20 @@ define('CONFIG', APP . 'config' . DS);
 define('CACHE', TMP . 'cache' . DS);
 define('LOGS', TMP . 'cakephp_log' . DS);
 define('SESSIONS', TMP . 'sessions' . DS);
-@mkdir(TMP);
-@mkdir(LOGS);
-@mkdir(SESSIONS);
-@mkdir(CACHE);
-@mkdir(CACHE . 'views');
-@mkdir(CACHE . 'models');
+
+foreach ([
+    TMP,
+    LOGS,
+    SESSIONS,
+    CACHE . 'models',
+    CACHE . 'persistent',
+    CACHE . 'views',
+] as $dir) {
+    @mkdir($dir, 0777, true);
+}
 
 require dirname(__DIR__) . '/vendor/autoload.php';
-require CORE_PATH . 'config' . DS . 'bootstrap.php';
+require_once CORE_PATH . 'config' . DS . 'bootstrap.php';
 
 Configure::write('debug', true);
 Configure::write('App', [

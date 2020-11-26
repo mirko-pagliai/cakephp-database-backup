@@ -64,11 +64,7 @@ class BackupImport
         Exceptionist::isReadable($filename);
 
         //Checks for extension
-        Exceptionist::isTrue(
-            $this->getExtension($filename),
-            __d('database_backup', 'Invalid file extension'),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid file extension'), InvalidArgumentException::class);
 
         $this->filename = $filename;
 
@@ -85,11 +81,7 @@ class BackupImport
      */
     public function import(): string
     {
-        Exceptionist::isTrue(
-            !empty($this->filename),
-            __d('database_backup', 'You must first set the filename'),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isTrue(!empty($this->filename), __d('database_backup', 'You must first set the filename'), InvalidArgumentException::class);
 
         //This allows the filename to be set again with a next call of this
         //  method

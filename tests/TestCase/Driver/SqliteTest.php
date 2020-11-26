@@ -23,7 +23,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class SqliteTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Sqlite
+     * @var string
      */
     protected $DriverClass = Sqlite::class;
 

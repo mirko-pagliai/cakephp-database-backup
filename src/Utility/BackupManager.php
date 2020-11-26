@@ -15,7 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
-use Cake\Collection\Collection;
+use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
@@ -45,9 +45,8 @@ class BackupManager
     public function delete(string $filename): bool
     {
         $filename = $this->getAbsolutePath($filename);
-        Exceptionist::isWritable($filename);
 
-        return unlink($filename);
+        return unlink(Exceptionist::isWritable($filename));
     }
 
     /**
@@ -67,11 +66,11 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return \Cake\Collection\Collection Collection of backups. Each backup
+     * @return \Cake\Collection\CollectionInterface Collection of backups. Each backup
      *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public function index(): Collection
+    public function index(): CollectionInterface
     {
         $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::read('DatabaseBackup.target'));
 
@@ -100,11 +99,7 @@ class BackupManager
      */
     public function rotate(int $rotate): array
     {
-        Exceptionist::isTrue(
-            is_positive($rotate),
-            __d('database_backup', 'Invalid rotate value'),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
         $backupsToBeDeleted = $this->index()->skip((int)$rotate);
         array_map([$this, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 

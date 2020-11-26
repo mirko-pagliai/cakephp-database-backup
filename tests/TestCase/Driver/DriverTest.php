@@ -19,7 +19,6 @@ use Cake\Database\Connection;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use ErrorException;
-use RuntimeException;
 
 /**
  * DriverTest class
@@ -40,7 +39,7 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->Driver = new Mysql($this->getConnection('test'));
+        $this->Driver = $this->Driver ?? new Mysql($this->getConnection('test'));
     }
 
     /**
@@ -62,8 +61,7 @@ class DriverTest extends TestCase
     public function testExportOnFailure()
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
-        //Sets a no existing database
+        $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
         $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
         $this->Driver->export($this->getAbsolutePath('example.sql'));
@@ -93,7 +91,7 @@ class DriverTest extends TestCase
         $this->assertEquals(which('mysql'), $this->invokeMethod($this->Driver, 'getBinary', ['mysql']));
 
         //With a binary not available
-        $this->expectException(RuntimeException::class);
+        $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
         $this->invokeMethod($this->Driver, 'getBinary', ['noExisting']);
     }
@@ -105,8 +103,7 @@ class DriverTest extends TestCase
      */
     public function testGetConfig()
     {
-        $this->assertNotEmpty($this->Driver->getConfig());
-        $this->assertIsArray($this->Driver->getConfig());
+        $this->assertIsArrayNotEmpty($this->Driver->getConfig());
         $this->assertNotEmpty($this->Driver->getConfig('name'));
         $this->assertNull($this->Driver->getConfig('noExistingKey'));
     }
@@ -119,13 +116,10 @@ class DriverTest extends TestCase
      */
     public function testImportOnFailure()
     {
-        $backup = $this->getAbsolutePath('example.sql');
-
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
+        $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
+        $backup = $this->getAbsolutePath('example.sql');
         $this->Driver->export($backup);
-
-        //Sets a no existing database
         $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
         $this->Driver->import($backup);

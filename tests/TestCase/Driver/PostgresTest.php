@@ -24,7 +24,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class PostgresTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Postgres
+     * @var string
      */
     protected $DriverClass = Postgres::class;
 
@@ -70,7 +70,7 @@ class PostgresTest extends DriverTestCase
         $expected = sprintf(
             '%s --format=c -b --dbname=postgresql://postgres%s@localhost/travis_ci_test',
             $this->Driver->getBinary('pg_dump'),
-            $password ? ':' . $password : null
+            $password ? ':' . $password : ''
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
@@ -85,7 +85,7 @@ class PostgresTest extends DriverTestCase
         $expected = sprintf(
             '%s --format=c -c -e --dbname=postgresql://postgres%s@localhost/travis_ci_test',
             $this->Driver->getBinary('pg_restore'),
-            $password ? ':' . $password : null
+            $password ? ':' . $password : ''
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }

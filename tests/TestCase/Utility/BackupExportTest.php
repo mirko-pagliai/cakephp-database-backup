@@ -22,7 +22,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
-use Tools\Exception\NotWritableException;
+use Tools\Filesystem;
 
 /**
  * BackupExportTest class
@@ -40,26 +40,28 @@ class BackupExportTest extends TestCase
      */
     public function setUp(): void
     {
+        if (!$this->BackupExport) {
+            $this->BackupExport = new BackupExport();
+
+            //Mocks the `send()` method of `BackupManager` class, so that it writes
+            //  on the debug log instead of sending a real mail
+            $this->BackupExport->BackupManager = $this->getMockBuilder(BackupManager::class)
+                ->setMethods(['send'])
+                ->getMock();
+
+            $this->BackupExport->BackupManager->method('send')
+                ->will($this->returnCallback(function () {
+                    $args = implode(', ', array_map(function ($arg) {
+                        return '`' . $arg . '`';
+                    }, func_get_args()));
+
+                    Log::write('debug', 'Called `send()` with args: ' . $args);
+
+                    return func_get_args();
+                }));
+        }
+
         parent::setUp();
-
-        $this->BackupExport = new BackupExport();
-
-        //Mocks the `send()` method of `BackupManager` class, so that it writes
-        //  on the debug log instead of sending a real mail
-        $this->BackupExport->BackupManager = $this->getMockBuilder(BackupManager::class)
-            ->setMethods(['send'])
-            ->getMock();
-
-        $this->BackupExport->BackupManager->method('send')
-            ->will($this->returnCallback(function () {
-                $args = implode(', ', array_map(function ($arg) {
-                    return '`' . $arg . '`';
-                }, func_get_args()));
-
-                Log::write('debug', 'Called `send()` with args: ' . $args);
-
-                return func_get_args();
-            }));
     }
 
     /**
@@ -70,7 +72,7 @@ class BackupExportTest extends TestCase
     {
         parent::tearDown();
 
-        @unlink_recursive(LOGS, 'empty');
+        (new Filesystem())->unlinkRecursive(LOGS, 'empty');
     }
 
     /**
@@ -121,7 +123,7 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename('backup.sql.bz2');
         $this->assertEquals(
-            add_slash_term(Configure::read('DatabaseBackup.target')) . 'backup.sql.bz2',
+            (new Filesystem())->addSlashTerm(Configure::read('DatabaseBackup.target')) . 'backup.sql.bz2',
             $this->getProperty($this->BackupExport, 'filename')
         );
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
@@ -149,10 +151,6 @@ class BackupExportTest extends TestCase
         $this->BackupExport->filename('{$TIMESTAMP}.sql');
         $this->assertRegExp('/^\d{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
 
-        //With a no writable directory
-        $this->expectException(NotWritableException::class);
-        $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir') . '` is not writable');
-
         //With invalid extension
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid file extension');
@@ -168,7 +166,6 @@ class BackupExportTest extends TestCase
         $this->BackupExport->rotate(10);
         $this->assertEquals(10, $this->getProperty($this->BackupExport, 'rotate'));
 
-        //With an invalid value
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupExport->rotate(-1)->export();
@@ -228,6 +225,6 @@ class BackupExportTest extends TestCase
     {
         Configure::write('DatabaseBackup.chmod', 0777);
         $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertFilePerms(0777, $filename);
+        $this->assertFileIsWritable($filename);
     }
 }
