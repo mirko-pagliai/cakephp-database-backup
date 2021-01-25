@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.8 branch
 ### 2.8.4
+* little fixes for code and descriptions;
 * ready for `phpunit` 9.
 
 ### 2.8.3

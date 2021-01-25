@@ -25,6 +25,7 @@ use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Tools\Exceptionist;
+use Tools\Filesystem;
 
 /**
  * Utility to manage database backups
@@ -45,13 +46,14 @@ class BackupManager
     public function delete(string $filename): bool
     {
         $filename = $this->getAbsolutePath($filename);
+        (new Filesystem())->remove(Exceptionist::isWritable($filename));
 
-        return unlink(Exceptionist::isWritable($filename));
+        return true;
     }
 
     /**
      * Deletes all backup files
-     * @return array List of deleted backup files
+     * @return array<string|true> List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
      * @uses delete()
@@ -91,7 +93,7 @@ class BackupManager
      * You must indicate the number of backups you want to keep. So, it will
      *  delete all backups that are older.
      * @param int $rotate Number of backups that you want to keep
-     * @return array Array of deleted files
+     * @return array<\Cake\ORM\Entity> Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws \InvalidArgumentException
      * @uses delete()
@@ -118,8 +120,7 @@ class BackupManager
     protected function getEmailInstance(string $backup, string $recipient): Email
     {
         $file = $this->getAbsolutePath($backup);
-        Exceptionist::isReadable($file);
-        $basename = basename($file);
+        $basename = basename(Exceptionist::isReadable($file));
         $server = env('SERVER_NAME', 'localhost');
 
         return (new Email())

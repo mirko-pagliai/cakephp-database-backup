@@ -35,18 +35,13 @@ trait BackupTrait
     protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
     /**
-     * Returns an absolute path
+     * Returns the absolute path for a backup file
      * @param string $path Relative or absolute path
      * @return string
      */
     public function getAbsolutePath(string $path): string
     {
-        $Filesystem = new Filesystem();
-        if (!$Filesystem->isAbsolutePath($path)) {
-            return $Filesystem->addSlashTerm(Configure::read('DatabaseBackup.target')) . $path;
-        }
-
-        return $path;
+        return (new Filesystem())->makePathAbsolute($path, Configure::read('DatabaseBackup.target'));
     }
 
     /**
@@ -110,7 +105,7 @@ trait BackupTrait
 
     /**
      * Returns all valid compressions
-     * @return array
+     * @return array<string, string>
      * @since 2.4.0
      * @uses $validExtensions
      */
