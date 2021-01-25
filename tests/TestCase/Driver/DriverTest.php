@@ -79,7 +79,7 @@ class DriverTest extends TestCase
         $Driver = $this->getMockForDriver(Mysql::class, ['beforeExport']);
         $Driver->method('beforeExport')->will($this->returnValue(false));
         $this->assertFalse($Driver->export($backup));
-        $this->assertFileNotExists($backup);
+        $this->assertFileDoesNotExist($backup);
     }
 
     /**

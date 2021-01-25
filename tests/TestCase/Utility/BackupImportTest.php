@@ -107,17 +107,17 @@ class BackupImportTest extends TestCase
         //Exports and imports with no compression
         $backup = $this->BackupExport->compression(null)->export();
         $filename = $this->BackupImport->filename($backup)->import();
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
+        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
 
         //Exports and imports with `bzip2` compression
         $backup = $this->BackupExport->compression('bzip2')->export();
         $filename = $this->BackupImport->filename($backup)->import();
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
+        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
 
         //Exports and imports with `gzip` compression
         $backup = $this->BackupExport->compression('gzip')->export();
         $filename = $this->BackupImport->filename($backup)->import();
-        $this->assertRegExp('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
+        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('You must first set the filename');
