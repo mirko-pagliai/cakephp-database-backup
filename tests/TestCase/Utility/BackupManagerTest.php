@@ -141,14 +141,12 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function ($first, $second) {
-            return strcmp($first->filename, $second->filename);
+        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function (Entity $first, Entity $second) {
+            return strcmp($first->get('filename'), $second->get('filename'));
         });
 
-        //Again, only 1 backup was deleted
+        //Again, only 1 backup was deleted. The difference is the same
         $this->assertCount(1, $diff);
-
-        //The difference is the same
         $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
 
         $this->expectException(InvalidArgumentException::class);
