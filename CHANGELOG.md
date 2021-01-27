@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.8 branch
 ### 2.8.4
+* all methods provided by `BackupManager` can now be called statically, except
+    for the `send()` method;
 * little fixes for code and descriptions;
 * ready for `phpunit` 9.
 

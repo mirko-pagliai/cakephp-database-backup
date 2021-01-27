@@ -125,7 +125,7 @@ class BackupManagerTest extends TestCase
      */
     public function testRotate()
     {
-        $this->assertEquals([], $this->BackupManager->rotate(1));
+        $this->assertEquals([], BackupManager::rotate(1));
 
         $this->createSomeBackups();
 

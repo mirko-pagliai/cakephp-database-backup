@@ -39,7 +39,7 @@ trait BackupTrait
      * @param string $path Relative or absolute path
      * @return string
      */
-    public function getAbsolutePath(string $path): string
+    public static function getAbsolutePath(string $path): string
     {
         return (new Filesystem())->makePathAbsolute($path, Configure::read('DatabaseBackup.target'));
     }
@@ -51,13 +51,11 @@ trait BackupTrait
      * @uses getExtension()
      * @uses getValidCompressions()
      */
-    public function getCompression(string $filename): ?string
+    public static function getCompression(string $filename): ?string
     {
-        //Gets the extension from the filename
-        $extension = $this->getExtension($filename);
-        $keyExists = array_key_exists($extension, $this->getValidCompressions());
+        $extension = self::getExtension($filename);
 
-        return $keyExists ? $this->getValidCompressions()[$extension] : null;
+        return self::getValidCompressions()[$extension] ?? null;
     }
 
     /**
@@ -96,7 +94,7 @@ trait BackupTrait
      *  if is an invalid extension
      * @uses $validExtensions
      */
-    public function getExtension(string $filename): ?string
+    public static function getExtension(string $filename): ?string
     {
         $extension = (new Filesystem())->getExtension($filename);
 
@@ -109,7 +107,7 @@ trait BackupTrait
      * @since 2.4.0
      * @uses $validExtensions
      */
-    public function getValidCompressions(): array
+    public static function getValidCompressions(): array
     {
         return array_filter(self::$validExtensions);
     }

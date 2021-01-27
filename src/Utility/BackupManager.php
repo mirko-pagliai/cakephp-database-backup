@@ -43,9 +43,9 @@ class BackupManager
      * @throws \Tools\Exception\FileNotExistsException
      * @throws \Tools\Exception\NotWritableException
      */
-    public function delete(string $filename): bool
+    public static function delete(string $filename): bool
     {
-        $filename = $this->getAbsolutePath($filename);
+        $filename = self::getAbsolutePath($filename);
         (new Filesystem())->remove(Exceptionist::isWritable($filename));
 
         return true;
@@ -59,11 +59,11 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public function deleteAll(): array
+    public static function deleteAll(): array
     {
         return array_filter(array_map(function (string $filename) {
-            return !$this->delete($filename) ?: $filename;
-        }, $this->index()->extract('filename')->toList()));
+            return !self::delete($filename) ?: $filename;
+        }, self::index()->extract('filename')->toList()));
     }
 
     /**
@@ -72,15 +72,16 @@ class BackupManager
      *  is an entity
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public function index(): CollectionInterface
+    public static function index(): CollectionInterface
     {
         $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::read('DatabaseBackup.target'));
 
         return collection($finder)->map(function (SplFileInfo $file) {
-            return new Entity([
-                'filename' => $file->getFilename(),
-                'extension' => $this->getExtension($file->getFilename()),
-                'compression' => $this->getCompression($file->getFilename()),
+            $filename = $file->getFilename();
+
+            return new Entity(compact('filename') + [
+                'extension' => self::getExtension($filename),
+                'compression' => self::getCompression($filename),
                 'size' => $file->getSize(),
                 'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
             ]);
@@ -99,11 +100,11 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public function rotate(int $rotate): array
+    public static function rotate(int $rotate): array
     {
         Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
-        $backupsToBeDeleted = $this->index()->skip((int)$rotate);
-        array_map([$this, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
+        $backupsToBeDeleted = self::index()->skip((int)$rotate);
+        array_map('self::delete', $backupsToBeDeleted->extract('filename')->toList());
 
         return $backupsToBeDeleted->toList();
     }
@@ -117,9 +118,9 @@ class BackupManager
      * @since 1.1.0
      * @throws \Tools\Exception\NotReadableException
      */
-    protected function getEmailInstance(string $backup, string $recipient): Email
+    protected static function getEmailInstance(string $backup, string $recipient): Email
     {
-        $file = $this->getAbsolutePath($backup);
+        $file = self::getAbsolutePath($backup);
         $basename = basename(Exceptionist::isReadable($file));
         $server = env('SERVER_NAME', 'localhost');
 
@@ -141,6 +142,6 @@ class BackupManager
      */
     public function send(string $filename, string $recipient): array
     {
-        return $this->getEmailInstance($filename, $recipient)->send();
+        return self::getEmailInstance($filename, $recipient)->send();
     }
 }
