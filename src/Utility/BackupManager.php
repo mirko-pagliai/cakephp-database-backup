@@ -38,22 +38,22 @@ class BackupManager
      * Deletes a backup file
      * @param string $filename Filename of the backup that you want to delete.
      *  The path can be relative to the backup directory
-     * @return bool
+     * @return string
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws \Tools\Exception\FileNotExistsException
      * @throws \Tools\Exception\NotWritableException
      */
-    public static function delete(string $filename): bool
+    public static function delete(string $filename): string
     {
         $filename = self::getAbsolutePath($filename);
         (new Filesystem())->remove(Exceptionist::isWritable($filename));
 
-        return true;
+        return $filename;
     }
 
     /**
      * Deletes all backup files
-     * @return array<string|true> List of deleted backup files
+     * @return array<string> List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
      * @uses delete()
@@ -61,9 +61,7 @@ class BackupManager
      */
     public static function deleteAll(): array
     {
-        return array_filter(array_map(function (string $filename) {
-            return !self::delete($filename) ?: $filename;
-        }, self::index()->extract('filename')->toList()));
+        return array_map('self::delete', self::index()->extract('filename')->toList());
     }
 
     /**

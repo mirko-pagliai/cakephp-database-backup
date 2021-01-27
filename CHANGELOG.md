@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.8 branch
 ### 2.8.4
+* `BackupManager::delete()` returns the full path;
 * all methods provided by `BackupManager` can now be called statically, except
     for the `send()` method;
 * little fixes for code and descriptions;

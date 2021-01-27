@@ -62,13 +62,13 @@ class BackupManagerTest extends TestCase
     {
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
-        $this->assertTrue($this->BackupManager->delete($filename));
+        $this->assertSame($filename, $this->BackupManager->delete($filename));
         $this->assertFileDoesNotExist($filename);
 
         //With a relative path
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
-        $this->assertTrue($this->BackupManager->delete(basename($filename)));
+        $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
         $this->assertFileDoesNotExist($filename);
     }
 
@@ -79,7 +79,7 @@ class BackupManagerTest extends TestCase
     public function testDeleteAll()
     {
         $createdFiles = $this->createSomeBackups();
-        $this->assertEquals(array_reverse(array_map('basename', $createdFiles)), $this->BackupManager->deleteAll());
+        $this->assertEquals(array_reverse($createdFiles), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
         $this->expectException(NotReadableException::class);
