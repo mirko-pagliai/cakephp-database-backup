@@ -72,7 +72,7 @@ trait BackupTrait
      * Gets the driver instance containing all methods to export/import database
      *  backups, according to the database engine
      * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
-     * @return object The driver instance
+     * @return \DatabaseBackup\Driver\Driver A driver instance
      * @since 2.0.0
      * @throws \InvalidArgumentException
      * @uses getConnection()

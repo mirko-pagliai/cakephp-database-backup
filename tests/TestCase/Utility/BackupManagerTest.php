@@ -23,6 +23,7 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use Tools\Exception\NotReadableException;
+use Tools\Exception\NotWritableException;
 use Tools\Filesystem;
 
 /**
@@ -82,7 +83,7 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(array_reverse($createdFiles), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
-        $this->expectException(NotReadableException::class);
+        $this->expectException(NotWritableException::class);
         $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` does not exist');
         $this->BackupManager->delete('noExistingFile');
     }
@@ -114,8 +115,8 @@ class BackupManagerTest extends TestCase
         //Checks for properties of each backup object
         foreach ($files as $file) {
             $this->assertInstanceOf(Entity::class, $file);
-            $this->assertTrue(is_positive($file->size));
-            $this->assertInstanceOf(FrozenTime::class, $file->datetime);
+            $this->assertIsPositive($file->get('size'));
+            $this->assertInstanceOf(FrozenTime::class, $file->get('datetime'));
         }
     }
 

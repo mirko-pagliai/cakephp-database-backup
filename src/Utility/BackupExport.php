@@ -56,7 +56,7 @@ class BackupExport
      * Driver containing all methods to export/import database backups
      *  according to the database engine
      * @since 2.0.0
-     * @var object
+     * @var \DatabaseBackup\Driver\Driver
      */
     public $driver;
 
@@ -116,7 +116,7 @@ class BackupExport
         $this->extension = $this->defaultExtension;
 
         if ($compression) {
-            $this->extension = array_search($compression, $this->getValidCompressions());
+            $this->extension = array_search($compression, $this->getValidCompressions()) ?: '';
             Exceptionist::isTrue($this->extension, __d('database_backup', 'Invalid compression type'), InvalidArgumentException::class);
         }
         $this->compression = $compression;

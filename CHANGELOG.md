@@ -4,7 +4,7 @@
 * `BackupManager::delete()` returns the full path;
 * all methods provided by `BackupManager` can now be called statically, except
     for the `send()` method;
-* little fixes for code and descriptions;
+* extensive improvement of function descriptions and tags;
 * ready for `phpunit` 9.
 
 ### 2.8.3

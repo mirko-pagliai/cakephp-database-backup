@@ -66,8 +66,7 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return \Cake\Collection\CollectionInterface Collection of backups. Each backup
-     *  is an entity
+     * @return \Cake\Collection\CollectionInterface<\Cake\ORM\Entity> Backups
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface

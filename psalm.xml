@@ -15,12 +15,17 @@
     </projectFiles>
 
     <issueHandlers>
-        <UndefinedConstant>
+        <InvalidArgument>
             <errorLevel type="suppress">
-                <file name="src/Driver/Driver.php" />
-                <file name="src/TestSuite/DriverTestCase.php" />
+                <file name="src/Driver/Sqlite.php" />
             </errorLevel>
-        </UndefinedConstant>
+        </InvalidArgument>
+
+        <InvalidDocblock>
+            <errorLevel type="suppress">
+                <file name="src/TestSuite/TestCase.php" />
+            </errorLevel>
+        </InvalidDocblock>
 
         <RedundantCondition>
             <errorLevel type="suppress">
@@ -28,11 +33,11 @@
             </errorLevel>
         </RedundantCondition>
 
-        <UndefinedInterfaceMethod>
+        <TooManyTemplateParams>
             <errorLevel type="suppress">
-                <file name="src/Driver/Sqlite.php" />
+                <file name="src/Utility/BackupManager.php" />
             </errorLevel>
-        </UndefinedInterfaceMethod>
+        </TooManyTemplateParams>
 
         <UndefinedClass>
             <errorLevel type="suppress">
@@ -40,10 +45,17 @@
             </errorLevel>
         </UndefinedClass>
 
-        <InvalidArgument>
+        <UndefinedConstant>
+            <errorLevel type="suppress">
+                <file name="src/Driver/Driver.php" />
+                <file name="src/TestSuite/DriverTestCase.php" />
+            </errorLevel>
+        </UndefinedConstant>
+
+        <UndefinedInterfaceMethod>
             <errorLevel type="suppress">
                 <file name="src/Driver/Sqlite.php" />
             </errorLevel>
-        </InvalidArgument>
+        </UndefinedInterfaceMethod>
     </issueHandlers>
 </psalm>

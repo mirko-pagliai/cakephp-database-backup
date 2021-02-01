@@ -208,7 +208,7 @@ class BackupExportTest extends TestCase
         //Exports with `send()`
         $recipient = 'recipient@example.com';
         $filename = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
-        $log = file_get_contents(LOGS . 'debug.log');
+        $log = file_get_contents(LOGS . 'debug.log') ?: '';
         $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
 
         //With a file that already exists

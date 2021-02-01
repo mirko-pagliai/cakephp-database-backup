@@ -1,5 +1,5 @@
 parameters:
-    level: 6
+    level: 7
 
     paths:
         - config
@@ -19,6 +19,7 @@ parameters:
     ignoreErrors:
         - '#(Ternary operator condition|Negated boolean expression) is always (true|false)\.$#'
         - "#^Constant REDIRECT_TO_DEV_NULL not found\\.$#"
+        - '#^Parameter \#1 \$callback of function array_map expects \(callable\(\): mixed\)\|null#'
         - "#^Static call to instance method Tools\\\\Exceptionist#"
         - "#^Parameter \\#2 \\$eventManager of method Cake\\\\TestSuite\\\\TestCase\\:\\:assertEventFired\\(\\) expects Cake\\\\Event\\\\EventManager\\|null, Cake\\\\Event\\\\EventManagerInterface given\\.$#"
         - "#^Parameter \\#1 \\$connection of method Cake\\\\Database\\\\Schema\\\\TableSchema\\:\\:dropSql\\(\\) expects Cake\\\\Database\\\\Connection, Cake\\\\Datasource\\\\ConnectionInterface given\\.$#"
@@ -28,14 +29,9 @@ parameters:
             path: src/Driver/Sqlite.php
 
         -
-            message: "#^Unable to resolve the template type RealInstanceType#"
-            path: src/TestSuite/TestCase.php
+            message: '#^Call to an undefined method [\w\|\\]+MockObject::\w+\(\)\.$#'
+            path: tests/TestCase
 
         -
             message: '#has no return typehint specified\.$#'
             path: tests/TestCase
-
-        -
-            message: "#^Binary operation \"\\+\" between#"
-            count: 3
-            path: tests/TestCase/Driver
