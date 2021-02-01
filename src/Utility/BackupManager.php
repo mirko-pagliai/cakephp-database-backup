@@ -46,7 +46,7 @@ class BackupManager
     public static function delete(string $filename): string
     {
         $filename = self::getAbsolutePath($filename);
-        (new Filesystem())->remove(Exceptionist::isWritable($filename));
+        Filesystem::instance()->remove(Exceptionist::isWritable($filename));
 
         return $filename;
     }

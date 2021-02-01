@@ -65,17 +65,6 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Called after every test method
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        (new Filesystem())->unlinkRecursive(LOGS, 'empty');
-    }
-
-    /**
      * Test for `construct()` method
      * @test
      */
@@ -123,7 +112,7 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename('backup.sql.bz2');
         $this->assertEquals(
-            (new Filesystem())->addSlashTerm(Configure::read('DatabaseBackup.target')) . 'backup.sql.bz2',
+            Filesystem::instance()->concatenate(Configure::read('DatabaseBackup.target'), 'backup.sql.bz2'),
             $this->getProperty($this->BackupExport, 'filename')
         );
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));

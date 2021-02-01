@@ -46,7 +46,7 @@ if (!Configure::check('DatabaseBackup.redirectStderrToDevNull')) {
 
 //Default target directory
 if (!Configure::check('DatabaseBackup.target')) {
-    Configure::write('DatabaseBackup.target', (new Filesystem())->concatenate(ROOT, 'backups'));
+    Configure::write('DatabaseBackup.target', Filesystem::instance()->concatenate(ROOT, 'backups'));
 }
 
 //Checks for the target directory
