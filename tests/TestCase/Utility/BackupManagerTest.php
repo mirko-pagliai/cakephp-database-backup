@@ -16,8 +16,9 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
+use Cake\Mailer\Email;
 use Cake\ORM\Entity;
-use Cake\TestSuite\EmailTrait;
+use Cake\TestSuite\EmailAssertTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -31,7 +32,7 @@ use Tools\Filesystem;
  */
 class BackupManagerTest extends TestCase
 {
-    use EmailTrait;
+    use EmailAssertTrait;
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport
@@ -162,12 +163,15 @@ class BackupManagerTest extends TestCase
     public function testSend()
     {
         $file = $this->createBackup();
+        $mimetype = mime_content_type($file);
         $recipient = 'recipient@example.com';
-        $this->BackupManager->send($file, $recipient);
-        $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
-        $this->assertMailSentTo($recipient);
-        $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
-        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
+
+        $this->_email = $this->invokeMethod($this->BackupManager, 'getEmailInstance', [$file, $recipient]);
+        $this->assertInstanceof(Email::class, $this->_email);
+        $this->assertEmailFrom(Configure::read('DatabaseBackup.mailSender'));
+        $this->assertEmailTo($recipient);
+        $this->assertEmailSubject('Database backup ' . basename($file) . ' from localhost');
+        $this->assertEmailAttachmentsContains(basename($file), compact('file', 'mimetype'));
 
         //With an invalid sender
         $this->expectException(InvalidArgumentException::class);

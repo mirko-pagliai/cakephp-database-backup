@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -11,35 +10,22 @@ declare(strict_types=1);
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @since       2.0.0
  */
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
-use Cake\TestSuite\TestCase as BaseTestCase;
-use DatabaseBackup\BackupTrait;
+use Cake\TestSuite\ConsoleIntegrationTestCase as BaseConsoleIntegrationTestCase;
 use DatabaseBackup\TestSuite\TestTrait;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use Tools\Filesystem;
-use Tools\TestSuite\BackwardCompatibilityTrait;
-use Tools\TestSuite\ReflectionTrait;
 
 /**
- * TestCase class
+ * A test case class intended to make integration tests of cake console commands
+ * easier
  */
-abstract class TestCase extends BaseTestCase
+abstract class ConsoleIntegrationTestCase extends BaseConsoleIntegrationTestCase
 {
-    use BackupTrait;
-    use BackwardCompatibilityTrait;
-    use ReflectionTrait;
     use TestTrait;
-
-    /**
-     * `BackupManager` instance
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
-    protected $BackupExport;
 
     /**
      * Called before every test method
@@ -52,8 +38,6 @@ abstract class TestCase extends BaseTestCase
         if (method_exists($this, 'loadPlugins')) {
             $this->loadPlugins(Configure::read('pluginsToLoad') ?: ['MeTools']);
         }
-
-        $this->BackupExport = $this->BackupExport ?: new BackupExport();
     }
 
     /**

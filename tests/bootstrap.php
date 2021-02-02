@@ -15,11 +15,11 @@ declare(strict_types=1);
 
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
+use Cake\Core\Plugin;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
-use Cake\TestSuite\TestEmailTransport;
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
@@ -54,6 +54,11 @@ foreach ([
 require dirname(__DIR__) . '/vendor/autoload.php';
 require_once CORE_PATH . 'config' . DS . 'bootstrap.php';
 
+//Disables deprecation warnings for CakePHP 3.6
+if (version_compare(Configure::version(), '3.6', '>=')) {
+    error_reporting(E_ALL & ~E_USER_DEPRECATED);
+}
+
 Configure::write('debug', true);
 Configure::write('App', [
     'namespace' => 'App',
@@ -72,6 +77,7 @@ Configure::write('App', [
 Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups');
 Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+Plugin::load('DatabaseBackup', ['bootstrap' => true, 'path' => ROOT]);
 Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 Cache::setConfig([
@@ -100,5 +106,12 @@ Log::setConfig('debug', [
     'levels' => ['notice', 'info', 'debug'],
     'file' => 'debug',
 ]);
-TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
-Email::setConfig('default', ['transport' => 'debug']);
+
+$transportName = 'debug';
+$transportConfig = ['className' => 'Debug'];
+if (class_exists(TransportFactory::class)) {
+    TransportFactory::setConfig($transportName, $transportConfig);
+} else {
+    Email::setConfigTransport($transportName, $transportConfig);
+}
+Email::setConfig('default', ['transport' => $transportName, 'log' => true]);

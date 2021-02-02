@@ -12,18 +12,16 @@
  */
 namespace DatabaseBackup\Test\TestCase\Shell;
 
+use Cake\Console\Shell;
 use Cake\Core\Configure;
-use Cake\TestSuite\ConsoleIntegrationTestTrait;
-use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\TestSuite\ConsoleIntegrationTestCase;
 use DatabaseBackup\Utility\BackupManager;
 
 /**
  * BackupShellTest class
  */
-class BackupShellTest extends TestCase
+class BackupShellTest extends ConsoleIntegrationTestCase
 {
-    use ConsoleIntegrationTestTrait;
-
     /**
      * Test for `deleteAll()` method
      * @test
@@ -31,12 +29,12 @@ class BackupShellTest extends TestCase
     public function testDeleteAll()
     {
         $this->exec('backup delete_all -v');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputContains('No backup has been deleted');
 
         $files = $this->createSomeBackups();
         $this->exec('backup delete_all -v');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         foreach ($files as $file) {
             $this->assertOutputContains('Backup `' . $file . '` has been deleted');
         }
@@ -53,24 +51,24 @@ class BackupShellTest extends TestCase
 
         //Exports, without params
         $this->exec($command);
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_test_\d+\.sql` has been exported/');
 
         //Exports, with `compression` param
         $this->exec($command . ' --compression bzip2');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_test_\d+\.sql\.bz2` has been exported/');
 
         //Exports, with `filename` param
         $this->exec($command . ' --filename backup.sql');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup\.sql` has been exported/');
 
         //Exports, with `rotate` param
         BackupManager::deleteAll();
         $files = $this->createSomeBackups();
         $this->exec($command . ' --rotate 3');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_test_\d+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename(array_value_first($files)) . '` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
@@ -78,7 +76,7 @@ class BackupShellTest extends TestCase
         //Exports, with `send` param
         BackupManager::deleteAll();
         $this->exec($command . ' --send mymail@example.com');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_test_\d+\.sql` has been exported/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_test_\d+\.sql` was sent via mail/');
 
@@ -94,11 +92,11 @@ class BackupShellTest extends TestCase
     public function testIndex()
     {
         $this->exec('backup index -v');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputContains('Backup files found: 0');
 
         $this->createSomeBackups();
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->exec('backup index -v');
         $this->assertOutputContains('Backup files found: 3');
         $this->assertOutputRegExp('/backup\.sql\.gz\s+|\s+sql\.gz\s+|\s+gzip\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
@@ -114,7 +112,7 @@ class BackupShellTest extends TestCase
     {
         $backup = $this->createBackup();
         $this->exec('backup import -v ' . $backup);
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
@@ -131,7 +129,7 @@ class BackupShellTest extends TestCase
     public function testMain()
     {
         $this->exec('backup -v');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputContains('Connection: test');
         $this->assertOutputContains('Driver: Mysql');
         $this->assertOutputContains('Backup files found: 0');
@@ -148,7 +146,7 @@ class BackupShellTest extends TestCase
 
         $this->createSomeBackups(true);
         $this->exec('backup rotate -v 1');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql\.bz2` has been deleted/');
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql` has been deleted/');
         $this->assertOutputContains('<success>Deleted backup files: 2</success>');
@@ -166,7 +164,7 @@ class BackupShellTest extends TestCase
     {
         $file = $this->createBackup();
         $this->exec('backup send -v ' . $file . ' recipient@example.com');
-        $this->assertExitSuccess();
+        $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputContains('<success>Backup `' . $file . '` was sent via mail</success>');
 
         //Without a sender in the configuration
