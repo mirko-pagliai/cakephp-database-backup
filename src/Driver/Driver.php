@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -58,7 +57,7 @@ abstract class Driver implements EventListenerInterface
      *  is fired
      * @since 2.1.1
      */
-    final public function implementedEvents(): array
+    final public function implementedEvents()
     {
         return [
             'Backup.afterExport' => 'afterExport',
@@ -72,20 +71,20 @@ abstract class Driver implements EventListenerInterface
      * Gets the executable command to export the database
      * @return string
      */
-    abstract protected function _exportExecutable(): string;
+    abstract protected function _exportExecutable();
 
     /**
      * Gets the executable command to import the database
      * @return string
      */
-    abstract protected function _importExecutable(): string;
+    abstract protected function _importExecutable();
 
     /**
      * Called after export
      * @return void
      * @since 2.1.0
      */
-    public function afterExport(): void
+    public function afterExport()
     {
     }
 
@@ -94,7 +93,7 @@ abstract class Driver implements EventListenerInterface
      * @return void
      * @since 2.1.0
      */
-    public function afterImport(): void
+    public function afterImport()
     {
     }
 
@@ -113,7 +112,7 @@ abstract class Driver implements EventListenerInterface
      * @return bool Returns `false` to stop the import
      * @since 2.1.0
      */
-    public function beforeImport(): bool
+    public function beforeImport()
     {
         return true;
     }
@@ -125,7 +124,7 @@ abstract class Driver implements EventListenerInterface
      * @uses _exportExecutable()
      * @uses getBinary()
      */
-    protected function _exportExecutableWithCompression(string $filename): string
+    protected function _exportExecutableWithCompression($filename)
     {
         $executable = $this->_exportExecutable();
         $compression = $this->getCompression($filename);
@@ -149,7 +148,7 @@ abstract class Driver implements EventListenerInterface
      * @uses _importExecutable()
      * @uses getBinary()
      */
-    protected function _importExecutableWithCompression(string $filename): string
+    protected function _importExecutableWithCompression($filename)
     {
         $compression = $this->getCompression($filename);
         $filename = escapeshellarg($filename);
@@ -178,7 +177,7 @@ abstract class Driver implements EventListenerInterface
      * @throws \Exception
      * @uses _exportExecutableWithCompression()
      */
-    final public function export(string $filename): bool
+    final public function export($filename)
     {
         $beforeExport = $this->dispatchEvent('Backup.beforeExport');
         if ($beforeExport->isStopped()) {
@@ -214,7 +213,7 @@ abstract class Driver implements EventListenerInterface
      * @since 2.3.0
      * @uses $connection
      */
-    final public function getConfig(?string $key = null)
+    final public function getConfig($key = null)
     {
         $config = $this->connection->config();
 
@@ -233,7 +232,7 @@ abstract class Driver implements EventListenerInterface
      * @throws \Exception
      * @uses _importExecutableWithCompression()
      */
-    final public function import(string $filename): bool
+    final public function import($filename)
     {
         $beforeImport = $this->dispatchEvent('Backup.beforeImport');
         if ($beforeImport->isStopped()) {

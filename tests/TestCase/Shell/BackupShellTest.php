@@ -144,7 +144,7 @@ class BackupShellTest extends ConsoleIntegrationTestCase
         $this->exec('backup rotate -v 1');
         $this->assertOutputContains('No backup has been deleted');
 
-        $this->createSomeBackups(true);
+        $this->createSomeBackups();
         $this->exec('backup rotate -v 1');
         $this->assertExitCode(Shell::CODE_SUCCESS);
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql\.bz2` has been deleted/');

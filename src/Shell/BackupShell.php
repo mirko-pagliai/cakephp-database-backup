@@ -247,7 +247,7 @@ class BackupShell extends Shell
             }
 
             foreach ($deleted as $file) {
-                $this->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->filename));
+                $this->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->get('filename')));
             }
 
             $this->success(__d('database_backup', 'Deleted backup files: {0}', count($deleted)));

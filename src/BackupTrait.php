@@ -77,7 +77,7 @@ trait BackupTrait
      * @throws \InvalidArgumentException
      * @uses getConnection()
      */
-    public function getDriver(?ConnectionInterface $connection = null): object
+    public function getDriver(?ConnectionInterface $connection = null)
     {
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());

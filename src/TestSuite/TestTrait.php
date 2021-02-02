@@ -11,7 +11,6 @@
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace DatabaseBackup\TestSuite;
 
 use DatabaseBackup\Utility\BackupExport;
@@ -50,19 +49,5 @@ trait TestTrait
         }
 
         return array_reverse($files);
-    }
-
-    /**
-     * Internal method to mock a driver
-     * @param class-string<object> $className Driver class name
-     * @param array $methods The list of methods to mock
-     * @return \DatabaseBackup\Driver\Driver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockForDriver(string $className, array $methods)
-    {
-        return $this->getMockBuilder($className)
-            ->setMethods($methods)
-            ->setConstructorArgs([$this->getConnection('test')])
-            ->getMock();
     }
 }

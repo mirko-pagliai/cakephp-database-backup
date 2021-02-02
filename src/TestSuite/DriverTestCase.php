@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -74,7 +73,7 @@ abstract class DriverTestCase extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    public function setUp()
     {
         parent::setUp();
 
@@ -93,7 +92,7 @@ abstract class DriverTestCase extends TestCase
      * Internal method to get all records from the database
      * @return array
      */
-    final protected function getAllRecords(): array
+    final protected function getAllRecords()
     {
         foreach (['Articles', 'Comments'] as $name) {
             $records[$name] = $this->$name->find()->enableHydration(false)->toArray();

@@ -30,6 +30,8 @@
         <RedundantCondition>
             <errorLevel type="suppress">
                 <file name="src/Driver/Mysql.php" />
+                <file name="src/TestSuite/ConsoleIntegrationTestCase.php" />
+                <file name="src/TestSuite/TestCase.php" />
             </errorLevel>
         </RedundantCondition>
 

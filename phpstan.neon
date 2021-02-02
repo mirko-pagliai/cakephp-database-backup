@@ -18,15 +18,18 @@ parameters:
 
     ignoreErrors:
         - '#(Ternary operator condition|Negated boolean expression) is always (true|false)\.$#'
-        - "#^Constant REDIRECT_TO_DEV_NULL not found\\.$#"
         - '#^Parameter \#1 \$callback of function array_map expects \(callable\(\): mixed\)\|null#'
         - "#^Static call to instance method Tools\\\\Exceptionist#"
-        - "#^Parameter \\#2 \\$eventManager of method Cake\\\\TestSuite\\\\TestCase\\:\\:assertEventFired\\(\\) expects Cake\\\\Event\\\\EventManager\\|null, Cake\\\\Event\\\\EventManagerInterface given\\.$#"
         - "#^Parameter \\#1 \\$connection of method Cake\\\\Database\\\\Schema\\\\TableSchema\\:\\:dropSql\\(\\) expects Cake\\\\Database\\\\Connection, Cake\\\\Datasource\\\\ConnectionInterface given\\.$#"
+        - '#assertSame\(\) invoked with 2 parameters, 3 required\.$#'
 
         -
             message: "#^Call to an undefined method Cake\\\\Datasource\\\\ConnectionInterface#"
             path: src/Driver/Sqlite.php
+
+        -
+            message: '#^Parameter \#1 \$var of function count expects array\|Countable#'
+            path: src/Shell/BackupShell.php
 
         -
             message: '#^Call to an undefined method [\w\|\\]+MockObject::\w+\(\)\.$#'
@@ -34,4 +37,12 @@ parameters:
 
         -
             message: '#has no return typehint specified\.$#'
+            path: tests/TestCase
+
+        -
+            message: '#PHPUnit\\Framework\\MockObject\\MockObject given\.$#'
+            path: tests/TestCase
+
+        -
+            message: '#does not accept PHPUnit\\Framework\\MockObject\\MockObject\.$#'
             path: tests/TestCase
