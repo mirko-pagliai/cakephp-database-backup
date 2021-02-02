@@ -11,14 +11,14 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
-        "cakephp/cakephp": "^4.0",
-        "mirko-pagliai/php-tools": "^1.4.7"
+        "php": ">=5.5.9",
+        "cakephp/cakephp": "^3.5.1",
+        "cakephp/chronos": "^1.0.1",
+        "mirko-pagliai/php-tools": "dev-php5.6"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "^4.0",
-        "mirko-pagliai/me-tools": "^2.19",
-        "phpunit/phpunit": "^8.0|^9.0"
+        "cakephp/cakephp-codesniffer": "^3.0|^4.0",
+        "phpunit/phpunit": "^5.7.14|^6.0"
     },
     "autoload": {
         "psr-4": {

@@ -97,7 +97,7 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public static function rotate(int $rotate): array
+    public static function rotate($rotate): array
     {
         Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
         $backupsToBeDeleted = self::index()->skip((int)$rotate);

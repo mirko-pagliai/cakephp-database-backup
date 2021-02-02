@@ -15,10 +15,15 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Core\Configure;
+use Cake\TestSuite\TestCase as BaseTestCase;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
-use MeTools\TestSuite\TestCase as BaseTestCase;
+use Tools\Filesystem;
+use Tools\TestSuite\BackwardCompatibilityTrait;
+use Tools\TestSuite\ReflectionTrait;
+use Tools\TestSuite\TestTrait;
 
 /**
  * TestCase class
@@ -26,6 +31,9 @@ use MeTools\TestSuite\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     use BackupTrait;
+    use BackwardCompatibilityTrait;
+    use ReflectionTrait;
+    use TestTrait;
 
     /**
      * `BackupManager` instance
@@ -37,19 +45,28 @@ abstract class TestCase extends BaseTestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    public function setUp()
     {
         parent::setUp();
 
+        $this->loadPlugins(Configure::read('pluginsToLoad') ?: ['MeTools']);
+
         $this->BackupExport = $this->BackupExport ?? new BackupExport();
     }
+
 
     /**
      * Called after every test method
      * @return void
      */
-    public function tearDown(): void
+    public function tearDown()
     {
+        parent::tearDown();
+
+        if (LOGS !== TMP) {
+            Filesystem::instance()->unlinkRecursive(LOGS, ['.gitkeep', 'empty'], true);
+        }
+
         //Deletes all backup files
         BackupManager::deleteAll();
 

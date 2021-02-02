@@ -17,6 +17,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\Configure;
 use Cake\Event\EventList;
+use Cake\ORM\TableRegistry;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -79,8 +80,9 @@ abstract class DriverTestCase extends TestCase
 
         Configure::write('DatabaseBackup.connection', $this->connection);
         $connection = $this->getConnection();
-        $this->Articles = $this->getTable('Articles', compact('connection'));
-        $this->Comments = $this->getTable('Comments', compact('connection'));
+
+        $this->Articles = $this->Articles ?: TableRegistry::getTableLocator()->get('Articles', compact('connection'));
+        $this->Comments = $this->Comments ?: TableRegistry::getTableLocator()->get('Comments', compact('connection'));
 
         //Enable event tracking
         $this->Driver = new $this->DriverClass($connection);
