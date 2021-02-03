@@ -14,7 +14,6 @@
  */
 namespace DatabaseBackup\Utility;
 
-use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Email;
