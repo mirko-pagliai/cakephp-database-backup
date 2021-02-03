@@ -19,12 +19,14 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use MeTools\TestSuite\TestCase as BaseTestCase;
+use Tools\TestSuite\BackwardCompatibilityTrait;
 
 /**
  * TestCase class
  */
 abstract class TestCase extends BaseTestCase
 {
+    use BackwardCompatibilityTrait;
     use BackupTrait;
 
     /**
