@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -34,7 +33,7 @@ class Postgres extends Driver
      * @return string
      * @uses getConfig()
      */
-    protected function getDbnameAsString(): string
+    protected function getDbnameAsString()
     {
         return sprintf(
             'postgresql://%s%s@%s/%s',
@@ -51,7 +50,7 @@ class Postgres extends Driver
      * @uses getBinary()
      * @uses getDbnameAsString()
      */
-    protected function _exportExecutable(): string
+    protected function _exportExecutable()
     {
         return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
     }
@@ -62,7 +61,7 @@ class Postgres extends Driver
      * @uses getBinary()
      * @uses getDbnameAsString()
      */
-    protected function _importExecutable(): string
+    protected function _importExecutable()
     {
         return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
     }

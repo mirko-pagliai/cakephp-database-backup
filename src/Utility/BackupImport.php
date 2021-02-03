@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -58,7 +57,7 @@ class BackupImport
      * @throws \Tools\Exception\NotReadableException
      * @uses $filename
      */
-    public function filename(string $filename)
+    public function filename($filename)
     {
         $filename = $this->getAbsolutePath($filename);
         Exceptionist::isReadable($filename);
@@ -79,7 +78,7 @@ class BackupImport
      * @uses $driver
      * @uses $filename
      */
-    public function import(): string
+    public function import()
     {
         Exceptionist::isTrue(!empty($this->filename), __d('database_backup', 'You must first set the filename'), InvalidArgumentException::class);
 

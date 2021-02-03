@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -28,7 +27,7 @@ class Sqlite extends Driver
      * @uses getBinary()
      * @uses getConfig()
      */
-    protected function _exportExecutable(): string
+    protected function _exportExecutable()
     {
         return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
@@ -39,7 +38,7 @@ class Sqlite extends Driver
      * @uses getBinary()
      * @uses getConfig()
      */
-    protected function _importExecutable(): string
+    protected function _importExecutable()
     {
         return sprintf('%s %s', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
@@ -50,7 +49,7 @@ class Sqlite extends Driver
      * @since 2.1.0
      * @uses $connection
      */
-    public function beforeImport(): bool
+    public function beforeImport()
     {
         $schemaCollection = $this->connection->getSchemaCollection();
 

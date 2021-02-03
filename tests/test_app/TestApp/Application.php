@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace App;
 
@@ -11,17 +10,17 @@ use DatabaseBackup\Plugin as DatabaseBackup;
 
 class Application extends BaseApplication
 {
-    public function bootstrap(): void
+    public function bootstrap()
     {
         $this->addPlugin(DatabaseBackup::class);
     }
 
-    public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
+    public function middleware(MiddlewareQueue $middlewareQueue)
     {
         return $middlewareQueue->add(new RoutingMiddleware($this));
     }
 
-    public function routes(RouteBuilder $routes): void
+    public function routes(RouteBuilder $routes)
     {
         //Do nothing
     }

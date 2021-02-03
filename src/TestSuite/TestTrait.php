@@ -28,7 +28,7 @@ trait TestTrait
      * @param string $filename Filename
      * @return string
      */
-    protected function createBackup(string $filename = 'backup.sql'): string
+    protected function createBackup($filename = 'backup.sql')
     {
         return (new BackupExport())->filename($filename)->export();
     }
@@ -38,7 +38,7 @@ trait TestTrait
      * @return array
      * @uses createBackup()
      */
-    protected function createSomeBackups(): array
+    protected function createSomeBackups()
     {
         $timestamp = time();
 

@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -39,7 +38,7 @@ trait BackupTrait
      * @param string $path Relative or absolute path
      * @return string
      */
-    public static function getAbsolutePath(string $path): string
+    public static function getAbsolutePath($path)
     {
         return Filesystem::instance()->makePathAbsolute($path, Configure::read('DatabaseBackup.target'));
     }
@@ -51,7 +50,7 @@ trait BackupTrait
      * @uses getExtension()
      * @uses getValidCompressions()
      */
-    public static function getCompression(string $filename): ?string
+    public static function getCompression($filename)
     {
         $extension = self::getExtension($filename);
 
@@ -63,7 +62,7 @@ trait BackupTrait
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface A connection object
      */
-    public function getConnection(?string $name = null): ConnectionInterface
+    public function getConnection($name = null)
     {
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
@@ -77,7 +76,7 @@ trait BackupTrait
      * @throws \InvalidArgumentException
      * @uses getConnection()
      */
-    public function getDriver(?ConnectionInterface $connection = null)
+    public function getDriver(ConnectionInterface $connection = null)
     {
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
@@ -94,7 +93,7 @@ trait BackupTrait
      *  if is an invalid extension
      * @uses $validExtensions
      */
-    public static function getExtension(string $filename): ?string
+    public static function getExtension($filename)
     {
         $extension = Filesystem::instance()->getExtension($filename);
 
@@ -107,7 +106,7 @@ trait BackupTrait
      * @since 2.4.0
      * @uses $validExtensions
      */
-    public static function getValidCompressions(): array
+    public static function getValidCompressions()
     {
         return array_filter(self::$validExtensions);
     }

@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -111,7 +110,7 @@ class BackupExport
      * @uses $defaultExtension
      * @uses $extension
      */
-    public function compression(?string $compression)
+    public function compression($compression)
     {
         $this->extension = $this->defaultExtension;
 
@@ -139,7 +138,7 @@ class BackupExport
      * @uses $config
      * @uses $filename
      */
-    public function filename(string $filename)
+    public function filename($filename)
     {
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
@@ -172,7 +171,7 @@ class BackupExport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
      * @uses $rotate
      */
-    public function rotate(int $rotate)
+    public function rotate($rotate)
     {
         $this->rotate = $rotate;
 
@@ -186,7 +185,7 @@ class BackupExport
      * @since 1.1.0
      * @uses $emailRecipient
      */
-    public function send(?string $recipient = null)
+    public function send($recipient = null)
     {
         $this->emailRecipient = $recipient;
 
@@ -205,7 +204,7 @@ class BackupExport
      * @uses $extension
      * @uses $rotate
      */
-    public function export(): string
+    public function export()
     {
         if (empty($this->filename)) {
             $this->extension = $this->extension ?? $this->defaultExtension;

@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -38,7 +37,7 @@ class BackupExportTest extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    public function setUp()
     {
         if (!$this->BackupExport) {
             $this->BackupExport = new BackupExport();

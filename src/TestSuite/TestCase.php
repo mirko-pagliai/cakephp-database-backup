@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -80,7 +79,7 @@ abstract class TestCase extends BaseTestCase
      * @param array $methods The list of methods to mock
      * @return \DatabaseBackup\Driver\Driver|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMockForDriver(string $className, array $methods)
+    protected function getMockForDriver($className, array $methods)
     {
         return $this->getMockBuilder($className)
             ->setMethods($methods)

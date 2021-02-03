@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of cakephp-database-backup.
@@ -43,7 +42,7 @@ class BackupManager
      * @throws \Tools\Exception\FileNotExistsException
      * @throws \Tools\Exception\NotWritableException
      */
-    public static function delete(string $filename): string
+    public static function delete($filename)
     {
         $filename = self::getAbsolutePath($filename);
         Filesystem::instance()->remove(Exceptionist::isWritable($filename));
@@ -59,7 +58,7 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public static function deleteAll(): array
+    public static function deleteAll()
     {
         return array_map('self::delete', self::index()->extract('filename')->toList());
     }
@@ -69,7 +68,7 @@ class BackupManager
      * @return \Cake\Collection\CollectionInterface<\Cake\ORM\Entity> Backups
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
-    public static function index(): CollectionInterface
+    public static function index()
     {
         $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::read('DatabaseBackup.target'));
 
@@ -97,7 +96,7 @@ class BackupManager
      * @uses delete()
      * @uses index()
      */
-    public static function rotate($rotate): array
+    public static function rotate($rotate)
     {
         Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
         $backupsToBeDeleted = self::index()->skip((int)$rotate);
@@ -115,7 +114,7 @@ class BackupManager
      * @since 1.1.0
      * @throws \Tools\Exception\NotReadableException
      */
-    protected static function getEmailInstance(string $backup, string $recipient): Email
+    protected static function getEmailInstance($backup, $recipient)
     {
         $file = self::getAbsolutePath($backup);
         $basename = basename(Exceptionist::isReadable($file));
@@ -137,7 +136,7 @@ class BackupManager
      * @since 1.1.0
      * @uses getEmailInstance()
      */
-    public function send(string $filename, string $recipient): array
+    public function send($filename, $recipient)
     {
         return self::getEmailInstance($filename, $recipient)->send();
     }
