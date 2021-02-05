@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "cakephp/cakephp": "^3.5.1",
         "cakephp/chronos": "^1.0.1",
         "mirko-pagliai/php-tools": "dev-php5.6"
