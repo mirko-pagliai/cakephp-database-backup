@@ -144,7 +144,7 @@ class BackupExport
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
             pathinfo($this->config['database'], PATHINFO_FILENAME),
             date('YmdHis'),
-            $this->config['host'] ?? 'localhost',
+            isset($this->config['host']) ? $this->config['host'] : 'localhost',
             time(),
         ], $filename);
 
@@ -207,7 +207,7 @@ class BackupExport
     public function export()
     {
         if (empty($this->filename)) {
-            $this->extension = $this->extension ?? $this->defaultExtension;
+            $this->extension = empty($this->extension) ? $this->defaultExtension : $this->extension;
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 

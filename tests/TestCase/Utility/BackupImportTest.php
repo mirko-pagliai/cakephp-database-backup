@@ -45,8 +45,8 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?? new BackupExport();
-        $this->BackupImport = $this->BackupImport ?? new BackupImport();
+        $this->BackupExport = $this->BackupExport ?: new BackupExport();
+        $this->BackupImport = $this->BackupImport ?: new BackupImport();
     }
 
     /**

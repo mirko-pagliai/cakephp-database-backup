@@ -38,7 +38,7 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->Driver = $this->Driver ?? new Mysql($this->getConnection('test'));
+        $this->Driver = $this->Driver ?: new Mysql($this->getConnection('test'));
     }
 
     /**

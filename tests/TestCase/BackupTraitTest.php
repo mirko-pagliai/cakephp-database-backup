@@ -19,7 +19,6 @@ use Cake\Database\Driver\Mysql as CakeMysql;
 use Cake\Database\Driver\Sqlserver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
@@ -29,8 +28,6 @@ use InvalidArgumentException;
  */
 class BackupTraitTest extends TestCase
 {
-    use BackupTrait;
-
     /**
      * @var bool
      */

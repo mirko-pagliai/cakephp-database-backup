@@ -53,8 +53,9 @@ trait BackupTrait
     public static function getCompression($filename)
     {
         $extension = self::getExtension($filename);
+        $validCompressions = self::getValidCompressions();
 
-        return self::getValidCompressions()[$extension] ?? null;
+        return isset($validCompressions[$extension]) ? $validCompressions[$extension] : null;
     }
 
     /**
