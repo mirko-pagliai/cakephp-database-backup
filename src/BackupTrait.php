@@ -35,18 +35,13 @@ trait BackupTrait
     protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
     /**
-     * Returns an absolute path
+     * Returns the absolute path for a backup file
      * @param string $path Relative or absolute path
      * @return string
      */
-    public function getAbsolutePath(string $path): string
+    public static function getAbsolutePath(string $path): string
     {
-        $Filesystem = new Filesystem();
-        if (!$Filesystem->isAbsolutePath($path)) {
-            return $Filesystem->addSlashTerm(Configure::read('DatabaseBackup.target')) . $path;
-        }
-
-        return $path;
+        return Filesystem::instance()->makePathAbsolute($path, Configure::read('DatabaseBackup.target'));
     }
 
     /**
@@ -56,13 +51,11 @@ trait BackupTrait
      * @uses getExtension()
      * @uses getValidCompressions()
      */
-    public function getCompression(string $filename): ?string
+    public static function getCompression(string $filename): ?string
     {
-        //Gets the extension from the filename
-        $extension = $this->getExtension($filename);
-        $keyExists = array_key_exists($extension, $this->getValidCompressions());
+        $extension = self::getExtension($filename);
 
-        return $keyExists ? $this->getValidCompressions()[$extension] : null;
+        return self::getValidCompressions()[$extension] ?? null;
     }
 
     /**
@@ -79,7 +72,7 @@ trait BackupTrait
      * Gets the driver instance containing all methods to export/import database
      *  backups, according to the database engine
      * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
-     * @return object The driver instance
+     * @return \DatabaseBackup\Driver\Driver A driver instance
      * @since 2.0.0
      * @throws \InvalidArgumentException
      * @uses getConnection()
@@ -101,20 +94,20 @@ trait BackupTrait
      *  if is an invalid extension
      * @uses $validExtensions
      */
-    public function getExtension(string $filename): ?string
+    public static function getExtension(string $filename): ?string
     {
-        $extension = (new Filesystem())->getExtension($filename);
+        $extension = Filesystem::instance()->getExtension($filename);
 
         return in_array($extension, array_keys(self::$validExtensions)) ? $extension : null;
     }
 
     /**
      * Returns all valid compressions
-     * @return array
+     * @return array<string, string>
      * @since 2.4.0
      * @uses $validExtensions
      */
-    public function getValidCompressions(): array
+    public static function getValidCompressions(): array
     {
         return array_filter(self::$validExtensions);
     }

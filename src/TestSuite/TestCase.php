@@ -15,11 +15,10 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
-use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use MeTools\TestSuite\TestCase as BaseTestCase;
-use Tools\Filesystem;
 use Tools\TestSuite\BackwardCompatibilityTrait;
 
 /**
@@ -54,7 +53,7 @@ abstract class TestCase extends BaseTestCase
     public function tearDown(): void
     {
         //Deletes all backup files
-        (new Filesystem())->unlinkRecursive(Configure::read('DatabaseBackup.target'));
+        BackupManager::deleteAll();
 
         parent::tearDown();
     }
@@ -89,11 +88,11 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Internal method to mock a driver
-     * @param string $className Driver class name
+     * @param class-string<object> $className Driver class name
      * @param array $methods The list of methods to mock
      * @return \DatabaseBackup\Driver\Driver|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMockForDriver($className, array $methods)
+    protected function getMockForDriver(string $className, array $methods)
     {
         return $this->getMockBuilder($className)
             ->setMethods($methods)

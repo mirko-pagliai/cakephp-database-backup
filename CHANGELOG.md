@@ -1,5 +1,12 @@
 # 2.x branch
 ## 2.8 branch
+### 2.8.4
+* `BackupManager::delete()` returns the full path;
+* all methods provided by `BackupManager` can now be called statically, except
+    for the `send()` method;
+* extensive improvement of function descriptions and tags;
+* ready for `phpunit` 9.
+
 ### 2.8.3
 * updated for `php-tools` 1.4.5;
 * added `phpstan`, so fixed some code.

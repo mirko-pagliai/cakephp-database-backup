@@ -13,12 +13,12 @@
     "require": {
         "php": ">=7.2",
         "cakephp/cakephp": "^4.0",
-        "mirko-pagliai/php-tools": "^1.4.5"
+        "mirko-pagliai/php-tools": "^1.4.7"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^4.0",
         "mirko-pagliai/me-tools": "^2.19",
-        "phpunit/phpunit": "^8.0"
+        "phpunit/phpunit": "^8.0|^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -39,16 +39,16 @@
             "@test",
             "@composer update",
             "@test",
-            "@stan-setup",
             "@stan"
         ],
         "cs-check": "phpcs --standard=phpcs.xml.dist",
         "cs-fix": "phpcbf --standard=phpcs.xml.dist",
         "test": "phpunit",
-        "test-coverage": "phpunit --coverage-html coverage",
+        "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
         "phpstan": "phpstan.phar analyse",
         "psalm": "psalm.phar",
         "stan": [
+            "@stan-setup",
             "@phpstan",
             "@psalm"
         ],

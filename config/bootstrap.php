@@ -17,20 +17,19 @@ declare(strict_types=1);
 use Cake\Core\Configure;
 use Tools\Filesystem;
 
-//Sets the redirect to `/dev/null`. This string can be concatenated to shell commands
+//Sets the redirect to `/dev/null`. This string will be concatenated to shell commands
 if (!defined('REDIRECT_TO_DEV_NULL')) {
     define('REDIRECT_TO_DEV_NULL', IS_WIN ? ' 2>nul' : ' 2>/dev/null');
 }
 
-//Binaries
+//Auto-discovers binaries
 foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlite3'] as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         Configure::write('DatabaseBackup.binaries.' . $binary, which($binary));
     }
 }
 
-//Chmod for backups.
-//This works only on Unix
+//Default chmod for backups. This works only on Unix
 if (!Configure::check('DatabaseBackup.chmod')) {
     Configure::write('DatabaseBackup.chmod', 0664);
 }
@@ -47,7 +46,7 @@ if (!Configure::check('DatabaseBackup.redirectStderrToDevNull')) {
 
 //Default target directory
 if (!Configure::check('DatabaseBackup.target')) {
-    Configure::write('DatabaseBackup.target', (new Filesystem())->addSlashTerm(ROOT) . 'backups');
+    Configure::write('DatabaseBackup.target', Filesystem::instance()->concatenate(ROOT, 'backups'));
 }
 
 //Checks for the target directory

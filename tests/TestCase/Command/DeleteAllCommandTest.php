@@ -39,7 +39,7 @@ class DeleteAllCommandTest extends TestCase
         $this->exec($this->command);
         $this->assertExitWithSuccess();
         foreach ($files as $file) {
-            $this->assertOutputContains('Backup `' . basename($file) . '` has been deleted');
+            $this->assertOutputContains('Backup `' . $file . '` has been deleted');
         }
         $this->assertOutputContains('<success>Deleted backup files: 3</success>');
     }

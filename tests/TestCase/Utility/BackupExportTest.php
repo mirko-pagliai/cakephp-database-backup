@@ -65,17 +65,6 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Called after every test method
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        (new Filesystem())->unlinkRecursive(LOGS, 'empty');
-    }
-
-    /**
      * Test for `construct()` method
      * @test
      */
@@ -123,7 +112,7 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename('backup.sql.bz2');
         $this->assertEquals(
-            (new Filesystem())->addSlashTerm(Configure::read('DatabaseBackup.target')) . 'backup.sql.bz2',
+            Filesystem::instance()->concatenate(Configure::read('DatabaseBackup.target'), 'backup.sql.bz2'),
             $this->getProperty($this->BackupExport, 'filename')
         );
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
@@ -141,7 +130,7 @@ class BackupExportTest extends TestCase
 
         //Filename with `{$DATETIME}` pattern
         $this->BackupExport->filename('{$DATETIME}.sql');
-        $this->assertRegExp('/^\d{14}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertMatchesRegularExpression('/^\d{14}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
 
         //Filename with `{$HOSTNAME}` pattern
         $this->BackupExport->filename('{$HOSTNAME}.sql');
@@ -149,7 +138,7 @@ class BackupExportTest extends TestCase
 
         //Filename with `{$TIMESTAMP}` pattern
         $this->BackupExport->filename('{$TIMESTAMP}.sql');
-        $this->assertRegExp('/^\d{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertMatchesRegularExpression('/^\d{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
 
         //With invalid extension
         $this->expectException(InvalidArgumentException::class);
@@ -193,12 +182,12 @@ class BackupExportTest extends TestCase
     {
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
-        $this->assertRegExp('/^backup_test_\d{14}\.sql$/', basename($filename));
+        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($filename));
 
         //Exports with `compression()`
         $filename = $this->BackupExport->compression('bzip2')->export();
         $this->assertFileExists($filename);
-        $this->assertRegExp('/^backup_test_\d{14}\.sql\.bz2$/', basename($filename));
+        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql\.bz2$/', basename($filename));
 
         //Exports with `filename()`
         $filename = $this->BackupExport->filename('backup.sql.bz2')->export();
@@ -208,7 +197,7 @@ class BackupExportTest extends TestCase
         //Exports with `send()`
         $recipient = 'recipient@example.com';
         $filename = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
-        $log = file_get_contents(LOGS . 'debug.log');
+        $log = file_get_contents(LOGS . 'debug.log') ?: '';
         $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
 
         //With a file that already exists

@@ -27,12 +27,13 @@ before_test:
 
 install:
   - cd c:\
-  - curl -fsS -o php.zip https://windows.php.net/downloads/releases/latest/php-7.2-nts-Win32-VC15-x86-latest.zip
+  - curl -fsS -o php.zip https://windows.php.net/downloads/releases/latest/php-7.3-nts-Win32-VC15-x86-latest.zip
   - 7z x php.zip -oc:\php > nul
   - cd c:\php
   - copy php.ini-production php.ini
   - echo date.timezone="UTC" >> php.ini
   - echo extension_dir=ext >> php.ini
+  - echo extension=php_curl.dll >> php.ini
   - echo extension=php_openssl.dll >> php.ini
   - echo extension=php_intl.dll >> php.ini
   - echo extension=php_mbstring.dll >> php.ini

@@ -23,6 +23,7 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use Tools\Exception\NotReadableException;
+use Tools\Exception\NotWritableException;
 use Tools\Filesystem;
 
 /**
@@ -62,14 +63,14 @@ class BackupManagerTest extends TestCase
     {
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
-        $this->assertTrue($this->BackupManager->delete($filename));
-        $this->assertFileNotExists($filename);
+        $this->assertSame($filename, $this->BackupManager->delete($filename));
+        $this->assertFileDoesNotExist($filename);
 
         //With a relative path
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
-        $this->assertTrue($this->BackupManager->delete(basename($filename)));
-        $this->assertFileNotExists($filename);
+        $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
+        $this->assertFileDoesNotExist($filename);
     }
 
     /**
@@ -79,10 +80,10 @@ class BackupManagerTest extends TestCase
     public function testDeleteAll()
     {
         $createdFiles = $this->createSomeBackups();
-        $this->assertEquals(array_reverse(array_map('basename', $createdFiles)), $this->BackupManager->deleteAll());
+        $this->assertEquals(array_reverse($createdFiles), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
-        $this->expectException(NotReadableException::class);
+        $this->expectException(NotWritableException::class);
         $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` does not exist');
         $this->BackupManager->delete('noExistingFile');
     }
@@ -94,7 +95,7 @@ class BackupManagerTest extends TestCase
     public function testIndex()
     {
         //Creates a text file. This file should be ignored
-        (new Filesystem())->createFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
+        Filesystem::instance()->createFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
 
         $createdFiles = $this->createSomeBackups();
         $files = $this->BackupManager->index();
@@ -114,8 +115,8 @@ class BackupManagerTest extends TestCase
         //Checks for properties of each backup object
         foreach ($files as $file) {
             $this->assertInstanceOf(Entity::class, $file);
-            $this->assertTrue(is_positive($file->size));
-            $this->assertInstanceOf(FrozenTime::class, $file->datetime);
+            $this->assertIsPositive($file->get('size'));
+            $this->assertInstanceOf(FrozenTime::class, $file->get('datetime'));
         }
     }
 
@@ -125,7 +126,7 @@ class BackupManagerTest extends TestCase
      */
     public function testRotate()
     {
-        $this->assertEquals([], $this->BackupManager->rotate(1));
+        $this->assertEquals([], BackupManager::rotate(1));
 
         $this->createSomeBackups();
 
@@ -141,14 +142,12 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function ($first, $second) {
-            return strcmp($first->filename, $second->filename);
+        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function (Entity $first, Entity $second) {
+            return strcmp($first->get('filename'), $second->get('filename'));
         });
 
-        //Again, only 1 backup was deleted
+        //Again, only 1 backup was deleted. The difference is the same
         $this->assertCount(1, $diff);
-
-        //The difference is the same
         $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
 
         $this->expectException(InvalidArgumentException::class);

@@ -30,7 +30,7 @@ class BackupImport
      * Driver containing all methods to export/import database backups
      *  according to the database engine
      * @since 2.0.0
-     * @var object
+     * @var \DatabaseBackup\Driver\Driver
      */
     protected $driver;
 

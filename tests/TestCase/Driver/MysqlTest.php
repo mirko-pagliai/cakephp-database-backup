@@ -152,10 +152,10 @@ class MysqlTest extends DriverTestCase
     {
         $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
 
-        $auth = tempnam(sys_get_temp_dir(), 'auth');
+        $auth = tempnam(sys_get_temp_dir(), 'auth') ?: '';
         $this->setProperty($this->Driver, 'auth', $auth);
         $this->assertFileExists($auth);
         $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
-        $this->assertFileNotExists($auth);
+        $this->assertFileDoesNotExist($auth);
     }
 }
