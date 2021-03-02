@@ -68,15 +68,16 @@ class ExportCommand extends Command
      * This command uses `RotateCommand` and `SendCommand`.
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return int|null The exit code or null for success
+     * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
+     * @throws \Cake\Console\Exception\StopException
      * @uses \DatabaseBackup\Command\RotateCommand::execute()
      * @uses \DatabaseBackup\Command\SendCommand::execute()
      * @uses \DatabaseBackup\Utility\BackupExport::compression()
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
-    public function execute(Arguments $args, ConsoleIo $io): ?int
+    public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
@@ -120,7 +121,5 @@ class ExportCommand extends Command
             $io->error($e->getMessage());
             $this->abort();
         }
-
-        return null;
     }
 }
