@@ -23,6 +23,7 @@ use DatabaseBackup\Command\SendCommand;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
+use Tools\Filesystem;
 
 /**
  * Exports a database backup
@@ -94,7 +95,7 @@ class ExportCommand extends Command
 
             //Exports
             $file = $instance->export();
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->Filesystem->rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', Filesystem::instance()->rtr($file)));
             $verbose = $args->getOption('verbose');
             $quiet = $args->getOption('quiet');
 

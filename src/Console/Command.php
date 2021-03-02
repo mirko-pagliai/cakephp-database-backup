@@ -19,7 +19,6 @@ use Cake\Console\Arguments;
 use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use DatabaseBackup\BackupTrait;
-use Tools\Filesystem;
 
 /**
  * Base class for console commands
@@ -27,19 +26,6 @@ use Tools\Filesystem;
 class Command extends BaseCommand
 {
     use BackupTrait;
-
-    /**
-     * @var \Tools\Filesystem
-     */
-    protected $Filesystem;
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        $this->Filesystem = $this->Filesystem ?: new Filesystem();
-    }
 
     /**
      * Implement this method with your command's logic
