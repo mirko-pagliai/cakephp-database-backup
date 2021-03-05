@@ -116,7 +116,7 @@ class BackupExport
         $this->extension = $this->defaultExtension;
 
         if ($compression) {
-            $this->extension = array_search($compression, $this->getValidCompressions()) ?: '';
+            $this->extension = (string)array_search($compression, $this->getValidCompressions());
             Exceptionist::isTrue($this->extension, __d('database_backup', 'Invalid compression type'), InvalidArgumentException::class);
         }
         $this->compression = $compression;

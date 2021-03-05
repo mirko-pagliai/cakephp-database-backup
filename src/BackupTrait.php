@@ -18,6 +18,7 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use DatabaseBackup\Driver\Driver;
 use InvalidArgumentException;
 use Tools\Exceptionist;
 use Tools\Filesystem;
@@ -30,7 +31,7 @@ trait BackupTrait
     /**
      * Valid extensions. Names as keys and compressions as values
      * @since 2.4.0
-     * @var array
+     * @var array<string, string|bool>
      */
     protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
@@ -77,7 +78,7 @@ trait BackupTrait
      * @throws \InvalidArgumentException
      * @uses getConnection()
      */
-    public function getDriver(?ConnectionInterface $connection = null): object
+    public function getDriver(?ConnectionInterface $connection = null): Driver
     {
         $connection = $connection ?: $this->getConnection();
         $className = get_class_short_name($connection->getDriver());
@@ -103,7 +104,7 @@ trait BackupTrait
 
     /**
      * Returns all valid compressions
-     * @return array<string, string>
+     * @return array
      * @since 2.4.0
      * @uses $validExtensions
      */

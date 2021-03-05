@@ -103,7 +103,7 @@ abstract class Driver implements EventListenerInterface
      * @return bool Returns `false` to stop the export
      * @since 2.1.0
      */
-    public function beforeExport()
+    public function beforeExport(): bool
     {
         return true;
     }
@@ -199,7 +199,7 @@ abstract class Driver implements EventListenerInterface
      * @return string
      * @throws \ErrorException
      */
-    public function getBinary($name)
+    public function getBinary(string $name): string
     {
         $binary = Configure::read('DatabaseBackup.binaries.' . $name);
 

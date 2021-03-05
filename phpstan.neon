@@ -21,12 +21,8 @@ parameters:
         - "#^Constant REDIRECT_TO_DEV_NULL not found\\.$#"
         - '#^Parameter \#1 \$callback of function array_map expects \(callable\(\): mixed\)\|null#'
         - "#^Static call to instance method Tools\\\\Exceptionist#"
-        - "#^Parameter \\#2 \\$eventManager of method Cake\\\\TestSuite\\\\TestCase\\:\\:assertEventFired\\(\\) expects Cake\\\\Event\\\\EventManager\\|null, Cake\\\\Event\\\\EventManagerInterface given\\.$#"
-        - "#^Parameter \\#1 \\$connection of method Cake\\\\Database\\\\Schema\\\\TableSchema\\:\\:dropSql\\(\\) expects Cake\\\\Database\\\\Connection, Cake\\\\Datasource\\\\ConnectionInterface given\\.$#"
-
-        -
-            message: "#^Call to an undefined method Cake\\\\Datasource\\\\ConnectionInterface#"
-            path: src/Driver/Sqlite.php
+        - '#^Parameter \#\d \$\w+ of method Cake\\[\w\:\\]+\(\) expects#'
+        - '#^Call to an undefined method Cake\\#'
 
         -
             message: '#^Call to an undefined method [\w\|\\]+MockObject::\w+\(\)\.$#'
