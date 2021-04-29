@@ -48,11 +48,12 @@ class RotateCommand extends Command
      *  delete all backups that are older. By default, no backup will be deleted
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return int|null The exit code or null for success
+     * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#rotate
+     * @throws \Cake\Console\Exception\StopException
      * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
-    public function execute(Arguments $args, ConsoleIo $io): ?int
+    public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
@@ -63,7 +64,7 @@ class RotateCommand extends Command
             if (!$files) {
                 $io->verbose(__d('database_backup', 'No backup has been deleted'));
 
-                return null;
+                return;
             }
 
             foreach ($files as $file) {
@@ -75,7 +76,5 @@ class RotateCommand extends Command
             $io->error($e->getMessage());
             $this->abort();
         }
-
-        return null;
     }
 }

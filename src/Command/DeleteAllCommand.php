@@ -20,6 +20,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
+use Tools\Filesystem;
 
 /**
  * Deletes all backup files
@@ -40,28 +41,25 @@ class DeleteAllCommand extends Command
      * Deletes all backup files
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return int|null The exit code or null for success
+     * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#delete_all
      * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
      */
-    public function execute(Arguments $args, ConsoleIo $io): ?int
+    public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
-        $files = (new BackupManager())->deleteAll();
-
+        $files = BackupManager::deleteAll();
         if (!$files) {
             $io->verbose(__d('database_backup', 'No backup has been deleted'));
 
-            return null;
+            return;
         }
 
         foreach ($files as $file) {
-            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $this->Filesystem->rtr($file)));
+            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', Filesystem::instance()->rtr($file)));
         }
 
         $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
-
-        return null;
     }
 }

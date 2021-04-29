@@ -23,6 +23,7 @@ use DatabaseBackup\Command\SendCommand;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
+use Tools\Filesystem;
 
 /**
  * Exports a database backup
@@ -68,15 +69,16 @@ class ExportCommand extends Command
      * This command uses `RotateCommand` and `SendCommand`.
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return int|null The exit code or null for success
+     * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
+     * @throws \Cake\Console\Exception\StopException
      * @uses \DatabaseBackup\Command\RotateCommand::execute()
      * @uses \DatabaseBackup\Command\SendCommand::execute()
      * @uses \DatabaseBackup\Utility\BackupExport::compression()
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
-    public function execute(Arguments $args, ConsoleIo $io): ?int
+    public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
@@ -93,7 +95,7 @@ class ExportCommand extends Command
 
             //Exports
             $file = $instance->export();
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->Filesystem->rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', Filesystem::instance()->rtr($file)));
             $verbose = $args->getOption('verbose');
             $quiet = $args->getOption('quiet');
 
@@ -120,7 +122,5 @@ class ExportCommand extends Command
             $io->error($e->getMessage());
             $this->abort();
         }
-
-        return null;
     }
 }

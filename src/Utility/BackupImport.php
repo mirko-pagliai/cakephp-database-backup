@@ -42,7 +42,6 @@ class BackupImport
 
     /**
      * Construct
-     * @uses $driver
      */
     public function __construct()
     {
@@ -56,12 +55,10 @@ class BackupImport
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws \InvalidArgumentException
      * @throws \Tools\Exception\NotReadableException
-     * @uses $filename
      */
     public function filename(string $filename)
     {
-        $filename = $this->getAbsolutePath($filename);
-        Exceptionist::isReadable($filename);
+        $filename = Exceptionist::isReadable($this->getAbsolutePath($filename));
 
         //Checks for extension
         Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid file extension'), InvalidArgumentException::class);
@@ -76,8 +73,6 @@ class BackupImport
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      * @throws \InvalidArgumentException
-     * @uses $driver
-     * @uses $filename
      */
     public function import(): string
     {
