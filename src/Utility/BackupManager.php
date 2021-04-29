@@ -38,7 +38,7 @@ class BackupManager
      * Deletes a backup file
      * @param string $filename Filename of the backup that you want to delete.
      *  The path can be relative to the backup directory
-     * @return string
+     * @return string Deleted backup file
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws \Tools\Exception\FileNotExistsException
      * @throws \Tools\Exception\NotWritableException
@@ -56,8 +56,6 @@ class BackupManager
      * @return array<string> List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
-     * @uses delete()
-     * @uses index()
      */
     public static function deleteAll(): array
     {
@@ -94,13 +92,11 @@ class BackupManager
      * @return array<\Cake\ORM\Entity> Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws \InvalidArgumentException
-     * @uses delete()
-     * @uses index()
      */
     public static function rotate(int $rotate): array
     {
         Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
-        $backupsToBeDeleted = self::index()->skip((int)$rotate);
+        $backupsToBeDeleted = self::index()->skip($rotate);
         array_map('self::delete', $backupsToBeDeleted->extract('filename')->toList());
 
         return $backupsToBeDeleted->toList();
@@ -135,7 +131,6 @@ class BackupManager
      * @param string $recipient Recipient's email address
      * @return array
      * @since 1.1.0
-     * @uses getEmailInstance()
      */
     public function send(string $filename, string $recipient): array
     {

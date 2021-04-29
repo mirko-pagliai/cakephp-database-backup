@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.8 branch
 ### 2.8.5
+* ready for php `8.0`;
 * extensive improvement of function descriptions and tags.
 
 ### 2.8.4

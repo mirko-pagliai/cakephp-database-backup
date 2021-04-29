@@ -41,9 +41,9 @@ abstract class TestCase extends BaseTestCase
      */
     public function setUp(): void
     {
-        parent::setUp();
+        @parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?? new BackupExport();
+        $this->BackupExport = $this->BackupExport ?: new BackupExport();
     }
 
     /**
@@ -71,7 +71,6 @@ abstract class TestCase extends BaseTestCase
     /**
      * Internal method to creates some backup files
      * @return array
-     * @uses createBackup()
      */
     protected function createSomeBackups(): array
     {
@@ -94,7 +93,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getMockForDriver(string $className, ?array $methods = []): object
     {
-        return $this->getMockBuilder($className)
+        return @$this->getMockBuilder($className)
             ->setMethods($methods)
             ->setConstructorArgs([$this->getConnection('test')])
             ->getMock();

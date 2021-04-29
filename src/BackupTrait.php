@@ -48,9 +48,7 @@ trait BackupTrait
     /**
      * Returns the compression type from a filename
      * @param string $filename Filename
-     * @return string|null Compression type as string or `null`
-     * @uses getExtension()
-     * @uses getValidCompressions()
+     * @return string|null Compression type or `null`
      */
     public static function getCompression(string $filename): ?string
     {

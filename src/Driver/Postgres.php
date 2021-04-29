@@ -32,7 +32,6 @@ class Postgres extends Driver
      * postgresql://postgres@localhost/travis_ci_test
      * </code>
      * @return string
-     * @uses getConfig()
      */
     protected function getDbnameAsString(): string
     {
@@ -48,8 +47,6 @@ class Postgres extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
-     * @uses getBinary()
-     * @uses getDbnameAsString()
      */
     protected function _exportExecutable(): string
     {
@@ -59,8 +56,6 @@ class Postgres extends Driver
     /**
      * Gets the executable command to import the database
      * @return string
-     * @uses getBinary()
-     * @uses getDbnameAsString()
      */
     protected function _importExecutable(): string
     {

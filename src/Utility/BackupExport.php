@@ -87,9 +87,6 @@ class BackupExport
 
     /**
      * Construct
-     * @uses $BackupManager
-     * @uses $config
-     * @uses $driver
      */
     public function __construct()
     {
@@ -106,10 +103,6 @@ class BackupExport
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws \InvalidArgumentException
-     * @uses getValidCompressions()
-     * @uses $compression
-     * @uses $defaultExtension
-     * @uses $extension
      */
     public function compression(?string $compression)
     {
@@ -135,9 +128,6 @@ class BackupExport
      * @throws \Exception
      * @throws \InvalidArgumentException
      * @throws \Tools\Exception\NotWritableException
-     * @uses compression()
-     * @uses $config
-     * @uses $filename
      */
     public function filename(string $filename)
     {
@@ -170,7 +160,6 @@ class BackupExport
      * @param int $rotate Number of backups you want to keep
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
-     * @uses $rotate
      */
     public function rotate(int $rotate)
     {
@@ -184,7 +173,6 @@ class BackupExport
      * @param string|null $recipient Recipient's email address or `null` to disable
      * @return $this
      * @since 1.1.0
-     * @uses $emailRecipient
      */
     public function send(?string $recipient = null)
     {
@@ -197,18 +185,11 @@ class BackupExport
      * Exports the database
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
-     * @uses filename()
-     * @uses $BackupManager;
-     * @uses $defaultExtension
-     * @uses $emailRecipient
-     * @uses $filename
-     * @uses $extension
-     * @uses $rotate
      */
     public function export(): string
     {
         if (empty($this->filename)) {
-            $this->extension = $this->extension ?? $this->defaultExtension;
+            $this->extension = $this->extension ?: $this->defaultExtension;
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 

@@ -39,7 +39,6 @@ abstract class Driver implements EventListenerInterface
     /**
      * Construct
      * @param \Cake\Datasource\ConnectionInterface $connection A connection object
-     * @uses $connection
      */
     public function __construct($connection)
     {
@@ -122,8 +121,6 @@ abstract class Driver implements EventListenerInterface
      * Gets the executable command to export the database, with compression
      * @param string $filename Filename where you want to export the database
      * @return string
-     * @uses _exportExecutable()
-     * @uses getBinary()
      */
     protected function _exportExecutableWithCompression(string $filename): string
     {
@@ -146,8 +143,6 @@ abstract class Driver implements EventListenerInterface
      * Gets the executable command to import the database, with compression
      * @param string $filename Filename from which you want to import the database
      * @return string
-     * @uses _importExecutable()
-     * @uses getBinary()
      */
     protected function _importExecutableWithCompression(string $filename): string
     {
@@ -174,9 +169,8 @@ abstract class Driver implements EventListenerInterface
      * - Backup.beforeExport: will be triggered before export
      * - Backup.afterExport: will be triggered after export
      * @param string $filename Filename where you want to export the database
-     * @return bool true on success
+     * @return bool `true` on success
      * @throws \Exception
-     * @uses _exportExecutableWithCompression()
      */
     final public function export(string $filename): bool
     {
@@ -212,7 +206,6 @@ abstract class Driver implements EventListenerInterface
      * @return mixed Config value, `null` if the key doesn't exist
      *  or all config values if no key was specified
      * @since 2.3.0
-     * @uses $connection
      */
     final public function getConfig(?string $key = null)
     {
@@ -231,7 +224,6 @@ abstract class Driver implements EventListenerInterface
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
      * @throws \Exception
-     * @uses _importExecutableWithCompression()
      */
     final public function import(string $filename): bool
     {
