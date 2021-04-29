@@ -22,16 +22,6 @@ You can install the plugin via composer:
 $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 ```
 
-The current release requires at least CakePHP 4.0, PHP 7.2 and `phpunit` 8.0.
-
-Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3)
-branch requires at least CakePHP 3.5.1, PHP 5.6 and `phpunit` 5.7.14.
-In this case, you can install the package as well:
-
-```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp3
-```
-
 Then you have to load the plugin. For more information on how to load the plugin,
 please refer to the [Cookbook](//book.cakephp.org/4.0/en/plugins.html#loading-a-plugin).
 
@@ -48,7 +38,21 @@ files. So you have to create the directory and make it writable:
 $ mkdir backups/ && chmod 775 backups/
 ```
 
-If you want to use a different directory, read below.
+If you want to use a different directory, read the [Configuration](#configuration) section.
+
+### Installation on older CakePHP and PHP versions
+Recent packages and the master branch require at least CakePHP 4.0 and PHP 7.2.
+Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3) branch
+requires at least PHP 5.6.
+
+In this case, you can install the package as well:
+```bash
+$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp3
+```
+
+Note that the `cakephp3` branch will no longer be updated as of April 29, 2021,
+except for security patches, and it matches the
+[2.8.5](//github.com/mirko-pagliai/cakephp-database-backup/releases/tag/2.8.5) version.
 
 ## Requirements
 *DatabaseBackup* requires:
