@@ -18,7 +18,7 @@ namespace DatabaseBackup\Utility;
 use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
-use Cake\Mailer\Email;
+use Cake\Mailer\Mailer;
 use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
@@ -111,17 +111,17 @@ class BackupManager
      *  backup file via email
      * @param string $backup Backup you want to send
      * @param string $recipient Recipient's email address
-     * @return \Cake\Mailer\Email
+     * @return \Cake\Mailer\Mailer
      * @since 1.1.0
      * @throws \Tools\Exception\NotReadableException
      */
-    protected static function getEmailInstance(string $backup, string $recipient): Email
+    protected static function getEmailInstance(string $backup, string $recipient): Mailer
     {
         $file = self::getAbsolutePath($backup);
         $basename = basename(Exceptionist::isReadable($file));
         $server = env('SERVER_NAME', 'localhost');
 
-        return (new Email())
+        return (new Mailer())
             ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
             ->setTo($recipient)
             ->setSubject(__d('database_backup', 'Database backup {0} from {1}', $basename, $server))
