@@ -106,7 +106,7 @@ class BackupTraitTest extends TestCase
         //With a no existing driver
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
-        $connection = $this->getMockBuilder(get_class($this->getConnection()))
+        $connection = @$this->getMockBuilder(get_class($this->getConnection()))
             ->setMethods(['getDriver'])
             ->setConstructorArgs([$this->getConnection()->config()])
             ->getMock();

@@ -8,4 +8,7 @@
     <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace.UseFromSameNamespace">
         <severity>0</severity>
     </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue.NullabilityTypeMissing">
+        <severity>0</severity>
+    </rule>
 </ruleset>

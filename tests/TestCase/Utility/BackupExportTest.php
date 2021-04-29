@@ -44,7 +44,7 @@ class BackupExportTest extends TestCase
 
             //Mocks the `send()` method of `BackupManager` class, so that it writes
             //  on the debug log instead of sending a real mail
-            $this->BackupExport->BackupManager = $this->getMockBuilder(BackupManager::class)
+            $this->BackupExport->BackupManager = @$this->getMockBuilder(BackupManager::class)
                 ->setMethods(['send'])
                 ->getMock();
 

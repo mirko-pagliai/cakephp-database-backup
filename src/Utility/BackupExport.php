@@ -86,9 +86,6 @@ class BackupExport
 
     /**
      * Construct
-     * @uses $BackupManager
-     * @uses $config
-     * @uses $driver
      */
     public function __construct()
     {
@@ -105,17 +102,13 @@ class BackupExport
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws \InvalidArgumentException
-     * @uses getValidCompressions()
-     * @uses $compression
-     * @uses $defaultExtension
-     * @uses $extension
      */
     public function compression($compression)
     {
         $this->extension = $this->defaultExtension;
 
         if ($compression) {
-            $this->extension = array_search($compression, $this->getValidCompressions()) ?: '';
+            $this->extension = (string)array_search($compression, $this->getValidCompressions());
             Exceptionist::isTrue($this->extension, __d('database_backup', 'Invalid compression type'), InvalidArgumentException::class);
         }
         $this->compression = $compression;
@@ -134,9 +127,6 @@ class BackupExport
      * @throws \Exception
      * @throws \InvalidArgumentException
      * @throws \Tools\Exception\NotWritableException
-     * @uses compression()
-     * @uses $config
-     * @uses $filename
      */
     public function filename($filename)
     {
@@ -169,7 +159,6 @@ class BackupExport
      * @param int $rotate Number of backups you want to keep
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
-     * @uses $rotate
      */
     public function rotate($rotate)
     {
@@ -183,7 +172,6 @@ class BackupExport
      * @param string|null $recipient Recipient's email address or `null` to disable
      * @return $this
      * @since 1.1.0
-     * @uses $emailRecipient
      */
     public function send($recipient = null)
     {
@@ -196,13 +184,6 @@ class BackupExport
      * Exports the database
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
-     * @uses filename()
-     * @uses $BackupManager;
-     * @uses $defaultExtension
-     * @uses $emailRecipient
-     * @uses $filename
-     * @uses $extension
-     * @uses $rotate
      */
     public function export()
     {

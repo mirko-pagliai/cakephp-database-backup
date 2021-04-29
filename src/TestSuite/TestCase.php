@@ -75,11 +75,11 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Internal method to mock a driver
-     * @param class-string<object> $className Driver class name
+     * @param class-string<\DatabaseBackup\Driver\Driver> $className Driver class name
      * @param array $methods The list of methods to mock
      * @return \DatabaseBackup\Driver\Driver|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMockForDriver($className, array $methods)
+    protected function getMockForDriver($className, array $methods = [])
     {
         return $this->getMockBuilder($className)
             ->setMethods($methods)

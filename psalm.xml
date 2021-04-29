@@ -57,6 +57,7 @@
         <UndefinedInterfaceMethod>
             <errorLevel type="suppress">
                 <file name="src/Driver/Sqlite.php" />
+                <file name="src/TestSuite/DriverTestCase.php" />
             </errorLevel>
         </UndefinedInterfaceMethod>
     </issueHandlers>

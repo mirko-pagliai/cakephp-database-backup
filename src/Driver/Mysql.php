@@ -32,9 +32,6 @@ class Mysql extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
-     * @uses getBinary()
-     * @uses getConfig()
-     * @uses $auth
      */
     protected function _exportExecutable()
     {
@@ -49,9 +46,6 @@ class Mysql extends Driver
     /**
      * Gets the executable command to import the database
      * @return string
-     * @uses getBinary()
-     * @uses getConfig()
-     * @uses $auth
      */
     protected function _importExecutable()
     {
@@ -68,8 +62,6 @@ class Mysql extends Driver
      * @param string $content Content
      * @return bool
      * @since 2.3.0
-     * @uses getConfig()
-     * @uses $auth
      */
     protected function writeAuthFile($content)
     {
@@ -88,7 +80,6 @@ class Mysql extends Driver
      * Called after export
      * @return void
      * @since 2.1.0
-     * @uses deleteAuthFile()
      */
     public function afterExport()
     {
@@ -99,7 +90,6 @@ class Mysql extends Driver
      * Called after import
      * @return void
      * @since 2.1.0
-     * @uses deleteAuthFile()
      */
     public function afterImport()
     {
@@ -118,7 +108,6 @@ class Mysql extends Driver
      * So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses writeAuthFile()
      */
     public function beforeExport()
     {
@@ -140,7 +129,6 @@ class Mysql extends Driver
      *  So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses writeAuthFile()
      */
     public function beforeImport()
     {
@@ -154,7 +142,6 @@ class Mysql extends Driver
      * Deletes the temporary file with the database authentication data
      * @return bool `true` on success
      * @since 2.1.0
-     * @uses $auth
      */
     protected function deleteAuthFile()
     {

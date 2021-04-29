@@ -47,7 +47,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * Driver class
      * @since 2.5.1
-     * @var string
+     * @var class-string<\DatabaseBackup\Driver\Driver>
      */
     protected $DriverClass;
 

@@ -29,7 +29,7 @@ trait BackupTrait
     /**
      * Valid extensions. Names as keys and compressions as values
      * @since 2.4.0
-     * @var array
+     * @var array<string, string|bool>
      */
     protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
@@ -46,9 +46,7 @@ trait BackupTrait
     /**
      * Returns the compression type from a filename
      * @param string $filename Filename
-     * @return string|null Compression type as string or `null`
-     * @uses getExtension()
-     * @uses getValidCompressions()
+     * @return string|null Compression type or `null`
      */
     public static function getCompression($filename)
     {
@@ -103,7 +101,7 @@ trait BackupTrait
 
     /**
      * Returns all valid compressions
-     * @return array<string, string>
+     * @return array
      * @since 2.4.0
      * @uses $validExtensions
      */
