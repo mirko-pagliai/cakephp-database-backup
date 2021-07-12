@@ -51,7 +51,9 @@ if (!Configure::check('DatabaseBackup.target')) {
 
 //Checks for the target directory
 $target = Configure::read('DatabaseBackup.target');
-@mkdir($target, 0777);
-if (!is_writeable($target)) {
-    trigger_error(sprintf('Directory %s not writeable', $target), E_USER_ERROR);
+if (!file_exists($target)) {
+    mkdir($target, 0777);
+}
+if (!is_dir($target) || !is_writeable($target)) {
+    trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target), E_USER_ERROR);
 }
