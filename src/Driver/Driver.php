@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 use Cake\Core\Configure;
+use Cake\Database\Connection;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
@@ -24,6 +25,7 @@ use Tools\Exceptionist;
 /**
  * Represents a driver containing all methods to export/import database backups
  *  according to the database engine
+ * @method \Cake\Event\EventManager getEventManager()
  */
 abstract class Driver implements EventListenerInterface
 {
@@ -32,15 +34,15 @@ abstract class Driver implements EventListenerInterface
 
     /**
      * A connection object
-     * @var \Cake\Datasource\ConnectionInterface
+     * @var \Cake\Database\Connection
      */
     protected $connection;
 
     /**
      * Construct
-     * @param \Cake\Datasource\ConnectionInterface $connection A connection object
+     * @param \Cake\Database\Connection $connection A connection object
      */
-    public function __construct($connection)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
 
@@ -52,9 +54,9 @@ abstract class Driver implements EventListenerInterface
      * List of events this object is implementing. When the class is registered
      *  in an event manager, each individual method will be associated with the
      *  respective event
-     * @return array Associative array or event key names pointing to the
-     *  function that should be called in the object when the respective event
-     *  is fired
+     * @return array<string, string> Associative array or event key names pointing
+     *  to the function that should be called in the object when the respective
+     *  event is fired
      * @since 2.1.1
      */
     final public function implementedEvents(): array

@@ -53,6 +53,7 @@ foreach ([
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 require_once CORE_PATH . 'config' . DS . 'bootstrap.php';
+define('REDIRECT_TO_DEV_NULL', IS_WIN ? ' 2>nul' : ' 2>/dev/null');
 
 Configure::write('debug', true);
 Configure::write('App', [

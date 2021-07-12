@@ -39,7 +39,11 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->Driver = $this->Driver ?? new Mysql($this->getConnection('test'));
+        if (!$this->Driver) {
+            /** @var \Cake\Database\Connection $connection */
+            $connection = $this->getConnection('test');
+            $this->Driver = new Mysql($connection);
+        }
     }
 
     /**

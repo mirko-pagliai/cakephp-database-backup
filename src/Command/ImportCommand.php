@@ -57,7 +57,7 @@ class ImportCommand extends Command
         parent::execute($args, $io);
 
         try {
-            $file = (new BackupImport())->filename($args->getArgument('filename'))->import();
+            $file = (new BackupImport())->filename($args->getArgument('filename') ?: '')->import();
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', Filesystem::instance()->rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());
