@@ -34,7 +34,7 @@ class SendCommandTest extends TestCase
      * Test for `execute()` method
      * @test
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $file = $this->createBackup();
         $this->exec($this->command . ' ' . $file . ' recipient@example.com');
@@ -48,7 +48,7 @@ class SendCommandTest extends TestCase
      * Test for `execute()` method, with no existing file
      * @test
      */
-    public function testExecuteNoExistingFile()
+    public function testExecuteNoExistingFile(): void
     {
         $this->exec($this->command . ' /noExistingDir/backup.sql');
         $this->assertExitWithError();
@@ -58,7 +58,7 @@ class SendCommandTest extends TestCase
      * Test for `execute()` method, with no sender configuration
      * @test
      */
-    public function testExecuteNoSender()
+    public function testExecuteNoSender(): void
     {
         Configure::write('DatabaseBackup.mailSender', false);
         $this->exec($this->command . ' file.sql recipient@example.com');

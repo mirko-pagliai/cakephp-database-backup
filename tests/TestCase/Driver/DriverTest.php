@@ -47,7 +47,7 @@ class DriverTest extends TestCase
      * @return void
      * @test
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceof(Connection::class, $this->getProperty($this->Driver, 'connection'));
     }
@@ -58,7 +58,7 @@ class DriverTest extends TestCase
      * @since 2.6.2
      * @test
      */
-    public function testExportOnFailure()
+    public function testExportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
@@ -73,7 +73,7 @@ class DriverTest extends TestCase
      * @return void
      * @test
      */
-    public function testExportStoppedByBeforeExport()
+    public function testExportStoppedByBeforeExport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
         $Driver = $this->getMockForDriver(Mysql::class, ['beforeExport']);
@@ -86,7 +86,7 @@ class DriverTest extends TestCase
      * Test for `getBinary()` method
      * @test
      */
-    public function testGetBinary()
+    public function testGetBinary(): void
     {
         $this->assertEquals(which('mysql'), $this->invokeMethod($this->Driver, 'getBinary', ['mysql']));
 
@@ -101,7 +101,7 @@ class DriverTest extends TestCase
      * @return void
      * @test
      */
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $this->assertIsArrayNotEmpty($this->Driver->getConfig());
         $this->assertNotEmpty($this->Driver->getConfig('name'));
@@ -114,7 +114,7 @@ class DriverTest extends TestCase
      * @since 2.6.2
      * @test
      */
-    public function testImportOnFailure()
+    public function testImportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
@@ -131,7 +131,7 @@ class DriverTest extends TestCase
      * @return void
      * @test
      */
-    public function testImportStoppedByBeforeExport()
+    public function testImportStoppedByBeforeExport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
         $Driver = $this->getMockForDriver(Mysql::class, ['beforeImport']);

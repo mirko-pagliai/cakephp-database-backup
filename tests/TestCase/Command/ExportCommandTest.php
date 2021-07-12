@@ -33,7 +33,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method
      * @test
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->exec($this->command);
         $this->assertExitWithSuccess();
@@ -46,7 +46,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `compression` param
      * @test
      */
-    public function testExecuteCompressionParam()
+    public function testExecuteCompressionParam(): void
     {
         $this->exec($this->command . ' --compression bzip2');
         $this->assertExitWithSuccess();
@@ -57,7 +57,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `filename` param
      * @test
      */
-    public function testExecuteFilenameParam()
+    public function testExecuteFilenameParam(): void
     {
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitWithSuccess();
@@ -68,7 +68,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `rotate` param
      * @test
      */
-    public function testExecuteRotateParam()
+    public function testExecuteRotateParam(): void
     {
         $files = $this->createSomeBackups();
         $this->exec($this->command . ' --rotate 3 -v');
@@ -82,7 +82,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `send` param
      * @test
      */
-    public function testExecuteSendParam()
+    public function testExecuteSendParam(): void
     {
         $this->exec($this->command . ' --send mymail@example.com');
         $this->assertExitWithSuccess();
@@ -94,7 +94,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with an invalid option value
      * @test
      */
-    public function testExecuteInvalidOptionValue()
+    public function testExecuteInvalidOptionValue(): void
     {
         $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
         $this->assertExitWithError();

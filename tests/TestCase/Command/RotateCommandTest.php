@@ -33,7 +33,7 @@ class RotateCommandTest extends TestCase
      * Test for `execute()` method
      * @test
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->createSomeBackups();
         $this->exec($this->command . ' 1');
@@ -47,7 +47,7 @@ class RotateCommandTest extends TestCase
      * Test for `execute()` method, with an invalid value
      * @test
      */
-    public function testExecuteInvalidValue()
+    public function testExecuteInvalidValue(): void
     {
         $this->exec($this->command . ' string');
         $this->assertExitWithError();
@@ -57,7 +57,7 @@ class RotateCommandTest extends TestCase
      * Test for `execute()` method, with no backups
      * @test
      */
-    public function testExecuteNoBackups()
+    public function testExecuteNoBackups(): void
     {
         $this->exec($this->command . ' 1');
         $this->assertExitWithSuccess();

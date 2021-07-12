@@ -105,7 +105,7 @@ abstract class DriverTestCase extends TestCase
      * @return void
      * @test
      */
-    public function testExport()
+    public function testExport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
         $this->assertTrue($this->Driver->export($backup));
@@ -121,7 +121,7 @@ abstract class DriverTestCase extends TestCase
      * @return void
      * @test
      */
-    public function testExportAndImport()
+    public function testExportAndImport(): void
     {
         foreach (self::$validExtensions as $extension) {
             $this->loadFixtures();
@@ -180,7 +180,7 @@ abstract class DriverTestCase extends TestCase
      * @return void
      * @test
      */
-    public function testExportExecutableWithCompression()
+    public function testExportExecutableWithCompression(): void
     {
         $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
 
@@ -208,7 +208,7 @@ abstract class DriverTestCase extends TestCase
      * @return void
      * @test
      */
-    public function testImport()
+    public function testImport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
         $this->assertTrue($this->Driver->export($backup));
@@ -228,7 +228,7 @@ abstract class DriverTestCase extends TestCase
      * @return void
      * @test
      */
-    public function testImportExecutableWithCompression()
+    public function testImportExecutableWithCompression(): void
     {
         $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
 

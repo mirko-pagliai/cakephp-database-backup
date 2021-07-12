@@ -33,7 +33,7 @@ class DeleteAllCommandTest extends TestCase
      * Test for `execute()` method
      * @test
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $files = $this->createSomeBackups();
         $this->exec($this->command);
@@ -48,7 +48,7 @@ class DeleteAllCommandTest extends TestCase
      * Test for `execute()` method, with no backups
      * @test
      */
-    public function testExecuteNoBackups()
+    public function testExecuteNoBackups(): void
     {
         $this->exec($this->command);
         $this->assertExitWithSuccess();
