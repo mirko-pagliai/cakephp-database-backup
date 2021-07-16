@@ -29,7 +29,6 @@ class BackupExport
     use BackupTrait;
 
     /**
-     * `BackupManager` instance
      * @var \DatabaseBackup\Utility\BackupManager
      */
     public $BackupManager;

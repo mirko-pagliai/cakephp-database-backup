@@ -30,7 +30,6 @@ abstract class TestCase extends BaseTestCase
     use BackupTrait;
 
     /**
-     * `BackupManager` instance
      * @var \DatabaseBackup\Utility\BackupExport
      */
     protected $BackupExport;
@@ -52,7 +51,6 @@ abstract class TestCase extends BaseTestCase
      */
     public function tearDown(): void
     {
-        //Deletes all backup files
         BackupManager::deleteAll();
 
         parent::tearDown();

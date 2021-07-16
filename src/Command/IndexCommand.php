@@ -44,13 +44,11 @@ class IndexCommand extends Command
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#index
-     * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
-        //Gets all backups
         $backups = BackupManager::index();
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
         if ($backups->isEmpty()) {

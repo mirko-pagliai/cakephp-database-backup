@@ -33,14 +33,13 @@ abstract class Driver implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * A connection object
      * @var \Cake\Database\Connection
      */
     protected $connection;
 
     /**
      * Construct
-     * @param \Cake\Database\Connection $connection A connection object
+     * @param \Cake\Database\Connection $connection Connection instance
      */
     public function __construct(Connection $connection)
     {
@@ -197,9 +196,7 @@ abstract class Driver implements EventListenerInterface
      */
     public function getBinary(string $name): string
     {
-        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-
-        return Exceptionist::isTrue($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
+        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
     }
 
     /**
@@ -213,7 +210,7 @@ abstract class Driver implements EventListenerInterface
     {
         $config = $this->connection->config();
 
-        return $key ? (array_key_exists($key, $config) ? $config[$key] : null) : $config;
+        return $key ? $config[$key] ?? null : $config;
     }
 
     /**

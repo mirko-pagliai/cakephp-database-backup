@@ -74,7 +74,6 @@ trait BackupTrait
      * @return \DatabaseBackup\Driver\Driver A driver instance
      * @since 2.0.0
      * @throws \InvalidArgumentException
-     * @uses getConnection()
      */
     public function getDriver(?ConnectionInterface $connection = null): Driver
     {

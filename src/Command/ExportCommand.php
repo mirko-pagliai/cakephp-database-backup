@@ -72,30 +72,26 @@ class ExportCommand extends Command
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
      * @throws \Cake\Console\Exception\StopException
-     * @uses \DatabaseBackup\Command\RotateCommand::execute()
-     * @uses \DatabaseBackup\Command\SendCommand::execute()
-     * @uses \DatabaseBackup\Utility\BackupExport::compression()
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
-     * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
         try {
-            $instance = new BackupExport();
+            $BackupExport = new BackupExport();
             //Sets the output filename or the compression type.
             //Regarding the `rotate` option, the `BackupShell::rotate()` method
             //  will be called at the end, instead of `BackupExport::rotate()`
             if ($args->getOption('filename')) {
-                $instance->filename((string)$args->getOption('filename'));
+                $BackupExport->filename((string)$args->getOption('filename'));
             } elseif ($args->getOption('compression')) {
-                $instance->compression((string)$args->getOption('compression'));
+                $BackupExport->compression((string)$args->getOption('compression'));
             }
 
             //Exports
-            $file = $instance->export();
+            $file = $BackupExport->export();
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', Filesystem::instance()->rtr($file)));
+
             $verbose = $args->getOption('verbose');
             $quiet = $args->getOption('quiet');
 

@@ -51,7 +51,6 @@ class RotateCommand extends Command
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#rotate
      * @throws \Cake\Console\Exception\StopException
-     * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

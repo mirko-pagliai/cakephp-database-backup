@@ -28,19 +28,16 @@ use DatabaseBackup\TestSuite\TestCase;
 abstract class DriverTestCase extends TestCase
 {
     /**
-     * `Articles` table
      * @var \Cake\ORM\Table
      */
     protected $Articles;
 
     /**
-     * `Comments` table
      * @var \Cake\ORM\Table
      */
     protected $Comments;
 
     /**
-     * `Driver` instance
      * @var \DatabaseBackup\Driver\Driver
      */
     protected $Driver;
@@ -65,7 +62,6 @@ abstract class DriverTestCase extends TestCase
     protected $connection;
 
     /**
-     * Fixtures
      * @var array
      */
     public $fixtures;
@@ -133,8 +129,8 @@ abstract class DriverTestCase extends TestCase
 
             //Initial records. 3 articles and 6 comments
             $initial = $this->getAllRecords();
-            $this->assertEquals(3, count($initial['Articles']));
-            $this->assertEquals(6, count($initial['Comments']));
+            $this->assertCount(3, $initial['Articles']);
+            $this->assertCount(6, $initial['Comments']);
 
             //Exports backup and deletes article with ID 2 and comment with ID 4
             $this->assertTrue($this->Driver->export($backup));
@@ -143,16 +139,16 @@ abstract class DriverTestCase extends TestCase
 
             //Records after delete. 2 articles and 5 comments
             $afterDelete = $this->getAllRecords();
-            $this->assertEquals(count($afterDelete['Articles']), count($initial['Articles']) - 1);
-            $this->assertEquals(count($afterDelete['Comments']), count($initial['Comments']) - 1);
+            $this->assertCount(count($initial['Articles']) - 1, $afterDelete['Articles']);
+            $this->assertCount(count($initial['Comments']) - 1, $afterDelete['Comments']);
 
             //Imports backup. Now initial records are the same of final records
             $this->assertTrue($this->Driver->import($backup));
             $final = $this->getAllRecords();
             $this->assertEquals($initial, $final);
 
-            //Gets the difference (`$diff`) between records after delete
-            //  (`$deleted`)and records after import (`$final`)
+            //Gets the difference (`$diff`) between records after delete and
+            //  records after import (`$final`)
             $diff = $final;
             foreach ($final as $model => $finalValues) {
                 foreach ($finalValues as $finalKey => $finalValue) {
@@ -163,8 +159,8 @@ abstract class DriverTestCase extends TestCase
                     }
                 }
             }
-            $this->assertEquals(1, count($diff['Articles']));
-            $this->assertEquals(1, count($diff['Comments']));
+            $this->assertCount(1, $diff['Articles']);
+            $this->assertCount(1, $diff['Comments']);
 
             //Difference is article with ID 2 and comment with ID 4
             $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
