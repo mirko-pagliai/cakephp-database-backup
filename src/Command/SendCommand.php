@@ -55,15 +55,14 @@ class SendCommand extends Command
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#send
      * @throws \Cake\Console\Exception\StopException
-     * @uses \DatabaseBackup\Utility\BackupManager::send()
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
         try {
-            (new BackupManager())->send($args->getArgument('filename'), $args->getArgument('recipient'));
-            $io->success(__d('database_backup', 'Backup `{0}` was sent via mail', Filesystem::instance()->rtr($args->getArgument('filename'))));
+            (new BackupManager())->send($args->getArgument('filename') ?: '', $args->getArgument('recipient') ?: '');
+            $io->success(__d('database_backup', 'Backup `{0}` was sent via mail', Filesystem::instance()->rtr($args->getArgument('filename') ?: '')));
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();

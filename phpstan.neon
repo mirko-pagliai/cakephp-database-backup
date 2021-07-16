@@ -1,5 +1,8 @@
+includes:
+    - phpstan-baseline.neon
+
 parameters:
-    level: 7
+    level: 8
 
     paths:
         - config
@@ -15,19 +18,3 @@ parameters:
 
     excludes_analyse:
         -  tests/test_app/
-
-    ignoreErrors:
-        - '#(Ternary operator condition|Negated boolean expression) is always (true|false)\.$#'
-        - "#^Constant REDIRECT_TO_DEV_NULL not found\\.$#"
-        - '#^Parameter \#1 \$callback of function array_map expects \(callable\(\): mixed\)\|null#'
-        - "#^Static call to instance method Tools\\\\Exceptionist#"
-        - '#^Parameter \#\d \$\w+ of method Cake\\[\w\:\\]+\(\) expects#'
-        - '#^Call to an undefined method Cake\\#'
-
-        -
-            message: '#^Call to an undefined method [\w\|\\]+MockObject::\w+\(\)\.$#'
-            path: tests/TestCase
-
-        -
-            message: '#has no return typehint specified\.$#'
-            path: tests/TestCase

@@ -59,7 +59,7 @@ class BackupManagerTest extends TestCase
      * Test for `delete()` method
      * @test
      */
-    public function testDelete()
+    public function testDelete(): void
     {
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
@@ -77,7 +77,7 @@ class BackupManagerTest extends TestCase
      * Test for `deleteAll()` method
      * @test
      */
-    public function testDeleteAll()
+    public function testDeleteAll(): void
     {
         $createdFiles = $this->createSomeBackups();
         $this->assertEquals(array_reverse($createdFiles), $this->BackupManager->deleteAll());
@@ -92,7 +92,7 @@ class BackupManagerTest extends TestCase
      * Test for `index()` method
      * @test
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         //Creates a text file. This file should be ignored
         Filesystem::instance()->createFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
@@ -124,7 +124,7 @@ class BackupManagerTest extends TestCase
      * Test for `rotate()` method
      * @test
      */
-    public function testRotate()
+    public function testRotate(): void
     {
         $this->assertEquals([], BackupManager::rotate(1));
 
@@ -159,7 +159,7 @@ class BackupManagerTest extends TestCase
      * Test for `send()` and `_send()` methods
      * @test
      */
-    public function testSend()
+    public function testSend(): void
     {
         $file = $this->createBackup();
         $recipient = 'recipient@example.com';
@@ -181,7 +181,7 @@ class BackupManagerTest extends TestCase
      * Test for `send()` method, with an invalid file
      * @test
      */
-    public function testSendInvalidFile()
+    public function testSendInvalidFile(): void
     {
         $this->expectException(NotReadableException::class);
         $this->expectExceptionMessage('File or directory `' . Configure::read('DatabaseBackup.target') . DS . 'noExistingFile` does not exist');

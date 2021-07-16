@@ -68,7 +68,7 @@ class BackupExportTest extends TestCase
      * Test for `construct()` method
      * @test
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
 
@@ -90,7 +90,7 @@ class BackupExportTest extends TestCase
      *  property
      * @test
      */
-    public function testCompression()
+    public function testCompression(): void
     {
         $this->BackupExport->compression('bzip2');
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
@@ -108,7 +108,7 @@ class BackupExportTest extends TestCase
      * This also tests for patterns and for the `$compression` property.
      * @test
      */
-    public function testFilename()
+    public function testFilename(): void
     {
         $this->BackupExport->filename('backup.sql.bz2');
         $this->assertEquals(
@@ -150,7 +150,7 @@ class BackupExportTest extends TestCase
      * Test for `rotate()` method
      * @test
      */
-    public function testRotate()
+    public function testRotate(): void
     {
         $this->BackupExport->rotate(10);
         $this->assertEquals(10, $this->getProperty($this->BackupExport, 'rotate'));
@@ -164,7 +164,7 @@ class BackupExportTest extends TestCase
      * Test for `send()` method
      * @test
      */
-    public function testSend()
+    public function testSend(): void
     {
         $this->BackupExport->send();
         $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
@@ -178,7 +178,7 @@ class BackupExportTest extends TestCase
      * Test for `export()` method, without compression
      * @test
      */
-    public function testExport()
+    public function testExport(): void
     {
         $filename = $this->BackupExport->export();
         $this->assertFileExists($filename);
@@ -210,7 +210,7 @@ class BackupExportTest extends TestCase
      * @requires OS Linux
      * @test
      */
-    public function testExportWithDifferendChmod()
+    public function testExportWithDifferendChmod(): void
     {
         Configure::write('DatabaseBackup.chmod', 0777);
         $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();

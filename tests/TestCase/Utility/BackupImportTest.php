@@ -54,7 +54,7 @@ class BackupImportTest extends TestCase
      * Test for `construct()` method
      * @test
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceof(Mysql::class, $this->getProperty($this->BackupImport, 'driver'));
         $this->assertNull($this->getProperty($this->BackupImport, 'filename'));
@@ -64,7 +64,7 @@ class BackupImportTest extends TestCase
      * Test for `filename()` method. This tests also `$compression` property
      * @test
      */
-    public function testFilename()
+    public function testFilename(): void
     {
         //Creates a `sql` backup
         $backup = $this->BackupExport->filename('backup.sql')->export();
@@ -102,7 +102,7 @@ class BackupImportTest extends TestCase
      * Test for `import()` method, without compression
      * @test
      */
-    public function testImport()
+    public function testImport(): void
     {
         //Exports and imports with no compression
         $backup = $this->BackupExport->compression(null)->export();

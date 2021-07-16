@@ -33,7 +33,7 @@ class ImportCommandTest extends TestCase
      * Test for `execute()` method
      * @test
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $backup = $this->createBackup();
         $this->exec($this->command . ' ' . $backup);
@@ -47,7 +47,7 @@ class ImportCommandTest extends TestCase
      * Test for `execute()` method, with a no existing file
      * @test
      */
-    public function testExecuteNoExistingFile()
+    public function testExecuteNoExistingFile(): void
     {
         $this->exec($this->command . ' /noExistingDir/backup.sql');
         $this->assertExitWithError();

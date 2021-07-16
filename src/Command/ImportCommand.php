@@ -49,15 +49,13 @@ class ImportCommand extends Command
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#import
      * @throws \Cake\Console\Exception\StopException
-     * @uses \DatabaseBackup\Utility\BackupImport::filename()
-     * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
         try {
-            $file = (new BackupImport())->filename($args->getArgument('filename'))->import();
+            $file = (new BackupImport())->filename((string)$args->getArgument('filename'))->import();
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', Filesystem::instance()->rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());

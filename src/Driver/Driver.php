@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 use Cake\Core\Configure;
+use Cake\Database\Connection;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
@@ -24,6 +25,7 @@ use Tools\Exceptionist;
 /**
  * Represents a driver containing all methods to export/import database backups
  *  according to the database engine
+ * @method \Cake\Event\EventManager getEventManager()
  */
 abstract class Driver implements EventListenerInterface
 {
@@ -31,16 +33,15 @@ abstract class Driver implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * A connection object
-     * @var \Cake\Datasource\ConnectionInterface
+     * @var \Cake\Database\Connection
      */
     protected $connection;
 
     /**
      * Construct
-     * @param \Cake\Datasource\ConnectionInterface $connection A connection object
+     * @param \Cake\Database\Connection $connection Connection instance
      */
-    public function __construct($connection)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
 
@@ -52,9 +53,9 @@ abstract class Driver implements EventListenerInterface
      * List of events this object is implementing. When the class is registered
      *  in an event manager, each individual method will be associated with the
      *  respective event
-     * @return array Associative array or event key names pointing to the
-     *  function that should be called in the object when the respective event
-     *  is fired
+     * @return array<string, string> Associative array or event key names pointing
+     *  to the function that should be called in the object when the respective
+     *  event is fired
      * @since 2.1.1
      */
     final public function implementedEvents(): array
@@ -195,9 +196,7 @@ abstract class Driver implements EventListenerInterface
      */
     public function getBinary(string $name): string
     {
-        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-
-        return Exceptionist::isTrue($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
+        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
     }
 
     /**
@@ -211,7 +210,7 @@ abstract class Driver implements EventListenerInterface
     {
         $config = $this->connection->config();
 
-        return $key ? (array_key_exists($key, $config) ? $config[$key] : null) : $config;
+        return $key ? $config[$key] ?? null : $config;
     }
 
     /**

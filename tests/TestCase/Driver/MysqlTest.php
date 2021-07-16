@@ -46,7 +46,7 @@ class MysqlTest extends DriverTestCase
      * Test for `_exportExecutable()` method
      * @test
      */
-    public function testExportExecutable()
+    public function testExportExecutable(): void
     {
         $expected = sprintf('%s --defaults-file=%s test', $this->Driver->getBinary('mysqldump'), escapeshellarg('authFile'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
@@ -57,7 +57,7 @@ class MysqlTest extends DriverTestCase
      * Test for `_exportExecutableWithCompression()` method
      * @test
      */
-    public function testExportExecutableWithCompression()
+    public function testExportExecutableWithCompression(): void
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
         parent::testExportExecutableWithCompression();
@@ -67,7 +67,7 @@ class MysqlTest extends DriverTestCase
      * Test for `_importExecutable()` method
      * @test
      */
-    public function testImportExecutable()
+    public function testImportExecutable(): void
     {
         $expected = sprintf('%s --defaults-extra-file=%s test', $this->Driver->getBinary('mysql'), escapeshellarg('authFile'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
@@ -78,7 +78,7 @@ class MysqlTest extends DriverTestCase
      * Test for `_importExecutableWithCompression()` method
      * @test
      */
-    public function testImportExecutableWithCompression()
+    public function testImportExecutableWithCompression(): void
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
         parent::testImportExecutableWithCompression();
@@ -88,7 +88,7 @@ class MysqlTest extends DriverTestCase
      * Test for `afterExport()` method
      * @test
      */
-    public function testAfterExport()
+    public function testAfterExport(): void
     {
         $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
         $driver->expects($this->once())->method('deleteAuthFile');
@@ -99,7 +99,7 @@ class MysqlTest extends DriverTestCase
      * Test for `afterImport()` method
      * @test
      */
-    public function testAfterImport()
+    public function testAfterImport(): void
     {
         $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
         $driver->expects($this->once())->method('deleteAuthFile');
@@ -110,7 +110,7 @@ class MysqlTest extends DriverTestCase
      * Test for `beforeExport()` method
      * @test
      */
-    public function testBeforeExport()
+    public function testBeforeExport(): void
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
         $this->assertTrue($this->Driver->beforeExport());
@@ -130,7 +130,7 @@ class MysqlTest extends DriverTestCase
      * Test for `beforeImport()` method
      * @test
      */
-    public function testBeforeImport()
+    public function testBeforeImport(): void
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
         $this->assertTrue($this->Driver->beforeImport());
@@ -148,7 +148,7 @@ class MysqlTest extends DriverTestCase
      * Test for `deleteAuthFile()` method
      * @test
      */
-    public function testDeleteAuthFile()
+    public function testDeleteAuthFile(): void
     {
         $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
 

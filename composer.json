@@ -43,7 +43,7 @@
         ],
         "cs-check": "phpcs --standard=phpcs.xml.dist",
         "cs-fix": "phpcbf --standard=phpcs.xml.dist",
-        "test": "phpunit",
+        "test": "rm -f -r /tmp/cake* && phpunit",
         "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
         "phpstan": "phpstan.phar analyse",
         "psalm": "psalm.phar",

@@ -47,7 +47,7 @@ class PostgresTest extends DriverTestCase
      * Test for `getDbnameAsString()` method
      * @test
      */
-    public function testGetDbnameAsString()
+    public function testGetDbnameAsString(): void
     {
         $password = $this->Driver->getConfig('password');
         $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@localhost/travis_ci_test';
@@ -64,7 +64,7 @@ class PostgresTest extends DriverTestCase
      * Test for `_exportExecutable()` method
      * @test
      */
-    public function testExportExecutable()
+    public function testExportExecutable(): void
     {
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(
@@ -79,7 +79,7 @@ class PostgresTest extends DriverTestCase
      * Test for `_importExecutable()` method
      * @test
      */
-    public function testImportExecutable()
+    public function testImportExecutable(): void
     {
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(

@@ -50,7 +50,7 @@ class BackupTraitTest extends TestCase
      * Test for `getAbsolutePath()` method
      * @test
      */
-    public function testGetAbsolutePath()
+    public function testGetAbsolutePath(): void
     {
         $this->assertEquals(DS . 'file.txt', $this->getAbsolutePath(DS . 'file.txt'));
         $this->assertEquals(Configure::read('DatabaseBackup.target') . DS . 'file.txt', $this->getAbsolutePath('file.txt'));
@@ -62,7 +62,7 @@ class BackupTraitTest extends TestCase
      * Test for `getCompression()` method
      * @test
      */
-    public function testGetCompression()
+    public function testGetCompression(): void
     {
         foreach ([
             'backup.sql' => false,
@@ -78,7 +78,7 @@ class BackupTraitTest extends TestCase
      * Test for `getConnection()` method
      * @test
      */
-    public function testGetConnection()
+    public function testGetConnection(): void
     {
         ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
 
@@ -101,7 +101,7 @@ class BackupTraitTest extends TestCase
      * Test for `getDriver()` method
      * @test
      */
-    public function testGetDriver()
+    public function testGetDriver(): void
     {
         foreach ([ConnectionManager::get('test'), null] as $driver) {
             $this->assertInstanceof(Mysql::class, $this->getDriver($driver));
@@ -122,7 +122,7 @@ class BackupTraitTest extends TestCase
      * Test for `getExtension()` method
      * @test
      */
-    public function testGetExtension()
+    public function testGetExtension(): void
     {
         foreach ([
             'backup.sql' => 'sql',
@@ -143,7 +143,7 @@ class BackupTraitTest extends TestCase
      * Test for `getValidCompressions()` method
      * @test
      */
-    public function testGetValidCompressions()
+    public function testGetValidCompressions(): void
     {
         $this->assertNotEmpty($this->getValidCompressions());
     }

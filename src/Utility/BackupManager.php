@@ -45,8 +45,8 @@ class BackupManager
      */
     public static function delete(string $filename): string
     {
-        $filename = self::getAbsolutePath($filename);
-        Filesystem::instance()->remove(Exceptionist::isWritable($filename));
+        $filename = Exceptionist::isWritable(self::getAbsolutePath($filename));
+        Filesystem::instance()->remove($filename);
 
         return $filename;
     }
@@ -113,15 +113,14 @@ class BackupManager
      */
     protected static function getEmailInstance(string $backup, string $recipient): Mailer
     {
-        $file = self::getAbsolutePath($backup);
-        $basename = basename(Exceptionist::isReadable($file));
+        $file = Exceptionist::isReadable(self::getAbsolutePath($backup));
         $server = env('SERVER_NAME', 'localhost');
 
         return (new Mailer())
             ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
             ->setTo($recipient)
-            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', $basename, $server))
-            ->setAttachments([$basename => compact('file') + ['mimetype' => mime_content_type($file)]]);
+            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($file), $server))
+            ->setAttachments([basename($file) => compact('file') + ['mimetype' => mime_content_type($file)]]);
     }
 
     /**

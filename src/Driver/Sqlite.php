@@ -47,6 +47,7 @@ class Sqlite extends Driver
      */
     public function beforeImport(): bool
     {
+        /** @var \Cake\Database\Schema\Collection $schemaCollection */
         $schemaCollection = $this->connection->getSchemaCollection();
 
         //Drops each table

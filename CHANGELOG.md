@@ -1,5 +1,10 @@
 # 2.x branch
 ## 2.8 branch
+### 2.8.6
+* fixed bootstrap, `mkdir` errors are no longer suppressed;
+* extensive improvement of function descriptions and tags. The level of `phpstan`
+    has been raised.
+
 ### 2.8.5
 * ready for php `8.0`;
 * extensive improvement of function descriptions and tags.
