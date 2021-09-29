@@ -145,12 +145,10 @@ jobs:
         ini-values: apc.enable_cli = 1, extension = php_fileinfo.dll
         coverage: none
 
-    - name: Setup MySQL latest
-      run: |
-        dir D:\ /s /b /o:gn
-        dir D:\Program Files /s /b /o:gn
-        dir D:\Program Files\MySQL /s /b /o:gn
-        mysqladmin --host=127.0.0.1 --user=root --password=Password12! create test
+    - uses: ankane/setup-mysql@v1
+      with:
+        database: test
+        mysql-version: 5.7
 
     - name: Cache Composer packages
       id: composer-cache
