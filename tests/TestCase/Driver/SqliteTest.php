@@ -19,6 +19,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 
 /**
  * SqliteTest class
+ * @group sqlite
  */
 class SqliteTest extends DriverTestCase
 {
