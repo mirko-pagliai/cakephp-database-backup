@@ -143,7 +143,7 @@ class BackupExport
         Exceptionist::isTrue(!file_exists($filename), __d('database_backup', 'File `{0}` already exists', $filename));
 
         //Checks for extension
-        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid file extension'), InvalidArgumentException::class);
+        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION)), InvalidArgumentException::class);
 
         //Sets the compression
         $this->compression($this->getCompression($filename));
