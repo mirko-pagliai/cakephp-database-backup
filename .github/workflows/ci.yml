@@ -13,7 +13,6 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ['7.2', '7.3', '7.4', '8.0']
-        db-type: [sqlite, mysql, pgsql]
         prefer-lowest: ['']
         include:
           - php-version: '7.2'
@@ -35,7 +34,7 @@ jobs:
           uses: shivammathur/setup-php@v2
           with:
             php-version: ${{ matrix.php-version }}
-            extensions: mbstring, intl, pdo_${{ matrix.db-type }}
+            extensions: mbstring, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
 
         - name: Cache Composer packages
           id: composer-cache
