@@ -134,7 +134,7 @@ class BackupExport
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
             pathinfo($this->config['database'], PATHINFO_FILENAME),
             date('YmdHis'),
-            $this->config['host'] ?? 'localhost',
+            str_replace(['127.0.0.1', '::1'], 'localhost', $this->config['host'] ?? 'localhost'),
             time(),
         ], $filename);
 
