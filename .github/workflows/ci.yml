@@ -134,6 +134,10 @@ jobs:
       EXTENSIONS: mbstring, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
       PHP_VERSION: '7.4'
 
+    services:
+        mysql:
+            image: mysql:5.7
+
     steps:
     - uses: actions/checkout@v2
 
