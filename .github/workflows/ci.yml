@@ -131,7 +131,7 @@ jobs:
     name: Windows - PHP 7.4
 
     env:
-      EXTENSIONS: mbstring, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
+      EXTENSIONS: mbstring, intl, pdo_mysql
       PHP_VERSION: '7.4'
 
     steps:
