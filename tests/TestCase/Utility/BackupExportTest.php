@@ -142,7 +142,7 @@ class BackupExportTest extends TestCase
 
         //With invalid extension
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid file extension');
+        $this->expectExceptionMessage('Invalid `txt` file extension');
         $this->BackupExport->filename('backup.txt');
     }
 
