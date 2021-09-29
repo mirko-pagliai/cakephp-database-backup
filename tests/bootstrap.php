@@ -87,7 +87,7 @@ if (!getenv('db_dsn')) {
     putenv('db_dsn=mysql://root:root@127.0.0.1/test');
 }
 if (!getenv('db_dsn_postgres')) {
-    putenv('db_dsn_postgres=postgres://postgres@localhost/travis_ci_test');
+    putenv('db_dsn_postgres=postgres://postgres@localhost/test');
 }
 if (!getenv('db_dsn_sqlite')) {
     putenv('db_dsn_sqlite=sqlite:///' . TMP . 'example.sq3');
