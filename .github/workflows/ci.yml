@@ -147,7 +147,7 @@ jobs:
 
     - name: Setup MySQL latest
       run: |
-        mysqladmin --user=root --password=Password12! create test
+        mysqladmin --host=127.0.0.1 --user=root --password=Password12! create test
 
     - name: Cache Composer packages
       id: composer-cache
@@ -162,7 +162,5 @@ jobs:
       run: composer update
 
     - name: Run PHPUnit
-      env:
-        DB_URL: 'sqlserver://@(localdb)\MSSQLLocalDB/cakephp'
       run: |
           vendor/bin/phpunit --verbose
