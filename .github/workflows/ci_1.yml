@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 0' # weekly
+
+jobs:
+  testsuite:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.2', '7.3', '7.4', '8.0']
+        prefer-lowest: ['']
+        include:
+          - php-version: '7.2'
+            prefer-lowest: 'prefer-lowest'
+          - php-version: '7.3'
+            prefer-lowest: 'prefer-lowest'
+          - php-version: '7.4'
+            prefer-lowest: 'prefer-lowest'
+          - php-version: '8.0'
+            prefer-lowest: 'prefer-lowest'
+
+    steps:
+        - uses: actions/checkout@v2
+
+        - name: Validate composer.json and composer.lock
+          run: composer validate --strict
+
+        - name: Cache Composer packages
+          id: composer-cache
+          uses: actions/cache@v2
+          with:
+            path: vendor
+            key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+            restore-keys: |
+              ${{ runner.os }}-php-
+
+        - name: Composer install
+          run: |
+            if ${{ matrix.prefer-lowest == 'prefer-lowest' }}; then
+              composer update --prefer-lowest --prefer-stable
+            else
+              composer update
+            fi
+
+        - name: Composer show
+          run: composer show
+
+        - name: Run PHPUnit
+          run: |
+            if [[ ${{ matrix.php-version }} == '8.0' ]]; then
+              export CODECOVERAGE=1 && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
+            else
+              vendor/bin/phpunit
+            fi
+
+        - name: Submit code coverage
+          if: matrix.php-version == '8.0'
+          uses: codecov/codecov-action@v1
+
+  cs-stan:
+    name: Coding Standard & Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v2
+
+        - name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: '7.4'
+            coverage: none
+            tools: cs2pr
+
+        - name: Cache Composer packages
+          id: composer-cache
+          uses: actions/cache@v2
+          with:
+            path: vendor
+            key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+            restore-keys: |
+              ${{ runner.os }}-php-
+
+        - name: Composer install
+          run: composer stan-setup
+
+        - name: Run PHP CodeSniffer
+          continue-on-error: true
+          run: vendor/bin/phpcs --report-full --report-checkstyle=./phpcs-report.xml
+
+        - name: Show PHPCS results in PR
+          run: cs2pr ./phpcs-report.xml
+
+        - name: Run psalm
+          if: success() || failure()
+          run: vendor/bin/psalm.phar --output-format=github
+
+        - name: Run phpstan
+          if: success() || failure()
+          run: vendor/bin/phpstan.phar analyse --error-format=github
+
+
+  testsuite-windows:
+    runs-on: windows-2019
+    name: Windows - PHP 7.4
+
+    env:
+      EXTENSIONS: mbstring, intl, gd
+      PHP_VERSION: '7.4'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: ${{ env.EXTENSIONS }}
+        ini-values: apc.enable_cli = 1, extension = php_fileinfo.dll
+        coverage: none
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Composer install
+      run: composer update
+
+    - name: Run PHPUnit
+      run: vendor/bin/phpunit --verbose
