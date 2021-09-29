@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.8 branch
 ### 2.8.7
+* fixed a small bug when using the numeric hostname (`127.0.0.1` or `::1`) as
+    the automatic backup filename;
 * `BackupExport` returns a more accurate error in case of invalid filename.
 
 ### 2.8.6
