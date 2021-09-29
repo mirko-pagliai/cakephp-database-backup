@@ -19,6 +19,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 
 /**
  * MysqlTest class
+ * @group mysql
  */
 class MysqlTest extends DriverTestCase
 {
