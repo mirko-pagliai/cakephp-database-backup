@@ -172,7 +172,7 @@ abstract class DriverTestCase extends TestCase
      * Test for `_exportExecutable()` method
      * @return void
      */
-    abstract public function testExportExecutable();
+    abstract public function testExportExecutable(): void;
 
     /**
      * Test for `_exportExecutableWithCompression()` method
@@ -220,7 +220,7 @@ abstract class DriverTestCase extends TestCase
      * Test for `_importExecutable()` method
      * @return void
      */
-    abstract public function testImportExecutable();
+    abstract public function testImportExecutable(): void;
 
     /**
      * Test for `_importExecutableWithCompression()` method
