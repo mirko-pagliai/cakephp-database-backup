@@ -84,10 +84,10 @@ Cache::setConfig([
 ]);
 
 if (!getenv('db_dsn')) {
-    putenv('db_dsn=mysql://root:root@127.0.0.1/test');
+    putenv('db_dsn=mysql://root:root@localhost/test');
 }
 if (!getenv('db_dsn_postgres')) {
-    putenv('db_dsn_postgres=postgres://postgres:postgres@127.0.0.1/test');
+    putenv('db_dsn_postgres=postgres://postgres:postgres@root@localhost/test');
 }
 if (!getenv('db_dsn_sqlite')) {
     putenv('db_dsn_sqlite=sqlite:///' . TMP . 'example.sq3');
