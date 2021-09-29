@@ -163,5 +163,7 @@ jobs:
       run: composer update
 
     - name: Run PHPUnit
+      env:
+        db_dsn: 'mysql://root@localhost/test'
       run: |
           vendor/bin/phpunit --verbose
