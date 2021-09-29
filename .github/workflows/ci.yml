@@ -25,21 +25,21 @@ jobs:
             prefer-lowest: 'prefer-lowest'
 
     steps:
-        - name: Setup MySQL latest
-          if: matrix.php-version != '7.2'
-          run: docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql --default-authentication-plugin=mysql_native_password --disable-log-bin
+        - name: Setup MySQL
+          run: |
+            if [[ ${{ matrix.php-version }} != '7.2' ]]; then
+                docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql --default-authentication-plugin=mysql_native_password --disable-log-bin
+            else
+                docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql:5.6 --character-set-server=utf8
+            fi
 
-        - name: Setup MySQL 5.6
-          if: matrix.php-version == '7.2'
-          run: docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql:5.6 --character-set-server=utf8
-
-        - name: Setup PostgreSQL latest
-          if: matrix.php-version != '7.2'
-          run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres
-
-        - name: Setup PostgreSQL 9.4
-          if: matrix.php-version == '7.2'
-          run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.4
+        - name: Setup PostgreSQL
+          run: |
+            if [[ ${{ matrix.php-version }} != '7.2' ]]; then
+                docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres
+            else
+                docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.4
+            fi
 
         - uses: actions/checkout@v2
 
