@@ -166,4 +166,4 @@ jobs:
       env:
         db_dsn: 'mysql://root@localhost/test'
       run: |
-          vendor/bin/phpunit --verbose
+          vendor/bin/phpunit --verbose --group mysql
