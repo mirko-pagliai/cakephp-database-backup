@@ -134,10 +134,6 @@ jobs:
       EXTENSIONS: mbstring, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
       PHP_VERSION: '7.4'
 
-    services:
-        mysql:
-            image: mysql:5.7
-
     steps:
     - uses: actions/checkout@v2
 
@@ -151,8 +147,9 @@ jobs:
 
     - name: Setup MySQL latest
       run: |
-        dir C:\Program Files /s /b /o:gn
-        dir C:\Program Files\MySQL /s /b /o:gn
+        dir D:\ /s /b /o:gn
+        dir D:\Program Files /s /b /o:gn
+        dir D:\Program Files\MySQL /s /b /o:gn
         mysqladmin --host=127.0.0.1 --user=root --password=Password12! create test
 
     - name: Cache Composer packages
