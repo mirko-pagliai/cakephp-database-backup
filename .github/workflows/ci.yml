@@ -147,7 +147,7 @@ jobs:
 
     - name: Setup MySQL latest
       run: |
-        mysqladmin --host=localhost --user=root --password=Password12! create test
+        mysqladmin --user=root --password=Password12! create test
 
     - name: Cache Composer packages
       id: composer-cache
