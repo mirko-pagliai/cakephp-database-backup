@@ -131,7 +131,7 @@ jobs:
     name: Windows - PHP 7.4
 
     env:
-      EXTENSIONS: mbstring, intl, pdo_sqlsrv
+      EXTENSIONS: mbstring, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
       PHP_VERSION: '7.4'
 
     steps:
@@ -145,12 +145,9 @@ jobs:
         ini-values: apc.enable_cli = 1, extension = php_fileinfo.dll
         coverage: none
 
-    - name: Setup SQLServer
+    - name: Setup MySQL latest
       run: |
-        # MSSQLLocalDB is the default SQL LocalDB instance
-        SqlLocalDB start MSSQLLocalDB
-        SqlLocalDB info MSSQLLocalDB
-        sqlcmd -S "(localdb)\MSSQLLocalDB" -Q "create database test;"
+        mysqladmin --host=localhost --user=root --password=Password12! create test
 
     - name: Cache Composer packages
       id: composer-cache
