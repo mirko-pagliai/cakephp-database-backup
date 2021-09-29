@@ -27,7 +27,7 @@ jobs:
     steps:
         - name: Setup MySQL latest
           if: matrix.php-version != '7.2'
-          run: docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql:5.6 --character-set-server=utf8
+          run: docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql --default-authentication-plugin=mysql_native_password --disable-log-bin
 
         - name: Setup MySQL 5.6
           if: matrix.php-version == '7.2'
