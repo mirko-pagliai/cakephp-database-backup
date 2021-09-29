@@ -50,11 +50,11 @@ class PostgresTest extends DriverTestCase
     public function testGetDbnameAsString(): void
     {
         $password = $this->Driver->getConfig('password');
-        $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@localhost/travis_ci_test';
+        $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
 
         //Adds a password to the config
-        $expected = 'postgresql://postgres:mypassword@localhost/travis_ci_test';
+        $expected = 'postgresql://postgres:mypassword@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
         $config = ['password' => 'mypassword'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
@@ -68,7 +68,7 @@ class PostgresTest extends DriverTestCase
     {
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(
-            '%s --format=c -b --dbname=postgresql://postgres%s@localhost/travis_ci_test',
+            '%s --format=c -b --dbname=postgresql://postgres%s@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'),
             $this->Driver->getBinary('pg_dump'),
             $password ? ':' . $password : ''
         );
@@ -83,7 +83,7 @@ class PostgresTest extends DriverTestCase
     {
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(
-            '%s --format=c -c -e --dbname=postgresql://postgres%s@localhost/travis_ci_test',
+            '%s --format=c -c -e --dbname=postgresql://postgres%s@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'),
             $this->Driver->getBinary('pg_restore'),
             $password ? ':' . $password : ''
         );
