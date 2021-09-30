@@ -87,15 +87,6 @@ See our wiki:
 
 And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
-## Testing
-Some tests refer to a specific driver: `mysql`, `postgres`, and `sqlite` groups.
-By default, all tests are performed, but you can test only one group or exclude a group using the `--group` and `--exclude-group` options.
-
-For example:
-```bash
-vendor/bin/phpunit --group mysql
-```
-
 ## Versioning
 For transparency and insight into our release cycle and to maintain backward
 compatibility, *DatabaseBackup* will be maintained under the
