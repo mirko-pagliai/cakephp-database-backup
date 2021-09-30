@@ -5,9 +5,7 @@
     the automatic backup filename;
 * export and import error messages are now more specific;
 * `BackupExport` returns a more accurate error in case of invalid filename;
-* added `Driver::_exec()` method;
-* driver tests have now been marked as groups (`mysql`, `postgres`, `sqlite`),
-    so you can use `--group` and `--exclude-group` options provided by `phpunit`.
+* added `Driver::_exec()` method.
 
 ### 2.8.6
 * fixed bootstrap, `mkdir` errors are no longer suppressed;
