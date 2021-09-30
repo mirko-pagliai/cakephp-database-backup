@@ -25,24 +25,17 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class PostgresTest extends DriverTestCase
 {
     /**
-     * @var string
+     * Called before every test method
+     * @return void
      */
-    protected $DriverClass = Postgres::class;
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    /**
-     * Name of the database connection
-     * @var string
-     */
-    protected $connection = 'test_postgres';
-
-    /**
-     * Fixtures
-     * @var array
-     */
-    public $fixtures = [
-        'plugin.DatabaseBackup.Postgres/Articles',
-        'plugin.DatabaseBackup.Postgres/Comments',
-    ];
+        if (!$this->Driver instanceof Postgres) {
+            $this->markTestIncomplete();
+        }
+    }
 
     /**
      * Test for `getDbnameAsString()` method

@@ -70,6 +70,7 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
+
 Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups');
 Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
@@ -85,16 +86,21 @@ Cache::setConfig([
 
 if (!getenv('db_dsn')) {
     putenv('db_dsn=mysql://travis@localhost/test');
+
+    $driverTest = getenv('driver_test');
+    if ($driverTest && $driverTest != 'mysql') {
+        if ($driverTest == 'sqlite') {
+            putenv('db_dsn=sqlite:///' . TMP . 'example.sq3');
+        } elseif ($driverTest == 'postgres') {
+            putenv('db_dsn=postgres://postgres@localhost/travis_ci_test');
+        } else {
+            die(sprintf('Unknown `%s` test driver', $driverTest) . PHP_EOL);
+        }
+    }
 }
-if (!getenv('db_dsn_postgres')) {
-    putenv('db_dsn_postgres=postgres://postgres@localhost/travis_ci_test');
-}
-if (!getenv('db_dsn_sqlite')) {
-    putenv('db_dsn_sqlite=sqlite:///' . TMP . 'example.sq3');
-}
+
 ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
-ConnectionManager::setConfig('test_postgres', ['url' => getenv('db_dsn_postgres')]);
-ConnectionManager::setConfig('test_sqlite', ['url' => getenv('db_dsn_sqlite')]);
+
 Log::setConfig('debug', [
     'className' => 'File',
     'path' => LOGS,
@@ -103,3 +109,5 @@ Log::setConfig('debug', [
 ]);
 TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
 Email::setConfig('default', ['transport' => 'debug']);
+
+echo 'Running tests for `' . ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'))->config()['scheme'] . '` driver ' . PHP_EOL;

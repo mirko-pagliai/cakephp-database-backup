@@ -24,24 +24,17 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class SqliteTest extends DriverTestCase
 {
     /**
-     * @var string
+     * Called before every test method
+     * @return void
      */
-    protected $DriverClass = Sqlite::class;
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    /**
-     * Name of the database connection
-     * @var string
-     */
-    protected $connection = 'test_sqlite';
-
-    /**
-     * Fixtures
-     * @var array
-     */
-    public $fixtures = [
-        'plugin.DatabaseBackup.Sqlite/Articles',
-        'plugin.DatabaseBackup.Sqlite/Comments',
-    ];
+        if (!$this->Driver instanceof Sqlite) {
+            $this->markTestIncomplete();
+        }
+    }
 
     /**
      * Test for `_exportExecutable()` method

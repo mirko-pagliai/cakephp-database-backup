@@ -15,13 +15,16 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Database\Connection;
-use DatabaseBackup\Driver\Mysql;
+use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use ErrorException;
 
 /**
- * DriverTest class
+ * DriverTest class.
+ *
+ * Performs tests that are valid for each driver class, thus covering the
+ *  methods of the abstract `Driver` class.
+ * @covers \DatabaseBackup\Driver\Driver
  */
 class DriverTest extends TestCase
 {
@@ -32,6 +35,19 @@ class DriverTest extends TestCase
     protected $Driver;
 
     /**
+     * Internal method to get a mock for `Driver` abstract class
+     * @param array $mockedMethods Mocked methods
+     * @return \DatabaseBackup\Driver\Driver
+     */
+    protected function getMockForAbstractDriver(array $mockedMethods = []): Driver
+    {
+        /** @var \Cake\Database\Connection $connection */
+        $connection = $this->getConnection('test');
+
+        return $this->getMockForAbstractClass(Driver::class, [$connection], '', true, true, true, $mockedMethods);
+    }
+
+    /**
      * Called before every test method
      * @return void
      */
@@ -39,36 +55,21 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        if (!$this->Driver) {
-            /** @var \Cake\Database\Connection $connection */
-            $connection = $this->getConnection('test');
-            $this->Driver = new Mysql($connection);
-        }
-    }
-
-    /**
-     * Test for `__construct()` method
-     * @return void
-     * @test
-     */
-    public function testConstruct(): void
-    {
-        $this->assertInstanceof(Connection::class, $this->getProperty($this->Driver, 'connection'));
+        $this->Driver = $this->Driver ?: $this->getMockForAbstractDriver();
     }
 
     /**
      * Test for `export()` method on failure
      * @return void
-     * @since 2.6.2
      * @test
      */
     public function testExportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->export($this->getAbsolutePath('example.sql'));
+        $Driver = $this->getMockForAbstractDriver(['_exec']);
+        $Driver->method('_exec')->will($this->returnValue(1));
+        $Driver->export($this->getAbsolutePath('example.sql'));
     }
 
     /**
@@ -79,11 +80,9 @@ class DriverTest extends TestCase
      */
     public function testExportStoppedByBeforeExport(): void
     {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(Mysql::class, ['beforeExport']);
+        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
         $Driver->method('beforeExport')->will($this->returnValue(false));
-        $this->assertFalse($Driver->export($backup));
-        $this->assertFileDoesNotExist($backup);
+        $this->assertFalse($Driver->export($this->getAbsolutePath('example.sql')));
     }
 
     /**
@@ -92,12 +91,12 @@ class DriverTest extends TestCase
      */
     public function testGetBinary(): void
     {
-        $this->assertEquals(which('mysql'), $this->invokeMethod($this->Driver, 'getBinary', ['mysql']));
+        $this->assertEquals(which('mysql'), $this->Driver->getBinary('mysql'));
 
         //With a binary not available
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
-        $this->invokeMethod($this->Driver, 'getBinary', ['noExisting']);
+        $this->Driver->getBinary('noExisting');
     }
 
     /**
@@ -115,18 +114,15 @@ class DriverTest extends TestCase
     /**
      * Test for `import()` method on failure
      * @return void
-     * @since 2.6.2
      * @test
      */
     public function testImportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
-        $backup = $this->getAbsolutePath('example.sql');
-        $this->Driver->export($backup);
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->import($backup);
+        $Driver = $this->getMockForAbstractDriver(['_exec']);
+        $Driver->method('_exec')->will($this->returnValue(1));
+        $Driver->import($this->getAbsolutePath('example.sql'));
     }
 
     /**
@@ -137,10 +133,8 @@ class DriverTest extends TestCase
      */
     public function testImportStoppedByBeforeExport(): void
     {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(Mysql::class, ['beforeImport']);
+        $Driver = $this->getMockForAbstractDriver(['beforeImport']);
         $Driver->method('beforeImport')->will($this->returnValue(false));
-        $this->assertTrue($Driver->export($backup));
-        $this->assertFalse($Driver->import($backup));
+        $this->assertFalse($Driver->import($this->getAbsolutePath('example.sql')));
     }
 }

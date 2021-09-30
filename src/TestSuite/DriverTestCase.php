@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
-use Cake\Core\Configure;
 use Cake\Event\EventList;
 use Cake\ORM\Table;
 use DatabaseBackup\TestSuite\TestCase;
@@ -64,7 +63,10 @@ abstract class DriverTestCase extends TestCase
     /**
      * @var array
      */
-    public $fixtures;
+    public $fixtures = [
+        'core.Articles',
+        'core.Comments',
+    ];
 
     /**
      * Called before every test method
@@ -74,21 +76,25 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
-        Configure::write('DatabaseBackup.connection', $this->connection);
-        $connection = $this->getConnection();
+        /** @var \Cake\Database\Connection $connection */
+        $connection = $this->getConnection('test');
 
         foreach (['Articles', 'Comments'] as $name) {
-            $this->$name = $this->getTable($name, compact('connection')) ?: new Table();
+            $this->$name = $this->$name ?: $this->getTable($name, compact('connection')) ?: new Table();
+        }
+
+        if (!$this->DriverClass || !$this->Driver) {
+            $this->DriverClass = 'DatabaseBackup\\Driver\\' . array_value_last(explode('\\', $connection->config()['driver']));
+            $this->Driver = new $this->DriverClass($connection);
         }
 
         //Enables event tracking
-        $this->Driver = new $this->DriverClass($connection);
         $this->Driver->getEventManager()->setEventList(new EventList());
     }
 
     /**
      * Internal method to get all records from the database
-     * @return array
+     * @return array<string, array>
      */
     final protected function getAllRecords(): array
     {
@@ -107,6 +113,7 @@ abstract class DriverTestCase extends TestCase
     public function testExport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
+        $this->assertFileNotExists($backup);
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
         $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
