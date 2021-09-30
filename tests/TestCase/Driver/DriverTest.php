@@ -65,7 +65,7 @@ class DriverTest extends TestCase
     public function testExportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
+        $this->expectExceptionMessageMatches('/^Export failed with exit code `\d`$/');
         $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
         $this->Driver->export($this->getAbsolutePath('example.sql'));
@@ -121,7 +121,7 @@ class DriverTest extends TestCase
     public function testImportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
+        $this->expectExceptionMessageMatches('/^Import failed with exit code `\d`$/');
         $backup = $this->getAbsolutePath('example.sql');
         $this->Driver->export($backup);
         $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
