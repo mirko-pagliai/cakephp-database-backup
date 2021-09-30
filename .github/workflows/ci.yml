@@ -12,14 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.2', '7.3', '7.4', '8.0']
+        php-version: ['7.2', '8.0']
+        db-type: [sqlite, mysql, pgsql]
         prefer-lowest: ['']
+        exclude:
+          - php-version: '7.2'
+            db-type: 'mysql'
         include:
           - php-version: '7.2'
-            prefer-lowest: 'prefer-lowest'
-          - php-version: '7.3'
-            prefer-lowest: 'prefer-lowest'
-          - php-version: '7.4'
+            db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
           - php-version: '8.0'
             prefer-lowest: 'prefer-lowest'
@@ -27,18 +28,22 @@ jobs:
     steps:
         - name: Setup MySQL
           run: |
-            if [[ ${{ matrix.php-version }} != '7.2' ]]; then
-                docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql --default-authentication-plugin=mysql_native_password --disable-log-bin
-            else
-                docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql:5.6 --character-set-server=utf8
+            if ${{ matrix.db-type == 'mysql' }}; then
+                if [[ ${{ matrix.php-version }} != '7.2' ]]; then
+                    docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql --default-authentication-plugin=mysql_native_password --disable-log-bin
+                else
+                    docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql:5.6 --character-set-server=utf8
+                fi
             fi
 
         - name: Setup PostgreSQL
           run: |
-            if [[ ${{ matrix.php-version }} != '7.2' ]]; then
-                docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres
-            else
-                docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.4
+            if ${{ matrix.db-type == 'pgsql' }}; then
+                if [[ ${{ matrix.php-version }} != '7.2' ]]; then
+                    docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres
+                else
+                    docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.4
+                fi
             fi
 
         - uses: actions/checkout@v2
@@ -50,7 +55,7 @@ jobs:
           uses: shivammathur/setup-php@v2
           with:
             php-version: ${{ matrix.php-version }}
-            extensions: mbstring, intl, pdo_sqlite, pdo_mysql, pdo_pgsql
+            extensions: mbstring, intl, pdo_${{ matrix.db-type }}
 
         - name: Cache Composer packages
           id: composer-cache
@@ -74,6 +79,12 @@ jobs:
 
         - name: Run PHPUnit
           run: |
+            export DB_URL='mysql://root:root@127.0.0.1/test?encoding=utf8'
+
+            if [[ ${{ matrix.db-type }} == 'sqlite' ]]; then export DB_URL='sqlite:///:memory:'; fi
+            if [[ ${{ matrix.db-type }} == 'mysql' ]]; then export DB_URL='mysql://root:root@127.0.0.1/test?encoding=utf8'; fi
+            if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DB_URL='postgres://postgres:postgres@127.0.0.1/test'; fi
+
             if [[ ${{ matrix.php-version }} == '8.0' ]]; then
               export CODECOVERAGE=1 && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
             else
