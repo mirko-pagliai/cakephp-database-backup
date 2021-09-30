@@ -69,6 +69,19 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
+     * Internal method to execute an external program
+     * @param string $command The command that will be executed
+     * @return int The return status of the executed command
+     * @since 2.8.7
+     */
+    protected function _exec(string $command): int
+    {
+        exec($command, $output, $returnVar);
+
+        return $returnVar;
+    }
+
+    /**
      * Gets the executable command to export the database
      * @return string
      */
@@ -180,8 +193,8 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        exec($this->_exportExecutableWithCompression($filename), $output, $returnVar);
-        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        $returnVar = $this->_exec($this->_exportExecutableWithCompression($filename));
+        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Export failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterExport');
 
@@ -231,8 +244,8 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        exec($this->_importExecutableWithCompression($filename), $output, $returnVar);
-        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        $returnVar = $this->_exec($this->_importExecutableWithCompression($filename));
+        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Import failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterImport');
 
