@@ -4,6 +4,7 @@
 * fixed a small bug when using the numeric hostname (`127.0.0.1` or `::1`) as
     the automatic backup filename;
 * `BackupExport` returns a more accurate error in case of invalid filename;
+* added `Driver::_exec()` method;
 * driver tests have now been marked as groups (`mysql`, `postgres`, `sqlite`),
     so you can use `--group` and `--exclude-group` options provided by `phpunit`.
 
