@@ -194,7 +194,7 @@ abstract class Driver implements EventListenerInterface
         }
 
         $returnVar = $this->_exec($this->_exportExecutableWithCompression($filename));
-        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Export failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterExport');
 
@@ -245,7 +245,7 @@ abstract class Driver implements EventListenerInterface
         }
 
         $returnVar = $this->_exec($this->_importExecutableWithCompression($filename));
-        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Failed with exit code `{0}`', $returnVar));
+        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Import failed with exit code `{0}`', $returnVar));
 
         $this->dispatchEvent('Backup.afterImport');
 

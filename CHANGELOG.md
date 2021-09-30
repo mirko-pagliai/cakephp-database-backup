@@ -3,6 +3,7 @@
 ### 2.8.7
 * fixed a small bug when using the numeric hostname (`127.0.0.1` or `::1`) as
     the automatic backup filename;
+* export and import error messages are now more specific;
 * `BackupExport` returns a more accurate error in case of invalid filename;
 * added `Driver::_exec()` method;
 * driver tests have now been marked as groups (`mysql`, `postgres`, `sqlite`),
