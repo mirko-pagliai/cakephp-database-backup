@@ -20,7 +20,6 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 
 /**
  * PostgresTest class
- * @group postgres
  */
 class PostgresTest extends DriverTestCase
 {
