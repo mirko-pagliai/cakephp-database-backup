@@ -66,7 +66,7 @@ class DriverTest extends TestCase
     public function testExportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
+        $this->expectExceptionMessageMatches('/^Export failed with exit code `\d`$/');
         $Driver = $this->getMockForAbstractDriver(['_exec']);
         $Driver->method('_exec')->will($this->returnValue(1));
         $Driver->export($this->getAbsolutePath('example.sql'));
@@ -119,7 +119,7 @@ class DriverTest extends TestCase
     public function testImportOnFailure(): void
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageMatches('/^Failed with exit code `\d`$/');
+        $this->expectExceptionMessageMatches('/^Import failed with exit code `\d`$/');
         $Driver = $this->getMockForAbstractDriver(['_exec']);
         $Driver->method('_exec')->will($this->returnValue(1));
         $Driver->import($this->getAbsolutePath('example.sql'));
