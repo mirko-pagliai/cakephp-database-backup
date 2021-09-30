@@ -81,9 +81,9 @@ jobs:
           run: |
             export DB_URL='mysql://root:root@127.0.0.1/test?encoding=utf8'
 
-            if [[ ${{ matrix.db-type }} == 'sqlite' ]]; then export DB_URL='sqlite:///:memory:'; fi
-            if [[ ${{ matrix.db-type }} == 'mysql' ]]; then export DB_URL='mysql://root:root@127.0.0.1/test?encoding=utf8'; fi
-            if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DB_URL='postgres://postgres:postgres@127.0.0.1/test'; fi
+            if [[ ${{ matrix.db-type }} == 'sqlite' ]]; then export db_url='sqlite:///:memory:'; fi
+            if [[ ${{ matrix.db-type }} == 'mysql' ]]; then export db_url='mysql://root:root@127.0.0.1/test?encoding=utf8'; fi
+            if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_url='postgres://postgres:postgres@127.0.0.1/test'; fi
 
             if [[ ${{ matrix.php-version }} == '8.0' ]]; then
               export CODECOVERAGE=1 && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
