@@ -84,7 +84,9 @@ abstract class DriverTestCase extends TestCase
         }
 
         if (!$this->DriverClass || !$this->Driver) {
-            $this->DriverClass = 'DatabaseBackup\\Driver\\' . array_value_last(explode('\\', $connection->config()['driver']));
+            /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
+            $DriverClass = 'DatabaseBackup\\Driver\\' . array_value_last(explode('\\', $connection->config()['driver']));
+            $this->DriverClass = $DriverClass;
             $this->Driver = new $this->DriverClass($connection);
         }
 

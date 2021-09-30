@@ -1,4 +1,10 @@
 # 2.x branch
+## 2.9 branch
+### 2.9.0
+* tests are now only run for one driver at a time, by default `mysql`. You can
+    choose another driver by setting `driver_test` or ``db_dsn` environment
+    variables before running `phpunit`.
+
 ## 2.8 branch
 ### 2.8.7
 * fixed a small bug when using the numeric hostname (`127.0.0.1` or `::1`) as

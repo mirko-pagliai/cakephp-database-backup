@@ -88,12 +88,20 @@ See our wiki:
 And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
 ## Testing
-Some tests refer to a specific driver: `mysql`, `postgres`, and `sqlite` groups.
-By default, all tests are performed, but you can test only one group or exclude a group using the `--group` and `--exclude-group` options.
+Tests are run for only one driver at a time, by default `mysql`.
+To choose another driver to use, you can set the `driver_test` environment variable before running `phpunit`.
 
 For example:
 ```bash
-vendor/bin/phpunit --group mysql
+driver_test=sqlite vendor/bin/phpunit
+driver_test=postgres vendor/bin/phpunit
+```
+
+Alternatively, you can set the `db_dsn` environment variable, indicating the connection parameters. In this case, the driver type will still be detected automatically.
+
+For example:
+```bash
+db_dsn=sqlite:///' . TMP . 'example.sq3 vendor/bin/phpunit
 ```
 
 ## Versioning

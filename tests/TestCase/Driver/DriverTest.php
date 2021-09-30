@@ -37,7 +37,7 @@ class DriverTest extends TestCase
     /**
      * Internal method to get a mock for `Driver` abstract class
      * @param array $mockedMethods Mocked methods
-     * @return \DatabaseBackup\Driver\Driver
+     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockForAbstractDriver(array $mockedMethods = []): Driver
     {

@@ -40,7 +40,7 @@ class SendCommandTest extends TestCase
         $this->exec($this->command . ' ' . $file . ' recipient@example.com');
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
-        $this->assertOutputContains('Driver: Mysql');
+        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('<success>Backup `' . $file . '` was sent via mail</success>');
     }
 

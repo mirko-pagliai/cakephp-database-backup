@@ -6,6 +6,11 @@ parameters:
 			path: config/bootstrap.php
 
 		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: src/TestSuite/DriverTestCase.php
+
+		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: src/TestSuite/TestCase.php
@@ -16,7 +21,7 @@ parameters:
 			path: src/Utility/BackupManager.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
+			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: tests/TestCase/Driver/DriverTest.php
 

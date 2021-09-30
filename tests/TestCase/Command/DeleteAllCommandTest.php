@@ -53,7 +53,7 @@ class DeleteAllCommandTest extends TestCase
         $this->exec($this->command);
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
-        $this->assertOutputContains('Driver: Mysql');
+        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');
     }
 }

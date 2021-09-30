@@ -16,12 +16,12 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Database\Connection;
-use Cake\Database\Driver\Mysql as CakeMysql;
+use Cake\Database\Driver as CakeDriver;
 use Cake\Database\Driver\Sqlserver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Mysql;
+use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 
@@ -89,7 +89,7 @@ class BackupTraitTest extends TestCase
         ] as $name) {
             $connection = $this->getConnection($name);
             $this->assertInstanceof(Connection::class, $connection);
-            $this->assertInstanceof(CakeMysql::class, $connection->getDriver());
+            $this->assertInstanceof(CakeDriver::class, $connection->getDriver());
         }
 
         $this->expectException(MissingDatasourceConfigException::class);
@@ -104,7 +104,7 @@ class BackupTraitTest extends TestCase
     public function testGetDriver(): void
     {
         foreach ([ConnectionManager::get('test'), null] as $driver) {
-            $this->assertInstanceof(Mysql::class, $this->getDriver($driver));
+            $this->assertInstanceof(Driver::class, $this->getDriver($driver));
         }
 
         //With a no existing driver

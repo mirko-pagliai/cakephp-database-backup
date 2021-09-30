@@ -90,9 +90,9 @@ if (!getenv('db_dsn')) {
     $driverTest = getenv('driver_test');
     if ($driverTest && $driverTest != 'mysql') {
         if ($driverTest == 'sqlite') {
-            putenv('db_dsn=sqlite:///' . TMP . 'example.sq3');
+            putenv('db_dsn=sqlite:///' . TMP . 'test.sq3');
         } elseif ($driverTest == 'postgres') {
-            putenv('db_dsn=postgres://postgres@localhost/travis_ci_test');
+            putenv('db_dsn=postgres://postgres@localhost/test');
         } else {
             die(sprintf('Unknown `%s` test driver', $driverTest) . PHP_EOL);
         }
