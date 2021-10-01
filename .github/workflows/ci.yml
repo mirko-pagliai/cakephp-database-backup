@@ -23,6 +23,7 @@ jobs:
             db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
           - php-version: '8.0'
+            db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
 
     steps:
