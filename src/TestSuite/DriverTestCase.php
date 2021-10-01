@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Core\Configure;
 use Cake\Event\EventList;
 use Cake\ORM\Table;
 use DatabaseBackup\TestSuite\TestCase;
