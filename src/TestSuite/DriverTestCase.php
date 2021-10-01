@@ -194,19 +194,20 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $expected = sprintf('%s > %s%s', $basicExecutable, escapeshellarg('backup.sql'), REDIRECT_TO_DEV_NULL);
+        $expected = sprintf('%s > %s', $basicExecutable, escapeshellarg('backup.sql'));
+        $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
         $this->assertEquals($expected, $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
             $expected = sprintf(
-                '%s | %s > %s%s',
+                '%s | %s > %s',
                 $basicExecutable,
                 $this->Driver->getBinary($compression),
-                escapeshellarg($filename),
-                REDIRECT_TO_DEV_NULL
+                escapeshellarg($filename)
             );
+            $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
             $this->assertEquals($expected, $result);
         }
     }
@@ -242,19 +243,20 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $expected = $basicExecutable . ' < ' . escapeshellarg('backup.sql') . REDIRECT_TO_DEV_NULL;
+        $expected = $basicExecutable . ' < ' . escapeshellarg('backup.sql');
+        $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
         $this->assertEquals($expected, $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
             $expected = sprintf(
-                '%s -dc %s | %s%s',
+                '%s -dc %s | %s',
                 $this->Driver->getBinary($compression),
                 escapeshellarg($filename),
-                $basicExecutable,
-                REDIRECT_TO_DEV_NULL
+                $basicExecutable
             );
+            $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
             $this->assertEquals($expected, $result);
         }
     }
