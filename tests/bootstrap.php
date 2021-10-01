@@ -110,6 +110,4 @@ Log::setConfig('debug', [
 TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
 Email::setConfig('default', ['transport' => 'debug']);
 
-Configure::write('DatabaseBackup.redirectStderrToDevNull', false);
-
 echo 'Running tests for `' . ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'))->config()['scheme'] . '` driver ' . PHP_EOL;
