@@ -18,6 +18,14 @@ jobs:
         exclude:
           - php-version: '7.2'
             db-type: 'mysql'
+          - php-version: '7.3'
+            db-type: 'sqlite'
+          - php-version: '7.3'
+            db-type: 'pgsql'
+          - php-version: '7.4'
+            db-type: 'sqlite'
+          - php-version: '7.4'
+            db-type: 'pgsql'
         include:
           - php-version: '7.2'
             db-type: 'mysql'
