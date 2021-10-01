@@ -30,11 +30,7 @@ jobs:
         - name: Setup MySQL
           run: |
             if ${{ matrix.db-type == 'mysql' }}; then
-                if [[ ${{ matrix.php-version }} != '7.2' ]]; then
-                    docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql --default-authentication-plugin=mysql_native_password --disable-log-bin
-                else
-                    docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql:5.6 --character-set-server=utf8
-                fi
+                docker run --rm --name=mysqld -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -p 3306:3306 -d mysql --default-authentication-plugin=mysql_native_password --disable-log-bin
             fi
 
         - name: Setup PostgreSQL
