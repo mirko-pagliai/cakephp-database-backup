@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use DatabaseBackup\Driver\Driver;
 use Cake\Log\Log;
+use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;

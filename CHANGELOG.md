@@ -3,7 +3,8 @@
 ### 2.9.0
 * tests are now only run for one driver at a time, by default `mysql`. You can
     choose another driver by setting `driver_test` or ``db_dsn` environment
-    variables before running `phpunit`.
+    variables before running `phpunit`;
+* migration to github actions.
 
 ## 2.8 branch
 ### 2.8.7
