@@ -40,7 +40,7 @@ jobs:
         - name: Setup PostgreSQL
           run: |
             if ${{ matrix.db-type == 'pgsql' }}; then
-                sudo apt purge postgresql-13
+                sudo apt install postgresql-14
 
                 if [[ ${{ matrix.php-version }} != '7.2' ]]; then
                     docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres
