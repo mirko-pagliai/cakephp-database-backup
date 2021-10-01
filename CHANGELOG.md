@@ -11,7 +11,8 @@
     the automatic backup filename;
 * export and import error messages are now more specific;
 * `BackupExport` returns a more accurate error in case of invalid filename;
-* added `Driver::_exec()` method.
+* added `Driver::_exec()` method;
+* tests no longer fail with `DatabaseBackup.redirectStderrToDevNull` set to `false`.
 
 ### 2.8.6
 * fixed bootstrap, `mkdir` errors are no longer suppressed;
