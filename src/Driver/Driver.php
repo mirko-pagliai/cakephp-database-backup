@@ -20,6 +20,7 @@ use Cake\Database\Connection;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
+use Symfony\Component\Process\Process;
 use Tools\Exceptionist;
 
 /**
@@ -71,14 +72,15 @@ abstract class Driver implements EventListenerInterface
     /**
      * Internal method to execute an external program
      * @param string $command The command that will be executed
-     * @return int The return status of the executed command
+     * @return \Symfony\Component\Process\Process
      * @since 2.8.7
      */
-    protected function _exec(string $command): int
+    protected function _exec(string $command): Process
     {
-        exec($command, $output, $returnVar);
+        $process = Process::fromShellCommandline($command);
+        $process->run();
 
-        return $returnVar;
+        return $process;
     }
 
     /**
@@ -138,19 +140,9 @@ abstract class Driver implements EventListenerInterface
      */
     protected function _exportExecutableWithCompression(string $filename): string
     {
-        $executable = $this->_exportExecutable();
         $compression = $this->getCompression($filename);
 
-        if ($compression) {
-            $executable .= ' | ' . $this->getBinary($compression);
-        }
-        $executable .= ' > ' . escapeshellarg($filename);
-
-        if (Configure::read('DatabaseBackup.redirectStderrToDevNull')) {
-            $executable .= REDIRECT_TO_DEV_NULL;
-        }
-
-        return $executable;
+        return $this->_exportExecutable() . ($compression ? ' | ' . $this->getBinary($compression) : '') . ' > ' . $filename;
     }
 
     /**
@@ -160,16 +152,11 @@ abstract class Driver implements EventListenerInterface
      */
     protected function _importExecutableWithCompression(string $filename): string
     {
-        $compression = $this->getCompression($filename);
-        $filename = escapeshellarg($filename);
-
         $executable = $this->_importExecutable() . ' < ' . $filename;
+
+        $compression = $this->getCompression($filename);
         if ($compression) {
             $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $this->_importExecutable();
-        }
-
-        if (Configure::read('DatabaseBackup.redirectStderrToDevNull')) {
-            $executable .= REDIRECT_TO_DEV_NULL;
         }
 
         return $executable;
@@ -193,8 +180,8 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $returnVar = $this->_exec($this->_exportExecutableWithCompression($filename));
-        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Export failed with exit code `{0}`', $returnVar));
+        $process = $this->_exec($this->_exportExecutableWithCompression($filename));
+        Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterExport');
 
@@ -244,8 +231,8 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $returnVar = $this->_exec($this->_importExecutableWithCompression($filename));
-        Exceptionist::isTrue($returnVar === 0, __d('database_backup', 'Import failed with exit code `{0}`', $returnVar));
+        $process = $this->_exec($this->_importExecutableWithCompression($filename));
+        Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterImport');
 
