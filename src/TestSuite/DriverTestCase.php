@@ -115,7 +115,7 @@ abstract class DriverTestCase extends TestCase
     public function testExport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
-        $this->assertFileNotExists($backup);
+        $this->assertFileDoesNotExist($backup);
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
         $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
