@@ -44,7 +44,7 @@ class DriverTest extends TestCase
         /** @var \Cake\Database\Connection $connection */
         $connection = $this->getConnection('test');
 
-        return $this->getMockForAbstractClass(Driver::class, [$connection], '', true, true, true, $mockedMethods);
+        return @$this->getMockForAbstractClass(Driver::class, [$connection], '', true, true, true, $mockedMethods);
     }
 
     /**
