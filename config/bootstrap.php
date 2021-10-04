@@ -20,7 +20,12 @@ use Tools\Filesystem;
 //Auto-discovers binaries
 foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlite3'] as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
-        Configure::write('DatabaseBackup.binaries.' . $binary, which($binary));
+        try {
+            $binaryPath = which($binary);
+        } catch (\Exception $e) {
+            $binaryPath = null;
+        }
+        Configure::write('DatabaseBackup.binaries.' . $binary, $binaryPath);
     }
 }
 
