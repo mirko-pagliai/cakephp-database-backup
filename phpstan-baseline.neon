@@ -25,8 +25,3 @@ parameters:
 			count: 1
 			path: tests/TestCase/Utility/BackupExportTest.php
 
-		-
-			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: tests/bootstrap.php
-
