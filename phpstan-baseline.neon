@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: config/bootstrap.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: src/TestSuite/DriverTestCase.php

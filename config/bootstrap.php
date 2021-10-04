@@ -17,11 +17,6 @@ declare(strict_types=1);
 use Cake\Core\Configure;
 use Tools\Filesystem;
 
-//Sets the redirect to `/dev/null`. This string will be concatenated to shell commands
-if (!defined('REDIRECT_TO_DEV_NULL')) {
-    define('REDIRECT_TO_DEV_NULL', IS_WIN ? ' 2>nul' : ' 2>/dev/null');
-}
-
 //Auto-discovers binaries
 foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlite3'] as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
@@ -37,11 +32,6 @@ if (!Configure::check('DatabaseBackup.chmod')) {
 //Database connection
 if (!Configure::check('DatabaseBackup.connection')) {
     Configure::write('DatabaseBackup.connection', 'default');
-}
-
-//Redirects stderr to `/dev/null`. This suppresses the output of executed commands
-if (!Configure::check('DatabaseBackup.redirectStderrToDevNull')) {
-    Configure::write('DatabaseBackup.redirectStderrToDevNull', true);
 }
 
 //Default target directory
