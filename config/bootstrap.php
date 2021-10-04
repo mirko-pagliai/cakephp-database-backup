@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
+use Exception;
 use Tools\Filesystem;
 
 //Auto-discovers binaries
@@ -22,10 +23,9 @@ foreach (['bzip2', 'gzip', 'mysql', 'mysqldump', 'pg_dump', 'pg_restore', 'sqlit
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         try {
             $binaryPath = which($binary);
-        } catch (\Exception $e) {
-            $binaryPath = null;
+        } catch (Exception $e) {
         }
-        Configure::write('DatabaseBackup.binaries.' . $binary, $binaryPath);
+        Configure::write('DatabaseBackup.binaries.' . $binary, $binaryPath ?? null);
     }
 }
 
