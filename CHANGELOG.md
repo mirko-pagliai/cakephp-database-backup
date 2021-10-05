@@ -1,4 +1,15 @@
 # 2.x branch
+## 2.9 branch
+### 2.9.0
+* now uses `symfony/process` to execute import and export shell commands. This
+    also allows for better handling of errors reported in the shell. The
+    `DatabaseBackup.redirectStderrToDevNull` config key has been removed;
+* only the binaries needed for the database driver used are auto-discovered;
+* tests are now only run for one driver at a time, by default `mysql`. You can
+    choose another driver by setting `driver_test` or ``db_dsn` environment
+    variables before running `phpunit`;
+* migration to github actions.
+
 ## 2.8 branch
 ### 2.8.7
 * fixed a small bug when using the numeric hostname (`127.0.0.1` or `::1`) as
