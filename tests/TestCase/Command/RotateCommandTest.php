@@ -62,7 +62,7 @@ class RotateCommandTest extends TestCase
         $this->exec($this->command . ' 1');
         $this->assertExitWithSuccess();
         $this->assertOutputContains('Connection: test');
-        $this->assertOutputContains('Driver: Mysql');
+        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');
     }
 }

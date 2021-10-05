@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
-use Cake\Core\Configure;
 use Cake\Event\EventList;
 use Cake\ORM\Table;
 use DatabaseBackup\TestSuite\TestCase;
@@ -64,7 +63,10 @@ abstract class DriverTestCase extends TestCase
     /**
      * @var array
      */
-    public $fixtures;
+    public $fixtures = [
+        'core.Articles',
+        'core.Comments',
+    ];
 
     /**
      * Called before every test method
@@ -74,21 +76,27 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
-        Configure::write('DatabaseBackup.connection', $this->connection);
-        $connection = $this->getConnection();
+        /** @var \Cake\Database\Connection $connection */
+        $connection = $this->getConnection('test');
 
         foreach (['Articles', 'Comments'] as $name) {
-            $this->$name = $this->getTable($name, compact('connection')) ?: new Table();
+            $this->$name = $this->$name ?: $this->getTable($name, compact('connection')) ?: new Table();
+        }
+
+        if (!$this->DriverClass || !$this->Driver) {
+            /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
+            $DriverClass = 'DatabaseBackup\\Driver\\' . array_value_last(explode('\\', $connection->config()['driver']));
+            $this->DriverClass = $DriverClass;
+            $this->Driver = new $this->DriverClass($connection);
         }
 
         //Enables event tracking
-        $this->Driver = new $this->DriverClass($connection);
         $this->Driver->getEventManager()->setEventList(new EventList());
     }
 
     /**
      * Internal method to get all records from the database
-     * @return array
+     * @return array<string, array>
      */
     final protected function getAllRecords(): array
     {
@@ -107,6 +115,7 @@ abstract class DriverTestCase extends TestCase
     public function testExport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
+        $this->assertFileDoesNotExist($backup);
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
         $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
@@ -185,9 +194,7 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $expected = sprintf('%s > %s', $basicExecutable, escapeshellarg('backup.sql'));
-        $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($basicExecutable . ' > backup.sql', $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
@@ -196,9 +203,8 @@ abstract class DriverTestCase extends TestCase
                 '%s | %s > %s',
                 $basicExecutable,
                 $this->Driver->getBinary($compression),
-                escapeshellarg($filename)
+                $filename
             );
-            $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
             $this->assertEquals($expected, $result);
         }
     }
@@ -234,9 +240,7 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $expected = $basicExecutable . ' < ' . escapeshellarg('backup.sql');
-        $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($basicExecutable . ' < backup.sql', $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
@@ -244,10 +248,9 @@ abstract class DriverTestCase extends TestCase
             $expected = sprintf(
                 '%s -dc %s | %s',
                 $this->Driver->getBinary($compression),
-                escapeshellarg($filename),
+                $filename,
                 $basicExecutable
             );
-            $expected .= Configure::read('DatabaseBackup.redirectStderrToDevNull') ? REDIRECT_TO_DEV_NULL : '';
             $this->assertEquals($expected, $result);
         }
     }

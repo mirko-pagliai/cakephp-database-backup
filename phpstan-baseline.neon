@@ -1,9 +1,9 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Ternary operator condition is always false\\.$#"
+			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
-			path: config/bootstrap.php
+			path: src/TestSuite/DriverTestCase.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
@@ -16,7 +16,7 @@ parameters:
 			path: src/Utility/BackupManager.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
+			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: tests/TestCase/Driver/DriverTest.php
 
@@ -24,9 +24,4 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: tests/TestCase/Utility/BackupExportTest.php
-
-		-
-			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: tests/bootstrap.php
 

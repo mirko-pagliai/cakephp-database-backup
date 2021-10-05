@@ -15,9 +15,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use Cake\Database\Driver\Mysql as CakeMySql;
 use Cake\Log\Log;
-use DatabaseBackup\Driver\Mysql;
+use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -72,13 +71,8 @@ class BackupExportTest extends TestCase
     {
         $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
 
-        $config = $this->getProperty($this->BackupExport, 'config');
-        $this->assertEquals($config['scheme'], 'mysql');
-        $this->assertEquals($config['database'], 'test');
-        $this->assertEquals($config['driver'], CakeMySql::class);
-
+        $this->assertInstanceof(Driver::class, $this->BackupExport->Driver);
         $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'defaultExtension'));
-        $this->assertInstanceof(Mysql::class, $this->getProperty($this->BackupExport, 'driver'));
         $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
         $this->assertNull($this->getProperty($this->BackupExport, 'extension'));
         $this->assertNull($this->getProperty($this->BackupExport, 'filename'));

@@ -23,24 +23,17 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class MysqlTest extends DriverTestCase
 {
     /**
-     * @var string
+     * Called before every test method
+     * @return void
      */
-    protected $DriverClass = Mysql::class;
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    /**
-     * Name of the database connection
-     * @var string
-     */
-    protected $connection = 'test';
-
-    /**
-     * Fixtures
-     * @var array
-     */
-    public $fixtures = [
-        'core.Articles',
-        'core.Comments',
-    ];
+        if (!$this->Driver instanceof Mysql) {
+            $this->markTestIncomplete();
+        }
+    }
 
     /**
      * Test for `_exportExecutable()` method
@@ -90,9 +83,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterExport(): void
     {
-        $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
-        $driver->expects($this->once())->method('deleteAuthFile');
-        $driver->afterExport();
+        $Driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
+        $Driver->expects($this->once())->method('deleteAuthFile');
+        $Driver->afterExport();
     }
 
     /**
@@ -101,9 +94,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterImport(): void
     {
-        $driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
-        $driver->expects($this->once())->method('deleteAuthFile');
-        $driver->afterImport();
+        $Driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
+        $Driver->expects($this->once())->method('deleteAuthFile');
+        $Driver->afterImport();
     }
 
     /**

@@ -34,6 +34,14 @@ class BackupExport
     public $BackupManager;
 
     /**
+     * Driver containing all methods to export/import database backups
+     *  according to the database engine
+     * @since 2.0.0
+     * @var \DatabaseBackup\Driver\Driver
+     */
+    public $Driver;
+
+    /**
      * Compression type
      * @var string|null
      */
@@ -50,14 +58,6 @@ class BackupExport
      * @var string
      */
     protected $defaultExtension = 'sql';
-
-    /**
-     * Driver containing all methods to export/import database backups
-     *  according to the database engine
-     * @since 2.0.0
-     * @var \DatabaseBackup\Driver\Driver
-     */
-    public $driver;
 
     /**
      * Recipient of the email, if you want to send the backup via mail
@@ -91,8 +91,8 @@ class BackupExport
     {
         $connection = $this->getConnection();
         $this->BackupManager = new BackupManager();
+        $this->Driver = $this->getDriver($connection);
         $this->config = $connection->config();
-        $this->driver = $this->getDriver($connection);
     }
 
     /**
@@ -196,7 +196,7 @@ class BackupExport
         $filename = $this->filename;
         unset($this->filename);
 
-        $this->driver->export($filename);
+        $this->Driver->export($filename);
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
         $this->emailRecipient ? $this->BackupManager->send($filename, $this->emailRecipient) : null;
