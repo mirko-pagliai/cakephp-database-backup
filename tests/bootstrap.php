@@ -70,11 +70,6 @@ Configure::write('App', [
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
 
-Configure::write('DatabaseBackup.connection', 'test');
-Configure::write('DatabaseBackup.target', TMP . 'backups');
-Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
-Configure::write('pluginsToLoad', ['DatabaseBackup']);
-
 Cache::setConfig([
     '_cake_core_' => [
         'engine' => 'File',
@@ -82,23 +77,6 @@ Cache::setConfig([
         'serialize' => true,
     ],
 ]);
-
-if (!getenv('db_dsn')) {
-    putenv('db_dsn=mysql://travis@localhost/test');
-
-    $driverTest = getenv('driver_test');
-    if ($driverTest && $driverTest != 'mysql') {
-        if ($driverTest == 'sqlite') {
-            putenv('db_dsn=sqlite:///' . TMP . 'test.sq3');
-        } elseif ($driverTest == 'postgres') {
-            putenv('db_dsn=postgres://postgres@localhost/test');
-        } else {
-            die(sprintf('Unknown `%s` test driver', $driverTest) . PHP_EOL);
-        }
-    }
-}
-
-ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 
 Log::setConfig('debug', [
     'className' => 'File',
@@ -109,4 +87,24 @@ Log::setConfig('debug', [
 TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
 Email::setConfig('default', ['transport' => 'debug']);
 
-echo 'Running tests for `' . ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'))->config()['scheme'] . '` driver ' . PHP_EOL;
+if (!getenv('db_dsn')) {
+    putenv('db_dsn=mysql://travis@localhost/test');
+
+    $driverTest = getenv('driver_test');
+    if ($driverTest && $driverTest != 'mysql') {
+        if ($driverTest == 'sqlite') {
+            putenv('db_dsn=sqlite:///' . TMP . 'test.sq3');
+        } elseif ($driverTest == 'postgres') {
+            putenv('db_dsn=postgres://postgres@localhost/test');
+        }
+    }
+}
+ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
+
+Configure::write('DatabaseBackup.connection', 'test');
+Configure::write('DatabaseBackup.target', TMP . 'backups');
+Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+Configure::write('pluginsToLoad', ['DatabaseBackup']);
+
+require_once ROOT . 'config' . DS . 'bootstrap.php';
+echo 'Running tests for `' . DATABASE_BACKUP_DRIVER . '` driver ' . PHP_EOL;

@@ -4,6 +4,7 @@
 * now uses `symfony/process` to execute import and export shell commands. This
     also allows for better handling of errors reported in the shell. The
     `DatabaseBackup.redirectStderrToDevNull` config key has been removed;
+* only the binaries needed for the database driver used are auto-discovered;
 * tests are now only run for one driver at a time, by default `mysql`. You can
     choose another driver by setting `driver_test` or ``db_dsn` environment
     variables before running `phpunit`;

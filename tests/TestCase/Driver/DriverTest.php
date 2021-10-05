@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Driver;
 
+use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use ErrorException;
@@ -111,7 +112,8 @@ class DriverTest extends TestCase
      */
     public function testGetBinary(): void
     {
-        $this->assertEquals(which('mysql'), $this->Driver->getBinary('mysql'));
+        $binary = DATABASE_BACKUP_DRIVER == 'mysql' ? 'mysql' : (DATABASE_BACKUP_DRIVER == 'postgres' ? 'pg_dump' : 'sqlite3');
+        $this->assertEquals(which($binary), $this->Driver->getBinary($binary));
 
         //With a binary not available
         $this->expectException(ErrorException::class);
