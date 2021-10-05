@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use ErrorException;
