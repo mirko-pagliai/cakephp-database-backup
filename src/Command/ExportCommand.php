@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -21,6 +23,7 @@ use DatabaseBackup\Command\SendCommand;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
+use Tools\Filesystem;
 
 /**
  * Exports a database backup
@@ -32,7 +35,7 @@ class ExportCommand extends Command
      * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
      * @return \Cake\Console\ConsoleOptionParser
      */
-    protected function buildOptionParser(ConsoleOptionParser $parser)
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser->setDescription(__d('database_backup', 'Exports a database backup'))
             ->addOptions([
@@ -47,8 +50,8 @@ class ExportCommand extends Command
                     'short' => 'f',
                 ],
                 'rotate' => [
-                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups' .
-                        'you ìwant to keep. So, it will delete all backups that are older. By default, no backup' .
+                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups ' .
+                        'you want to keep. So, it will delete all backups that are older. By default, no backup ' .
                         'will be deleted'),
                     'short' => 'r',
                 ],
@@ -66,32 +69,29 @@ class ExportCommand extends Command
      * This command uses `RotateCommand` and `SendCommand`.
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return int|null The exit code or null for success
+     * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
-     * @uses \DatabaseBackup\Command\RotateCommand::execute()
-     * @uses \DatabaseBackup\Command\SendCommand::execute()
-     * @uses \DatabaseBackup\Utility\BackupExport::compression()
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
-     * @uses \DatabaseBackup\Utility\BackupExport::filename()
+     * @throws \Cake\Console\Exception\StopException
      */
-    public function execute(Arguments $args, ConsoleIo $io)
+    public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
         try {
-            $instance = new BackupExport();
+            $BackupExport = new BackupExport();
             //Sets the output filename or the compression type.
             //Regarding the `rotate` option, the `BackupShell::rotate()` method
             //  will be called at the end, instead of `BackupExport::rotate()`
             if ($args->getOption('filename')) {
-                $instance->filename($args->getOption('filename'));
+                $BackupExport->filename((string)$args->getOption('filename'));
             } elseif ($args->getOption('compression')) {
-                $instance->compression($args->getOption('compression'));
+                $BackupExport->compression((string)$args->getOption('compression'));
             }
 
             //Exports
-            $file = $instance->export();
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
+            $file = $BackupExport->export();
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', Filesystem::instance()->rtr($file)));
+
             $verbose = $args->getOption('verbose');
             $quiet = $args->getOption('quiet');
 
@@ -99,7 +99,7 @@ class ExportCommand extends Command
             if ($args->getOption('send')) {
                 $SendCommand = new SendCommand();
                 $SendCommand->execute(new Arguments(
-                    [$file, $args->getOption('send')],
+                    [$file, (string)$args->getOption('send')],
                     compact('verbose', 'quiet'),
                     $SendCommand->getOptionParser()->argumentNames()
                 ), $io);
@@ -109,7 +109,7 @@ class ExportCommand extends Command
             if ($args->getOption('rotate')) {
                 $RotateCommand = new RotateCommand();
                 $RotateCommand->execute(new Arguments(
-                    [$args->getOption('rotate')],
+                    [(string)$args->getOption('rotate')],
                     compact('verbose', 'quiet'),
                     $RotateCommand->getOptionParser()->argumentNames()
                 ), $io);
@@ -118,7 +118,5 @@ class ExportCommand extends Command
             $io->error($e->getMessage());
             $this->abort();
         }
-
-        return null;
     }
 }

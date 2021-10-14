@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -14,6 +16,7 @@
 namespace DatabaseBackup\Driver;
 
 use DatabaseBackup\Driver\Driver;
+use Tools\Filesystem;
 
 /**
  * Mysql driver to export/import database backups
@@ -30,32 +33,28 @@ class Mysql extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
-     * @uses getConfig()
-     * @uses $auth
      */
-    protected function _exportExecutable()
+    protected function _exportExecutable(): string
     {
         return sprintf(
             '%s --defaults-file=%s %s',
-            $this->getBinary('mysqldump'),
+            escapeshellarg($this->getBinary('mysqldump')),
             escapeshellarg($this->auth),
-            $this->getConfig('database')
+            escapeshellarg($this->getConfig('database'))
         );
     }
 
     /**
      * Gets the executable command to import the database
      * @return string
-     * @uses getConfig()
-     * @uses $auth
      */
-    protected function _importExecutable()
+    protected function _importExecutable(): string
     {
         return sprintf(
             '%s --defaults-extra-file=%s %s',
-            $this->getBinary('mysql'),
+            escapeshellarg($this->getBinary('mysql')),
             escapeshellarg($this->auth),
-            $this->getConfig('database')
+            escapeshellarg($this->getConfig('database'))
         );
     }
 
@@ -64,18 +63,16 @@ class Mysql extends Driver
      * @param string $content Content
      * @return bool
      * @since 2.3.0
-     * @uses getConfig()
-     * @uses $auth
      */
-    protected function writeAuthFile($content)
+    protected function writeAuthFile(string $content): bool
     {
         $content = str_replace(
             ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
-            [$this->getConfig('username'), $this->getConfig('password'), $this->getConfig('host')],
+            [(string)$this->getConfig('username'), (string)$this->getConfig('password'), (string)$this->getConfig('host')],
             $content
         );
 
-        $this->auth = create_tmp_file($content, null, 'auth');
+        $this->auth = Filesystem::instance()->createTmpFile($content, null, 'auth');
 
         return $this->auth !== false;
     }
@@ -84,9 +81,8 @@ class Mysql extends Driver
      * Called after export
      * @return void
      * @since 2.1.0
-     * @uses deleteAuthFile()
      */
-    public function afterExport()
+    public function afterExport(): void
     {
         $this->deleteAuthFile();
     }
@@ -95,9 +91,8 @@ class Mysql extends Driver
      * Called after import
      * @return void
      * @since 2.1.0
-     * @uses deleteAuthFile()
      */
-    public function afterImport()
+    public function afterImport(): void
     {
         $this->deleteAuthFile();
     }
@@ -114,14 +109,13 @@ class Mysql extends Driver
      * So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses writeAuthFile()
      */
-    public function beforeExport()
+    public function beforeExport(): bool
     {
-        return $this->writeAuthFile("[mysqldump]" . PHP_EOL .
-            "user={{USER}}" . PHP_EOL .
-            "password=\"{{PASSWORD}}\"" . PHP_EOL .
-            "host={{HOST}}");
+        return $this->writeAuthFile('[mysqldump]' . PHP_EOL .
+            'user={{USER}}' . PHP_EOL .
+            'password="{{PASSWORD}}"' . PHP_EOL .
+            'host={{HOST}}');
     }
 
     /**
@@ -136,23 +130,21 @@ class Mysql extends Driver
      *  So it creates a temporary file to store the configuration options
      * @return bool
      * @since 2.1.0
-     * @uses writeAuthFile()
      */
-    public function beforeImport()
+    public function beforeImport(): bool
     {
-        return $this->writeAuthFile("[client]" . PHP_EOL .
-            "user={{USER}}" . PHP_EOL .
-            "password=\"{{PASSWORD}}\"" . PHP_EOL .
-            "host={{HOST}}");
+        return $this->writeAuthFile('[client]' . PHP_EOL .
+            'user={{USER}}' . PHP_EOL .
+            'password="{{PASSWORD}}"' . PHP_EOL .
+            'host={{HOST}}');
     }
 
     /**
      * Deletes the temporary file with the database authentication data
      * @return bool `true` on success
      * @since 2.1.0
-     * @uses $auth
      */
-    protected function deleteAuthFile()
+    protected function deleteAuthFile(): bool
     {
         if (!$this->auth || !file_exists($this->auth)) {
             return false;

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -19,6 +21,7 @@ use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
+use Tools\Filesystem;
 
 /**
  * Imports a database backup
@@ -30,7 +33,7 @@ class ImportCommand extends Command
      * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
      * @return \Cake\Console\ConsoleOptionParser
      */
-    protected function buildOptionParser(ConsoleOptionParser $parser)
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser->setDescription(__d('database_backup', 'Imports a database backup'))
             ->addArgument('filename', [
@@ -43,23 +46,20 @@ class ImportCommand extends Command
      * Imports a database backup
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return int|null The exit code or null for success
+     * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#import
-     * @uses \DatabaseBackup\Utility\BackupImport::filename()
-     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     * @throws \Cake\Console\Exception\StopException
      */
-    public function execute(Arguments $args, ConsoleIo $io)
+    public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
         try {
-            $file = (new BackupImport())->filename($args->getArgument('filename'))->import();
-            $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
+            $file = (new BackupImport())->filename((string)$args->getArgument('filename'))->import();
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', Filesystem::instance()->rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();
         }
-
-        return null;
     }
 }

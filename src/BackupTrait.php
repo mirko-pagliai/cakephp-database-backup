@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -16,9 +18,10 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use DatabaseBackup\Driver\Driver;
 use InvalidArgumentException;
-use RuntimeException;
-use Symfony\Component\Filesystem\Filesystem;
+use Tools\Exceptionist;
+use Tools\Filesystem;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -26,52 +29,32 @@ use Symfony\Component\Filesystem\Filesystem;
 trait BackupTrait
 {
     /**
-     * Valid extensions (as keys) and compressions (as values)
+     * Valid extensions. Names as keys and compressions as values
      * @since 2.4.0
-     * @var array
+     * @var array<string, string|bool>
      */
-    private static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
+    protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
 
     /**
-     * Returns an absolute path
+     * Returns the absolute path for a backup file
      * @param string $path Relative or absolute path
      * @return string
-     * @uses getTarget()
      */
-    public function getAbsolutePath($path)
+    public static function getAbsolutePath(string $path): string
     {
-        return (new Filesystem())->isAbsolutePath($path) ? $path : $this->getTarget() . DS . $path;
-    }
-
-    /**
-     * Gets a binary path
-     * @param string $name Binary name
-     * @return string
-     * @since 2.0.0
-     * @throws \RuntimeException
-     */
-    public function getBinary($name)
-    {
-        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
-        is_true_or_fail($binary, sprintf('Binary for `%s` could not be found. You have to set its path manually', $name), RuntimeException::class);
-
-        return $binary;
+        return Filesystem::instance()->makePathAbsolute($path, Configure::read('DatabaseBackup.target'));
     }
 
     /**
      * Returns the compression type from a filename
      * @param string $filename Filename
-     * @return string|null Compression type as string or `null`
-     * @uses getExtension()
-     * @uses getValidCompressions()
+     * @return string|null Compression type or `null`
      */
-    public function getCompression($filename)
+    public static function getCompression(string $filename): ?string
     {
-        //Gets the extension from the filename
-        $extension = $this->getExtension($filename);
-        $keyExists = array_key_exists($extension, $this->getValidCompressions());
+        $extension = self::getExtension($filename);
 
-        return $keyExists ? $this->getValidCompressions()[$extension] : null;
+        return self::getValidCompressions()[$extension] ?? null;
     }
 
     /**
@@ -79,7 +62,7 @@ trait BackupTrait
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface A connection object
      */
-    public function getConnection($name = null)
+    public function getConnection(?string $name = null): ConnectionInterface
     {
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
@@ -88,38 +71,18 @@ trait BackupTrait
      * Gets the driver instance containing all methods to export/import database
      *  backups, according to the database engine
      * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
-     * @return object The driver instance
+     * @return \DatabaseBackup\Driver\Driver A driver instance
      * @since 2.0.0
      * @throws \InvalidArgumentException
-     * @uses getConnection()
-     * @uses getDriverName()
      */
-    public function getDriver(ConnectionInterface $connection = null)
+    public function getDriver(?ConnectionInterface $connection = null): Driver
     {
         $connection = $connection ?: $this->getConnection();
-        $className = $this->getDriverName($connection);
+        $className = get_class_short_name($connection->getDriver());
         $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-        is_true_or_fail(
-            $driver,
-            __d('database_backup', 'The `{0}` driver does not exist', $className),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isTrue($driver, __d('database_backup', 'The `{0}` driver does not exist', $className), InvalidArgumentException::class);
 
         return new $driver($connection);
-    }
-
-    /**
-     * Gets the driver name, according to the database engine
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
-     * @return string The driver name
-     * @since 2.6.2
-     * @uses getConnection()
-     */
-    public function getDriverName(ConnectionInterface $connection = null)
-    {
-        $connection = $connection ?: $this->getConnection();
-
-        return get_class_short_name(get_class($connection->getDriver()));
     }
 
     /**
@@ -127,22 +90,13 @@ trait BackupTrait
      * @param string $filename Filename
      * @return string|null Extension or `null` if the extension is not found or
      *  if is an invalid extension
-     * @uses getValidExtensions()
+     * @uses $validExtensions
      */
-    public function getExtension($filename)
+    public static function getExtension(string $filename): ?string
     {
-        $extension = get_extension($filename);
+        $extension = Filesystem::instance()->getExtension($filename);
 
-        return in_array($extension, $this->getValidExtensions()) ? $extension : null;
-    }
-
-    /**
-     * Returns the target path
-     * @return string
-     */
-    public function getTarget()
-    {
-        return Configure::read('DatabaseBackup.target');
+        return in_array($extension, array_keys(self::$validExtensions)) ? $extension : null;
     }
 
     /**
@@ -151,19 +105,8 @@ trait BackupTrait
      * @since 2.4.0
      * @uses $validExtensions
      */
-    public function getValidCompressions()
+    public static function getValidCompressions(): array
     {
         return array_filter(self::$validExtensions);
-    }
-
-    /**
-     * Returns all valid extensions
-     * @return array
-     * @since 2.4.0
-     * @uses $validExtensions
-     */
-    public function getValidExtensions()
-    {
-        return array_keys(self::$validExtensions);
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -22,37 +24,30 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class PostgresTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Postgres
+     * Called before every test method
+     * @return void
      */
-    protected $DriverClass = Postgres::class;
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    /**
-     * Name of the database connection
-     * @var string
-     */
-    protected $connection = 'test_postgres';
-
-    /**
-     * Fixtures
-     * @var array
-     */
-    public $fixtures = [
-        'plugin.DatabaseBackup.Postgres/Articles',
-        'plugin.DatabaseBackup.Postgres/Comments',
-    ];
+        if (!$this->Driver instanceof Postgres) {
+            $this->markTestIncomplete();
+        }
+    }
 
     /**
      * Test for `getDbnameAsString()` method
      * @test
      */
-    public function testGetDbnameAsString()
+    public function testGetDbnameAsString(): void
     {
         $password = $this->Driver->getConfig('password');
-        $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@localhost/travis_ci_test';
+        $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
 
         //Adds a password to the config
-        $expected = 'postgresql://postgres:mypassword@localhost/travis_ci_test';
+        $expected = 'postgresql://postgres:mypassword@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
         $config = ['password' => 'mypassword'] + $this->Driver->getConfig();
         $this->setProperty($this->Driver, 'connection', new Connection($config));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
@@ -62,13 +57,13 @@ class PostgresTest extends DriverTestCase
      * Test for `_exportExecutable()` method
      * @test
      */
-    public function testExportExecutable()
+    public function testExportExecutable(): void
     {
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(
-            '%s --format=c -b --dbname=postgresql://postgres%s@localhost/travis_ci_test',
-            $this->getBinary('pg_dump'),
-            $password ? ':' . $password : null
+            '%s --format=c -b --dbname=postgresql://postgres%s@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'),
+            $this->Driver->getBinary('pg_dump'),
+            $password ? ':' . $password : ''
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
@@ -77,13 +72,13 @@ class PostgresTest extends DriverTestCase
      * Test for `_importExecutable()` method
      * @test
      */
-    public function testImportExecutable()
+    public function testImportExecutable(): void
     {
         $password = $this->Driver->getConfig('password');
         $expected = sprintf(
-            '%s --format=c -c -e --dbname=postgresql://postgres%s@localhost/travis_ci_test',
-            $this->getBinary('pg_restore'),
-            $password ? ':' . $password : null
+            '%s --format=c -c -e --dbname=postgresql://postgres%s@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'),
+            $this->Driver->getBinary('pg_restore'),
+            $password ? ':' . $password : ''
         );
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }

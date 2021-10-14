@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -21,32 +23,25 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class MysqlTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Mysql
+     * Called before every test method
+     * @return void
      */
-    protected $DriverClass = Mysql::class;
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    /**
-     * Name of the database connection
-     * @var string
-     */
-    protected $connection = 'test';
-
-    /**
-     * Fixtures
-     * @var array
-     */
-    public $fixtures = [
-        'core.Articles',
-        'core.Comments',
-    ];
+        if (!$this->Driver instanceof Mysql) {
+            $this->markTestIncomplete();
+        }
+    }
 
     /**
      * Test for `_exportExecutable()` method
      * @test
      */
-    public function testExportExecutable()
+    public function testExportExecutable(): void
     {
-        $expected = sprintf('%s --defaults-file=%s test', $this->getBinary('mysqldump'), escapeshellarg('authFile'));
+        $expected = sprintf('%s --defaults-file=%s %s', escapeshellarg($this->Driver->getBinary('mysqldump')), escapeshellarg('authFile'), escapeshellarg('test'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
@@ -55,7 +50,7 @@ class MysqlTest extends DriverTestCase
      * Test for `_exportExecutableWithCompression()` method
      * @test
      */
-    public function testExportExecutableWithCompression()
+    public function testExportExecutableWithCompression(): void
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
         parent::testExportExecutableWithCompression();
@@ -65,9 +60,9 @@ class MysqlTest extends DriverTestCase
      * Test for `_importExecutable()` method
      * @test
      */
-    public function testImportExecutable()
+    public function testImportExecutable(): void
     {
-        $expected = sprintf('%s --defaults-extra-file=%s test', $this->getBinary('mysql'), escapeshellarg('authFile'));
+        $expected = sprintf('%s --defaults-extra-file=%s %s', escapeshellarg($this->Driver->getBinary('mysql')), escapeshellarg('authFile'), escapeshellarg('test'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
@@ -76,7 +71,7 @@ class MysqlTest extends DriverTestCase
      * Test for `_importExecutableWithCompression()` method
      * @test
      */
-    public function testImportExecutableWithCompression()
+    public function testImportExecutableWithCompression(): void
     {
         $this->setProperty($this->Driver, 'auth', 'authFile');
         parent::testImportExecutableWithCompression();
@@ -86,29 +81,29 @@ class MysqlTest extends DriverTestCase
      * Test for `afterExport()` method
      * @test
      */
-    public function testAfterExport()
+    public function testAfterExport(): void
     {
-        $driver = $this->getMockForDriver(['deleteAuthFile']);
-        $driver->expects($this->once())->method('deleteAuthFile');
-        $this->assertNull($driver->afterExport());
+        $Driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
+        $Driver->expects($this->once())->method('deleteAuthFile');
+        $Driver->afterExport();
     }
 
     /**
      * Test for `afterImport()` method
      * @test
      */
-    public function testAfterImport()
+    public function testAfterImport(): void
     {
-        $driver = $this->getMockForDriver(['deleteAuthFile']);
-        $driver->expects($this->once())->method('deleteAuthFile');
-        $this->assertNull($driver->afterImport());
+        $Driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
+        $Driver->expects($this->once())->method('deleteAuthFile');
+        $Driver->afterImport();
     }
 
     /**
      * Test for `beforeExport()` method
      * @test
      */
-    public function testBeforeExport()
+    public function testBeforeExport(): void
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
         $this->assertTrue($this->Driver->beforeExport());
@@ -116,7 +111,7 @@ class MysqlTest extends DriverTestCase
         $expected = '[mysqldump]' . PHP_EOL .
             'user=' . $this->Driver->getConfig('username') . PHP_EOL .
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
-            'host=localhost';
+            'host=' . $this->Driver->getConfig('host');
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
         $this->assertEquals($expected, file_get_contents($auth));
@@ -128,7 +123,7 @@ class MysqlTest extends DriverTestCase
      * Test for `beforeImport()` method
      * @test
      */
-    public function testBeforeImport()
+    public function testBeforeImport(): void
     {
         $this->assertNull($this->getProperty($this->Driver, 'auth'));
         $this->assertTrue($this->Driver->beforeImport());
@@ -136,7 +131,7 @@ class MysqlTest extends DriverTestCase
         $expected = '[client]' . PHP_EOL .
             'user=' . $this->Driver->getConfig('username') . PHP_EOL .
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
-            'host=localhost';
+            'host=' . $this->Driver->getConfig('host');
         $auth = $this->getProperty($this->Driver, 'auth');
         $this->assertFileExists($auth);
         $this->assertEquals($expected, file_get_contents($auth));
@@ -146,14 +141,14 @@ class MysqlTest extends DriverTestCase
      * Test for `deleteAuthFile()` method
      * @test
      */
-    public function testDeleteAuthFile()
+    public function testDeleteAuthFile(): void
     {
         $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
 
-        $auth = tempnam(sys_get_temp_dir(), 'auth');
+        $auth = tempnam(sys_get_temp_dir(), 'auth') ?: '';
         $this->setProperty($this->Driver, 'auth', $auth);
         $this->assertFileExists($auth);
         $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
-        $this->assertFileNotExists($auth);
+        $this->assertFileDoesNotExist($auth);
     }
 }

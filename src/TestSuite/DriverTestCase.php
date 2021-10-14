@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -13,11 +15,9 @@
  */
 namespace DatabaseBackup\TestSuite;
 
-use Cake\Core\Configure;
-use Cake\Database\Connection;
 use Cake\Event\EventList;
+use Cake\ORM\Table;
 use DatabaseBackup\TestSuite\TestCase;
-use ErrorException;
 
 /**
  * DriverTestCase class.
@@ -42,12 +42,14 @@ abstract class DriverTestCase extends TestCase
     protected $Driver;
 
     /**
+     * Driver class
      * @since 2.5.1
-     * @var string
+     * @var class-string<\DatabaseBackup\Driver\Driver>
      */
     protected $DriverClass;
 
     /**
+     * Auto fixtures
      * @var bool
      */
     public $autoFixtures = false;
@@ -59,34 +61,44 @@ abstract class DriverTestCase extends TestCase
     protected $connection;
 
     /**
-     * Fixtures
      * @var array
      */
-    public $fixtures;
+    public $fixtures = [
+        'core.Articles',
+        'core.Comments',
+    ];
 
     /**
      * Called before every test method
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
-        Configure::write('DatabaseBackup.connection', $this->connection);
-        $connection = $this->getConnection();
-        $this->Articles = $this->getTable('Articles', compact('connection'));
-        $this->Comments = $this->getTable('Comments', compact('connection'));
+        /** @var \Cake\Database\Connection $connection */
+        $connection = $this->getConnection('test');
 
-        //Enable event tracking
-        $this->Driver = new $this->DriverClass($connection);
+        foreach (['Articles', 'Comments'] as $name) {
+            $this->$name = $this->$name ?: $this->getTable($name, compact('connection')) ?: new Table();
+        }
+
+        if (!$this->DriverClass || !$this->Driver) {
+            /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
+            $DriverClass = 'DatabaseBackup\\Driver\\' . array_value_last(explode('\\', $connection->config()['driver']));
+            $this->DriverClass = $DriverClass;
+            $this->Driver = new $this->DriverClass($connection);
+        }
+
+        //Enables event tracking
         $this->Driver->getEventManager()->setEventList(new EventList());
     }
 
     /**
      * Internal method to get all records from the database
-     * @return array
+     * @return array<string, array>
      */
-    final protected function getAllRecords()
+    final protected function getAllRecords(): array
     {
         foreach (['Articles', 'Comments'] as $name) {
             $records[$name] = $this->$name->find()->enableHydration(false)->toArray();
@@ -96,38 +108,14 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Internal method to mock a driver
-     * @param array $methods The list of methods to mock
-     * @return \DatabaseBackup\Driver\Driver|\PHPUnit_Framework_MockObject_MockObject
-     * @since 2.6.1
-     * @uses $Driver
-     */
-    final protected function getMockForDriver(array $methods)
-    {
-        return $this->getMockBuilder(get_class($this->Driver))
-            ->setMethods($methods)
-            ->setConstructorArgs([$this->getConnection()])
-            ->getMock();
-    }
-
-    /**
-     * Test for `__construct()` method
-     * @return void
-     * @test
-     */
-    public function testConstruct()
-    {
-        $this->assertInstanceof(Connection::class, $this->getProperty($this->Driver, 'connection'));
-    }
-
-    /**
      * Test for `export()` method
      * @return void
      * @test
      */
-    public function testExport()
+    public function testExport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
+        $this->assertFileDoesNotExist($backup);
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
         $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
@@ -141,16 +129,17 @@ abstract class DriverTestCase extends TestCase
      * @return void
      * @test
      */
-    public function testExportAndImport()
+    public function testExportAndImport(): void
     {
-        foreach ($this->getValidExtensions() as $extension) {
+        foreach (self::$validExtensions as $extension) {
             $this->loadFixtures();
-            $backup = $this->getAbsolutePath(sprintf('example.%s', $extension));
+            $backup = uniqid('example_');
+            $backup = $this->getAbsolutePath($extension ? $backup . '.' . $extension : $backup);
 
             //Initial records. 3 articles and 6 comments
             $initial = $this->getAllRecords();
-            $this->assertEquals(3, count($initial['Articles']));
-            $this->assertEquals(6, count($initial['Comments']));
+            $this->assertCount(3, $initial['Articles']);
+            $this->assertCount(6, $initial['Comments']);
 
             //Exports backup and deletes article with ID 2 and comment with ID 4
             $this->assertTrue($this->Driver->export($backup));
@@ -159,16 +148,16 @@ abstract class DriverTestCase extends TestCase
 
             //Records after delete. 2 articles and 5 comments
             $afterDelete = $this->getAllRecords();
-            $this->assertEquals(count($afterDelete['Articles']), count($initial['Articles']) - 1);
-            $this->assertEquals(count($afterDelete['Comments']), count($initial['Comments']) - 1);
+            $this->assertCount(count($initial['Articles']) - 1, $afterDelete['Articles']);
+            $this->assertCount(count($initial['Comments']) - 1, $afterDelete['Comments']);
 
             //Imports backup. Now initial records are the same of final records
             $this->assertTrue($this->Driver->import($backup));
             $final = $this->getAllRecords();
             $this->assertEquals($initial, $final);
 
-            //Gets the difference (`$diff`) between records after delete
-            //  (`$deleted`)and records after import (`$final`)
+            //Gets the difference (`$diff`) between records after delete and
+            //  records after import (`$final`)
             $diff = $final;
             foreach ($final as $model => $finalValues) {
                 foreach ($finalValues as $finalKey => $finalValue) {
@@ -179,8 +168,8 @@ abstract class DriverTestCase extends TestCase
                     }
                 }
             }
-            $this->assertEquals(1, count($diff['Articles']));
-            $this->assertEquals(1, count($diff['Comments']));
+            $this->assertCount(1, $diff['Articles']);
+            $this->assertCount(1, $diff['Comments']);
 
             //Difference is article with ID 2 and comment with ID 4
             $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
@@ -192,78 +181,32 @@ abstract class DriverTestCase extends TestCase
      * Test for `_exportExecutable()` method
      * @return void
      */
-    abstract public function testExportExecutable();
+    abstract public function testExportExecutable(): void;
 
     /**
      * Test for `_exportExecutableWithCompression()` method
      * @return void
      * @test
      */
-    public function testExportExecutableWithCompression()
+    public function testExportExecutableWithCompression(): void
     {
         $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $expected = sprintf('%s > %s%s', $basicExecutable, escapeshellarg('backup.sql'), REDIRECT_TO_DEV_NULL);
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($basicExecutable . ' > ' . escapeshellarg('backup.sql'), $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
             $expected = sprintf(
-                '%s | %s > %s%s',
+                '%s | %s > %s',
                 $basicExecutable,
-                $this->getBinary($compression),
-                escapeshellarg($filename),
-                REDIRECT_TO_DEV_NULL
+                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($filename)
             );
             $this->assertEquals($expected, $result);
         }
-    }
-
-    /**
-     * Test for `export()` method on failure
-     * @return void
-     * @since 2.6.2
-     * @test
-     */
-    public function testExportOnFailure()
-    {
-        $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `export()` method. Export is stopped because the
-     *  `beforeExport()` method returns `false`
-     * @return void
-     * @test
-     */
-    public function testExportStoppedByBeforeExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(['beforeExport']);
-        $Driver->method('beforeExport')->will($this->returnValue(false));
-        $this->assertFalse($Driver->export($backup));
-        $this->assertFileNotExists($backup);
-    }
-
-    /**
-     * Test for `getConfig()` method
-     * @return void
-     * @test
-     */
-    public function testGetConfig()
-    {
-        $this->assertNotEmpty($this->Driver->getConfig());
-        $this->assertIsArray($this->Driver->getConfig());
-        $this->assertNotEmpty($this->Driver->getConfig('name'));
-        $this->assertNull($this->Driver->getConfig('noExistingKey'));
     }
 
     /**
@@ -271,7 +214,7 @@ abstract class DriverTestCase extends TestCase
      * @return void
      * @test
      */
-    public function testImport()
+    public function testImport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
         $this->assertTrue($this->Driver->export($backup));
@@ -284,68 +227,31 @@ abstract class DriverTestCase extends TestCase
      * Test for `_importExecutable()` method
      * @return void
      */
-    abstract public function testImportExecutable();
+    abstract public function testImportExecutable(): void;
 
     /**
      * Test for `_importExecutableWithCompression()` method
      * @return void
      * @test
      */
-    public function testImportExecutableWithCompression()
+    public function testImportExecutableWithCompression(): void
     {
         $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $expected = $basicExecutable . ' < ' . escapeshellarg('backup.sql') . REDIRECT_TO_DEV_NULL;
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($basicExecutable . ' < ' . escapeshellarg('backup.sql'), $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
             $expected = sprintf(
-                '%s -dc %s | %s%s',
-                $this->getBinary($compression),
+                '%s -dc %s | %s',
+                escapeshellarg($this->Driver->getBinary($compression)),
                 escapeshellarg($filename),
-                $basicExecutable,
-                REDIRECT_TO_DEV_NULL
+                $basicExecutable
             );
             $this->assertEquals($expected, $result);
         }
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @return void
-     * @since 2.6.2
-     * @test
-     */
-    public function testImportOnFailure()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-
-        $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageRegExp('/^Failed with exit code `\d`$/');
-        $this->Driver->export($backup);
-
-        //Sets a no existing database
-        $config = ['database' => 'noExisting'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->Driver->import($backup);
-    }
-
-    /**
-     * Test for `import()` method. Import is stopped because the
-     *  `beforeImport()` method returns `false`
-     * @return void
-     * @test
-     */
-    public function testImportStoppedByBeforeExport()
-    {
-        $backup = $this->getAbsolutePath('example.sql');
-        $Driver = $this->getMockForDriver(['beforeImport']);
-        $Driver->method('beforeImport')->will($this->returnValue(false));
-        $this->assertTrue($Driver->export($backup));
-        $this->assertFalse($Driver->import($backup));
     }
 }

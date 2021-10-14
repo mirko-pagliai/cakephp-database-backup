@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -23,9 +25,8 @@ class Sqlite extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
-     * @uses getConfig()
      */
-    protected function _exportExecutable()
+    protected function _exportExecutable(): string
     {
         return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
@@ -33,9 +34,8 @@ class Sqlite extends Driver
     /**
      * Gets the executable command to import the database
      * @return string
-     * @uses getConfig()
      */
-    protected function _importExecutable()
+    protected function _importExecutable(): string
     {
         return sprintf('%s %s', $this->getBinary('sqlite3'), $this->getConfig('database'));
     }
@@ -44,10 +44,10 @@ class Sqlite extends Driver
      * Called before import
      * @return bool
      * @since 2.1.0
-     * @uses $connection
      */
-    public function beforeImport()
+    public function beforeImport(): bool
     {
+        /** @var \Cake\Database\Schema\Collection $schemaCollection */
         $schemaCollection = $this->connection->getSchemaCollection();
 
         //Drops each table

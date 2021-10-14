@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -13,16 +15,18 @@
  */
 namespace DatabaseBackup\TestSuite;
 
-use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use MeTools\TestSuite\TestCase as BaseTestCase;
+use Tools\TestSuite\BackwardCompatibilityTrait;
 
 /**
  * TestCase class
  */
 abstract class TestCase extends BaseTestCase
 {
+    use BackwardCompatibilityTrait;
     use BackupTrait;
 
     /**
@@ -34,9 +38,9 @@ abstract class TestCase extends BaseTestCase
      * Called before every test method
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
-        parent::setUp();
+        @parent::setUp();
 
         $this->BackupExport = $this->BackupExport ?: new BackupExport();
     }
@@ -45,10 +49,9 @@ abstract class TestCase extends BaseTestCase
      * Called after every test method
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
-        //Deletes all backup files
-        unlink_recursive(Configure::read('DatabaseBackup.target'));
+        BackupManager::deleteAll();
 
         parent::tearDown();
     }
@@ -58,27 +61,39 @@ abstract class TestCase extends BaseTestCase
      * @param string $filename Filename
      * @return string
      */
-    protected function createBackup($filename = 'backup.sql')
+    protected function createBackup(string $filename = 'backup.sql'): string
     {
         return $this->BackupExport->filename($filename)->export();
     }
 
     /**
      * Internal method to creates some backup files
-     * @param bool $sleep If `true`, waits a second for each backup
      * @return array
-     * @uses createBackup()
      */
-    protected function createSomeBackups($sleep = false)
+    protected function createSomeBackups(): array
     {
-        $files[] = $this->createBackup();
+        $timestamp = time();
 
-        $sleep ? sleep(1) : null;
-        $files[] = $this->createBackup('backup.sql.bz2');
+        foreach (['sql.gz', 'sql.bz2', 'sql'] as $extension) {
+            $file = $this->createBackup('backup_test_' . (string)$timestamp . '.' . $extension);
+            touch($file, $timestamp--);
+            $files[] = $file;
+        }
 
-        $sleep ? sleep(1) : null;
-        $files[] = $this->createBackup('backup.sql.gz');
+        return array_reverse($files);
+    }
 
-        return $files;
+    /**
+     * Internal method to mock a driver
+     * @param class-string<\DatabaseBackup\Driver\Driver> $className Driver class name
+     * @param array|null $methods The list of methods to mock
+     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getMockForDriver(string $className, ?array $methods = []): object
+    {
+        return @$this->getMockBuilder($className)
+            ->setMethods($methods)
+            ->setConstructorArgs([$this->getConnection('test')])
+            ->getMock();
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -17,14 +19,12 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
+use Cake\TestSuite\TestEmailTransport;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+date_default_timezone_set('UTC');
+mb_internal_encoding('UTF-8');
+ini_set('intl.default_locale', 'en_US');
 
-if (!defined('DS')) {
-    define('DS', DIRECTORY_SEPARATOR);
-}
-
-// Path constants to a few helpful things.
 define('ROOT', dirname(__DIR__) . DS);
 define('CAKE_CORE_INCLUDE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp');
 define('CORE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
@@ -40,17 +40,19 @@ define('CACHE', TMP . 'cache' . DS);
 define('LOGS', TMP . 'cakephp_log' . DS);
 define('SESSIONS', TMP . 'sessions' . DS);
 
-@mkdir(TMP);
-@mkdir(LOGS);
-@mkdir(SESSIONS);
-@mkdir(CACHE);
-@mkdir(CACHE . 'views');
-@mkdir(CACHE . 'models');
+foreach ([
+    TMP,
+    LOGS,
+    SESSIONS,
+    CACHE . 'models',
+    CACHE . 'persistent',
+    CACHE . 'views',
+] as $dir) {
+    @mkdir($dir, 0777, true);
+}
 
-require CORE_PATH . 'config' . DS . 'bootstrap.php';
-
-date_default_timezone_set('UTC');
-mb_internal_encoding('UTF-8');
+require dirname(__DIR__) . '/vendor/autoload.php';
+require_once CORE_PATH . 'config' . DS . 'bootstrap.php';
 
 Configure::write('debug', true);
 Configure::write('App', [
@@ -65,9 +67,7 @@ Configure::write('App', [
     'imageBaseUrl' => 'img/',
     'jsBaseUrl' => 'js/',
     'cssBaseUrl' => 'css/',
-    'paths' => [
-        'plugins' => [APP . 'Plugin' . DS],
-    ],
+    'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
 
 Cache::setConfig([
@@ -76,53 +76,35 @@ Cache::setConfig([
         'prefix' => 'cake_core_',
         'serialize' => true,
     ],
-    '_cake_model_' => [
-        'engine' => 'File',
-        'prefix' => 'cake_model_',
-        'serialize' => true,
-    ],
-    'default' => [
-        'engine' => 'File',
-        'prefix' => 'default_',
-        'serialize' => true,
-    ],
 ]);
 
-if (!getenv('db_dsn')) {
-    putenv('db_dsn=mysql://travis@localhost/test');
-}
-if (!getenv('db_dsn_postgres')) {
-    putenv('db_dsn_postgres=postgres://postgres@localhost/travis_ci_test');
-}
-if (!getenv('db_dsn_sqlite')) {
-    putenv('db_dsn_sqlite=sqlite:///' . TMP . 'example.sq3');
-}
-
-ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
-ConnectionManager::setConfig('test_postgres', ['url' => getenv('db_dsn_postgres')]);
-ConnectionManager::setConfig('test_sqlite', ['url' => getenv('db_dsn_sqlite')]);
-
-Configure::write('DatabaseBackup.connection', 'test');
-Configure::write('DatabaseBackup.target', TMP . 'backups');
-Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
-
-//Sets debug log
 Log::setConfig('debug', [
     'className' => 'File',
     'path' => LOGS,
     'levels' => ['notice', 'info', 'debug'],
     'file' => 'debug',
 ]);
+TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
+Email::setConfig('default', ['transport' => 'debug']);
 
-$transportName = 'debug';
-$transportConfig = ['className' => 'Debug'];
-if (class_exists(TransportFactory::class)) {
-    TransportFactory::setConfig($transportName, $transportConfig);
-} else {
-    Email::setConfigTransport($transportName, $transportConfig);
+if (!getenv('db_dsn')) {
+    putenv('db_dsn=mysql://travis@localhost/test');
+
+    $driverTest = getenv('driver_test');
+    if ($driverTest && $driverTest != 'mysql') {
+        if ($driverTest == 'sqlite') {
+            putenv('db_dsn=sqlite:///' . TMP . 'test.sq3');
+        } elseif ($driverTest == 'postgres') {
+            putenv('db_dsn=postgres://postgres@localhost/test');
+        }
+    }
 }
-Email::setConfig('default', ['transport' => $transportName, 'log' => true]);
+ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 
+Configure::write('DatabaseBackup.connection', 'test');
+Configure::write('DatabaseBackup.target', TMP . 'backups');
+Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
-ini_set('intl.default_locale', 'en_US');
+require_once ROOT . 'config' . DS . 'bootstrap.php';
+echo 'Running tests for `' . DATABASE_BACKUP_DRIVER . '` driver ' . PHP_EOL;

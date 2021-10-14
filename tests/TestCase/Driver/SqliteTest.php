@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -21,32 +23,25 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class SqliteTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Sqlite
+     * Called before every test method
+     * @return void
      */
-    protected $DriverClass = Sqlite::class;
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    /**
-     * Name of the database connection
-     * @var string
-     */
-    protected $connection = 'test_sqlite';
-
-    /**
-     * Fixtures
-     * @var array
-     */
-    public $fixtures = [
-        'plugin.DatabaseBackup.Sqlite/Articles',
-        'plugin.DatabaseBackup.Sqlite/Comments',
-    ];
+        if (!$this->Driver instanceof Sqlite) {
+            $this->markTestIncomplete();
+        }
+    }
 
     /**
      * Test for `_exportExecutable()` method
      * @test
      */
-    public function testExportExecutable()
+    public function testExportExecutable(): void
     {
-        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3 .dump';
+        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'test.sq3 .dump';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
@@ -54,52 +49,19 @@ class SqliteTest extends DriverTestCase
      * Test for `_importExecutable()` method
      * @test
      */
-    public function testImportExecutable()
+    public function testImportExecutable(): void
     {
-        $expected = $this->getBinary('sqlite3') . ' ' . TMP . 'example.sq3';
+        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'test.sq3';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
-    }
-
-    /**
-     * Test for `export()` method on failure
-     * @test
-     */
-    public function testExportOnFailure()
-    {
-        $this->Driver = $this->getMockForDriver(['_exportExecutableWithCompression']);
-        $this->Driver->method('_exportExecutableWithCompression')
-            ->will($this->returnValue(sprintf(
-                '%s %s .dump noExistingDir/dump.sql' . REDIRECT_TO_DEV_NULL,
-                $this->getBinary('sqlite3'),
-                $this->Driver->getConfig('database')
-            )));
-        parent::testExportOnFailure();
     }
 
     /**
      * Test for `import()` method
      * @test
      */
-    public function testImport()
+    public function testImport(): void
     {
         $this->loadFixtures();
-
         parent::testImport();
-    }
-
-    /**
-     * Test for `import()` method on failure
-     * @test
-     */
-    public function testImportOnFailure()
-    {
-        $this->Driver = $this->getMockForDriver(['_importExecutableWithCompression', 'beforeImport']);
-        $this->Driver->method('beforeImport')->will($this->returnValue(true));
-        $this->Driver->method('_importExecutableWithCompression')->will($this->returnValue(sprintf(
-            '%s %s .dump noExisting' . REDIRECT_TO_DEV_NULL,
-            $this->getBinary('sqlite3'),
-            $this->Driver->getConfig('database')
-        )));
-        parent::testImportOnFailure();
     }
 }

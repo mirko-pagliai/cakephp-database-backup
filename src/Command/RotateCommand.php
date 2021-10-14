@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -30,7 +32,7 @@ class RotateCommand extends Command
      * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
      * @return \Cake\Console\ConsoleOptionParser
      */
-    protected function buildOptionParser(ConsoleOptionParser $parser)
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser->setDescription(__d('database_backup', 'Rotates backups'))
             ->addArgument('keep', [
@@ -46,11 +48,11 @@ class RotateCommand extends Command
      *  delete all backups that are older. By default, no backup will be deleted
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return int|null The exit code or null for success
+     * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#rotate
-     * @uses \DatabaseBackup\Utility\BackupManager::rotate()
+     * @throws \Cake\Console\Exception\StopException
      */
-    public function execute(Arguments $args, ConsoleIo $io)
+    public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
 
@@ -61,11 +63,11 @@ class RotateCommand extends Command
             if (!$files) {
                 $io->verbose(__d('database_backup', 'No backup has been deleted'));
 
-                return null;
+                return;
             }
 
             foreach ($files as $file) {
-                $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->filename));
+                $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file->get('filename')));
             }
 
             $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
@@ -73,7 +75,5 @@ class RotateCommand extends Command
             $io->error($e->getMessage());
             $this->abort();
         }
-
-        return null;
     }
 }

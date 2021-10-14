@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -30,14 +32,13 @@ class Postgres extends Driver
      * postgresql://postgres@localhost/travis_ci_test
      * </code>
      * @return string
-     * @uses getConfig()
      */
-    protected function getDbnameAsString()
+    protected function getDbnameAsString(): string
     {
         return sprintf(
             'postgresql://%s%s@%s/%s',
             $this->getConfig('username'),
-            $this->getConfig('password') ? ':' . $this->getConfig('password') : null,
+            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             $this->getConfig('host'),
             $this->getConfig('database')
         );
@@ -46,9 +47,8 @@ class Postgres extends Driver
     /**
      * Gets the executable command to export the database
      * @return string
-     * @uses getDbnameAsString()
      */
-    protected function _exportExecutable()
+    protected function _exportExecutable(): string
     {
         return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
     }
@@ -56,9 +56,8 @@ class Postgres extends Driver
     /**
      * Gets the executable command to import the database
      * @return string
-     * @uses getDbnameAsString()
      */
-    protected function _importExecutable()
+    protected function _importExecutable(): string
     {
         return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
     }

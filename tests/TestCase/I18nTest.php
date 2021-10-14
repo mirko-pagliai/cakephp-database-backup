@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -10,18 +12,24 @@
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace DatabaseBackup\Test\Fixture\Postgres;
 
-use Cake\Test\Fixture\ArticlesFixture as CakeArticlesFixture;
+namespace DatabaseBackup\Test\TestCase;
+
+use Cake\I18n\I18n;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
- * ArticlesFixture class
+ * I18nTest class
  */
-class ArticlesFixture extends CakeArticlesFixture
+class I18nTest extends TestCase
 {
     /**
-     * Fixture datasource
-     * @var string
+     * Tests I18n translations
+     * @test
      */
-    public $connection = 'test_postgres';
+    public function testI18nConstant(): void
+    {
+        $translator = I18n::getTranslator('database_backup', 'it');
+        $this->assertEquals('Esporta un backup del database', $translator->translate('Exports a database backup'));
+    }
 }

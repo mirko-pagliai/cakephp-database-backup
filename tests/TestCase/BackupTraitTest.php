@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -14,14 +16,14 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Database\Connection;
-use Cake\Database\Driver\Mysql as CakeMysql;
+use Cake\Database\Driver as CakeDriver;
+use Cake\Database\Driver\Sqlserver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Mysql;
+use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
-use RuntimeException;
 
 /**
  * BackupTraitTest class
@@ -48,33 +50,19 @@ class BackupTraitTest extends TestCase
      * Test for `getAbsolutePath()` method
      * @test
      */
-    public function testGetAbsolutePath()
+    public function testGetAbsolutePath(): void
     {
-        $this->assertEquals('/file.txt', $this->getAbsolutePath('/file.txt'));
+        $this->assertEquals(DS . 'file.txt', $this->getAbsolutePath(DS . 'file.txt'));
         $this->assertEquals(Configure::read('DatabaseBackup.target') . DS . 'file.txt', $this->getAbsolutePath('file.txt'));
         $expected = Configure::read('DatabaseBackup.target') . DS . 'file.txt';
         $this->assertEquals($expected, $this->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
     }
 
     /**
-     * Test for `getBinary()` method
-     * @test
-     */
-    public function testGetBinary()
-    {
-        $this->assertEquals(which('mysql'), $this->getBinary('mysql'));
-
-        //With a binary not available
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
-        $this->getBinary('noExisting');
-    }
-
-    /**
      * Test for `getCompression()` method
      * @test
      */
-    public function testGetCompression()
+    public function testGetCompression(): void
     {
         foreach ([
             'backup.sql' => false,
@@ -90,7 +78,7 @@ class BackupTraitTest extends TestCase
      * Test for `getConnection()` method
      * @test
      */
-    public function testGetConnection()
+    public function testGetConnection(): void
     {
         ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
 
@@ -101,10 +89,9 @@ class BackupTraitTest extends TestCase
         ] as $name) {
             $connection = $this->getConnection($name);
             $this->assertInstanceof(Connection::class, $connection);
-            $this->assertInstanceof(CakeMysql::class, $connection->getDriver());
+            $this->assertInstanceof(CakeDriver::class, $connection->getDriver());
         }
 
-        //With an invalid connection
         $this->expectException(MissingDatasourceConfigException::class);
         $this->expectExceptionMessage('The datasource configuration "noExisting" was not found');
         $this->getConnection('noExisting');
@@ -114,39 +101,28 @@ class BackupTraitTest extends TestCase
      * Test for `getDriver()` method
      * @test
      */
-    public function testGetDriver()
+    public function testGetDriver(): void
     {
         foreach ([ConnectionManager::get('test'), null] as $driver) {
-            $this->assertInstanceof(Mysql::class, $this->getDriver($driver));
+            $this->assertInstanceof(Driver::class, $this->getDriver($driver));
         }
 
         //With a no existing driver
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The `InvalidArgumentException` driver does not exist');
-        $connection = $this->getMockBuilder(get_class($this->getConnection()))
+        $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
+        $connection = @$this->getMockBuilder(get_class($this->getConnection()))
             ->setMethods(['getDriver'])
             ->setConstructorArgs([$this->getConnection()->config()])
             ->getMock();
-        $connection->method('getDriver')->will($this->returnValue(new InvalidArgumentException()));
+        $connection->method('getDriver')->will($this->returnValue(new Sqlserver()));
         $this->getDriver($connection);
-    }
-
-    /**
-     * Test for `getDriverName()` method
-     * @test
-     */
-    public function testGetDriverName()
-    {
-        foreach ([ConnectionManager::get('test'), null] as $driver) {
-            $this->assertEquals('Mysql', $this->getDriverName($driver));
-        }
     }
 
     /**
      * Test for `getExtension()` method
      * @test
      */
-    public function testGetExtension()
+    public function testGetExtension(): void
     {
         foreach ([
             'backup.sql' => 'sql',
@@ -164,29 +140,11 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getTarget()` method
-     * @test
-     */
-    public function testGetTarget()
-    {
-        $this->assertEquals(Configure::read('DatabaseBackup.target'), $this->getTarget());
-    }
-
-    /**
      * Test for `getValidCompressions()` method
      * @test
      */
-    public function testGetValidCompressions()
+    public function testGetValidCompressions(): void
     {
         $this->assertNotEmpty($this->getValidCompressions());
-    }
-
-    /**
-     * Test for `getValidExtensions()` method
-     * @test
-     */
-    public function testGetValidExtensions()
-    {
-        $this->assertNotEmpty($this->getValidExtensions());
     }
 }

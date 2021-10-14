@@ -1,15 +1,15 @@
-# DatabaseBackup
+# cakephp-database-backup
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
-[![Build Status](https://api.travis-ci.org/mirko-pagliai/cakephp-database-backup.svg?branch=master)](https://travis-ci.org/mirko-pagliai/cakephp-database-backup)
-[![Build status](https://ci.appveyor.com/api/projects/status/imerokwpvy0r51fj/branch/master?svg=true)](https://ci.appveyor.com/project/mirko-pagliai/cakephp-database-backup/branch/master)
+[![CI](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml/badge.svg)](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup/branch/master/graph/badge.svg)](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup)
-[![CodeFactor](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/badge/develop)](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/overview/develop)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/cd12284c1047431c8149e09fa56536bf)](https://www.codacy.com/gh/mirko-pagliai/cakephp-database-backup/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mirko-pagliai/cakephp-database-backup&amp;utm_campaign=Badge_Grade)
+[![CodeFactor](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/badge)](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup)
 
-*DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.  
+*DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.
 Currently, the plugin supports *MySql*, *Postgres* and *Sqlite* databases.
 
-Did you like this plugin? Its development requires a lot of time for me.  
+Did you like this plugin? Its development requires a lot of time for me.
 Please consider the possibility of making [a donation](//paypal.me/mirkopagliai):
 even a coffee is enough! Thank you.
 
@@ -22,33 +22,37 @@ You can install the plugin via composer:
 $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 ```
 
-**NOTE: the latest version available requires at least CakePHP 3.7**.
+Then you have to load the plugin. For more information on how to load the plugin,
+please refer to the [Cookbook](//book.cakephp.org/4.0/en/plugins.html#loading-a-plugin).
 
-Instead, the [cakephp3.2](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3.2)
-branch is compatible with all previous versions of CakePHP from version 3.2. 
-In this case, you can install the package as well:
-
+Simply, you can execute the shell command to enable the plugin:
 ```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp3.2
+bin/cake plugin load DatabaseBackup
 ```
+This would update your application's bootstrap method.
 
-After installation, you have to edit `APP/config/bootstrap.php` to load the plugin:
-
-```php
-Plugin::load('DatabaseBackup', ['bootstrap' => true]);
-```
-
-For more information on how to load the plugin, please refer to the 
-[Cookbook](http://book.cakephp.org/3.0/en/plugins.html#loading-a-plugin).
-    
-By default the plugin uses the `APP/backups` directory to save the backups 
+By default the plugin uses the `APP/backups` directory to save the backups
 files. So you have to create the directory and make it writable:
 
 ```bash
 $ mkdir backups/ && chmod 775 backups/
 ```
 
-If you want to use a different directory, read below.
+If you want to use a different directory, read the [Configuration](#configuration) section.
+
+### Installation on older CakePHP and PHP versions
+Recent packages and the master branch require at least CakePHP 4.0 and PHP 7.2.
+Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3) branch
+requires at least PHP 5.6.
+
+In this case, you can install the package as well:
+```bash
+$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp3
+```
+
+Note that the `cakephp3` branch will no longer be updated as of April 29, 2021,
+except for security patches, and it matches the
+[2.8.5](//github.com/mirko-pagliai/cakephp-database-backup/releases/tag/2.8.5) version.
 
 ## Requirements
 *DatabaseBackup* requires:
@@ -56,7 +60,7 @@ If you want to use a different directory, read below.
 *   `pg_dump` and `pg_restore` for *Postgres* databases;
 *   `sqlite3` for *Sqlite* databases.
 
-**Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are 
+**Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are
 also required.
 
 The installation of these binaries may vary depending on your operating system.
@@ -71,7 +75,7 @@ The plugin uses some configuration parameters. See our wiki:
 
 If you want to send backup files by email, remember to set up your application
 correctly so that it can send emails. For more information on how to configure
-your application, see the [Cookbook](https://book.cakephp.org/3.0/en/core-libraries/email.html#configuring-transports).
+your application, see the [Cookbook](https://book.cakephp.org/4.0/en/core-libraries/email.html#configuring-transports).
 
 ## How to use
 See our wiki:
@@ -83,7 +87,24 @@ See our wiki:
 
 And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
+## Testing
+Tests are run for only one driver at a time, by default `mysql`.
+To choose another driver to use, you can set the `driver_test` environment variable before running `phpunit`.
+
+For example:
+```bash
+driver_test=sqlite vendor/bin/phpunit
+driver_test=postgres vendor/bin/phpunit
+```
+
+Alternatively, you can set the `db_dsn` environment variable, indicating the connection parameters. In this case, the driver type will still be detected automatically.
+
+For example:
+```bash
+db_dsn=sqlite:///' . TMP . 'example.sq3 vendor/bin/phpunit
+```
+
 ## Versioning
-For transparency and insight into our release cycle and to maintain backward 
-compatibility, *DatabaseBackup* will be maintained under the 
+For transparency and insight into our release cycle and to maintain backward
+compatibility, *DatabaseBackup* will be maintained under the
 [Semantic Versioning guidelines](http://semver.org).

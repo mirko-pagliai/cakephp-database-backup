@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="4"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    autoloader="tests/bootstrap.php"
+>
+    <projectFiles>
+        <directory name="src" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <InvalidArgument>
+            <errorLevel type="suppress">
+                <file name="src/Driver/Sqlite.php" />
+            </errorLevel>
+        </InvalidArgument>
+
+        <InvalidDocblock>
+            <errorLevel type="suppress">
+                <file name="src/TestSuite/TestCase.php" />
+            </errorLevel>
+        </InvalidDocblock>
+
+        <RedundantCondition>
+            <errorLevel type="suppress">
+                <file name="src/Driver/Mysql.php" />
+            </errorLevel>
+        </RedundantCondition>
+
+        <TooManyTemplateParams>
+            <errorLevel type="suppress">
+                <file name="src/Utility/BackupManager.php" />
+            </errorLevel>
+        </TooManyTemplateParams>
+
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <file name="src/BackupTrait.php" />
+            </errorLevel>
+        </UndefinedClass>
+
+        <UndefinedConstant>
+            <errorLevel type="suppress">
+                <file name="src/Driver/Driver.php" />
+                <file name="src/TestSuite/DriverTestCase.php" />
+            </errorLevel>
+        </UndefinedConstant>
+
+        <UndefinedInterfaceMethod>
+            <errorLevel type="suppress">
+                <file name="src/Driver/Sqlite.php" />
+                <file name="src/TestSuite/DriverTestCase.php" />
+            </errorLevel>
+        </UndefinedInterfaceMethod>
+    </issueHandlers>
+</psalm>

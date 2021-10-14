@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * This file is part of cakephp-database-backup.
  *
@@ -15,6 +17,7 @@ namespace DatabaseBackup\Utility;
 
 use DatabaseBackup\BackupTrait;
 use InvalidArgumentException;
+use Tools\Exceptionist;
 
 /**
  * Utility to import databases
@@ -27,7 +30,7 @@ class BackupImport
      * Driver containing all methods to export/import database backups
      *  according to the database engine
      * @since 2.0.0
-     * @var object
+     * @var \DatabaseBackup\Driver\Driver
      */
     protected $driver;
 
@@ -39,7 +42,6 @@ class BackupImport
 
     /**
      * Construct
-     * @uses $driver
      */
     public function __construct()
     {
@@ -49,23 +51,17 @@ class BackupImport
     /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
-     * @return \DatabaseBackup\Utility\BackupImport
+     * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws \InvalidArgumentException
      * @throws \Tools\Exception\NotReadableException
-     * @uses $filename
      */
-    public function filename($filename)
+    public function filename(string $filename)
     {
-        $filename = $this->getAbsolutePath($filename);
-        is_readable_or_fail($filename);
+        $filename = Exceptionist::isReadable($this->getAbsolutePath($filename));
 
         //Checks for extension
-        is_true_or_fail(
-            $this->getExtension($filename),
-            __d('database_backup', 'Invalid file extension'),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid file extension'), InvalidArgumentException::class);
 
         $this->filename = $filename;
 
@@ -77,16 +73,10 @@ class BackupImport
      * @return string Filename path
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      * @throws \InvalidArgumentException
-     * @uses $driver
-     * @uses $filename
      */
-    public function import()
+    public function import(): string
     {
-        is_true_or_fail(
-            !empty($this->filename),
-            __d('database_backup', 'You must first set the filename'),
-            InvalidArgumentException::class
-        );
+        Exceptionist::isTrue(!empty($this->filename), __d('database_backup', 'You must first set the filename'), InvalidArgumentException::class);
 
         //This allows the filename to be set again with a next call of this
         //  method
