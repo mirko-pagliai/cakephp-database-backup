@@ -183,6 +183,7 @@ class BackupExport
     /**
      * Exports the database
      * @return string Filename path
+     * @throws \Exception
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      */
     public function export(): string
