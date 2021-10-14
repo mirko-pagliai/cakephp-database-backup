@@ -142,7 +142,7 @@ abstract class Driver implements EventListenerInterface
     {
         $compression = $this->getCompression($filename);
 
-        return $this->_exportExecutable() . ($compression ? ' | ' . $this->getBinary($compression) : '') . ' > ' . $filename;
+        return $this->_exportExecutable() . ($compression ? ' | ' . escapeshellarg($this->getBinary($compression)) : '') . ' > ' . escapeshellarg($filename);
     }
 
     /**
@@ -152,11 +152,11 @@ abstract class Driver implements EventListenerInterface
      */
     protected function _importExecutableWithCompression(string $filename): string
     {
-        $executable = $this->_importExecutable() . ' < ' . $filename;
+        $executable = $this->_importExecutable() . ' < ' . escapeshellarg($filename);
 
         $compression = $this->getCompression($filename);
         if ($compression) {
-            $executable = sprintf('%s -dc %s | ', $this->getBinary($compression), $filename) . $this->_importExecutable();
+            $executable = sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $this->_importExecutable();
         }
 
         return $executable;

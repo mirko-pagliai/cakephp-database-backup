@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.9 branch
+### 2.9.1
+* all shell arguments are now correctly escaped.
+
 ### 2.9.0
 * now uses `symfony/process` to execute import and export shell commands. This
     also allows for better handling of errors reported in the shell. The

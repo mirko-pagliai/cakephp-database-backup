@@ -38,9 +38,9 @@ class Mysql extends Driver
     {
         return sprintf(
             '%s --defaults-file=%s %s',
-            $this->getBinary('mysqldump'),
+            escapeshellarg($this->getBinary('mysqldump')),
             escapeshellarg($this->auth),
-            $this->getConfig('database')
+            escapeshellarg($this->getConfig('database'))
         );
     }
 
@@ -52,9 +52,9 @@ class Mysql extends Driver
     {
         return sprintf(
             '%s --defaults-extra-file=%s %s',
-            $this->getBinary('mysql'),
+            escapeshellarg($this->getBinary('mysql')),
             escapeshellarg($this->auth),
-            $this->getConfig('database')
+            escapeshellarg($this->getConfig('database'))
         );
     }
 

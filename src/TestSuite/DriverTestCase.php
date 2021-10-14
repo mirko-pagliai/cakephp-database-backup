@@ -194,7 +194,7 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' > backup.sql', $result);
+        $this->assertEquals($basicExecutable . ' > ' . escapeshellarg('backup.sql'), $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
@@ -202,8 +202,8 @@ abstract class DriverTestCase extends TestCase
             $expected = sprintf(
                 '%s | %s > %s',
                 $basicExecutable,
-                $this->Driver->getBinary($compression),
-                $filename
+                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($filename)
             );
             $this->assertEquals($expected, $result);
         }
@@ -240,15 +240,15 @@ abstract class DriverTestCase extends TestCase
 
         //No compression
         $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' < backup.sql', $result);
+        $this->assertEquals($basicExecutable . ' < ' . escapeshellarg('backup.sql'), $result);
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
             $expected = sprintf(
                 '%s -dc %s | %s',
-                $this->Driver->getBinary($compression),
-                $filename,
+                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($filename),
                 $basicExecutable
             );
             $this->assertEquals($expected, $result);
