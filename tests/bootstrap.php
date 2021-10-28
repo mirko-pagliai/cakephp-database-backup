@@ -69,6 +69,10 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
+/**
+ * @todo Upgrade fixtures: https://book.cakephp.org/4/en/appendices/fixture-upgrade.html
+ */
+Configure::write('Error.ignoredDeprecationPaths', ['*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
 
 Cache::setConfig([
     '_cake_core_' => [
