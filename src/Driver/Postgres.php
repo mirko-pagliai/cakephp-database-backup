@@ -37,10 +37,10 @@ class Postgres extends Driver
     {
         return sprintf(
             'postgresql://%s%s@%s/%s',
-            escapeshellarg($this->getConfig('username')),
-            $this->getConfig('password') ? ':' . escapeshellarg($this->getConfig('password')) : '',
-            escapeshellarg($this->getConfig('host')),
-            escapeshellarg($this->getConfig('database'))
+            $this->getConfig('username'),
+            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
+            $this->getConfig('host'),
+            $this->getConfig('database')
         );
     }
 
@@ -50,7 +50,7 @@ class Postgres extends Driver
      */
     protected function _exportExecutable(): string
     {
-        return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), $this->getDbnameAsString());
+        return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), escapeshellarg($this->getDbnameAsString()));
     }
 
     /**
@@ -59,6 +59,6 @@ class Postgres extends Driver
      */
     protected function _importExecutable(): string
     {
-        return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), $this->getDbnameAsString());
+        return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), escapeshellarg($this->getDbnameAsString()));
     }
 }

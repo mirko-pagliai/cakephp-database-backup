@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.9 branch
+### 2.9.2
+* postgres and sqlite commands are also properly escaped.
+
 ### 2.9.1
 * all shell arguments are now correctly escaped.
 
