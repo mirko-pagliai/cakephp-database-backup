@@ -49,12 +49,6 @@ abstract class DriverTestCase extends TestCase
     protected $DriverClass;
 
     /**
-     * Auto fixtures
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
      * Name of the database connection
      * @var string
      */
@@ -132,7 +126,6 @@ abstract class DriverTestCase extends TestCase
     public function testExportAndImport(): void
     {
         foreach (self::$validExtensions as $extension) {
-            $this->loadFixtures();
             $backup = uniqid('example_');
             $backup = $this->getAbsolutePath($extension ? $backup . '.' . $extension : $backup);
 

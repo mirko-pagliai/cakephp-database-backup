@@ -33,11 +33,6 @@ class BackupTraitTest extends TestCase
     use BackupTrait;
 
     /**
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
      * Fixtures
      * @var array
      */

@@ -61,7 +61,6 @@ class SqliteTest extends DriverTestCase
      */
     public function testImport(): void
     {
-        $this->loadFixtures();
         parent::testImport();
     }
 }
