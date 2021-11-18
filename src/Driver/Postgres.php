@@ -37,10 +37,10 @@ class Postgres extends Driver
     {
         return sprintf(
             'postgresql://%s%s@%s/%s',
-            $this->getConfig('username'),
-            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
-            $this->getConfig('host'),
-            $this->getConfig('database')
+            escapeshellarg($this->getConfig('username')),
+            $this->getConfig('password') ? ':' . escapeshellarg($this->getConfig('password')) : '',
+            escapeshellarg($this->getConfig('host')),
+            escapeshellarg($this->getConfig('database'))
         );
     }
 

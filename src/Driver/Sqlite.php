@@ -28,7 +28,7 @@ class Sqlite extends Driver
      */
     protected function _exportExecutable(): string
     {
-        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->getConfig('database'));
+        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), escapeshellarg($this->getConfig('database')));
     }
 
     /**
@@ -37,7 +37,7 @@ class Sqlite extends Driver
      */
     protected function _importExecutable(): string
     {
-        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->getConfig('database'));
+        return sprintf('%s %s', $this->getBinary('sqlite3'), escapeshellarg($this->getConfig('database')));
     }
 
     /**
