@@ -59,7 +59,7 @@ class PostgresTest extends DriverTestCase
      */
     public function testExportExecutable(): void
     {
-        $password = $this->Driver->getConfig('password') ? $this->Driver->getConfig('password') . ':' : '';
+        $password = $this->Driver->getConfig('password') ? ':' . $this->Driver->getConfig('password') : '';
         $expected = $this->Driver->getBinary('pg_dump') . ' --format=c -b --dbname=' . escapeshellarg('postgresql://postgres' . $password . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
