@@ -18,6 +18,14 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Tools\Filesystem;
 
+if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
+    define('DATABASE_BACKUP_EXECUTABLES', [
+        'mysql' => ['mysqldump', 'mysql'],
+        'postgres' => ['pg_dump', 'pg_restore'],
+        'sqlite' => ['sqlite3', 'sqlite3'],
+    ]);
+}
+
 //Database connection
 if (!Configure::check('DatabaseBackup.connection')) {
     Configure::write('DatabaseBackup.connection', 'default');
@@ -26,12 +34,12 @@ if (!Configure::check('DatabaseBackup.connection')) {
 if (!defined('DATABASE_BACKUP_DRIVER')) {
     define('DATABASE_BACKUP_DRIVER', ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'))->config()['scheme']);
 }
-if (!in_array(DATABASE_BACKUP_DRIVER, ['mysql', 'postgres', 'sqlite'])) {
+if (!in_array(DATABASE_BACKUP_DRIVER, array_keys(DATABASE_BACKUP_EXECUTABLES))) {
     die('Unknown `' . DATABASE_BACKUP_DRIVER . '` test driver' . PHP_EOL);
 }
 
 //Auto-discovers binaries
-foreach (array_merge(['bzip2', 'gzip'], DATABASE_BACKUP_DRIVER == 'mysql' ? ['mysql', 'mysqldump'] : (DATABASE_BACKUP_DRIVER == 'postgres' ? ['pg_dump', 'pg_restore'] : ['sqlite3'])) as $binary) {
+foreach (array_merge(array_unique(DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER]), ['bzip2', 'gzip']) as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         try {
             $binaryPath = which($binary);
