@@ -59,8 +59,13 @@ class PostgresTest extends DriverTestCase
      */
     public function testExportExecutable(): void
     {
-        $password = $this->Driver->getConfig('password') ? ':' . $this->Driver->getConfig('password') : '';
-        $expected = $this->Driver->getBinary('pg_dump') . ' --format=c -b --dbname=' . escapeshellarg('postgresql://postgres' . $password . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
+        //Sets a password
+        $connection = $this->getProperty($this->Driver, 'connection');
+        $config = $this->getProperty($connection, '_config') + ['password' => 'mysecret'];
+        $this->setProperty($connection, '_config', $config);
+        $this->setProperty($this->Driver, 'connection', $connection);
+
+        $expected = $this->Driver->getBinary('pg_dump') . ' --format=c -b --dbname=' . escapeshellarg('postgresql://postgres:mysecret@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
@@ -70,8 +75,13 @@ class PostgresTest extends DriverTestCase
      */
     public function testImportExecutable(): void
     {
-        $password = $this->Driver->getConfig('password') ? $this->Driver->getConfig('password') . ':' : '';
-        $expected = $this->Driver->getBinary('pg_restore') . ' --format=c -c -e --dbname=' . escapeshellarg('postgresql://postgres' . $password . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
+        //Sets a password
+        $connection = $this->getProperty($this->Driver, 'connection');
+        $config = $this->getProperty($connection, '_config') + ['password' => 'mysecret'];
+        $this->setProperty($connection, '_config', $config);
+        $this->setProperty($this->Driver, 'connection', $connection);
+
+        $expected = $this->Driver->getBinary('pg_restore') . ' --format=c -c -e --dbname=' . escapeshellarg('postgresql://postgres:mysecret@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 }
