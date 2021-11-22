@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Driver;
 
+use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -28,7 +29,13 @@ class Sqlite extends Driver
      */
     protected function _exportExecutable(): string
     {
-        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), escapeshellarg($this->getConfig('database')));
+        return str_replace([
+            '{{BINARY}}',
+            '{{DB_NAME}}',
+        ], [
+            escapeshellarg($this->getBinary('sqlite3')),
+            escapeshellarg($this->getConfig('database')),
+        ], Configure::read('DatabaseBackup.sqlite.export'));
     }
 
     /**
@@ -37,7 +44,13 @@ class Sqlite extends Driver
      */
     protected function _importExecutable(): string
     {
-        return sprintf('%s %s', $this->getBinary('sqlite3'), escapeshellarg($this->getConfig('database')));
+        return str_replace([
+            '{{BINARY}}',
+            '{{DB_NAME}}',
+        ], [
+            escapeshellarg($this->getBinary('sqlite3')),
+            escapeshellarg($this->getConfig('database')),
+        ], Configure::read('DatabaseBackup.sqlite.import'));
     }
 
     /**

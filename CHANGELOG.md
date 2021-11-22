@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.9 branch
 ### 2.9.2
+* now allows to configure and customize via bootstrap the executable commands to
+    import and export databases, for each driver;
 * postgres and sqlite commands are also properly escaped.
 
 ### 2.9.1
