@@ -54,13 +54,4 @@ class SqliteTest extends DriverTestCase
         $expected = $this->Driver->getBinary('sqlite3') . ' ' . escapeshellarg(TMP . 'test.sq3');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
-
-    /**
-     * Test for `import()` method
-     * @test
-     */
-    public function testImport(): void
-    {
-        parent::testImport();
-    }
 }
