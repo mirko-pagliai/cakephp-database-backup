@@ -46,6 +46,20 @@ if (!Configure::check('DatabaseBackup.chmod')) {
     Configure::write('DatabaseBackup.chmod', 0664);
 }
 
+//Default executable commands to export/import databases
+foreach ([
+    'mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
+    'mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
+    'postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
+    'sqlite.import' => '{{BINARY}} {{DB_NAME}}',
+] as $k => $v) {
+    if (!Configure::check('DatabaseBackup.' . $k)) {
+        Configure::write('DatabaseBackup.' . $k, $v);
+    }
+}
+
 //Default target directory
 if (!Configure::check('DatabaseBackup.target')) {
     Configure::write('DatabaseBackup.target', Filesystem::instance()->concatenate(ROOT, 'backups'));

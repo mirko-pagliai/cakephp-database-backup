@@ -65,7 +65,7 @@ class PostgresTest extends DriverTestCase
         $this->setProperty($connection, '_config', $config);
         $this->setProperty($this->Driver, 'connection', $connection);
 
-        $expected = $this->Driver->getBinary('pg_dump') . ' --format=c -b --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
+        $expected = escapeshellarg($this->Driver->getBinary('pg_dump')) . ' --format=c -b --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
 
@@ -81,7 +81,7 @@ class PostgresTest extends DriverTestCase
         $this->setProperty($connection, '_config', $config);
         $this->setProperty($this->Driver, 'connection', $connection);
 
-        $expected = $this->Driver->getBinary('pg_restore') . ' --format=c -c -e --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
+        $expected = escapeshellarg($this->Driver->getBinary('pg_restore')) . ' --format=c -c -e --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 }

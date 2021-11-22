@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Driver;
 
+use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -23,34 +24,24 @@ use DatabaseBackup\Driver\Driver;
 class Postgres extends Driver
 {
     /**
-     * Gets the value for the `--dbname` option for export and import
-     *  executables as string. It contains the connection string with username,
-     *  password and hostname.
-     *
-     * It returns something like:
-     * <code>
-     * postgresql://postgres@localhost/travis_ci_test
-     * </code>
-     * @return string
-     */
-    protected function getDbnameAsString(): string
-    {
-        return sprintf(
-            'postgresql://%s%s@%s/%s',
-            $this->getConfig('username'),
-            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
-            $this->getConfig('host'),
-            $this->getConfig('database')
-        );
-    }
-
-    /**
      * Gets the executable command to export the database
      * @return string
      */
     protected function _exportExecutable(): string
     {
-        return sprintf('%s --format=c -b --dbname=%s', $this->getBinary('pg_dump'), escapeshellarg($this->getDbnameAsString()));
+        return str_replace([
+            '{{BINARY}}',
+            '{{DB_USER}}',
+            '{{DB_PASSWORD}}',
+            '{{DB_HOST}}',
+            '{{DB_NAME}}',
+        ], [
+            escapeshellarg($this->getBinary('pg_dump')),
+            $this->getConfig('username'),
+            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
+            $this->getConfig('host'),
+            $this->getConfig('database'),
+        ], Configure::read('DatabaseBackup.postgres.export'));
     }
 
     /**
@@ -59,6 +50,18 @@ class Postgres extends Driver
      */
     protected function _importExecutable(): string
     {
-        return sprintf('%s --format=c -c -e --dbname=%s', $this->getBinary('pg_restore'), escapeshellarg($this->getDbnameAsString()));
+        return str_replace([
+            '{{BINARY}}',
+            '{{DB_USER}}',
+            '{{DB_PASSWORD}}',
+            '{{DB_HOST}}',
+            '{{DB_NAME}}',
+        ], [
+            escapeshellarg($this->getBinary('pg_restore')),
+            $this->getConfig('username'),
+            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
+            $this->getConfig('host'),
+            $this->getConfig('database'),
+        ], Configure::read('DatabaseBackup.postgres.import'));
     }
 }

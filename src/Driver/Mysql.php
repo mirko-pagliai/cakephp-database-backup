@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Driver;
 
+use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 use Tools\Filesystem;
 
@@ -36,12 +37,15 @@ class Mysql extends Driver
      */
     protected function _exportExecutable(): string
     {
-        return sprintf(
-            '%s --defaults-file=%s %s',
+        return str_replace([
+            '{{BINARY}}',
+            '{{AUTH_FILE}}',
+            '{{DB_NAME}}',
+        ], [
             escapeshellarg($this->getBinary('mysqldump')),
             escapeshellarg($this->auth),
-            escapeshellarg($this->getConfig('database'))
-        );
+            escapeshellarg($this->getConfig('database')),
+        ], Configure::read('DatabaseBackup.mysql.export'));
     }
 
     /**
@@ -50,12 +54,15 @@ class Mysql extends Driver
      */
     protected function _importExecutable(): string
     {
-        return sprintf(
-            '%s --defaults-extra-file=%s %s',
+        return str_replace([
+            '{{BINARY}}',
+            '{{AUTH_FILE}}',
+            '{{DB_NAME}}',
+        ], [
             escapeshellarg($this->getBinary('mysql')),
             escapeshellarg($this->auth),
-            escapeshellarg($this->getConfig('database'))
-        );
+            escapeshellarg($this->getConfig('database')),
+        ], Configure::read('DatabaseBackup.mysql.import'));
     }
 
     /**
