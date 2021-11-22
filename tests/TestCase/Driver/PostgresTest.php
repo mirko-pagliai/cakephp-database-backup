@@ -37,33 +37,13 @@ class PostgresTest extends DriverTestCase
     }
 
     /**
-     * Test for `getDbnameAsString()` method
-     * @test
-     */
-    public function testGetDbnameAsString(): void
-    {
-        $password = $this->Driver->getConfig('password');
-        $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
-
-        //Adds a password to the config
-        $expected = 'postgresql://postgres:mypassword@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
-        $config = ['password' => 'mypassword'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
-    }
-
-    /**
      * Test for `_exportExecutable()` method
      * @test
      */
     public function testExportExecutable(): void
     {
         //Sets a password
-        $connection = $this->getProperty($this->Driver, 'connection');
-        $config = $this->getProperty($connection, '_config') + ['password' => 'mysecret'];
-        $this->setProperty($connection, '_config', $config);
-        $this->setProperty($this->Driver, 'connection', $connection);
+        $this->setProperty($this->Driver, 'connection', new Connection($this->Driver->getConfig() + ['password' => 'mysecret']));
 
         $expected = escapeshellarg($this->Driver->getBinary('pg_dump')) . ' --format=c -b --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
@@ -76,10 +56,7 @@ class PostgresTest extends DriverTestCase
     public function testImportExecutable(): void
     {
         //Sets a password
-        $connection = $this->getProperty($this->Driver, 'connection');
-        $config = $this->getProperty($connection, '_config') + ['password' => 'mysecret'];
-        $this->setProperty($connection, '_config', $config);
-        $this->setProperty($this->Driver, 'connection', $connection);
+        $this->setProperty($this->Driver, 'connection', new Connection($this->Driver->getConfig() + ['password' => 'mysecret']));
 
         $expected = escapeshellarg($this->Driver->getBinary('pg_restore')) . ' --format=c -c -e --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
