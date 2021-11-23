@@ -84,16 +84,59 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to export the database
-     * @return string
+     * Parses the executable command, replacing placeholders
+     * @param string $executable The executable command, with placeholders
+     * @param string $binary The name of the binary to use
+     * @return string The executable command, with the placeholders replaced
      */
-    abstract protected function _exportExecutable(): string;
+    protected function _parseExecutable(string $executable, string $binary): string
+    {
+        $replacement = [
+            '{{BINARY}}' => escapeshellarg($this->getBinary($binary)),
+            '{{AUTH_FILE}}' => isset($this->auth) ? escapeshellarg($this->auth) : '',
+            '{{DB_USER}}' => $this->getConfig('username'),
+            '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
+            '{{DB_HOST}}' => $this->getConfig('host'),
+            '{{DB_NAME}}' => $this->getConfig('database'),
+        ];
+
+        return str_replace(array_keys($replacement), $replacement, $executable);
+    }
 
     /**
-     * Gets the executable command to import the database
+     * Gets the executable command to export the database, with compression if requested
+     * @param string $filename Filename where you want to export the database
      * @return string
      */
-    abstract protected function _importExecutable(): string;
+    protected function _exportExecutable(string $filename): string
+    {
+        $binary = DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER][0];
+        $compression = $this->getCompression($filename);
+        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . DATABASE_BACKUP_DRIVER . '.export'), $binary);
+        if ($compression) {
+            $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
+        }
+
+        return $exec . ' > ' . escapeshellarg($filename);
+    }
+
+    /**
+     * Gets the executable command to import the database, with compression if requested
+     * @param string $filename Filename from which you want to import the database
+     * @return string
+     */
+    protected function _importExecutable(string $filename): string
+    {
+        $binary = DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER][1];
+        $compression = $this->getCompression($filename);
+        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . DATABASE_BACKUP_DRIVER . '.import'), $binary);
+
+        if ($compression) {
+            return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
+        }
+
+        return $exec . ' < ' . escapeshellarg($filename);
+    }
 
     /**
      * Called after export
@@ -134,35 +177,6 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to export the database, with compression
-     * @param string $filename Filename where you want to export the database
-     * @return string
-     */
-    protected function _exportExecutableWithCompression(string $filename): string
-    {
-        $compression = $this->getCompression($filename);
-
-        return $this->_exportExecutable() . ($compression ? ' | ' . escapeshellarg($this->getBinary($compression)) : '') . ' > ' . escapeshellarg($filename);
-    }
-
-    /**
-     * Gets the executable command to import the database, with compression
-     * @param string $filename Filename from which you want to import the database
-     * @return string
-     */
-    protected function _importExecutableWithCompression(string $filename): string
-    {
-        $executable = $this->_importExecutable() . ' < ' . escapeshellarg($filename);
-
-        $compression = $this->getCompression($filename);
-        if ($compression) {
-            $executable = sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $this->_importExecutable();
-        }
-
-        return $executable;
-    }
-
-    /**
      * Exports the database.
      *
      * When exporting, this method will trigger these events:
@@ -180,7 +194,7 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $process = $this->_exec($this->_exportExecutableWithCompression($filename));
+        $process = $this->_exec($this->_exportExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterExport');
@@ -231,7 +245,7 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $process = $this->_exec($this->_importExecutableWithCompression($filename));
+        $process = $this->_exec($this->_importExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterImport');

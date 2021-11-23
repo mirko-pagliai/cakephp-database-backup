@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Driver;
 
-use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -23,45 +22,4 @@ use DatabaseBackup\Driver\Driver;
  */
 class Postgres extends Driver
 {
-    /**
-     * Gets the executable command to export the database
-     * @return string
-     */
-    protected function _exportExecutable(): string
-    {
-        return str_replace([
-            '{{BINARY}}',
-            '{{DB_USER}}',
-            '{{DB_PASSWORD}}',
-            '{{DB_HOST}}',
-            '{{DB_NAME}}',
-        ], [
-            escapeshellarg($this->getBinary('pg_dump')),
-            $this->getConfig('username'),
-            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
-            $this->getConfig('host'),
-            $this->getConfig('database'),
-        ], Configure::read('DatabaseBackup.postgres.export'));
-    }
-
-    /**
-     * Gets the executable command to import the database
-     * @return string
-     */
-    protected function _importExecutable(): string
-    {
-        return str_replace([
-            '{{BINARY}}',
-            '{{DB_USER}}',
-            '{{DB_PASSWORD}}',
-            '{{DB_HOST}}',
-            '{{DB_NAME}}',
-        ], [
-            escapeshellarg($this->getBinary('pg_restore')),
-            $this->getConfig('username'),
-            $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
-            $this->getConfig('host'),
-            $this->getConfig('database'),
-        ], Configure::read('DatabaseBackup.postgres.import'));
-    }
 }

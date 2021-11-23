@@ -14,7 +14,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Database\Connection;
 use DatabaseBackup\Driver\Postgres;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
@@ -34,31 +33,5 @@ class PostgresTest extends DriverTestCase
         if (!$this->Driver instanceof Postgres) {
             $this->markTestIncomplete();
         }
-    }
-
-    /**
-     * Test for `_exportExecutable()` method
-     * @test
-     */
-    public function testExportExecutable(): void
-    {
-        //Sets a password
-        $this->setProperty($this->Driver, 'connection', new Connection($this->Driver->getConfig() + ['password' => 'mysecret']));
-
-        $expected = escapeshellarg($this->Driver->getBinary('pg_dump')) . ' --format=c -b --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
-    }
-
-    /**
-     * Test for `_importExecutable()` method
-     * @test
-     */
-    public function testImportExecutable(): void
-    {
-        //Sets a password
-        $this->setProperty($this->Driver, 'connection', new Connection($this->Driver->getConfig() + ['password' => 'mysecret']));
-
-        $expected = escapeshellarg($this->Driver->getBinary('pg_restore')) . ' --format=c -c -e --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 }

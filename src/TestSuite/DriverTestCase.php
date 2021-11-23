@@ -173,32 +173,21 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `_exportExecutable()` method
      * @return void
-     */
-    abstract public function testExportExecutable(): void;
-
-    /**
-     * Test for `_exportExecutableWithCompression()` method
-     * @return void
      * @test
      */
-    public function testExportExecutableWithCompression(): void
+    public function testExportExecutable(): void
     {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' > ' . escapeshellarg('backup.sql'), $result);
+        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_exportExecutable', ['backup.sql']));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_exportExecutable', [$filename]);
             $expected = sprintf(
-                '%s | %s > %s',
-                $basicExecutable,
+                ' | %s > %s',
                 escapeshellarg($this->Driver->getBinary($compression)),
                 escapeshellarg($filename)
             );
-            $this->assertEquals($expected, $result);
+            $this->assertStringEndsWith($expected, $result);
         }
     }
 
@@ -219,32 +208,21 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `_importExecutable()` method
      * @return void
-     */
-    abstract public function testImportExecutable(): void;
-
-    /**
-     * Test for `_importExecutableWithCompression()` method
-     * @return void
      * @test
      */
-    public function testImportExecutableWithCompression(): void
+    public function testImportExecutable(): void
     {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' < ' . escapeshellarg('backup.sql'), $result);
+        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_importExecutable', ['backup.sql']));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_importExecutable', [$filename]);
             $expected = sprintf(
-                '%s -dc %s | %s',
+                '%s -dc %s | ',
                 escapeshellarg($this->Driver->getBinary($compression)),
-                escapeshellarg($filename),
-                $basicExecutable
+                escapeshellarg($filename)
             );
-            $this->assertEquals($expected, $result);
+            $this->assertStringStartsWith($expected, $result);
         }
     }
 }
