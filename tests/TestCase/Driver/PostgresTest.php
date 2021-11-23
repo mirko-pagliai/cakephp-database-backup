@@ -58,7 +58,7 @@ class PostgresTest extends DriverTestCase
         //Sets a password
         $this->setProperty($this->Driver, 'connection', new Connection($this->Driver->getConfig() + ['password' => 'mysecret']));
 
-        $expected = escapeshellarg($this->Driver->getBinary('pg_restore')) . ' --format=c -c -e --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
+        $expected = escapeshellarg($this->Driver->getBinary('pg_restore')) . ' --format=c -c -e --dbname=\'' . 'postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database') . '\'';
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 }

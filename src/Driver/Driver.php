@@ -84,16 +84,46 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
+     * Parses the executable command, replacing placeholders
+     * @param string $executable The executable command, with placeholders
+     * @param string $binary The name of the binary to use
+     * @return string The executable command, with the placeholders replaced
+     */
+    protected function _parseExecutable(string $executable, string $binary): string
+    {
+        $replacement = [
+            '{{BINARY}}' => escapeshellarg($this->getBinary($binary)),
+            '{{AUTH_FILE}}' => isset($this->auth) ? escapeshellarg($this->auth) : '',
+            '{{DB_USER}}' => $this->getConfig('username'),
+            '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
+            '{{DB_HOST}}' => $this->getConfig('host'),
+            '{{DB_NAME}}' => $this->getConfig('database'),
+        ];
+
+        return str_replace(array_keys($replacement), $replacement, $executable);
+    }
+
+    /**
      * Gets the executable command to export the database
      * @return string
      */
-    abstract protected function _exportExecutable(): string;
+    protected function _exportExecutable(): string
+    {
+        $binary = DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER][0];
+
+        return $this->_parseExecutable(Configure::read('DatabaseBackup.' . DATABASE_BACKUP_DRIVER . '.export'), $binary);
+    }
 
     /**
      * Gets the executable command to import the database
      * @return string
      */
-    abstract protected function _importExecutable(): string;
+    protected function _importExecutable(): string
+    {
+        $binary = DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER][1];
+
+        return $this->_parseExecutable(Configure::read('DatabaseBackup.' . DATABASE_BACKUP_DRIVER . '.import'), $binary);
+    }
 
     /**
      * Called after export

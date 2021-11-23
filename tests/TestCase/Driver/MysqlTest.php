@@ -41,7 +41,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testExportExecutable(): void
     {
-        $expected = sprintf('%s --defaults-file=%s %s', escapeshellarg($this->Driver->getBinary('mysqldump')), escapeshellarg('authFile'), escapeshellarg('test'));
+        $expected = sprintf('%s --defaults-file=%s %s', escapeshellarg($this->Driver->getBinary('mysqldump')), escapeshellarg('authFile'), 'test');
         $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
     }
@@ -62,7 +62,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testImportExecutable(): void
     {
-        $expected = sprintf('%s --defaults-extra-file=%s %s', escapeshellarg($this->Driver->getBinary('mysql')), escapeshellarg('authFile'), escapeshellarg('test'));
+        $expected = sprintf('%s --defaults-extra-file=%s %s', escapeshellarg($this->Driver->getBinary('mysql')), escapeshellarg('authFile'), 'test');
         $this->setProperty($this->Driver, 'auth', 'authFile');
         $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }

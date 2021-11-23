@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Driver;
 
-use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 use Tools\Filesystem;
 
@@ -30,40 +29,6 @@ class Mysql extends Driver
      * @var string
      */
     protected $auth;
-
-    /**
-     * Gets the executable command to export the database
-     * @return string
-     */
-    protected function _exportExecutable(): string
-    {
-        return str_replace([
-            '{{BINARY}}',
-            '{{AUTH_FILE}}',
-            '{{DB_NAME}}',
-        ], [
-            escapeshellarg($this->getBinary('mysqldump')),
-            escapeshellarg($this->auth),
-            escapeshellarg($this->getConfig('database')),
-        ], Configure::read('DatabaseBackup.mysql.export'));
-    }
-
-    /**
-     * Gets the executable command to import the database
-     * @return string
-     */
-    protected function _importExecutable(): string
-    {
-        return str_replace([
-            '{{BINARY}}',
-            '{{AUTH_FILE}}',
-            '{{DB_NAME}}',
-        ], [
-            escapeshellarg($this->getBinary('mysql')),
-            escapeshellarg($this->auth),
-            escapeshellarg($this->getConfig('database')),
-        ], Configure::read('DatabaseBackup.mysql.import'));
-    }
 
     /**
      * Internal method to write an auth file
