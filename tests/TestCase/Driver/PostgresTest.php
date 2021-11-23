@@ -45,8 +45,8 @@ class PostgresTest extends DriverTestCase
         //Sets a password
         $this->setProperty($this->Driver, 'connection', new Connection($this->Driver->getConfig() + ['password' => 'mysecret']));
 
-        $expected = escapeshellarg($this->Driver->getBinary('pg_dump')) . ' --format=c -b --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'));
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
+        $expected = escapeshellarg($this->Driver->getBinary('pg_dump')) . ' --format=c -b --dbname=' . escapeshellarg('postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database')) . ' > ' . escapeshellarg('backup.sql');
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable', ['backup.sql']));
     }
 
     /**
@@ -58,7 +58,7 @@ class PostgresTest extends DriverTestCase
         //Sets a password
         $this->setProperty($this->Driver, 'connection', new Connection($this->Driver->getConfig() + ['password' => 'mysecret']));
 
-        $expected = escapeshellarg($this->Driver->getBinary('pg_restore')) . ' --format=c -c -e --dbname=\'' . 'postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database') . '\'';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
+        $expected = escapeshellarg($this->Driver->getBinary('pg_restore')) . ' --format=c -c -e --dbname=\'' . 'postgresql://' . $this->Driver->getConfig('username') . ':' . $this->Driver->getConfig('password') . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database') . '\' < ' . escapeshellarg('backup.sql');
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable', ['backup.sql']));
     }
 }

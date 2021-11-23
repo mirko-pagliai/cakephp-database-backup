@@ -41,9 +41,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testExportExecutable(): void
     {
-        $expected = sprintf('%s --defaults-file=%s %s', escapeshellarg($this->Driver->getBinary('mysqldump')), escapeshellarg('authFile'), 'test');
+        $expected = sprintf('%s --defaults-file=%s %s > %s', escapeshellarg($this->Driver->getBinary('mysqldump')), escapeshellarg('authFile'), 'test', escapeshellarg('backup.sql'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable', ['backup.sql']));
     }
 
     /**
@@ -62,9 +62,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testImportExecutable(): void
     {
-        $expected = sprintf('%s --defaults-extra-file=%s %s', escapeshellarg($this->Driver->getBinary('mysql')), escapeshellarg('authFile'), 'test');
+        $expected = sprintf('%s --defaults-extra-file=%s %s < %s', escapeshellarg($this->Driver->getBinary('mysql')), escapeshellarg('authFile'), 'test', escapeshellarg('backup.sql'));
         $this->setProperty($this->Driver, 'auth', 'authFile');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
+        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable', ['backup.sql']));
     }
 
     /**

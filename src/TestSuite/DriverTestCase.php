@@ -183,22 +183,15 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportExecutableWithCompression(): void
     {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' > ' . escapeshellarg('backup.sql'), $result);
-
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_exportExecutable', [$filename]);
             $expected = sprintf(
-                '%s | %s > %s',
-                $basicExecutable,
+                ' | %s > %s',
                 escapeshellarg($this->Driver->getBinary($compression)),
                 escapeshellarg($filename)
             );
-            $this->assertEquals($expected, $result);
+            $this->assertStringEndsWith($expected, $result);
         }
     }
 
@@ -229,22 +222,15 @@ abstract class DriverTestCase extends TestCase
      */
     public function testImportExecutableWithCompression(): void
     {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' < ' . escapeshellarg('backup.sql'), $result);
-
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_importExecutable', [$filename]);
             $expected = sprintf(
-                '%s -dc %s | %s',
+                '%s -dc %s | ',
                 escapeshellarg($this->Driver->getBinary($compression)),
-                escapeshellarg($filename),
-                $basicExecutable
+                escapeshellarg($filename)
             );
-            $this->assertEquals($expected, $result);
+            $this->assertStringStartsWith($expected, $result);
         }
     }
 }
