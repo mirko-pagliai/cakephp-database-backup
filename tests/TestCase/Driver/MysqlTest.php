@@ -36,48 +36,6 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `_exportExecutable()` method
-     * @test
-     */
-    public function testExportExecutable(): void
-    {
-        $expected = sprintf('%s --defaults-file=%s %s > %s', escapeshellarg($this->Driver->getBinary('mysqldump')), escapeshellarg('authFile'), 'test', escapeshellarg('backup.sql'));
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable', ['backup.sql']));
-    }
-
-    /**
-     * Test for `_exportExecutableWithCompression()` method
-     * @test
-     */
-    public function testExportExecutableWithCompression(): void
-    {
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        parent::testExportExecutableWithCompression();
-    }
-
-    /**
-     * Test for `_importExecutable()` method
-     * @test
-     */
-    public function testImportExecutable(): void
-    {
-        $expected = sprintf('%s --defaults-extra-file=%s %s < %s', escapeshellarg($this->Driver->getBinary('mysql')), escapeshellarg('authFile'), 'test', escapeshellarg('backup.sql'));
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable', ['backup.sql']));
-    }
-
-    /**
-     * Test for `_importExecutableWithCompression()` method
-     * @test
-     */
-    public function testImportExecutableWithCompression(): void
-    {
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        parent::testImportExecutableWithCompression();
-    }
-
-    /**
      * Test for `afterExport()` method
      * @test
      */

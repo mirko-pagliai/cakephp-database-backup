@@ -173,16 +173,13 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `_exportExecutable()` method
      * @return void
-     */
-    abstract public function testExportExecutable(): void;
-
-    /**
-     * Test for `_exportExecutableWithCompression()` method
-     * @return void
      * @test
      */
-    public function testExportExecutableWithCompression(): void
+    public function testExportExecutable(): void
     {
+        $result = $this->invokeMethod($this->Driver, '_exportExecutable', ['backup.sql']);
+        $this->assertNotEmpty($result);
+
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_exportExecutable', [$filename]);
@@ -212,16 +209,13 @@ abstract class DriverTestCase extends TestCase
     /**
      * Test for `_importExecutable()` method
      * @return void
-     */
-    abstract public function testImportExecutable(): void;
-
-    /**
-     * Test for `_importExecutableWithCompression()` method
-     * @return void
      * @test
      */
-    public function testImportExecutableWithCompression(): void
+    public function testImportExecutable(): void
     {
+        $result = $this->invokeMethod($this->Driver, '_importExecutable', ['backup.sql']);
+        $this->assertNotEmpty($result);
+
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_importExecutable', [$filename]);
