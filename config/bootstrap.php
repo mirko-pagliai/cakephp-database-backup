@@ -31,7 +31,7 @@ if (!in_array(DATABASE_BACKUP_DRIVER, ['mysql', 'postgres', 'sqlite'])) {
 }
 
 //Auto-discovers binaries
-foreach (array_merge(['bzip2', 'gzip'], DATABASE_BACKUP_DRIVER == 'mysql' ? ['mysql', 'mysqldump'] : (DATABASE_BACKUP_DRIVER == 'postgres' ? ['pg_dump', 'pg_restore'] : ['sqlite3'])) as $binary) {
+foreach (['mysql', 'mysqldump', 'pg_dump', 'pg_restore','sqlite3', 'bzip2', 'gzip'] as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         try {
             $binaryPath = which($binary);
