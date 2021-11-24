@@ -208,13 +208,13 @@ abstract class Driver implements EventListenerInterface
      * @return string
      * @throws \ErrorException
      */
-    public function getBinary(string $name): string
+    final public function getBinary(string $name): string
     {
         return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
     }
 
     /**
-     * Gets a config value or the whole configuration
+     * Gets a config value or the whole configuration of the connection
      * @param string|null $key Config key or `null` to get all config values
      * @return mixed Config value, `null` if the key doesn't exist
      *  or all config values if no key was specified
