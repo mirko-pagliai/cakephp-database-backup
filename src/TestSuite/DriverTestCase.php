@@ -125,7 +125,7 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportAndImport(): void
     {
-        foreach (self::$validExtensions as $extension) {
+        foreach (DATABASE_BACKUP_EXTENSIONS as $extension) {
             $backup = uniqid('example_');
             $backup = $this->getAbsolutePath($extension ? $backup . '.' . $extension : $backup);
 

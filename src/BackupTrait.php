@@ -29,13 +29,6 @@ use Tools\Filesystem;
 trait BackupTrait
 {
     /**
-     * Valid extensions. Names as keys and compressions as values
-     * @since 2.4.0
-     * @var array<string, string|bool>
-     */
-    protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
-
-    /**
      * Returns the absolute path for a backup file
      * @param string $path Relative or absolute path
      * @return string
@@ -107,7 +100,7 @@ trait BackupTrait
     {
         $extension = Filesystem::instance()->getExtension($path);
 
-        return in_array($extension, array_keys(self::$validExtensions)) ? $extension : null;
+        return in_array($extension, array_keys(DATABASE_BACKUP_EXTENSIONS)) ? $extension : null;
     }
 
     /**
@@ -117,6 +110,6 @@ trait BackupTrait
      */
     public static function getValidCompressions(): array
     {
-        return array_filter(self::$validExtensions);
+        return array_filter(DATABASE_BACKUP_EXTENSIONS);
     }
 }

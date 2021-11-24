@@ -6,6 +6,8 @@
 * `__exportExecutableWithCompression()` and `_importExecutableWithCompression()`
     methods provided by the `Driver` class have been removed and incorporated
     into `_exportExecutable()` and `_importExecutable()`;
+* `BackupTrait::$validExtensions` has been removed and replaced by the
+    `DATABASE_BACKUP_EXTENSIONS` constant;
 * postgres and sqlite commands are also properly escaped.
 
 ## 2.9 branch
