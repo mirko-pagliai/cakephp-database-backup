@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
-use ErrorException;
 use Symfony\Component\Process\Process;
 
 /**
