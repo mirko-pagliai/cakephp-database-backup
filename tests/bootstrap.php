@@ -20,6 +20,7 @@ use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\TestEmailTransport;
+use DatabaseBackup\Utility\BackupManager;
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
@@ -69,6 +70,7 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
+Configure::write('Error.ignoredDeprecationPaths', '*/cakephp/cakephp/src/TestSuite/Fixture/FixtureInjector.php');
 
 Cache::setConfig([
     '_cake_core_' => [
