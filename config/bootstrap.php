@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use Tools\Filesystem;
 
 if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
@@ -29,13 +28,6 @@ if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
 //Database connection
 if (!Configure::check('DatabaseBackup.connection')) {
     Configure::write('DatabaseBackup.connection', 'default');
-}
-
-if (!defined('DATABASE_BACKUP_DRIVER')) {
-    define('DATABASE_BACKUP_DRIVER', ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'))->config()['scheme']);
-}
-if (!in_array(DATABASE_BACKUP_DRIVER, array_keys(DATABASE_BACKUP_EXECUTABLES))) {
-    die('Unknown `' . DATABASE_BACKUP_DRIVER . '` test driver' . PHP_EOL);
 }
 
 //Auto-discovers binaries

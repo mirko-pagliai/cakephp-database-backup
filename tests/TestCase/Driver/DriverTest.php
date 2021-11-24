@@ -111,11 +111,9 @@ class DriverTest extends TestCase
      */
     public function testGetBinary(): void
     {
-        $binary = DATABASE_BACKUP_DRIVER == 'mysql' ? 'mysql' : (DATABASE_BACKUP_DRIVER == 'postgres' ? 'pg_dump' : 'sqlite3');
-        $this->assertEquals(which($binary), $this->Driver->getBinary($binary));
+        $this->assertEquals(which('mysql'), $this->Driver->getBinary('mysql'));
 
         //With a binary not available
-        $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
         $this->Driver->getBinary('noExisting');
     }

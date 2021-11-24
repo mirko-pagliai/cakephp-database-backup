@@ -62,7 +62,7 @@ trait BackupTrait
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface A connection object
      */
-    public function getConnection(?string $name = null): ConnectionInterface
+    public static function getConnection(?string $name = null): ConnectionInterface
     {
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
@@ -75,14 +75,27 @@ trait BackupTrait
      * @since 2.0.0
      * @throws \InvalidArgumentException
      */
-    public function getDriver(?ConnectionInterface $connection = null): Driver
+    public static function getDriver(?ConnectionInterface $connection = null): Driver
     {
-        $connection = $connection ?: $this->getConnection();
-        $className = get_class_short_name($connection->getDriver());
-        $driver = App::classname(sprintf('%s.%s', 'DatabaseBackup', $className), 'Driver');
-        Exceptionist::isTrue($driver, __d('database_backup', 'The `{0}` driver does not exist', $className), InvalidArgumentException::class);
+        $connection = $connection ?: self::getConnection();
+        $name = self::getDriverName($connection);
+        $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
+        Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name), InvalidArgumentException::class);
 
-        return new $driver($connection);
+        return new $Driver($connection);
+    }
+
+    /**
+     * Gets the driver name, according to the connection
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
+     * @return string Driver name
+     * @since 2.9.2
+     */
+    public static function getDriverName(?ConnectionInterface $connection = null): string
+    {
+        $connection = $connection ?: self::getConnection();
+
+        return get_class_short_name($connection->getDriver());
     }
 
     /**

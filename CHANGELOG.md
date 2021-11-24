@@ -10,6 +10,8 @@
 
 ## 2.9 branch
 ### 2.9.2
+* added `BackupTrait::getDriverName()` static method; `getConnection()` and
+    `getDriver()` methods are now static;
 * backtrack (compared to version `2.9.0`): all tracks are auto-discovered,
     otherwise it would not be possible to change the connection you want to work
     on on the fly.
