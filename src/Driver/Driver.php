@@ -110,9 +110,10 @@ abstract class Driver implements EventListenerInterface
      */
     protected function _exportExecutable(string $filename): string
     {
-        $binary = DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER][0];
+        $driver = strtolower($this->getDriverName());
+        $binary = DATABASE_BACKUP_EXECUTABLES[$driver][0];
         $compression = $this->getCompression($filename);
-        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . DATABASE_BACKUP_DRIVER . '.export'), $binary);
+        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . $driver . '.export'), $binary);
         if ($compression) {
             $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
         }
@@ -127,9 +128,10 @@ abstract class Driver implements EventListenerInterface
      */
     protected function _importExecutable(string $filename): string
     {
-        $binary = DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER][1];
+        $driver = strtolower($this->getDriverName());
+        $binary = DATABASE_BACKUP_EXECUTABLES[$driver][1];
         $compression = $this->getCompression($filename);
-        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . DATABASE_BACKUP_DRIVER . '.import'), $binary);
+        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . $driver . '.import'), $binary);
 
         if ($compression) {
             return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
