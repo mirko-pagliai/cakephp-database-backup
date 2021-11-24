@@ -9,6 +9,11 @@
 * postgres and sqlite commands are also properly escaped.
 
 ## 2.9 branch
+### 2.9.2
+* backtrack (compared to version `2.9.0`): all tracks are auto-discovered,
+    otherwise it would not be possible to change the connection you want to work
+    on on the fly.
+
 ### 2.9.1
 * all shell arguments are now correctly escaped.
 
