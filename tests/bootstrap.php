@@ -109,4 +109,4 @@ Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
-echo 'Running tests for `' . DATABASE_BACKUP_DRIVER . '` driver ' . PHP_EOL;
+echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
