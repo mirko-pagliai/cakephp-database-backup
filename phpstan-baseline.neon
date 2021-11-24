@@ -20,8 +20,3 @@ parameters:
 			count: 1
 			path: tests/TestCase/Driver/DriverTest.php
 
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: tests/TestCase/Utility/BackupExportTest.php
-

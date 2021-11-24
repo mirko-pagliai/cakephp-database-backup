@@ -16,7 +16,6 @@ declare(strict_types=1);
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\TestEmailTransport;
@@ -83,12 +82,6 @@ Cache::setConfig([
     ],
 ]);
 
-Log::setConfig('debug', [
-    'className' => 'File',
-    'path' => LOGS,
-    'levels' => ['notice', 'info', 'debug'],
-    'file' => 'debug',
-]);
 TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
 Email::setConfig('default', ['transport' => 'debug']);
 

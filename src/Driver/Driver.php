@@ -25,7 +25,7 @@ use Tools\Exceptionist;
 
 /**
  * Represents a driver containing all methods to export/import database backups
- *  according to the database engine
+ *  according to the connection
  * @method \Cake\Event\EventManager getEventManager()
  */
 abstract class Driver implements EventListenerInterface
@@ -112,8 +112,9 @@ abstract class Driver implements EventListenerInterface
     {
         $driver = strtolower($this->getDriverName());
         $binary = DATABASE_BACKUP_EXECUTABLES[$driver][0];
-        $compression = $this->getCompression($filename);
         $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . $driver . '.export'), $binary);
+
+        $compression = $this->getCompression($filename);
         if ($compression) {
             $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
         }
@@ -130,9 +131,9 @@ abstract class Driver implements EventListenerInterface
     {
         $driver = strtolower($this->getDriverName());
         $binary = DATABASE_BACKUP_EXECUTABLES[$driver][1];
-        $compression = $this->getCompression($filename);
         $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . $driver . '.import'), $binary);
 
+        $compression = $this->getCompression($filename);
         if ($compression) {
             return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
         }

@@ -61,7 +61,7 @@ class SendCommand extends Command
         parent::execute($args, $io);
 
         try {
-            (new BackupManager())->send($args->getArgument('filename') ?: '', $args->getArgument('recipient') ?: '');
+            BackupManager::send($args->getArgument('filename') ?: '', $args->getArgument('recipient') ?: '');
             $io->success(__d('database_backup', 'Backup `{0}` was sent via mail', Filesystem::instance()->rtr($args->getArgument('filename') ?: '')));
         } catch (Exception $e) {
             $io->error($e->getMessage());

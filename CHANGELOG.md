@@ -8,7 +8,8 @@
     into `_exportExecutable()` and `_importExecutable()`;
 * `BackupTrait::$validExtensions` has been removed and replaced by the
     `DATABASE_BACKUP_EXTENSIONS` constant;
-* postgres and sqlite commands are also properly escaped.
+* postgres and sqlite commands are also properly escaped;
+* many little fixes and many code simplifications.
 
 ## 2.9 branch
 ### 2.9.2

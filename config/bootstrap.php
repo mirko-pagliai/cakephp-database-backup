@@ -77,7 +77,7 @@ if (!Configure::check('DatabaseBackup.target')) {
 }
 
 //Checks for the target directory
-$target = Configure::read('DatabaseBackup.target');
+$target = Configure::readOrFail('DatabaseBackup.target');
 if (!file_exists($target)) {
     mkdir($target, 0777);
 }

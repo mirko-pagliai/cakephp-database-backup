@@ -69,7 +69,7 @@ class BackupManager
      */
     public static function index(): CollectionInterface
     {
-        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::read('DatabaseBackup.target'));
+        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::readOrFail('DatabaseBackup.target'));
 
         return collection($finder)->map(function (SplFileInfo $file) {
             $filename = $file->getFilename();
@@ -128,10 +128,10 @@ class BackupManager
      * @param string $filename Filename of the backup that you want to send via
      *  email. The path can be relative to the backup directory
      * @param string $recipient Recipient's email address
-     * @return array
+     * @return array{headers: string, message: string}
      * @since 1.1.0
      */
-    public function send(string $filename, string $recipient): array
+    public static function send(string $filename, string $recipient): array
     {
         return self::getEmailInstance($filename, $recipient)->send();
     }

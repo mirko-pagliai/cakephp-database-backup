@@ -53,7 +53,7 @@ trait BackupTrait
     /**
      * Gets the `Connection` instance
      * @param string|null $name Connection name
-     * @return \Cake\Datasource\ConnectionInterface A connection object
+     * @return \Cake\Datasource\ConnectionInterface A `Connection` object
      */
     public static function getConnection(?string $name = null): ConnectionInterface
     {
@@ -80,7 +80,7 @@ trait BackupTrait
 
     /**
      * Gets the driver name, according to the connection
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` object
      * @return string Driver name
      * @since 2.9.2
      */

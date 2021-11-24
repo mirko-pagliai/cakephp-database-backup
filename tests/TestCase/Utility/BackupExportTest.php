@@ -15,11 +15,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use Cake\Log\Log;
+use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
-use DatabaseBackup\Utility\BackupExport;
-use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use Tools\Filesystem;
 
@@ -28,40 +26,7 @@ use Tools\Filesystem;
  */
 class BackupExportTest extends TestCase
 {
-    /**
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
-    protected $BackupExport;
-
-    /**
-     * Called before every test method
-     * @return void
-     */
-    public function setUp(): void
-    {
-        if (!$this->BackupExport) {
-            $this->BackupExport = new BackupExport();
-
-            //Mocks the `send()` method of `BackupManager` class, so that it writes
-            //  on the debug log instead of sending a real mail
-            $this->BackupExport->BackupManager = @$this->getMockBuilder(BackupManager::class)
-                ->setMethods(['send'])
-                ->getMock();
-
-            $this->BackupExport->BackupManager->method('send')
-                ->will($this->returnCallback(function () {
-                    $args = implode(', ', array_map(function ($arg) {
-                        return '`' . $arg . '`';
-                    }, func_get_args()));
-
-                    Log::write('debug', 'Called `send()` with args: ' . $args);
-
-                    return func_get_args();
-                }));
-        }
-
-        parent::setUp();
-    }
+    use EmailTrait;
 
     /**
      * Test for `construct()` method
@@ -174,25 +139,27 @@ class BackupExportTest extends TestCase
      */
     public function testExport(): void
     {
-        $filename = $this->BackupExport->export();
-        $this->assertFileExists($filename);
-        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($filename));
+        $file = $this->BackupExport->export();
+        $this->assertFileExists($file);
+        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($file));
 
         //Exports with `compression()`
-        $filename = $this->BackupExport->compression('bzip2')->export();
-        $this->assertFileExists($filename);
-        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql\.bz2$/', basename($filename));
+        $file = $this->BackupExport->compression('bzip2')->export();
+        $this->assertFileExists($file);
+        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql\.bz2$/', basename($file));
 
         //Exports with `filename()`
-        $filename = $this->BackupExport->filename('backup.sql.bz2')->export();
-        $this->assertFileExists($filename);
-        $this->assertEquals('backup.sql.bz2', basename($filename));
+        $file = $this->BackupExport->filename('backup.sql.bz2')->export();
+        $this->assertFileExists($file);
+        $this->assertEquals('backup.sql.bz2', basename($file));
 
         //Exports with `send()`
         $recipient = 'recipient@example.com';
-        $filename = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
-        $log = file_get_contents(LOGS . 'debug.log') ?: '';
-        $this->assertTextContains('Called `send()` with args: `' . $filename . '`, `' . $recipient . '`', $log);
+        $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
+        $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
+        $this->assertMailSentTo($recipient);
+        $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
+        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
 
         //With a file that already exists
         $this->expectExceptionMessage('File `' . $this->BackupExport->getAbsolutePath('backup.sql.bz2') . '` already exists');
@@ -207,7 +174,7 @@ class BackupExportTest extends TestCase
     public function testExportWithDifferendChmod(): void
     {
         Configure::write('DatabaseBackup.chmod', 0777);
-        $filename = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertFileIsWritable($filename);
+        $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
+        $this->assertFileIsWritable($file);
     }
 }
