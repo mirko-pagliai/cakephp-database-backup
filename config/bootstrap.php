@@ -39,7 +39,7 @@ if (!in_array(DATABASE_BACKUP_DRIVER, array_keys(DATABASE_BACKUP_EXECUTABLES))) 
 }
 
 //Auto-discovers binaries
-foreach (array_merge(array_unique(DATABASE_BACKUP_EXECUTABLES[DATABASE_BACKUP_DRIVER]), ['bzip2', 'gzip']) as $binary) {
+foreach (array_merge(array_unique(call_user_func_array('array_merge', array_values(DATABASE_BACKUP_EXECUTABLES))), ['bzip2', 'gzip']) as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         try {
             $binaryPath = which($binary);
