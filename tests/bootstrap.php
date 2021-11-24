@@ -20,6 +20,7 @@ use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\TestEmailTransport;
+use DatabaseBackup\Utility\BackupManager;
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
@@ -69,6 +70,7 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
+Configure::write('Error.ignoredDeprecationPaths', '*/cakephp/cakephp/src/TestSuite/Fixture/FixtureInjector.php');
 
 Cache::setConfig([
     '_cake_core_' => [
@@ -107,4 +109,4 @@ Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
-echo 'Running tests for `' . DATABASE_BACKUP_DRIVER . '` driver ' . PHP_EOL;
+echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;

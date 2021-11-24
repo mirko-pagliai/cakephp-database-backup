@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use Tools\Filesystem;
 
 //Database connection
@@ -23,15 +22,8 @@ if (!Configure::check('DatabaseBackup.connection')) {
     Configure::write('DatabaseBackup.connection', 'default');
 }
 
-if (!defined('DATABASE_BACKUP_DRIVER')) {
-    define('DATABASE_BACKUP_DRIVER', ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'))->config()['scheme']);
-}
-if (!in_array(DATABASE_BACKUP_DRIVER, ['mysql', 'postgres', 'sqlite'])) {
-    die('Unknown `' . DATABASE_BACKUP_DRIVER . '` test driver' . PHP_EOL);
-}
-
 //Auto-discovers binaries
-foreach (array_merge(['bzip2', 'gzip'], DATABASE_BACKUP_DRIVER == 'mysql' ? ['mysql', 'mysqldump'] : (DATABASE_BACKUP_DRIVER == 'postgres' ? ['pg_dump', 'pg_restore'] : ['sqlite3'])) as $binary) {
+foreach (['mysql', 'mysqldump', 'pg_dump', 'pg_restore','sqlite3', 'bzip2', 'gzip'] as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         try {
             $binaryPath = which($binary);
