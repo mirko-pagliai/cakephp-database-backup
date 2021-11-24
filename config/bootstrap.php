@@ -15,19 +15,11 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use Tools\Filesystem;
 
 //Database connection
 if (!Configure::check('DatabaseBackup.connection')) {
     Configure::write('DatabaseBackup.connection', 'default');
-}
-
-if (!defined('DATABASE_BACKUP_DRIVER')) {
-    define('DATABASE_BACKUP_DRIVER', ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'))->config()['scheme']);
-}
-if (!in_array(DATABASE_BACKUP_DRIVER, ['mysql', 'postgres', 'sqlite'])) {
-    die('Unknown `' . DATABASE_BACKUP_DRIVER . '` test driver' . PHP_EOL);
 }
 
 //Auto-discovers binaries
