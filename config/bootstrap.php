@@ -17,6 +17,10 @@ declare(strict_types=1);
 use Cake\Core\Configure;
 use Tools\Filesystem;
 
+/**
+ * Executables. Name of driver as keys, Then, as value, an array that contains
+ *  first the executable to export and then the executable to import backups.
+ */
 if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
     define('DATABASE_BACKUP_EXECUTABLES', [
         'mysql' => ['mysqldump', 'mysql'],
