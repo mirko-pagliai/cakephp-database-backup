@@ -84,17 +84,20 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Gets and parses executable commands, according to the type of requested
-     *  operation (`export` or `import`) and the connection driver
-     * @param string $type Type or the request operation (must be `export` or `import`)
+     * Gets and parses executable commands from the configuration, according to
+     *  the type of requested operation (`export` or `import`) and the connection
+     *  driver.
+     *
+     * These executables are not yet final, use instead `_getExportExecutable()`
+     *  and `_getImportExecutable()` methods to have the final executables,
+     *  including compression.
+     * @param string $type Type or the request operation (`export` or `import`)
      * @return string
      */
     protected function _getExecutable(string $type): string
     {
         Exceptionist::inArray([$type, ['export', 'import']]);
         $driver = strtolower($this->getDriverName());
-        $exec = Configure::readOrFail('DatabaseBackup.' . $driver . '.' . $type);
-
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
             '{{AUTH_FILE}}' => isset($this->auth) ? escapeshellarg($this->auth) : '',
@@ -103,6 +106,7 @@ abstract class Driver implements EventListenerInterface
             '{{DB_HOST}}' => $this->getConfig('host'),
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
+        $exec = Configure::readOrFail('DatabaseBackup.' . $driver . '.' . $type);
 
         return str_replace(array_keys($replacements), $replacements, $exec);
     }
