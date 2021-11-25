@@ -29,22 +29,6 @@ class BackupExportTest extends TestCase
     use EmailTrait;
 
     /**
-     * Test for `construct()` method
-     * @test
-     */
-    public function testConstruct(): void
-    {
-        $this->assertNull($this->getProperty($this->BackupExport, 'compression'));
-
-        $this->assertInstanceof(Driver::class, $this->BackupExport->Driver);
-        $this->assertEquals('sql', $this->getProperty($this->BackupExport, 'defaultExtension'));
-        $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
-        $this->assertNull($this->getProperty($this->BackupExport, 'extension'));
-        $this->assertNull($this->getProperty($this->BackupExport, 'filename'));
-        $this->assertEquals(0, $this->getProperty($this->BackupExport, 'rotate'));
-    }
-
-    /**
      * Test for `compression()` method. This also tests for `$extension`
      *  property
      * @test
@@ -156,7 +140,7 @@ class BackupExportTest extends TestCase
         //Exports with `send()`
         $recipient = 'recipient@example.com';
         $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
-        $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
+        $this->assertMailSentFrom(Configure::readOrFail('DatabaseBackup.mailSender'));
         $this->assertMailSentTo($recipient);
         $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
         $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);

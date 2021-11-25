@@ -46,18 +46,8 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?? new BackupExport();
-        $this->BackupImport = $this->BackupImport ?? new BackupImport();
-    }
-
-    /**
-     * Test for `construct()` method
-     * @test
-     */
-    public function testConstruct(): void
-    {
-        $this->assertInstanceof(Driver::class, $this->getProperty($this->BackupImport, 'driver'));
-        $this->assertNull($this->getProperty($this->BackupImport, 'filename'));
+        $this->BackupExport = $this->BackupExport ?: new BackupExport();
+        $this->BackupImport = $this->BackupImport ?: new BackupImport();
     }
 
     /**

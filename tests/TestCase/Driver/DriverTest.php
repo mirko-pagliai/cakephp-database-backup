@@ -29,7 +29,6 @@ use Symfony\Component\Process\Process;
 class DriverTest extends TestCase
 {
     /**
-     * `Driver` instance
      * @var \DatabaseBackup\Driver\Driver
      */
     protected $Driver;
@@ -48,21 +47,25 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Internal method to get a mock for `Process` class, that returns a failure
-     *  with a custom error message
-     * @param string $error Custom error message
-     * @return \Symfony\Component\Process\Process&\PHPUnit\Framework\MockObject\MockObject
+     * Internal method to get a mock for `Driver` abstract class, with the
+     *  `_exec()` method that returns a `Process` instance with a failure and a
+     *  custom error message
+     * @param string $errorMessage The error message
+     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMockForProcessWithError(string $error): Process
+    protected function getMockForAbstractDriverWithErrorProcess(string $errorMessage): Driver
     {
         $process = @$this->getMockBuilder(Process::class)
             ->setMethods(['getErrorOutput', 'isSuccessful'])
             ->setConstructorArgs([[]])
             ->getMock();
-        $process->method('getErrorOutput')->will($this->returnValue($error . PHP_EOL));
+        $process->method('getErrorOutput')->will($this->returnValue($errorMessage . PHP_EOL));
         $process->method('isSuccessful')->will($this->returnValue(false));
 
-        return $process;
+        $Driver = $this->getMockForAbstractDriver(['_exec']);
+        $Driver->method('_exec')->will($this->returnValue($process));
+
+        return $Driver;
     }
 
     /**
@@ -77,40 +80,12 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `export()` method on failure
-     * @return void
-     * @test
-     */
-    public function testExportOnFailure(): void
-    {
-        $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
-
-        $driver = $this->getMockForAbstractDriver(['_exec']);
-        $driver->method('_exec')->will($this->returnValue($this->getMockForProcessWithError($expectedError . PHP_EOL)));
-        $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
-        $driver->export($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `export()` method. Export is stopped because the
-     *  `beforeExport()` method returns `false`
-     * @return void
-     * @test
-     */
-    public function testExportStoppedByBeforeExport(): void
-    {
-        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
-        $Driver->method('beforeExport')->will($this->returnValue(false));
-        $this->assertFalse($Driver->export($this->getAbsolutePath('example.sql')));
-    }
-
-    /**
      * Test for `getBinary()` method
      * @test
      */
     public function testGetBinary(): void
     {
-        $this->assertEquals(which('mysql'), $this->Driver->getBinary('mysql'));
+        $this->assertStringEndsWith('mysql', $this->Driver->getBinary('mysql'));
 
         //With a binary not available
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
@@ -130,6 +105,33 @@ class DriverTest extends TestCase
     }
 
     /**
+     * Test for `export()` method on failure
+     * @return void
+     * @test
+     */
+    public function testExportOnFailure(): void
+    {
+        $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
+
+        $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
+        $Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
+        $Driver->export($this->getAbsolutePath('example.sql'));
+    }
+
+    /**
+     * Test for `export()` method. Export is stopped because the
+     *  `beforeExport()` method returns `false`
+     * @return void
+     * @test
+     */
+    public function testExportStoppedByBeforeExport(): void
+    {
+        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
+        $Driver->method('beforeExport')->will($this->returnValue(false));
+        $this->assertFalse($Driver->export($this->getAbsolutePath('example.sql')));
+    }
+
+    /**
      * Test for `import()` method on failure
      * @return void
      * @test
@@ -138,12 +140,9 @@ class DriverTest extends TestCase
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
 
-        $driver = $this->getMockForAbstractDriver(['_exec']);
-        $driver->method('_exec')->will($this->returnValue($this->getMockForProcessWithError($expectedError . PHP_EOL)));
-
-        $this->expectException(\ErrorException::class);
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
-        $driver->import($this->getAbsolutePath('example.sql'));
+        $Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
+        $Driver->import($this->getAbsolutePath('example.sql'));
     }
 
     /**

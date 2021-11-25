@@ -71,8 +71,7 @@ class MysqlTest extends DriverTestCase
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=' . $this->Driver->getConfig('host');
         $auth = $this->getProperty($this->Driver, 'auth');
-        $this->assertFileExists($auth);
-        $this->assertEquals($expected, file_get_contents($auth));
+        $this->assertStringEqualsFile($auth, $expected);
 
         @unlink($auth);
     }
@@ -91,8 +90,9 @@ class MysqlTest extends DriverTestCase
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=' . $this->Driver->getConfig('host');
         $auth = $this->getProperty($this->Driver, 'auth');
-        $this->assertFileExists($auth);
-        $this->assertEquals($expected, file_get_contents($auth));
+        $this->assertStringEqualsFile($auth, $expected);
+
+        @unlink($auth);
     }
 
     /**

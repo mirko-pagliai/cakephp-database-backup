@@ -182,6 +182,31 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
+     * Gets a binary path
+     * @param string $name Binary name
+     * @return string
+     * @throws \ErrorException
+     */
+    final public function getBinary(string $name): string
+    {
+        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
+    }
+
+    /**
+     * Gets a config value or the whole configuration of the connection
+     * @param string|null $key Config key or `null` to get all config values
+     * @return mixed Config value, `null` if the key doesn't exist
+     *  or all config values if no key was specified
+     * @since 2.3.0
+     */
+    final public function getConfig(?string $key = null)
+    {
+        $config = $this->connection->config();
+
+        return $key ? $config[$key] ?? null : $config;
+    }
+
+    /**
      * Exports the database.
      *
      * When exporting, this method will trigger these events:
@@ -205,31 +230,6 @@ abstract class Driver implements EventListenerInterface
         $this->dispatchEvent('Backup.afterExport');
 
         return file_exists($filename);
-    }
-
-    /**
-     * Gets a binary path
-     * @param string $name Binary name
-     * @return string
-     * @throws \ErrorException
-     */
-    final public function getBinary(string $name): string
-    {
-        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
-    }
-
-    /**
-     * Gets a config value or the whole configuration of the connection
-     * @param string|null $key Config key or `null` to get all config values
-     * @return mixed Config value, `null` if the key doesn't exist
-     *  or all config values if no key was specified
-     * @since 2.3.0
-     */
-    final public function getConfig(?string $key = null)
-    {
-        $config = $this->connection->config();
-
-        return $key ? $config[$key] ?? null : $config;
     }
 
     /**
