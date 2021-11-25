@@ -23,9 +23,9 @@ use Tools\Filesystem;
  */
 if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
     define('DATABASE_BACKUP_EXECUTABLES', [
-        'mysql' => ['mysqldump', 'mysql'],
-        'postgres' => ['pg_dump', 'pg_restore'],
-        'sqlite' => ['sqlite3', 'sqlite3'],
+        'mysql' => ['export' => 'mysqldump', 'import' => 'mysql'],
+        'postgres' => ['export' => 'pg_dump', 'import' => 'pg_restore'],
+        'sqlite' => ['export' => 'sqlite3', 'import' => 'sqlite3'],
     ]);
 }
 
@@ -42,7 +42,7 @@ if (!Configure::check('DatabaseBackup.connection')) {
 }
 
 //Auto-discovers binaries
-foreach (array_merge(array_unique(call_user_func_array('array_merge', array_values(DATABASE_BACKUP_EXECUTABLES))), ['bzip2', 'gzip']) as $binary) {
+foreach (array_unique(array_merge(array_column(DATABASE_BACKUP_EXECUTABLES, 'export'), array_column(DATABASE_BACKUP_EXECUTABLES, 'import'), ['bzip2', 'gzip'])) as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         try {
             $binaryPath = which($binary);

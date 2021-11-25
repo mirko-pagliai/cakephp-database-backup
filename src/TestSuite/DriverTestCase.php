@@ -171,17 +171,17 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_exportExecutable()` method
+     * Test for `_getExportExecutable()` method
      * @return void
      * @test
      */
-    public function testExportExecutable(): void
+    public function testGetExportExecutable(): void
     {
-        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_exportExecutable', ['backup.sql']));
+        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_getExportExecutable', ['backup.sql']));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_exportExecutable', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_getExportExecutable', [$filename]);
             $expected = sprintf(
                 ' | %s > %s',
                 escapeshellarg($this->Driver->getBinary($compression)),
@@ -206,17 +206,17 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_importExecutable()` method
+     * Test for `_getImportExecutable()` method
      * @return void
      * @test
      */
-    public function testImportExecutable(): void
+    public function testGetImportExecutable(): void
     {
-        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_importExecutable', ['backup.sql']));
+        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_getImportExecutable', ['backup.sql']));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_importExecutable', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_getImportExecutable', [$filename]);
             $expected = sprintf(
                 '%s -dc %s | ',
                 escapeshellarg($this->Driver->getBinary($compression)),

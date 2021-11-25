@@ -84,15 +84,19 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Parses the executable command, replacing placeholders
-     * @param string $executable The executable command, with placeholders
-     * @param string $binary The name of the binary to use
-     * @return string The executable command, with the placeholders replaced
+     * Gets and parses executable commands, according to the type of requested
+     *  operation (`export` or `import`) and the connection driver
+     * @param string $type Type or the request operation (must be `export` or `import`)
+     * @return string
      */
-    protected function _parseExecutable(string $executable, string $binary): string
+    protected function _getExecutable(string $type): string
     {
-        $replacement = [
-            '{{BINARY}}' => escapeshellarg($this->getBinary($binary)),
+        Exceptionist::inArray([$type, ['export', 'import']]);
+        $driver = strtolower($this->getDriverName());
+        $exec = Configure::readOrFail('DatabaseBackup.' . $driver . '.' . $type);
+
+        $replacements = [
+            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
             '{{AUTH_FILE}}' => isset($this->auth) ? escapeshellarg($this->auth) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
@@ -100,7 +104,7 @@ abstract class Driver implements EventListenerInterface
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
 
-        return str_replace(array_keys($replacement), $replacement, $executable);
+        return str_replace(array_keys($replacements), $replacements, $exec);
     }
 
     /**
@@ -108,12 +112,9 @@ abstract class Driver implements EventListenerInterface
      * @param string $filename Filename where you want to export the database
      * @return string
      */
-    protected function _exportExecutable(string $filename): string
+    protected function _getExportExecutable(string $filename): string
     {
-        $driver = strtolower($this->getDriverName());
-        $binary = DATABASE_BACKUP_EXECUTABLES[$driver][0];
-        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . $driver . '.export'), $binary);
-
+        $exec = $this->_getExecutable('export');
         $compression = $this->getCompression($filename);
         if ($compression) {
             $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
@@ -127,12 +128,9 @@ abstract class Driver implements EventListenerInterface
      * @param string $filename Filename from which you want to import the database
      * @return string
      */
-    protected function _importExecutable(string $filename): string
+    protected function _getImportExecutable(string $filename): string
     {
-        $driver = strtolower($this->getDriverName());
-        $binary = DATABASE_BACKUP_EXECUTABLES[$driver][1];
-        $exec = $this->_parseExecutable(Configure::read('DatabaseBackup.' . $driver . '.import'), $binary);
-
+        $exec = $this->_getExecutable('import');
         $compression = $this->getCompression($filename);
         if ($compression) {
             return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
@@ -197,7 +195,7 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $process = $this->_exec($this->_exportExecutable($filename));
+        $process = $this->_exec($this->_getExportExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterExport');
@@ -248,7 +246,7 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $process = $this->_exec($this->_importExecutable($filename));
+        $process = $this->_exec($this->_getImportExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterImport');
