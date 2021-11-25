@@ -59,15 +59,15 @@ if (!Configure::check('DatabaseBackup.chmod')) {
 
 //Default executable commands to export/import databases
 foreach ([
-    'mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
-    'mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
-    'postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
-    'postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
-    'sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
-    'sqlite.import' => '{{BINARY}} {{DB_NAME}}',
+    'DatabaseBackup.mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
+    'DatabaseBackup.sqlite.import' => '{{BINARY}} {{DB_NAME}}',
 ] as $k => $v) {
-    if (!Configure::check('DatabaseBackup.' . $k)) {
-        Configure::write('DatabaseBackup.' . $k, $v);
+    if (!Configure::check($k)) {
+        Configure::write($k, $v);
     }
 }
 
