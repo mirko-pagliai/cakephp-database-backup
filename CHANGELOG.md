@@ -5,7 +5,8 @@
     `getDriver()` methods are now static;
 * backtrack (compared to version `2.9.0`): all tracks are auto-discovered,
     otherwise it would not be possible to change the connection you want to work
-    on on the fly.
+    on on the fly;
+* fixed some tests that produced false positives.
 
 ### 2.9.1
 * all shell arguments are now correctly escaped.

@@ -14,7 +14,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Utility;
 
-use Cake\Core\Configure;
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -87,15 +86,19 @@ class BackupImportTest extends TestCase
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);
-        $this->expectExceptionMessage('File or directory `' . $this->BackupExport->getAbsolutePath('noExistingDir' . DS . 'backup.sql') . '` does not exist');
-        $this->BackupImport->filename('noExistingDir' . DS . 'backup.sql');
+        $this->expectExceptionMessage('File or directory `' . TMP . 'noExistingDir' . DS . 'backup.sql` does not exist');
+        $this->BackupImport->filename(TMP . 'noExistingDir' . DS . 'backup.sql');
+    }
 
-        //With invalid extension
+    /**
+     * Test for `filename()` method, with invalid extension
+     * @test
+     */
+    public function testFilenameWithInvalidExtension(): void
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid file extension');
-        $Filesystem = new Filesystem();
-        $Filesystem->createFile($Filesystem->addSlashTerm(Configure::read('DatabaseBackup.target')) . 'backup.txt');
-        $this->BackupImport->filename('backup.txt');
+        $this->BackupImport->filename(Filesystem::instance()->createTmpFile());
     }
 
     /**
