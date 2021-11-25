@@ -16,7 +16,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailTrait;
-use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 use Tools\Filesystem;
