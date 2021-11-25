@@ -20,3 +20,8 @@ parameters:
 			count: 1
 			path: tests/TestCase/Driver/DriverTest.php
 
+		-
+			message: "#^Ternary operator condition is always true\\.$#"
+			count: 2
+			path: tests/TestCase/Utility/BackupImportTest.php
+
