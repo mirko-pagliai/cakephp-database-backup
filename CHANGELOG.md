@@ -1,6 +1,6 @@
 # 2.x branch
 ## 2.10 branch
-### 2.10.0
+### 2.10.0-beta1
 * now allows to configure and customize via bootstrap the executable commands to
     import and export databases, for each driver, with placeholders;
 * `__exportExecutableWithCompression()` and `_importExecutableWithCompression()`
