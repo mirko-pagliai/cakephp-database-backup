@@ -31,7 +31,7 @@ class PostgresTest extends DriverTestCase
         parent::setUp();
 
         if (!$this->Driver instanceof Postgres) {
-            $this->markTestIncomplete();
+            $this->markTestSkipped('Skipping tests for Postgres, current driver is ' . $this->Driver->getDriverName());
         }
     }
 }

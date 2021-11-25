@@ -31,7 +31,7 @@ class MysqlTest extends DriverTestCase
         parent::setUp();
 
         if (!$this->Driver instanceof Mysql) {
-            $this->markTestIncomplete();
+            $this->markTestSkipped('Skipping tests for Mysql, current driver is ' . $this->Driver->getDriverName());
         }
     }
 
