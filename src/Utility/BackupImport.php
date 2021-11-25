@@ -28,11 +28,11 @@ class BackupImport
 
     /**
      * Driver containing all methods to export/import database backups
-     *  according to the database engine
+     *  according to the connection
      * @since 2.0.0
      * @var \DatabaseBackup\Driver\Driver
      */
-    protected $driver;
+    protected $Driver;
 
     /**
      * Filename where to import the database
@@ -45,7 +45,7 @@ class BackupImport
      */
     public function __construct()
     {
-        $this->driver = $this->getDriver();
+        $this->Driver = $this->getDriver();
     }
 
     /**
@@ -83,7 +83,7 @@ class BackupImport
         $filename = $this->filename;
         unset($this->filename);
 
-        $this->driver->import($filename);
+        $this->Driver->import($filename);
 
         return $filename;
     }

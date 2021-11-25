@@ -31,37 +31,7 @@ class SqliteTest extends DriverTestCase
         parent::setUp();
 
         if (!$this->Driver instanceof Sqlite) {
-            $this->markTestIncomplete();
+            $this->markTestSkipped('Skipping tests for Sqlite, current driver is ' . $this->Driver->getDriverName());
         }
-    }
-
-    /**
-     * Test for `_exportExecutable()` method
-     * @test
-     */
-    public function testExportExecutable(): void
-    {
-        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'test.sq3 .dump';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
-    }
-
-    /**
-     * Test for `_importExecutable()` method
-     * @test
-     */
-    public function testImportExecutable(): void
-    {
-        $expected = $this->Driver->getBinary('sqlite3') . ' ' . TMP . 'test.sq3';
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
-    }
-
-    /**
-     * Test for `import()` method
-     * @test
-     */
-    public function testImport(): void
-    {
-        $this->loadFixtures();
-        parent::testImport();
     }
 }

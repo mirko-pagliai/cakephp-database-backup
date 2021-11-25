@@ -27,6 +27,12 @@
             </errorLevel>
         </InvalidDocblock>
 
+        <InvalidReturnType>
+            <errorLevel type="suppress">
+                <file name="src/BackupTrait.php" />
+            </errorLevel>
+        </InvalidReturnType>
+
         <RedundantCondition>
             <errorLevel type="suppress">
                 <file name="src/Driver/Mysql.php" />

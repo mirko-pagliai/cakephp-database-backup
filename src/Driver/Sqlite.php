@@ -23,24 +23,6 @@ use DatabaseBackup\Driver\Driver;
 class Sqlite extends Driver
 {
     /**
-     * Gets the executable command to export the database
-     * @return string
-     */
-    protected function _exportExecutable(): string
-    {
-        return sprintf('%s %s .dump', $this->getBinary('sqlite3'), $this->getConfig('database'));
-    }
-
-    /**
-     * Gets the executable command to import the database
-     * @return string
-     */
-    protected function _importExecutable(): string
-    {
-        return sprintf('%s %s', $this->getBinary('sqlite3'), $this->getConfig('database'));
-    }
-
-    /**
      * Called before import
      * @return bool
      * @since 2.1.0

@@ -31,34 +31,6 @@ class Mysql extends Driver
     protected $auth;
 
     /**
-     * Gets the executable command to export the database
-     * @return string
-     */
-    protected function _exportExecutable(): string
-    {
-        return sprintf(
-            '%s --defaults-file=%s %s',
-            escapeshellarg($this->getBinary('mysqldump')),
-            escapeshellarg($this->auth),
-            escapeshellarg($this->getConfig('database'))
-        );
-    }
-
-    /**
-     * Gets the executable command to import the database
-     * @return string
-     */
-    protected function _importExecutable(): string
-    {
-        return sprintf(
-            '%s --defaults-extra-file=%s %s',
-            escapeshellarg($this->getBinary('mysql')),
-            escapeshellarg($this->auth),
-            escapeshellarg($this->getConfig('database'))
-        );
-    }
-
-    /**
      * Internal method to write an auth file
      * @param string $content Content
      * @return bool

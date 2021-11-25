@@ -25,7 +25,7 @@ use Tools\Exceptionist;
 
 /**
  * Represents a driver containing all methods to export/import database backups
- *  according to the database engine
+ *  according to the connection
  * @method \Cake\Event\EventManager getEventManager()
  */
 abstract class Driver implements EventListenerInterface
@@ -84,16 +84,64 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to export the database
+     * Gets and parses executable commands from the configuration, according to
+     *  the type of requested operation (`export` or `import`) and the connection
+     *  driver.
+     *
+     * These executables are not yet final, use instead `_getExportExecutable()`
+     *  and `_getImportExecutable()` methods to have the final executables,
+     *  including compression.
+     * @param string $type Type or the request operation (`export` or `import`)
      * @return string
      */
-    abstract protected function _exportExecutable(): string;
+    protected function _getExecutable(string $type): string
+    {
+        Exceptionist::inArray([$type, ['export', 'import']]);
+        $driver = strtolower($this->getDriverName());
+        $replacements = [
+            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
+            '{{AUTH_FILE}}' => isset($this->auth) ? escapeshellarg($this->auth) : '',
+            '{{DB_USER}}' => $this->getConfig('username'),
+            '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
+            '{{DB_HOST}}' => $this->getConfig('host'),
+            '{{DB_NAME}}' => $this->getConfig('database'),
+        ];
+        $exec = Configure::readOrFail('DatabaseBackup.' . $driver . '.' . $type);
+
+        return str_replace(array_keys($replacements), $replacements, $exec);
+    }
 
     /**
-     * Gets the executable command to import the database
+     * Gets the executable command to export the database, with compression if requested
+     * @param string $filename Filename where you want to export the database
      * @return string
      */
-    abstract protected function _importExecutable(): string;
+    protected function _getExportExecutable(string $filename): string
+    {
+        $exec = $this->_getExecutable('export');
+        $compression = $this->getCompression($filename);
+        if ($compression) {
+            $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
+        }
+
+        return $exec . ' > ' . escapeshellarg($filename);
+    }
+
+    /**
+     * Gets the executable command to import the database, with compression if requested
+     * @param string $filename Filename from which you want to import the database
+     * @return string
+     */
+    protected function _getImportExecutable(string $filename): string
+    {
+        $exec = $this->_getExecutable('import');
+        $compression = $this->getCompression($filename);
+        if ($compression) {
+            return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
+        }
+
+        return $exec . ' < ' . escapeshellarg($filename);
+    }
 
     /**
      * Called after export
@@ -134,32 +182,28 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to export the database, with compression
-     * @param string $filename Filename where you want to export the database
+     * Gets a binary path
+     * @param string $name Binary name
      * @return string
+     * @throws \ErrorException
      */
-    protected function _exportExecutableWithCompression(string $filename): string
+    final public function getBinary(string $name): string
     {
-        $compression = $this->getCompression($filename);
-
-        return $this->_exportExecutable() . ($compression ? ' | ' . escapeshellarg($this->getBinary($compression)) : '') . ' > ' . escapeshellarg($filename);
+        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
     }
 
     /**
-     * Gets the executable command to import the database, with compression
-     * @param string $filename Filename from which you want to import the database
-     * @return string
+     * Gets a config value or the whole configuration of the connection
+     * @param string|null $key Config key or `null` to get all config values
+     * @return mixed Config value, `null` if the key doesn't exist
+     *  or all config values if no key was specified
+     * @since 2.3.0
      */
-    protected function _importExecutableWithCompression(string $filename): string
+    final public function getConfig(?string $key = null)
     {
-        $executable = $this->_importExecutable() . ' < ' . escapeshellarg($filename);
+        $config = $this->connection->config();
 
-        $compression = $this->getCompression($filename);
-        if ($compression) {
-            $executable = sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $this->_importExecutable();
-        }
-
-        return $executable;
+        return $key ? $config[$key] ?? null : $config;
     }
 
     /**
@@ -180,37 +224,12 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $process = $this->_exec($this->_exportExecutableWithCompression($filename));
+        $process = $this->_exec($this->_getExportExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterExport');
 
         return file_exists($filename);
-    }
-
-    /**
-     * Gets a binary path
-     * @param string $name Binary name
-     * @return string
-     * @throws \ErrorException
-     */
-    public function getBinary(string $name): string
-    {
-        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
-    }
-
-    /**
-     * Gets a config value or the whole configuration
-     * @param string|null $key Config key or `null` to get all config values
-     * @return mixed Config value, `null` if the key doesn't exist
-     *  or all config values if no key was specified
-     * @since 2.3.0
-     */
-    final public function getConfig(?string $key = null)
-    {
-        $config = $this->connection->config();
-
-        return $key ? $config[$key] ?? null : $config;
     }
 
     /**
@@ -231,7 +250,7 @@ abstract class Driver implements EventListenerInterface
             return false;
         }
 
-        $process = $this->_exec($this->_importExecutableWithCompression($filename));
+        $process = $this->_exec($this->_getImportExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($process->getErrorOutput())));
 
         $this->dispatchEvent('Backup.afterImport');

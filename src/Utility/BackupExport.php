@@ -35,7 +35,7 @@ class BackupExport
 
     /**
      * Driver containing all methods to export/import database backups
-     *  according to the database engine
+     *  according to the connection
      * @since 2.0.0
      * @var \DatabaseBackup\Driver\Driver
      */

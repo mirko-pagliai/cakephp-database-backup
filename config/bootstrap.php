@@ -17,13 +17,32 @@ declare(strict_types=1);
 use Cake\Core\Configure;
 use Tools\Filesystem;
 
+/**
+ * Executables. Name of driver as keys, Then, as value, an array that contains
+ *  first the executable to export and then the executable to import backups.
+ */
+if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
+    define('DATABASE_BACKUP_EXECUTABLES', [
+        'mysql' => ['export' => 'mysqldump', 'import' => 'mysql'],
+        'postgres' => ['export' => 'pg_dump', 'import' => 'pg_restore'],
+        'sqlite' => ['export' => 'sqlite3', 'import' => 'sqlite3'],
+    ]);
+}
+
+/**
+ * Valid extensions. Names as keys and compressions as values
+ */
+if (!defined('DATABASE_BACKUP_EXTENSIONS')) {
+    define('DATABASE_BACKUP_EXTENSIONS', ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false]);
+}
+
 //Database connection
 if (!Configure::check('DatabaseBackup.connection')) {
     Configure::write('DatabaseBackup.connection', 'default');
 }
 
 //Auto-discovers binaries
-foreach (['mysql', 'mysqldump', 'pg_dump', 'pg_restore','sqlite3', 'bzip2', 'gzip'] as $binary) {
+foreach (array_unique(array_merge(array_column(DATABASE_BACKUP_EXECUTABLES, 'export'), array_column(DATABASE_BACKUP_EXECUTABLES, 'import'), ['bzip2', 'gzip'])) as $binary) {
     if (!Configure::check('DatabaseBackup.binaries.' . $binary)) {
         try {
             $binaryPath = which($binary);
@@ -38,13 +57,27 @@ if (!Configure::check('DatabaseBackup.chmod')) {
     Configure::write('DatabaseBackup.chmod', 0664);
 }
 
+//Default executable commands to export/import databases
+foreach ([
+    'DatabaseBackup.mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
+    'DatabaseBackup.sqlite.import' => '{{BINARY}} {{DB_NAME}}',
+] as $k => $v) {
+    if (!Configure::check($k)) {
+        Configure::write($k, $v);
+    }
+}
+
 //Default target directory
 if (!Configure::check('DatabaseBackup.target')) {
     Configure::write('DatabaseBackup.target', Filesystem::instance()->concatenate(ROOT, 'backups'));
 }
 
 //Checks for the target directory
-$target = Configure::read('DatabaseBackup.target');
+$target = Configure::readOrFail('DatabaseBackup.target');
 if (!file_exists($target)) {
     mkdir($target, 0777);
 }

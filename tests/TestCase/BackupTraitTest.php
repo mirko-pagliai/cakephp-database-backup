@@ -16,7 +16,6 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Database\Connection;
-use Cake\Database\Driver as CakeDriver;
 use Cake\Database\Driver\Sqlserver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
@@ -33,11 +32,6 @@ class BackupTraitTest extends TestCase
     use BackupTrait;
 
     /**
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
      * Fixtures
      * @var array
      */
@@ -52,9 +46,8 @@ class BackupTraitTest extends TestCase
      */
     public function testGetAbsolutePath(): void
     {
-        $this->assertEquals(DS . 'file.txt', $this->getAbsolutePath(DS . 'file.txt'));
-        $this->assertEquals(Configure::read('DatabaseBackup.target') . DS . 'file.txt', $this->getAbsolutePath('file.txt'));
         $expected = Configure::read('DatabaseBackup.target') . DS . 'file.txt';
+        $this->assertEquals($expected, $this->getAbsolutePath('file.txt'));
         $this->assertEquals($expected, $this->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
     }
 
@@ -67,6 +60,8 @@ class BackupTraitTest extends TestCase
         foreach ([
             'backup.sql' => false,
             'backup.sql.bz2' => 'bzip2',
+            DS . 'backup.sql.bz2' => 'bzip2',
+            Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'bzip2',
             'backup.sql.gz' => 'gzip',
             'text.txt' => null,
         ] as $filename => $expectedCompression) {
@@ -80,17 +75,16 @@ class BackupTraitTest extends TestCase
      */
     public function testGetConnection(): void
     {
-        ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
-
-        foreach ([
-            null,
-            Configure::read('DatabaseBackup.connection'),
-            'fake',
-        ] as $name) {
+        foreach ([null, Configure::read('DatabaseBackup.connection')] as $name) {
             $connection = $this->getConnection($name);
             $this->assertInstanceof(Connection::class, $connection);
-            $this->assertInstanceof(CakeDriver::class, $connection->getDriver());
+            $this->assertEquals('test', $connection->config()['name']);
         }
+
+        ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
+        $connection = $this->getConnection('fake');
+        $this->assertInstanceof(Connection::class, $connection);
+        $this->assertEquals('fake', $connection->config()['name']);
 
         $this->expectException(MissingDatasourceConfigException::class);
         $this->expectExceptionMessage('The datasource configuration "noExisting" was not found');
@@ -108,13 +102,13 @@ class BackupTraitTest extends TestCase
         }
 
         //With a no existing driver
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
-        $connection = @$this->getMockBuilder(get_class($this->getConnection()))
+        $connection = @$this->getMockBuilder(Connection::class)
             ->setMethods(['getDriver'])
-            ->setConstructorArgs([$this->getConnection()->config()])
+            ->disableOriginalConstructor()
             ->getMock();
         $connection->method('getDriver')->will($this->returnValue(new Sqlserver()));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
         $this->getDriver($connection);
     }
 
@@ -127,6 +121,8 @@ class BackupTraitTest extends TestCase
         foreach ([
             'backup.sql' => 'sql',
             'backup.sql.bz2' => 'sql.bz2',
+            DS . 'backup.sql.bz2' => 'sql.bz2',
+            Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'sql.bz2',
             'backup.sql.gz' => 'sql.gz',
             'backup.SQL' => 'sql',
             'backup.SQL.BZ2' => 'sql.bz2',

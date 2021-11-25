@@ -14,7 +14,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Utility;
 
-use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
@@ -45,18 +44,8 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?? new BackupExport();
-        $this->BackupImport = $this->BackupImport ?? new BackupImport();
-    }
-
-    /**
-     * Test for `construct()` method
-     * @test
-     */
-    public function testConstruct(): void
-    {
-        $this->assertInstanceof(Driver::class, $this->getProperty($this->BackupImport, 'driver'));
-        $this->assertNull($this->getProperty($this->BackupImport, 'filename'));
+        $this->BackupExport = $this->BackupExport ?: new BackupExport();
+        $this->BackupImport = $this->BackupImport ?: new BackupImport();
     }
 
     /**

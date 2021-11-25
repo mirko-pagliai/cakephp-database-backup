@@ -49,12 +49,6 @@ abstract class DriverTestCase extends TestCase
     protected $DriverClass;
 
     /**
-     * Auto fixtures
-     * @var bool
-     */
-    public $autoFixtures = false;
-
-    /**
      * Name of the database connection
      * @var string
      */
@@ -131,8 +125,7 @@ abstract class DriverTestCase extends TestCase
      */
     public function testExportAndImport(): void
     {
-        foreach (self::$validExtensions as $extension) {
-            $this->loadFixtures();
+        foreach (DATABASE_BACKUP_EXTENSIONS as $extension) {
             $backup = uniqid('example_');
             $backup = $this->getAbsolutePath($extension ? $backup . '.' . $extension : $backup);
 
@@ -178,34 +171,23 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_exportExecutable()` method
-     * @return void
-     */
-    abstract public function testExportExecutable(): void;
-
-    /**
-     * Test for `_exportExecutableWithCompression()` method
+     * Test for `_getExportExecutable()` method
      * @return void
      * @test
      */
-    public function testExportExecutableWithCompression(): void
+    public function testGetExportExecutable(): void
     {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_exportExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' > ' . escapeshellarg('backup.sql'), $result);
+        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_getExportExecutable', ['backup.sql']));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_exportExecutableWithCompression', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_getExportExecutable', [$filename]);
             $expected = sprintf(
-                '%s | %s > %s',
-                $basicExecutable,
+                ' | %s > %s',
                 escapeshellarg($this->Driver->getBinary($compression)),
                 escapeshellarg($filename)
             );
-            $this->assertEquals($expected, $result);
+            $this->assertStringEndsWith($expected, $result);
         }
     }
 
@@ -224,34 +206,23 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_importExecutable()` method
-     * @return void
-     */
-    abstract public function testImportExecutable(): void;
-
-    /**
-     * Test for `_importExecutableWithCompression()` method
+     * Test for `_getImportExecutable()` method
      * @return void
      * @test
      */
-    public function testImportExecutableWithCompression(): void
+    public function testGetImportExecutable(): void
     {
-        $basicExecutable = $this->invokeMethod($this->Driver, '_importExecutable');
-
-        //No compression
-        $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', ['backup.sql']);
-        $this->assertEquals($basicExecutable . ' < ' . escapeshellarg('backup.sql'), $result);
+        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_getImportExecutable', ['backup.sql']));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_importExecutableWithCompression', [$filename]);
+            $result = $this->invokeMethod($this->Driver, '_getImportExecutable', [$filename]);
             $expected = sprintf(
-                '%s -dc %s | %s',
+                '%s -dc %s | ',
                 escapeshellarg($this->Driver->getBinary($compression)),
-                escapeshellarg($filename),
-                $basicExecutable
+                escapeshellarg($filename)
             );
-            $this->assertEquals($expected, $result);
+            $this->assertStringStartsWith($expected, $result);
         }
     }
 }

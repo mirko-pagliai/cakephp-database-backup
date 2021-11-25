@@ -14,7 +14,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use Cake\Database\Connection;
 use DatabaseBackup\Driver\Postgres;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
@@ -32,54 +31,7 @@ class PostgresTest extends DriverTestCase
         parent::setUp();
 
         if (!$this->Driver instanceof Postgres) {
-            $this->markTestIncomplete();
+            $this->markTestSkipped('Skipping tests for Postgres, current driver is ' . $this->Driver->getDriverName());
         }
-    }
-
-    /**
-     * Test for `getDbnameAsString()` method
-     * @test
-     */
-    public function testGetDbnameAsString(): void
-    {
-        $password = $this->Driver->getConfig('password');
-        $expected = 'postgresql://postgres' . ($password ? ':' . $password : null) . '@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
-
-        //Adds a password to the config
-        $expected = 'postgresql://postgres:mypassword@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database');
-        $config = ['password' => 'mypassword'] + $this->Driver->getConfig();
-        $this->setProperty($this->Driver, 'connection', new Connection($config));
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, 'getDbnameAsString'));
-    }
-
-    /**
-     * Test for `_exportExecutable()` method
-     * @test
-     */
-    public function testExportExecutable(): void
-    {
-        $password = $this->Driver->getConfig('password');
-        $expected = sprintf(
-            '%s --format=c -b --dbname=postgresql://postgres%s@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'),
-            $this->Driver->getBinary('pg_dump'),
-            $password ? ':' . $password : ''
-        );
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
-    }
-
-    /**
-     * Test for `_importExecutable()` method
-     * @test
-     */
-    public function testImportExecutable(): void
-    {
-        $password = $this->Driver->getConfig('password');
-        $expected = sprintf(
-            '%s --format=c -c -e --dbname=postgresql://postgres%s@' . $this->Driver->getConfig('host') . '/' . $this->Driver->getConfig('database'),
-            $this->Driver->getBinary('pg_restore'),
-            $password ? ':' . $password : ''
-        );
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
     }
 }

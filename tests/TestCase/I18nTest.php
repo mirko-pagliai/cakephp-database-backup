@@ -30,6 +30,6 @@ class I18nTest extends TestCase
     public function testI18nConstant(): void
     {
         $translator = I18n::getTranslator('database_backup', 'it');
-        $this->assertEquals('Esporta un backup del database', $translator->translate('Exports a database backup'));
+        $this->assertNotEquals('Exports a database backup', $translator->translate('Exports a database backup'));
     }
 }

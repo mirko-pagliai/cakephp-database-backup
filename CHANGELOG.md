@@ -1,4 +1,16 @@
 # 2.x branch
+## 2.10 branch
+### 2.10.0-beta1
+* now allows to configure and customize via bootstrap the executable commands to
+    import and export databases, for each driver, with placeholders;
+* `__exportExecutableWithCompression()` and `_importExecutableWithCompression()`
+    methods provided by the `Driver` class have been removed and incorporated
+    into the new `_getExportExecutable()` and `_getImportExecutable()`;
+* `BackupTrait::$validExtensions` has been removed and replaced by the
+    `DATABASE_BACKUP_EXTENSIONS` constant;
+* postgres and sqlite commands are also properly escaped;
+* many little fixes and many code simplifications.
+
 ## 2.9 branch
 ### 2.9.2
 * added `BackupTrait::getDriverName()` static method; `getConnection()` and

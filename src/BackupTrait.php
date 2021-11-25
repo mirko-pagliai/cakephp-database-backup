@@ -29,38 +29,31 @@ use Tools\Filesystem;
 trait BackupTrait
 {
     /**
-     * Valid extensions. Names as keys and compressions as values
-     * @since 2.4.0
-     * @var array<string, string|bool>
-     */
-    protected static $validExtensions = ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false];
-
-    /**
      * Returns the absolute path for a backup file
      * @param string $path Relative or absolute path
      * @return string
      */
     public static function getAbsolutePath(string $path): string
     {
-        return Filesystem::instance()->makePathAbsolute($path, Configure::read('DatabaseBackup.target'));
+        return Filesystem::instance()->makePathAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }
 
     /**
-     * Returns the compression type from a filename
-     * @param string $filename Filename
+     * Returns the compression type for a backup file
+     * @param string $path File path
      * @return string|null Compression type or `null`
      */
-    public static function getCompression(string $filename): ?string
+    public static function getCompression(string $path): ?string
     {
-        $extension = self::getExtension($filename);
+        $extension = self::getExtension($path);
 
         return self::getValidCompressions()[$extension] ?? null;
     }
 
     /**
-     * Gets the connection array
+     * Gets the `Connection` instance
      * @param string|null $name Connection name
-     * @return \Cake\Datasource\ConnectionInterface A connection object
+     * @return \Cake\Datasource\ConnectionInterface A `Connection` object
      */
     public static function getConnection(?string $name = null): ConnectionInterface
     {
@@ -68,10 +61,10 @@ trait BackupTrait
     }
 
     /**
-     * Gets the driver instance containing all methods to export/import database
+     * Gets the `Driver` instance containing all methods to export/import database
      *  backups, according to the connection
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
-     * @return \DatabaseBackup\Driver\Driver A driver instance
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` object
+     * @return \DatabaseBackup\Driver\Driver A `Driver` instance
      * @since 2.0.0
      * @throws \InvalidArgumentException
      */
@@ -87,7 +80,7 @@ trait BackupTrait
 
     /**
      * Gets the driver name, according to the connection
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A connection object
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` object
      * @return string Driver name
      * @since 2.9.2
      */
@@ -99,27 +92,24 @@ trait BackupTrait
     }
 
     /**
-     * Returns the extension from a filename
-     * @param string $filename Filename
-     * @return string|null Extension or `null` if the extension is not found or
-     *  if is an invalid extension
-     * @uses $validExtensions
+     * Returns the extension for a backup file
+     * @param string $path File path
+     * @return string|null Extension or `null` for invalid extensions
      */
-    public static function getExtension(string $filename): ?string
+    public static function getExtension(string $path): ?string
     {
-        $extension = Filesystem::instance()->getExtension($filename);
+        $extension = Filesystem::instance()->getExtension($path);
 
-        return in_array($extension, array_keys(self::$validExtensions)) ? $extension : null;
+        return in_array($extension, array_keys(DATABASE_BACKUP_EXTENSIONS)) ? $extension : null;
     }
 
     /**
      * Returns all valid compressions
-     * @return array
+     * @return array<string, string>
      * @since 2.4.0
-     * @uses $validExtensions
      */
     public static function getValidCompressions(): array
     {
-        return array_filter(self::$validExtensions);
+        return array_filter(DATABASE_BACKUP_EXTENSIONS);
     }
 }

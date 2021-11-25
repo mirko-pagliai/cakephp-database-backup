@@ -35,10 +35,8 @@ class Command extends BaseCommand
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        $config = $this->getConnection()->config();
-
-        $io->out(__d('database_backup', 'Connection: {0}', $config['name']));
-        $io->out(__d('database_backup', 'Driver: {0}', get_class_short_name($this->getConnection()->getDriver())));
+        $io->out(__d('database_backup', 'Connection: {0}', $this->getConnection()->config()['name']));
+        $io->out(__d('database_backup', 'Driver: {0}', $this->getDriverName()));
         $io->hr();
     }
 }

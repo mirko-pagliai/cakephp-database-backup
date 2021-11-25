@@ -31,50 +31,8 @@ class MysqlTest extends DriverTestCase
         parent::setUp();
 
         if (!$this->Driver instanceof Mysql) {
-            $this->markTestIncomplete();
+            $this->markTestSkipped('Skipping tests for Mysql, current driver is ' . $this->Driver->getDriverName());
         }
-    }
-
-    /**
-     * Test for `_exportExecutable()` method
-     * @test
-     */
-    public function testExportExecutable(): void
-    {
-        $expected = sprintf('%s --defaults-file=%s %s', escapeshellarg($this->Driver->getBinary('mysqldump')), escapeshellarg('authFile'), escapeshellarg('test'));
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_exportExecutable'));
-    }
-
-    /**
-     * Test for `_exportExecutableWithCompression()` method
-     * @test
-     */
-    public function testExportExecutableWithCompression(): void
-    {
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        parent::testExportExecutableWithCompression();
-    }
-
-    /**
-     * Test for `_importExecutable()` method
-     * @test
-     */
-    public function testImportExecutable(): void
-    {
-        $expected = sprintf('%s --defaults-extra-file=%s %s', escapeshellarg($this->Driver->getBinary('mysql')), escapeshellarg('authFile'), escapeshellarg('test'));
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        $this->assertEquals($expected, $this->invokeMethod($this->Driver, '_importExecutable'));
-    }
-
-    /**
-     * Test for `_importExecutableWithCompression()` method
-     * @test
-     */
-    public function testImportExecutableWithCompression(): void
-    {
-        $this->setProperty($this->Driver, 'auth', 'authFile');
-        parent::testImportExecutableWithCompression();
     }
 
     /**
@@ -113,8 +71,7 @@ class MysqlTest extends DriverTestCase
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=' . $this->Driver->getConfig('host');
         $auth = $this->getProperty($this->Driver, 'auth');
-        $this->assertFileExists($auth);
-        $this->assertEquals($expected, file_get_contents($auth));
+        $this->assertStringEqualsFile($auth, $expected);
 
         @unlink($auth);
     }
@@ -133,8 +90,9 @@ class MysqlTest extends DriverTestCase
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=' . $this->Driver->getConfig('host');
         $auth = $this->getProperty($this->Driver, 'auth');
-        $this->assertFileExists($auth);
-        $this->assertEquals($expected, file_get_contents($auth));
+        $this->assertStringEqualsFile($auth, $expected);
+
+        @unlink($auth);
     }
 
     /**

@@ -16,7 +16,6 @@ declare(strict_types=1);
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\TestEmailTransport;
@@ -70,7 +69,10 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
-Configure::write('Error.ignoredDeprecationPaths', '*/cakephp/cakephp/src/TestSuite/Fixture/FixtureInjector.php');
+/**
+ * @todo Upgrade fixtures: https://book.cakephp.org/4/en/appendices/fixture-upgrade.html
+ */
+Configure::write('Error.ignoredDeprecationPaths', ['*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
 
 Cache::setConfig([
     '_cake_core_' => [
@@ -80,12 +82,6 @@ Cache::setConfig([
     ],
 ]);
 
-Log::setConfig('debug', [
-    'className' => 'File',
-    'path' => LOGS,
-    'levels' => ['notice', 'info', 'debug'],
-    'file' => 'debug',
-]);
 TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
 Email::setConfig('default', ['transport' => 'debug']);
 
