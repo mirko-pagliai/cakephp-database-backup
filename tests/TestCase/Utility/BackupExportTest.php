@@ -173,8 +173,11 @@ class BackupExportTest extends TestCase
      */
     public function testExportWithDifferendChmod(): void
     {
+        $file = $this->BackupExport->filename('exportWithNormalChmod.sql')->export();
+        $this->assertEquals('0664', substr(sprintf('%o', fileperms($file)), -4));
+
         Configure::write('DatabaseBackup.chmod', 0777);
         $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertFileIsWritable($file);
+        $this->assertEquals('0777', substr(sprintf('%o', fileperms($file)), -4));
     }
 }
