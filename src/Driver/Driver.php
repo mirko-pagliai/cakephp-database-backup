@@ -96,7 +96,7 @@ abstract class Driver implements EventListenerInterface
      */
     protected function _getExecutable(string $type): string
     {
-        Exceptionist::inArray([$type, ['export', 'import']]);
+        Exceptionist::inArray($type, ['export', 'import']);
         $driver = strtolower($this->getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),

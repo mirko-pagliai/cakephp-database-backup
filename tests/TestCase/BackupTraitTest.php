@@ -102,8 +102,8 @@ class BackupTraitTest extends TestCase
         }
 
         //With a no existing driver
-        $connection = @$this->getMockBuilder(Connection::class)
-            ->setMethods(['getDriver'])
+        $connection = $this->getMockBuilder(Connection::class)
+            ->setMethods(['__debuginfo', 'getDriver'])
             ->disableOriginalConstructor()
             ->getMock();
         $connection->method('getDriver')->will($this->returnValue(new Sqlserver()));

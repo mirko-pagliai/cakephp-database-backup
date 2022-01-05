@@ -72,7 +72,7 @@ Configure::write('App', [
 /**
  * @todo Upgrade fixtures: https://book.cakephp.org/4/en/appendices/fixture-upgrade.html
  */
-Configure::write('Error.ignoredDeprecationPaths', ['*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
+Configure::write('Error.ignoredDeprecationPaths', ['tureInjector.php', '*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
 
 Cache::setConfig([
     '_cake_core_' => [
