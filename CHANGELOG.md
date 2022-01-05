@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.10 branch
 ### 2.10.1
-* stable version.
+* stable version;
+* updated for `php-tools` 1.5.8.
 
 ### 2.10.0-beta1
 * now allows to configure and customize via bootstrap the executable commands to
