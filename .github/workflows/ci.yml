@@ -95,14 +95,14 @@ jobs:
             if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_dsn='postgres://postgres:postgres@127.0.0.1/test'; fi
 
             if [[ ${{ matrix.php-version }} == '8.0' ]]; then
-              export CODECOVERAGE=1 && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
+             export XDEBUG_MODE=coverage && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
             else
               vendor/bin/phpunit
             fi
 
         - name: Submit code coverage
           if: matrix.php-version == '8.0'
-          uses: codecov/codecov-action@v1
+          uses: codecov/codecov-action@v2
 
   cs-stan:
     name: Coding Standard & Static Analysis
