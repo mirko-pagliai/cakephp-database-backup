@@ -46,7 +46,7 @@
         "test": "rm -f -r /tmp/cake* && phpunit && driver_test=sqlite phpunit && driver_test=postgres phpunit",
         "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
         "phpstan": "phpstan.phar analyse",
-        "psalm": "psalm.phar",
+        "psalm": "psalm.phar --php-version=8.0",
         "stan": [
             "@stan-setup",
             "@phpstan",
