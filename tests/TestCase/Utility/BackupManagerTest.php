@@ -51,8 +51,8 @@ class BackupManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?? new BackupExport();
-        $this->BackupManager = $this->BackupManager ?? new BackupManager();
+        $this->BackupExport = $this->BackupExport ?: new BackupExport();
+        $this->BackupManager = $this->BackupManager ?: new BackupManager();
     }
 
     /**

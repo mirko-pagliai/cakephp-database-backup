@@ -29,16 +29,30 @@ use InvalidArgumentException;
  */
 class BackupTraitTest extends TestCase
 {
-    use BackupTrait;
+    /**
+     * @psalm-var trait-string<\DatabaseBackup\BackupTrait>
+     */
+    protected $Trait;
 
     /**
      * Fixtures
-     * @var array
+     * @var array<string>
      */
     public $fixtures = [
         'core.Articles',
         'core.Comments',
     ];
+
+    /**
+     * Called before every test method
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->Trait = $this->Trait ?: $this->getMockForTrait(BackupTrait::class);
+    }
 
     /**
      * Test for `getAbsolutePath()` method
@@ -47,8 +61,8 @@ class BackupTraitTest extends TestCase
     public function testGetAbsolutePath(): void
     {
         $expected = Configure::read('DatabaseBackup.target') . DS . 'file.txt';
-        $this->assertEquals($expected, $this->getAbsolutePath('file.txt'));
-        $this->assertEquals($expected, $this->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
+        $this->assertEquals($expected, $this->Trait->getAbsolutePath('file.txt'));
+        $this->assertEquals($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
     }
 
     /**
@@ -65,7 +79,7 @@ class BackupTraitTest extends TestCase
             'backup.sql.gz' => 'gzip',
             'text.txt' => null,
         ] as $filename => $expectedCompression) {
-            $this->assertEquals($expectedCompression, $this->getCompression($filename));
+            $this->assertEquals($expectedCompression, $this->Trait->getCompression($filename));
         }
     }
 
@@ -76,13 +90,13 @@ class BackupTraitTest extends TestCase
     public function testGetConnection(): void
     {
         foreach ([null, Configure::read('DatabaseBackup.connection')] as $name) {
-            $connection = $this->getConnection($name);
+            $connection = $this->Trait->getConnection($name);
             $this->assertInstanceof(Connection::class, $connection);
             $this->assertEquals('test', $connection->config()['name']);
         }
 
         ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
-        $connection = $this->getConnection('fake');
+        $connection = $this->Trait->getConnection('fake');
         $this->assertInstanceof(Connection::class, $connection);
         $this->assertEquals('fake', $connection->config()['name']);
 
@@ -98,18 +112,18 @@ class BackupTraitTest extends TestCase
     public function testGetDriver(): void
     {
         foreach ([ConnectionManager::get('test'), null] as $driver) {
-            $this->assertInstanceof(Driver::class, $this->getDriver($driver));
+            $this->assertInstanceof(Driver::class, $this->Trait->getDriver($driver));
         }
 
         //With a no existing driver
         $connection = $this->getMockBuilder(Connection::class)
-            ->setMethods(['__debuginfo', 'getDriver'])
+            ->onlyMethods(['__debuginfo', 'getDriver'])
             ->disableOriginalConstructor()
             ->getMock();
         $connection->method('getDriver')->will($this->returnValue(new Sqlserver()));
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
-        $this->getDriver($connection);
+        $this->Trait->getDriver($connection);
     }
 
     /**
@@ -131,7 +145,7 @@ class BackupTraitTest extends TestCase
             'text' => null,
             '.txt' => null,
         ] as $filename => $expectedExtension) {
-            $this->assertEquals($expectedExtension, $this->getExtension($filename));
+            $this->assertEquals($expectedExtension, $this->Trait->getExtension($filename));
         }
     }
 
@@ -141,6 +155,6 @@ class BackupTraitTest extends TestCase
      */
     public function testGetValidCompressions(): void
     {
-        $this->assertNotEmpty($this->getValidCompressions());
+        $this->assertNotEmpty($this->Trait->getValidCompressions());
     }
 }

@@ -1,5 +1,9 @@
 # 2.x branch
 ## 2.10 branch
+### 2.10.2
+* added tests for PHP 8.1;
+* little fixes for phpstan, psalm and for the composer.json file.
+
 ### 2.10.1
 * stable version;
 * updated for `php-tools` 1.5.8.

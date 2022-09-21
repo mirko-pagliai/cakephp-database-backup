@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.2', '7.3', '7.4', '8.0']
+        php-version: ['7.2', '7.3', '7.4', '8.0', '8.1']
         db-type: [sqlite, mysql, pgsql]
         prefer-lowest: ['']
         exclude:
@@ -39,6 +39,9 @@ jobs:
           - php-version: '8.0'
             db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
+          - php-version: '8.1'
+            db-type: 'mysql'
+            prefer-lowest: 'prefer-lowest'
 
     steps:
         - name: Setup Database
@@ -49,7 +52,7 @@ jobs:
                 docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.6
             fi
 
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v3
 
         - name: Validate composer.json and composer.lock
           run: composer validate --strict
@@ -95,21 +98,21 @@ jobs:
             if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_dsn='postgres://postgres:postgres@127.0.0.1/test'; fi
 
             if [[ ${{ matrix.php-version }} == '8.0' ]]; then
-              export CODECOVERAGE=1 && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
+             export XDEBUG_MODE=coverage && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
             else
               vendor/bin/phpunit
             fi
 
         - name: Submit code coverage
           if: matrix.php-version == '8.0'
-          uses: codecov/codecov-action@v1
+          uses: codecov/codecov-action@v2
 
   cs-stan:
     name: Coding Standard & Static Analysis
     runs-on: ubuntu-latest
 
     steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v3
 
         - name: Setup PHP
           uses: shivammathur/setup-php@v2
@@ -118,17 +121,11 @@ jobs:
             coverage: none
             tools: cs2pr
 
-        - name: Cache Composer packages
-          id: composer-cache
-          uses: actions/cache@v2
-          with:
-            path: vendor
-            key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-            restore-keys: |
-              ${{ runner.os }}-php-
-
         - name: Composer install
-          run: composer stan-setup
+          run: composer update
+
+        - name: Composer show
+          run: composer show
 
         - name: Run PHP CodeSniffer
           continue-on-error: true
@@ -139,7 +136,7 @@ jobs:
 
         - name: Run psalm
           if: success() || failure()
-          run: vendor/bin/psalm.phar --output-format=github
+          run: vendor/bin/psalm.phar --output-format=github --php-version=8.0
 
         - name: Run phpstan
           if: success() || failure()
@@ -155,7 +152,7 @@ jobs:
       PHP_VERSION: '7.4'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2

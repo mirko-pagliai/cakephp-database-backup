@@ -55,7 +55,7 @@ abstract class DriverTestCase extends TestCase
     protected $connection;
 
     /**
-     * @var array
+     * @var array<string>
      */
     public $fixtures = [
         'core.Articles',
