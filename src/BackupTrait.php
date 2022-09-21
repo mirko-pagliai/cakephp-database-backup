@@ -72,6 +72,7 @@ trait BackupTrait
     {
         $connection = $connection ?: self::getConnection();
         $name = self::getDriverName($connection);
+        /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
         $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
         Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name), InvalidArgumentException::class);
 
