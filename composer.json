@@ -18,7 +18,9 @@
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^4.4",
         "mirko-pagliai/me-tools": "^2.19.8",
-        "phpunit/phpunit": "^8.5.14|^9.1|^9.5"
+        "phpunit/phpunit": "^9.1|^9.5",
+        "phpstan/phpstan": "^1.7",
+        "psalm/phar": "^4.24"
     },
     "autoload": {
         "psr-4": {
@@ -48,11 +50,14 @@
         "phpstan": "phpstan.phar analyse",
         "psalm": "psalm.phar --php-version=8.0",
         "stan": [
-            "@stan-setup",
             "@phpstan",
             "@psalm"
         ],
-        "stan-setup": "cp composer.json composer.backup && composer require --dev phpstan/phpstan:^0.12 psalm/phar:\"^3.18|^4\" && mv composer.backup composer.json",
         "update-lowest": "@composer update --prefer-lowest"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
