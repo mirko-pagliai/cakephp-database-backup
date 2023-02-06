@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\Utility\BackupExport;
 use Tools\Filesystem;
 use Tools\TestSuite\ReflectionTrait;
 
@@ -28,6 +29,24 @@ class BackupExportTest extends TestCase
 {
     use EmailTrait;
     use ReflectionTrait;
+
+    /**
+     * @var \DatabaseBackup\Utility\BackupExport
+     */
+    protected BackupExport $BackupExport;
+
+    /**
+     * Called before every test method
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        if (empty($this->BackupExport)) {
+            $this->BackupExport = new BackupExport();
+        }
+    }
 
     /**
      * Test for `compression()` method. This also tests for `$extension` property

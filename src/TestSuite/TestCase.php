@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use MeTools\TestSuite\TestCase as BaseTestCase;
 
@@ -26,22 +25,6 @@ use MeTools\TestSuite\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     use BackupTrait;
-
-    /**
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
-    protected $BackupExport;
-
-    /**
-     * Called before every test method
-     * @return void
-     */
-    public function setUp(): void
-    {
-        @parent::setUp();
-
-        $this->BackupExport = $this->BackupExport ?: new BackupExport();
-    }
 
     /**
      * Called after every test method
