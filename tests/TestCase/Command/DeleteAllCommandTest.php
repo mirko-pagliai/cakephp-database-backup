@@ -14,44 +14,32 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\TestCase;
-use MeTools\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\CommandTestCase;
 
 /**
  * DeleteAllCommandTest class
  */
-class DeleteAllCommandTest extends TestCase
+class DeleteAllCommandTest extends CommandTestCase
 {
-    use ConsoleIntegrationTestTrait;
-
     /**
-     * @var string
-     */
-    protected $command = 'database_backup.delete_all -v';
-
-    /**
-     * Test for `execute()` method
      * @test
+     * @uses \DatabaseBackup\Command\DeleteAllCommand::execute()
      */
     public function testExecute(): void
     {
-        $files = $this->createSomeBackups();
-        $this->exec($this->command);
-        $this->assertExitWithSuccess();
+        $command = 'database_backup.delete_all -v';
+
+        $files = createSomeBackups();
+        $this->exec($command);
+        $this->assertExitSuccess();
         foreach ($files as $file) {
             $this->assertOutputContains('Backup `' . $file . '` has been deleted');
         }
         $this->assertOutputContains('<success>Deleted backup files: 3</success>');
-    }
 
-    /**
-     * Test for `execute()` method, with no backups
-     * @test
-     */
-    public function testExecuteNoBackups(): void
-    {
-        $this->exec($this->command);
-        $this->assertExitWithSuccess();
+        //With no backups
+        $this->exec($command);
+        $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');

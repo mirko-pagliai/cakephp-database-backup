@@ -19,6 +19,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\TestEmailTransport;
+use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 
 date_default_timezone_set('UTC');
@@ -106,3 +107,37 @@ Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
+
+if (!function_exists('createBackup')) {
+    /**
+     * Global function to create a backup file
+     * @param string $filename Filename
+     * @return string
+     * @throws \Tools\Exception\NotWritableException
+     * @throws \Exception
+     */
+    function createBackup(string $filename = 'backup.sql'): string
+    {
+        return (new BackupExport())->filename($filename)->export();
+    }
+}
+
+if (!function_exists('createSomeBackups')) {
+    /**
+     * Global function to create some backup files
+     * @return array
+     * @throws \Tools\Exception\NotWritableException
+     */
+    function createSomeBackups(): array
+    {
+        $timestamp = time();
+
+        foreach (['sql.gz', 'sql.bz2', 'sql'] as $extension) {
+            $file = createBackup('backup_test_' . (string)$timestamp . '.' . $extension);
+            touch($file, $timestamp--);
+            $files[] = $file;
+        }
+
+        return array_reverse($files);
+    }
+}

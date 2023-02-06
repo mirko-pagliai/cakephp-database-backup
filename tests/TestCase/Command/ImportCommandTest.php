@@ -14,42 +14,30 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\TestCase;
-use MeTools\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\CommandTestCase;
 
 /**
  * ImportCommandTest class
  */
-class ImportCommandTest extends TestCase
+class ImportCommandTest extends CommandTestCase
 {
-    use ConsoleIntegrationTestTrait;
-
     /**
-     * @var string
-     */
-    protected $command = 'database_backup.import -v';
-
-    /**
-     * Test for `execute()` method
      * @test
+     * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecute(): void
     {
-        $backup = $this->createBackup();
-        $this->exec($this->command . ' ' . $backup);
-        $this->assertExitWithSuccess();
+        $command = 'database_backup.import -v';
+
+        $backup = createBackup();
+        $this->exec($command . ' ' . $backup);
+        $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
-    }
 
-    /**
-     * Test for `execute()` method, with a no existing file
-     * @test
-     */
-    public function testExecuteNoExistingFile(): void
-    {
-        $this->exec($this->command . ' /noExistingDir/backup.sql');
-        $this->assertExitWithError();
+        //With a no existing file
+        $this->exec($command . ' /noExistingDir/backup.sql');
+        $this->assertExitError();
     }
 }

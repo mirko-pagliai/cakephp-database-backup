@@ -1,4 +1,10 @@
 # 2.x branch
+## 2.11 branch
+### 2.11.0
+* `createBackup()` and `createSomeBackups()` are now testing global functions and no longer methods provided by the
+  `TestCase` class;
+* added `CommandTestCase` to test commands.
+
 ## 2.10 branch
 ### 2.10.2
 * added tests for PHP 8.1;

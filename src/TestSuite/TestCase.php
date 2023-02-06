@@ -55,33 +55,6 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Internal method to create a backup file
-     * @param string $filename Filename
-     * @return string
-     */
-    protected function createBackup(string $filename = 'backup.sql'): string
-    {
-        return $this->BackupExport->filename($filename)->export();
-    }
-
-    /**
-     * Internal method to creates some backup files
-     * @return array
-     */
-    protected function createSomeBackups(): array
-    {
-        $timestamp = time();
-
-        foreach (['sql.gz', 'sql.bz2', 'sql'] as $extension) {
-            $file = $this->createBackup('backup_test_' . (string)$timestamp . '.' . $extension);
-            touch($file, $timestamp--);
-            $files[] = $file;
-        }
-
-        return array_reverse($files);
-    }
-
-    /**
      * Internal method to mock a driver
      * @param class-string<\DatabaseBackup\Driver\Driver> $className Driver class name
      * @param array|null $methods The list of methods to mock

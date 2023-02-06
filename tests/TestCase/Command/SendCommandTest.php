@@ -15,53 +15,35 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Core\Configure;
-use DatabaseBackup\TestSuite\TestCase;
-use MeTools\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\CommandTestCase;
 
 /**
  * SendCommandTest class
  */
-class SendCommandTest extends TestCase
+class SendCommandTest extends CommandTestCase
 {
-    use ConsoleIntegrationTestTrait;
-
     /**
-     * @var string
-     */
-    protected $command = 'database_backup.send -v';
-
-    /**
-     * Test for `execute()` method
      * @test
+     * @uses \DatabaseBackup\Command\SendCommand::execute()
      */
     public function testExecute(): void
     {
-        $file = $this->createBackup();
-        $this->exec($this->command . ' ' . $file . ' recipient@example.com');
-        $this->assertExitWithSuccess();
+        $command = 'database_backup.send -v';
+
+        $file = createBackup();
+        $this->exec($command . ' ' . $file . ' recipient@example.com');
+        $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('<success>Backup `' . $file . '` was sent via mail</success>');
-    }
 
-    /**
-     * Test for `execute()` method, with no existing file
-     * @test
-     */
-    public function testExecuteNoExistingFile(): void
-    {
-        $this->exec($this->command . ' /noExistingDir/backup.sql');
-        $this->assertExitWithError();
-    }
-
-    /**
-     * Test for `execute()` method, with no sender configuration
-     * @test
-     */
-    public function testExecuteNoSender(): void
-    {
+        //With no sender configuration
         Configure::write('DatabaseBackup.mailSender', false);
-        $this->exec($this->command . ' file.sql recipient@example.com');
-        $this->assertExitWithError();
+        $this->exec($command . ' file.sql recipient@example.com');
+        $this->assertExitError();
+
+        //With no existing file
+        $this->exec($command . ' /noExistingDir/backup.sql');
+        $this->assertExitError();
     }
 }
