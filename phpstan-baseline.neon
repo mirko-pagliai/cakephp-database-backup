@@ -1,16 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: src/TestSuite/DriverTestCase.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: src/TestSuite/TestCase.php
-
-		-
 			message: "#^Property DatabaseBackup\\\\Test\\\\TestCase\\\\BackupTraitTest\\:\\:\\$Trait has no type specified\\.$#"
 			count: 1
 			path: tests/TestCase/BackupTraitTest.php
