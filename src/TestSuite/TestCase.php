@@ -53,18 +53,4 @@ abstract class TestCase extends BaseTestCase
 
         parent::tearDown();
     }
-
-    /**
-     * Internal method to mock a driver
-     * @param class-string<\DatabaseBackup\Driver\Driver> $className Driver class name
-     * @param array $methods The list of methods to mock
-     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockForDriver(string $className, array $methods = []): object
-    {
-        return @$this->getMockBuilder($className)
-            ->onlyMethods($methods)
-            ->setConstructorArgs([$this->getConnection('test')])
-            ->getMock();
-    }
 }

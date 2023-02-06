@@ -42,7 +42,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterExport(): void
     {
-        $Driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
+        $Driver = $this->createPartialMock(Mysql::class, ['deleteAuthFile']);
         $Driver->expects($this->once())->method('deleteAuthFile');
         $Driver->afterExport();
     }
@@ -53,7 +53,7 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterImport(): void
     {
-        $Driver = $this->getMockForDriver(Mysql::class, ['deleteAuthFile']);
+        $Driver = $this->createPartialMock(Mysql::class, ['deleteAuthFile']);
         $Driver->expects($this->once())->method('deleteAuthFile');
         $Driver->afterImport();
     }
@@ -103,7 +103,7 @@ class MysqlTest extends DriverTestCase
         $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
 
         $auth = tempnam(sys_get_temp_dir(), 'auth') ?: '';
-        $Driver = $this->getMockForDriver(Mysql::class, ['getAuthFile']);
+        $Driver = $this->createPartialMock(Mysql::class, ['getAuthFile']);
         $Driver->method('getAuthFile')->willReturn($auth);
         $this->assertFileExists($auth);
         $this->assertTrue($this->invokeMethod($Driver, 'deleteAuthFile'));
