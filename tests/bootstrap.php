@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -113,8 +114,7 @@ if (!function_exists('createBackup')) {
      * Global function to create a backup file
      * @param string $filename Filename
      * @return string
-     * @throws \Tools\Exception\NotWritableException
-     * @throws \Exception
+     * @throws \Tools\Exception\NotWritableException|\ErrorException
      */
     function createBackup(string $filename = 'backup.sql'): string
     {
@@ -126,14 +126,14 @@ if (!function_exists('createSomeBackups')) {
     /**
      * Global function to create some backup files
      * @return array
-     * @throws \Tools\Exception\NotWritableException
+     * @throws \Tools\Exception\NotWritableException|\ErrorException
      */
     function createSomeBackups(): array
     {
         $timestamp = time();
 
         foreach (['sql.gz', 'sql.bz2', 'sql'] as $extension) {
-            $file = createBackup('backup_test_' . (string)$timestamp . '.' . $extension);
+            $file = createBackup('backup_test_' . $timestamp . '.' . $extension);
             touch($file, $timestamp--);
             $files[] = $file;
         }

@@ -19,7 +19,6 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Driver\Driver;
-use InvalidArgumentException;
 use Tools\Exceptionist;
 use Tools\Filesystem;
 
@@ -53,7 +52,7 @@ trait BackupTrait
     /**
      * Gets the `Connection` instance
      * @param string|null $name Connection name
-     * @return \Cake\Datasource\ConnectionInterface A `Connection` object
+     * @return \Cake\Datasource\ConnectionInterface
      */
     public static function getConnection(?string $name = null): ConnectionInterface
     {
@@ -61,12 +60,11 @@ trait BackupTrait
     }
 
     /**
-     * Gets the `Driver` instance containing all methods to export/import database
-     *  backups, according to the connection
+     * Gets the `Driver` instance containing all methods to export/import database backups, according to the connection
      * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` object
      * @return \DatabaseBackup\Driver\Driver A `Driver` instance
+     * @throws \ErrorException|\ReflectionException
      * @since 2.0.0
-     * @throws \InvalidArgumentException
      */
     public static function getDriver(?ConnectionInterface $connection = null): Driver
     {
@@ -74,7 +72,7 @@ trait BackupTrait
         $name = self::getDriverName($connection);
         /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
         $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
-        Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name), InvalidArgumentException::class);
+        Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name));
 
         return new $Driver($connection);
     }
@@ -83,6 +81,7 @@ trait BackupTrait
      * Gets the driver name, according to the connection
      * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` object
      * @return string Driver name
+     * @throws \ReflectionException
      * @since 2.9.2
      */
     public static function getDriverName(?ConnectionInterface $connection = null): string

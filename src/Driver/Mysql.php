@@ -34,6 +34,7 @@ class Mysql extends Driver
      * Internal method to write an auth file
      * @param string $content Content
      * @return bool
+     * @throws \ErrorException
      * @since 2.3.0
      */
     protected function writeAuthFile(string $content): bool
@@ -46,7 +47,7 @@ class Mysql extends Driver
 
         $this->auth = Filesystem::instance()->createTmpFile($content, null, 'auth');
 
-        return $this->auth !== false;
+        return $this->auth != false;
     }
 
     /**
@@ -72,14 +73,13 @@ class Mysql extends Driver
     /**
      * Called before export.
      *
-     * It stores the authentication data, to be used to export the database, in
-     *  a temporary file.
+     * It stores the authentication data, to be used to export the database, in a temporary file.
      *
-     * For security reasons, it's recommended to specify the password in a
-     *  configuration file and not in the command (a user can execute a
-     *  `ps aux | grep mysqldump` and see the password).
-     * So it creates a temporary file to store the configuration options
+     * For security reasons, it's recommended to specify the password in a configuration file and not in the command (a
+     *  user can execute a `ps aux | grep mysqldump` and see the password).
+     * So it creates a temporary file to store the configuration options.
      * @return bool
+     * @throws \ErrorException
      * @since 2.1.0
      */
     public function beforeExport(): bool
@@ -93,14 +93,13 @@ class Mysql extends Driver
     /**
      * Called before export.
      *
-     * It stores the authentication data, to be used to import the database, in
-     *  a temporary file.
+     * It stores the authentication data, to be used to import the database, in a temporary file.
      *
-     * For security reasons, it's recommended to specify the password in
-     *  a configuration file and not in the command (a user can execute
-     *  a `ps aux | grep mysqldump` and see the password).
-     *  So it creates a temporary file to store the configuration options
+     * For security reasons, it's recommended to specify the password in a configuration file and not in the command (a
+     *  user can execute a `ps aux | grep mysqldump` and see the password).
+     *  So it creates a temporary file to store the configuration options.
      * @return bool
+     * @throws \ErrorException
      * @since 2.1.0
      */
     public function beforeImport(): bool

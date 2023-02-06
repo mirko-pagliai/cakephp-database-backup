@@ -54,7 +54,7 @@ class SendCommand extends Command
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#send
-     * @throws \Cake\Console\Exception\StopException
+     * @throws \Cake\Console\Exception\StopException|\ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

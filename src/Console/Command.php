@@ -32,6 +32,7 @@ class Command extends BaseCommand
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
+     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

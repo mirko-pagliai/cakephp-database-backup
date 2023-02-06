@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -36,8 +37,8 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `afterExport()` method
      * @test
+     * @uses \DatabaseBackup\Driver\Mysql::afterExport()
      */
     public function testAfterExport(): void
     {
@@ -47,8 +48,8 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `afterImport()` method
      * @test
+     * @uses \DatabaseBackup\Driver\Mysql::afterImport()
      */
     public function testAfterImport(): void
     {
@@ -58,8 +59,8 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `beforeExport()` method
      * @test
+     * @uses \DatabaseBackup\Driver\Mysql::beforeExport()
      */
     public function testBeforeExport(): void
     {
@@ -77,8 +78,8 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `beforeImport()` method
      * @test
+     * @uses \DatabaseBackup\Driver\Mysql::beforeImport()
      */
     public function testBeforeImport(): void
     {
@@ -96,8 +97,8 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * Test for `deleteAuthFile()` method
      * @test
+     * @uses \DatabaseBackup\Driver\Mysql::deleteAuthFile()
      */
     public function testDeleteAuthFile(): void
     {

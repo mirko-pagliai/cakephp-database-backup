@@ -24,8 +24,7 @@ use Symfony\Component\Process\Process;
 use Tools\Exceptionist;
 
 /**
- * Represents a driver containing all methods to export/import database backups
- *  according to the connection
+ * Represents a driver containing all methods to export/import database backups according to the connection
  * @method \Cake\Event\EventManager getEventManager()
  */
 abstract class Driver implements EventListenerInterface
@@ -93,6 +92,9 @@ abstract class Driver implements EventListenerInterface
      *  including compression.
      * @param string $type Type or the request operation (`export` or `import`)
      * @return string
+     * @throws \Tools\Exception\NotInArrayException
+     * @throws \ReflectionException
+     * @throws \ErrorException
      */
     protected function _getExecutable(string $type): string
     {
@@ -115,6 +117,9 @@ abstract class Driver implements EventListenerInterface
      * Gets the executable command to export the database, with compression if requested
      * @param string $filename Filename where you want to export the database
      * @return string
+     * @throws \Tools\Exception\NotInArrayException
+     * @throws \ReflectionException
+     * @throws \ErrorException
      */
     protected function _getExportExecutable(string $filename): string
     {
@@ -131,6 +136,9 @@ abstract class Driver implements EventListenerInterface
      * Gets the executable command to import the database, with compression if requested
      * @param string $filename Filename from which you want to import the database
      * @return string
+     * @throws \Tools\Exception\NotInArrayException
+     * @throws \ReflectionException
+     * @throws \ErrorException
      */
     protected function _getImportExecutable(string $filename): string
     {
@@ -195,8 +203,7 @@ abstract class Driver implements EventListenerInterface
     /**
      * Gets a config value or the whole configuration of the connection
      * @param string|null $key Config key or `null` to get all config values
-     * @return mixed Config value, `null` if the key doesn't exist
-     *  or all config values if no key was specified
+     * @return mixed Config value, `null` if the key doesn't exist or all config values if no key was specified
      * @since 2.3.0
      */
     final public function getConfig(?string $key = null)
@@ -210,9 +217,8 @@ abstract class Driver implements EventListenerInterface
      * Exports the database.
      *
      * When exporting, this method will trigger these events:
-     *
-     * - Backup.beforeExport: will be triggered before export
-     * - Backup.afterExport: will be triggered after export
+     * - `Backup.beforeExport`: will be triggered before export;
+     * - `Backup.afterExport`: will be triggered after export.
      * @param string $filename Filename where you want to export the database
      * @return bool `true` on success
      * @throws \Exception
@@ -236,12 +242,13 @@ abstract class Driver implements EventListenerInterface
      * Imports the database.
      *
      * When importing, this method will trigger these events:
-     *
-     * - Backup.beforeImport: will be triggered before import
-     * - Backup.afterImport: will be triggered after import
+     * - `Backup.beforeImport`: will be triggered before import;
+     * - `Backup.afterImport`: will be triggered after import.
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
-     * @throws \Exception
+     * @throws \Tools\Exception\NotInArrayException
+     * @throws \ReflectionException
+     * @throws \ErrorException
      */
     final public function import(string $filename): bool
     {

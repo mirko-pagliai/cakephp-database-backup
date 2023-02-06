@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -22,8 +23,7 @@ use Symfony\Component\Process\Process;
 /**
  * DriverTest class.
  *
- * Performs tests that are valid for each driver class, thus covering the
- *  methods of the abstract `Driver` class.
+ * Performs test that are valid for each driver class, thus covering the methods of the abstract `Driver` class.
  * @covers \DatabaseBackup\Driver\Driver
  */
 class DriverTest extends TestCase
@@ -47,23 +47,19 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Internal method to get a mock for `Driver` abstract class, with the
-     *  `_exec()` method that returns a `Process` instance with a failure and a
-     *  custom error message
+     * Internal method to get a mock for `Driver` abstract class, with the `_exec()` method that returns a `Process`
+     *  instance with a failure and a custom error message
      * @param string $errorMessage The error message
      * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockForAbstractDriverWithErrorProcess(string $errorMessage): Driver
     {
-        $process = @$this->getMockBuilder(Process::class)
-            ->setMethods(['getErrorOutput', 'isSuccessful'])
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $process->method('getErrorOutput')->will($this->returnValue($errorMessage . PHP_EOL));
-        $process->method('isSuccessful')->will($this->returnValue(false));
+        $Process = $this->createPartialMock(Process::class, ['getErrorOutput', 'isSuccessful']);
+        $Process->method('getErrorOutput')->willReturn($errorMessage . PHP_EOL);
+        $Process->method('isSuccessful')->willReturn(false);
 
         $Driver = $this->getMockForAbstractDriver(['_exec']);
-        $Driver->method('_exec')->will($this->returnValue($process));
+        $Driver->method('_exec')->willReturn($Process);
 
         return $Driver;
     }
@@ -80,8 +76,8 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `getBinary()` method
      * @test
+     * @uses \DatabaseBackup\Driver\Driver::getBinary()
      */
     public function testGetBinary(): void
     {
@@ -93,9 +89,8 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `getConfig()` method
-     * @return void
      * @test
+     * @uses \DatabaseBackup\Driver\Driver::getConfig()
      */
     public function testGetConfig(): void
     {
@@ -105,9 +100,8 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `export()` method on failure
-     * @return void
      * @test
+     * @uses \DatabaseBackup\Driver\Driver::export()
      */
     public function testExportOnFailure(): void
     {
@@ -119,22 +113,21 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `export()` method. Export is stopped because the
-     *  `beforeExport()` method returns `false`
-     * @return void
+     * Test for `export()` method. Export is stopped because the `beforeExport()` method returns `false`
      * @test
+     * @uses \DatabaseBackup\Driver\Driver::export()
      */
     public function testExportStoppedByBeforeExport(): void
     {
         $Driver = $this->getMockForAbstractDriver(['beforeExport']);
-        $Driver->method('beforeExport')->will($this->returnValue(false));
+        $Driver->method('beforeExport')->willReturn(false);
         $this->assertFalse($Driver->export($this->getAbsolutePath('example.sql')));
     }
 
     /**
      * Test for `import()` method on failure
-     * @return void
      * @test
+     * @uses \DatabaseBackup\Driver\Driver::import()
      */
     public function testImportOnFailure(): void
     {
@@ -146,10 +139,9 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `import()` method. Import is stopped because the
-     *  `beforeImport()` method returns `false`
-     * @return void
+     * Test for `import()` method. Import is stopped because the `beforeImport()` method returns `false`
      * @test
+     * @uses \DatabaseBackup\Driver\Driver::import()
      */
     public function testImportStoppedByBeforeExport(): void
     {

@@ -17,7 +17,6 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
-use InvalidArgumentException;
 use Tools\Exceptionist;
 use Tools\Filesystem;
 
@@ -34,8 +33,7 @@ class BackupExport
     public $BackupManager;
 
     /**
-     * Driver containing all methods to export/import database backups
-     *  according to the connection
+     * Driver containing all methods to export/import database backups according to the connection
      * @since 2.0.0
      * @var \DatabaseBackup\Driver\Driver
      */
@@ -78,14 +76,14 @@ class BackupExport
     protected $filename;
 
     /**
-     * Rotate limit. This is the number of backups you want to keep. So, it
-     *  will delete all backups that are older.
+     * Rotate limit. This is the number of backups you want to keep. So, it will delete all backups that are older
      * @var int
      */
     protected $rotate = 0;
 
     /**
      * Construct
+     * @throws \ErrorException|\ReflectionException
      */
     public function __construct()
     {
@@ -96,12 +94,16 @@ class BackupExport
     }
 
     /**
-     * Sets the compression
-     * @param string|null $compression Compression type name. Supported
-     *  values are `bzip2` and `gzip`. Use `null` for no compression
+     * Sets the compression.
+     *
+     * Compression supported values are:
+     *  - `bzip2`;
+     *  - `gzip`;
+     *  - `null` for no compression.
+     * @param string|null $compression Compression type name
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
-     * @throws \InvalidArgumentException
+     * @throws \ErrorException
      */
     public function compression(?string $compression)
     {
@@ -109,7 +111,7 @@ class BackupExport
 
         if ($compression) {
             $this->extension = (string)array_search($compression, $this->getValidCompressions());
-            Exceptionist::isTrue($this->extension, __d('database_backup', 'Invalid compression type'), InvalidArgumentException::class);
+            Exceptionist::isTrue($this->extension, __d('database_backup', 'Invalid compression type'));
         }
         $this->compression = $compression;
 
@@ -119,13 +121,11 @@ class BackupExport
     /**
      * Sets the filename.
      *
-     * The compression type will be automatically setted by the filename.
-     * @param string $filename Filename. It can be an absolute path and may
-     *  contain patterns
+     * The compression type will be automatically set by the filename.
+     * @param string $filename Filename. It can be an absolute path and may contain patterns
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
-     * @throws \Exception
-     * @throws \InvalidArgumentException
+     * @throws \ErrorException
      * @throws \Tools\Exception\NotWritableException
      */
     public function filename(string $filename)
@@ -143,7 +143,7 @@ class BackupExport
         Exceptionist::isTrue(!file_exists($filename), __d('database_backup', 'File `{0}` already exists', $filename));
 
         //Checks for extension
-        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION)), InvalidArgumentException::class);
+        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION)));
 
         //Sets the compression
         $this->compression($this->getCompression($filename));
@@ -154,8 +154,7 @@ class BackupExport
     }
 
     /**
-     * Sets the number of backups you want to keep. So, it will delete all
-     * backups that are older
+     * Sets the number of backups you want to keep. So, it will delete all backups that are older
      * @param int $rotate Number of backups you want to keep
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate

@@ -17,7 +17,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Event\EventList;
 use Cake\ORM\Table;
-use DatabaseBackup\TestSuite\TestCase;
+use Tools\TestSuite\ReflectionTrait;
 
 /**
  * DriverTestCase class.
@@ -26,6 +26,8 @@ use DatabaseBackup\TestSuite\TestCase;
  */
 abstract class DriverTestCase extends TestCase
 {
+    use ReflectionTrait;
+
     /**
      * @var \Cake\ORM\Table
      */
@@ -102,9 +104,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `export()` method
      * @return void
-     * @test
+     * @throws \Exception
+     * @uses \DatabaseBackup\Driver\Driver::export()
      */
     public function testExport(): void
     {
@@ -117,11 +119,11 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `export()` and `import()` methods.
-     *
-     * It tests that the backup is properly exported and then imported.
+     * Test for `export()` and `import()` methods. It tests that the backup is properly exported and then imported.
      * @return void
-     * @test
+     * @throws \Exception
+     * @uses \DatabaseBackup\Driver\Driver::import()
+     * @uses \DatabaseBackup\Driver\Driver::export()
      */
     public function testExportAndImport(): void
     {
@@ -171,9 +173,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_getExportExecutable()` method
      * @return void
-     * @test
+     * @throws \ReflectionException|\ErrorException
+     * @uses \DatabaseBackup\Driver\Driver::_getExportExecutable()
      */
     public function testGetExportExecutable(): void
     {
@@ -192,9 +194,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `import()` method
      * @return void
-     * @test
+     * @throws \Exception
+     * @uses \DatabaseBackup\Driver\Driver::import()
      */
     public function testImport(): void
     {
@@ -206,9 +208,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_getImportExecutable()` method
      * @return void
-     * @test
+     * @throws \ReflectionException|\ErrorException
+     * @uses \DatabaseBackup\Driver\Driver::_getImportExecutable()
      */
     public function testGetImportExecutable(): void
     {
