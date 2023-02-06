@@ -77,12 +77,12 @@ abstract class DriverTestCase extends TestCase
         $connection = $this->getConnection('test');
 
         foreach (['Articles', 'Comments'] as $name) {
-            if (empty($this->name)) {
+            if (empty($this->$name)) {
                 $this->$name = $this->getTable($name, compact('connection'));
             }
         }
 
-        if (!$this->DriverClass || !$this->Driver) {
+        if (empty($this->DriverClass) || empty($this->Driver)) {
             /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
             $DriverClass = 'DatabaseBackup\\Driver\\' . array_value_last(explode('\\', $connection->config()['driver']));
             $this->DriverClass = $DriverClass;
