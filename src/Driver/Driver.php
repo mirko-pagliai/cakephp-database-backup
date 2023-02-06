@@ -35,7 +35,7 @@ abstract class Driver implements EventListenerInterface
     /**
      * @var \Cake\Database\Connection
      */
-    protected $connection;
+    protected Connection $connection;
 
     /**
      * Construct
@@ -45,17 +45,15 @@ abstract class Driver implements EventListenerInterface
     {
         $this->connection = $connection;
 
-        //Attachs the object to the event manager
+        //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
 
     /**
-     * List of events this object is implementing. When the class is registered
-     *  in an event manager, each individual method will be associated with the
-     *  respective event
-     * @return array<string, string> Associative array or event key names pointing
-     *  to the function that should be called in the object when the respective
-     *  event is fired
+     * List of events this object is implementing. When the class is registered in an event manager, each individual
+     *  method will be associated with the respective event
+     * @return array<string, string> Associative array or event key names pointing to the function that should be called
+     *  in the object when the respective event is fired
      * @since 2.1.1
      */
     final public function implementedEvents(): array
@@ -83,13 +81,11 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Gets and parses executable commands from the configuration, according to
-     *  the type of requested operation (`export` or `import`) and the connection
-     *  driver.
+     * Gets and parses executable commands from the configuration, according to the type of requested operation
+     *  (`export` or `import`) and the connection driver.
      *
-     * These executables are not yet final, use instead `_getExportExecutable()`
-     *  and `_getImportExecutable()` methods to have the final executables,
-     *  including compression.
+     * These executables are not yet final, use instead `_getExportExecutable()` and `_getImportExecutable()` methods to
+     *  have the final executables, including compression.
      * @param string $type Type or the request operation (`export` or `import`)
      * @return string
      * @throws \Tools\Exception\NotInArrayException
@@ -102,7 +98,7 @@ abstract class Driver implements EventListenerInterface
         $driver = strtolower($this->getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
-            '{{AUTH_FILE}}' => isset($this->auth) ? escapeshellarg($this->auth) : '',
+            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFile') && $this->getAuthFile() ? escapeshellarg($this->getAuthFile()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),
@@ -217,8 +213,8 @@ abstract class Driver implements EventListenerInterface
      * Exports the database.
      *
      * When exporting, this method will trigger these events:
-     * - `Backup.beforeExport`: will be triggered before export;
-     * - `Backup.afterExport`: will be triggered after export.
+     *  - `Backup.beforeExport`: will be triggered before export;
+     *  - `Backup.afterExport`: will be triggered after export.
      * @param string $filename Filename where you want to export the database
      * @return bool `true` on success
      * @throws \Exception
@@ -242,8 +238,8 @@ abstract class Driver implements EventListenerInterface
      * Imports the database.
      *
      * When importing, this method will trigger these events:
-     * - `Backup.beforeImport`: will be triggered before import;
-     * - `Backup.afterImport`: will be triggered after import.
+     *  - `Backup.beforeImport`: will be triggered before import;
+     *  - `Backup.afterImport`: will be triggered after import.
      * @param string $filename Filename from which you want to import the database
      * @return bool true on success
      * @throws \Tools\Exception\NotInArrayException

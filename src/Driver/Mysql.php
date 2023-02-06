@@ -28,7 +28,17 @@ class Mysql extends Driver
      * @since 2.1.0
      * @var string
      */
-    protected $auth;
+    private string $auth;
+
+    /**
+     * Internal method to get the auth file
+     * @return string|null
+     * @since 2.11.0
+     */
+    protected function getAuthFile(): ?string
+    {
+        return empty($this->auth) || !file_exists($this->auth) ? null : $this->auth;
+    }
 
     /**
      * Internal method to write an auth file
@@ -117,12 +127,13 @@ class Mysql extends Driver
      */
     protected function deleteAuthFile(): bool
     {
-        if (!$this->auth || !file_exists($this->auth)) {
+        $authFile = $this->getAuthFile();
+        if (!$authFile) {
             return false;
         }
 
         //Deletes the temporary file with the authentication data
-        @unlink($this->auth);
+        @unlink($authFile);
         unset($this->auth);
 
         return true;

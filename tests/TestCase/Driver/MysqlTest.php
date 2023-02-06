@@ -64,14 +64,13 @@ class MysqlTest extends DriverTestCase
      */
     public function testBeforeExport(): void
     {
-        $this->assertNull($this->getProperty($this->Driver, 'auth'));
         $this->assertTrue($this->Driver->beforeExport());
 
         $expected = '[mysqldump]' . PHP_EOL .
             'user=' . $this->Driver->getConfig('username') . PHP_EOL .
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=' . $this->Driver->getConfig('host');
-        $auth = $this->getProperty($this->Driver, 'auth');
+        $auth = $this->invokeMethod($this->Driver, 'getAuthFile');
         $this->assertStringEqualsFile($auth, $expected);
 
         @unlink($auth);
@@ -83,14 +82,13 @@ class MysqlTest extends DriverTestCase
      */
     public function testBeforeImport(): void
     {
-        $this->assertNull($this->getProperty($this->Driver, 'auth'));
         $this->assertTrue($this->Driver->beforeImport());
 
         $expected = '[client]' . PHP_EOL .
             'user=' . $this->Driver->getConfig('username') . PHP_EOL .
             'password="' . $this->Driver->getConfig('password') . '"' . PHP_EOL .
             'host=' . $this->Driver->getConfig('host');
-        $auth = $this->getProperty($this->Driver, 'auth');
+        $auth = $this->invokeMethod($this->Driver, 'getAuthFile');
         $this->assertStringEqualsFile($auth, $expected);
 
         @unlink($auth);
@@ -105,9 +103,10 @@ class MysqlTest extends DriverTestCase
         $this->assertFalse($this->invokeMethod($this->Driver, 'deleteAuthFile'));
 
         $auth = tempnam(sys_get_temp_dir(), 'auth') ?: '';
-        $this->setProperty($this->Driver, 'auth', $auth);
+        $Driver = $this->getMockForDriver(Mysql::class, ['getAuthFile']);
+        $Driver->method('getAuthFile')->willReturn($auth);
         $this->assertFileExists($auth);
-        $this->assertTrue($this->invokeMethod($this->Driver, 'deleteAuthFile'));
+        $this->assertTrue($this->invokeMethod($Driver, 'deleteAuthFile'));
         $this->assertFileDoesNotExist($auth);
     }
 }

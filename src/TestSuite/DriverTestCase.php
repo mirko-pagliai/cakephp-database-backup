@@ -17,6 +17,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Event\EventList;
 use Cake\ORM\Table;
+use DatabaseBackup\Driver\Driver;
 use Tools\TestSuite\ReflectionTrait;
 
 /**
@@ -31,17 +32,17 @@ abstract class DriverTestCase extends TestCase
     /**
      * @var \Cake\ORM\Table
      */
-    protected $Articles;
+    protected Table $Articles;
 
     /**
      * @var \Cake\ORM\Table
      */
-    protected $Comments;
+    protected Table $Comments;
 
     /**
      * @var \DatabaseBackup\Driver\Driver
      */
-    protected $Driver;
+    protected Driver $Driver;
 
     /**
      * Driver class
@@ -54,7 +55,7 @@ abstract class DriverTestCase extends TestCase
      * Name of the database connection
      * @var string
      */
-    protected $connection;
+    protected string $connection;
 
     /**
      * @var array<string>
@@ -76,7 +77,9 @@ abstract class DriverTestCase extends TestCase
         $connection = $this->getConnection('test');
 
         foreach (['Articles', 'Comments'] as $name) {
-            $this->$name = $this->$name ?: $this->getTable($name, compact('connection')) ?: new Table();
+            if (empty($this->name)) {
+                $this->$name = $this->getTable($name, compact('connection'));
+            }
         }
 
         if (!$this->DriverClass || !$this->Driver) {

@@ -31,7 +31,7 @@ class DriverTest extends TestCase
     /**
      * @var \DatabaseBackup\Driver\Driver
      */
-    protected $Driver;
+    protected Driver $Driver;
 
     /**
      * Internal method to get a mock for `Driver` abstract class
@@ -72,7 +72,9 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->Driver = $this->Driver ?: $this->getMockForAbstractDriver();
+        if (empty($this->Driver)) {
+            $this->Driver = $this->getMockForAbstractDriver();
+        }
     }
 
     /**
