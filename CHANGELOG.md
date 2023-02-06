@@ -5,7 +5,8 @@
 * added `MySql::getAuthFile()` method. So the `MySql::$auth` property is now private;
 * `createBackup()` and `createSomeBackups()` are now testing global functions and no longer methods provided by the
   `TestCase` class;
-* added `CommandTestCase` to test commands.
+* added `CommandTestCase` to test commands;
+* many, small tweaks to code and descriptions.
 
 ## 2.10 branch
 ### 2.10.2
