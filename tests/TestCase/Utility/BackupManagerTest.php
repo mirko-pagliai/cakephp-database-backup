@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -56,8 +57,8 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `delete()` method
      * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::delete()
      */
     public function testDelete(): void
     {
@@ -74,30 +75,30 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `deleteAll()` method
      * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
      */
     public function testDeleteAll(): void
     {
-        $createdFiles = $this->createSomeBackups();
+        $createdFiles = createSomeBackups();
         $this->assertEquals(array_reverse($createdFiles), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
         $this->expectException(NotWritableException::class);
-        $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` does not exist');
+        $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` is not writable');
         $this->BackupManager->delete('noExistingFile');
     }
 
     /**
-     * Test for `index()` method
      * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
     public function testIndex(): void
     {
         //Creates a text file. This file should be ignored
         Filesystem::instance()->createFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
 
-        $createdFiles = $this->createSomeBackups();
+        $createdFiles = createSomeBackups();
         $files = $this->BackupManager->index();
 
         //Checks compressions
@@ -121,14 +122,14 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `rotate()` method
      * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
     public function testRotate(): void
     {
         $this->assertEquals([], BackupManager::rotate(1));
 
-        $this->createSomeBackups();
+        createSomeBackups();
 
         $initialFiles = $this->BackupManager->index();
 
@@ -142,7 +143,7 @@ class BackupManagerTest extends TestCase
         $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function (Entity $first, Entity $second) {
+        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function (Entity $first, Entity $second): int {
             return strcmp($first->get('filename'), $second->get('filename'));
         });
 
@@ -150,18 +151,17 @@ class BackupManagerTest extends TestCase
         $this->assertCount(1, $diff);
         $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
 
-        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupManager->rotate(-1);
     }
 
     /**
-     * Test for `send()` and `_send()` methods
      * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::send()
      */
     public function testSend(): void
     {
-        $file = $this->createBackup();
+        $file = createBackup();
         $recipient = 'recipient@example.com';
         $this->BackupManager->send($file, $recipient);
         $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
@@ -174,17 +174,11 @@ class BackupManagerTest extends TestCase
         $this->expectExceptionMessage('Invalid email set for "from". You passed "invalidSender".');
         @unlink($file);
         Configure::write('DatabaseBackup.mailSender', 'invalidSender');
-        $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
-    }
+        $this->BackupManager->send(createBackup(), 'recipient@example.com');
 
-    /**
-     * Test for `send()` method, with an invalid file
-     * @test
-     */
-    public function testSendInvalidFile(): void
-    {
+        //With an invalid file
         $this->expectException(NotReadableException::class);
-        $this->expectExceptionMessage('File or directory `' . Configure::read('DatabaseBackup.target') . DS . 'noExistingFile` does not exist');
+        $this->expectExceptionMessage('File or directory `' . Configure::readOrFail('DatabaseBackup.target') . DS . 'noExistingFile` is not readable');
         $this->BackupManager->send('noExistingFile', 'recipient@example.com');
     }
 }

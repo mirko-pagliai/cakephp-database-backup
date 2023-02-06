@@ -11,14 +11,15 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.4",
+        "ext-fileinfo": "*",
         "cakephp/cakephp": "^4.0",
-        "mirko-pagliai/php-tools": "^1.5.8"
+        "mirko-pagliai/php-tools": "~1.7.1"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^4.4",
-        "mirko-pagliai/me-tools": "^2.19.8",
-        "phpunit/phpunit": "^8.5.23|^9.1|^9.5",
+        "mirko-pagliai/me-tools": "~2.23",
+        "phpunit/phpunit": "^9.1|^9.5",
         "phpstan/phpstan": "^1.7",
         "psalm/phar": "^4.24"
     },

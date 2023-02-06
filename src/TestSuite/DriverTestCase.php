@@ -17,7 +17,8 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Event\EventList;
 use Cake\ORM\Table;
-use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\Driver\Driver;
+use Tools\TestSuite\ReflectionTrait;
 
 /**
  * DriverTestCase class.
@@ -26,20 +27,22 @@ use DatabaseBackup\TestSuite\TestCase;
  */
 abstract class DriverTestCase extends TestCase
 {
-    /**
-     * @var \Cake\ORM\Table
-     */
-    protected $Articles;
+    use ReflectionTrait;
 
     /**
      * @var \Cake\ORM\Table
      */
-    protected $Comments;
+    protected Table $Articles;
+
+    /**
+     * @var \Cake\ORM\Table
+     */
+    protected Table $Comments;
 
     /**
      * @var \DatabaseBackup\Driver\Driver
      */
-    protected $Driver;
+    protected Driver $Driver;
 
     /**
      * Driver class
@@ -52,7 +55,7 @@ abstract class DriverTestCase extends TestCase
      * Name of the database connection
      * @var string
      */
-    protected $connection;
+    protected string $connection;
 
     /**
      * @var array<string>
@@ -74,10 +77,12 @@ abstract class DriverTestCase extends TestCase
         $connection = $this->getConnection('test');
 
         foreach (['Articles', 'Comments'] as $name) {
-            $this->$name = $this->$name ?: $this->getTable($name, compact('connection')) ?: new Table();
+            if (empty($this->$name)) {
+                $this->$name = $this->getTable($name, compact('connection'));
+            }
         }
 
-        if (!$this->DriverClass || !$this->Driver) {
+        if (empty($this->DriverClass) || empty($this->Driver)) {
             /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
             $DriverClass = 'DatabaseBackup\\Driver\\' . array_value_last(explode('\\', $connection->config()['driver']));
             $this->DriverClass = $DriverClass;
@@ -102,9 +107,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `export()` method
      * @return void
-     * @test
+     * @throws \Exception
+     * @uses \DatabaseBackup\Driver\Driver::export()
      */
     public function testExport(): void
     {
@@ -117,11 +122,11 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `export()` and `import()` methods.
-     *
-     * It tests that the backup is properly exported and then imported.
+     * Test for `export()` and `import()` methods. It tests that the backup is properly exported and then imported.
      * @return void
-     * @test
+     * @throws \Exception
+     * @uses \DatabaseBackup\Driver\Driver::import()
+     * @uses \DatabaseBackup\Driver\Driver::export()
      */
     public function testExportAndImport(): void
     {
@@ -171,9 +176,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_getExportExecutable()` method
      * @return void
-     * @test
+     * @throws \ReflectionException|\ErrorException
+     * @uses \DatabaseBackup\Driver\Driver::_getExportExecutable()
      */
     public function testGetExportExecutable(): void
     {
@@ -192,9 +197,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `import()` method
      * @return void
-     * @test
+     * @throws \Exception
+     * @uses \DatabaseBackup\Driver\Driver::import()
      */
     public function testImport(): void
     {
@@ -206,9 +211,9 @@ abstract class DriverTestCase extends TestCase
     }
 
     /**
-     * Test for `_getImportExecutable()` method
      * @return void
-     * @test
+     * @throws \ReflectionException|\ErrorException
+     * @uses \DatabaseBackup\Driver\Driver::_getImportExecutable()
      */
     public function testGetImportExecutable(): void
     {

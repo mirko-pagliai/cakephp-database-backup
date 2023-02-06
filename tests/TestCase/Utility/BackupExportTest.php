@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -17,8 +18,9 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
-use InvalidArgumentException;
+use DatabaseBackup\Utility\BackupExport;
 use Tools\Filesystem;
+use Tools\TestSuite\ReflectionTrait;
 
 /**
  * BackupExportTest class
@@ -26,11 +28,30 @@ use Tools\Filesystem;
 class BackupExportTest extends TestCase
 {
     use EmailTrait;
+    use ReflectionTrait;
 
     /**
-     * Test for `compression()` method. This also tests for `$extension`
-     *  property
+     * @var \DatabaseBackup\Utility\BackupExport
+     */
+    protected BackupExport $BackupExport;
+
+    /**
+     * Called before every test method
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        if (empty($this->BackupExport)) {
+            $this->BackupExport = new BackupExport();
+        }
+    }
+
+    /**
+     * Test for `compression()` method. This also tests for `$extension` property
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::compression()
      */
     public function testCompression(): void
     {
@@ -39,16 +60,14 @@ class BackupExportTest extends TestCase
         $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 
         //With an invalid type
-        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid compression type');
         $this->BackupExport->compression('invalidType');
     }
 
     /**
-     * Test for `filename()` method.
-     *
-     * This also tests for patterns and for the `$compression` property.
+     * Test for `filename()` method. This also tests for patterns and for the `$compression` property
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
     public function testFilename(): void
     {
@@ -83,28 +102,26 @@ class BackupExportTest extends TestCase
         $this->assertMatchesRegularExpression('/^\d{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
 
         //With invalid extension
-        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `txt` file extension');
         $this->BackupExport->filename('backup.txt');
     }
 
     /**
-     * Test for `rotate()` method
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::rotate()
      */
     public function testRotate(): void
     {
         $this->BackupExport->rotate(10);
         $this->assertEquals(10, $this->getProperty($this->BackupExport, 'rotate'));
 
-        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupExport->rotate(-1)->export();
     }
 
     /**
-     * Test for `send()` method
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::send()
      */
     public function testSend(): void
     {
@@ -117,8 +134,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method, without compression
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExport(): void
     {
@@ -153,6 +170,7 @@ class BackupExportTest extends TestCase
      * Test for `export()` method, with a different chmod
      * @requires OS Linux
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportWithDifferendChmod(): void
     {

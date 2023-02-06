@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -12,27 +11,26 @@ declare(strict_types=1);
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
+ * @since       2.11.0
  */
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\TestSuite;
 
-use DatabaseBackup\Driver\Sqlite;
-use DatabaseBackup\TestSuite\DriverTestCase;
+use DatabaseBackup\Utility\BackupManager;
+use MeTools\TestSuite\CommandTestCase as BaseCommandTestCase;
 
 /**
- * SqliteTest class
+ * Abstract class for test commands
  */
-class SqliteTest extends DriverTestCase
+abstract class CommandTestCase extends BaseCommandTestCase
 {
     /**
-     * Called before every test method
+     * Called after every test method
      * @return void
      */
-    public function setUp(): void
+    public function tearDown(): void
     {
-        parent::setUp();
+        BackupManager::deleteAll();
 
-        if (!$this->Driver instanceof Sqlite) {
-            $this->markTestSkipped('Skipping tests for Sqlite, current driver is ' . $this->Driver->getDriverName());
-        }
+        parent::tearDown();
     }
 }

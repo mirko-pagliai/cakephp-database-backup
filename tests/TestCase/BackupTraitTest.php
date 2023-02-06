@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -22,7 +23,6 @@ use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
-use InvalidArgumentException;
 
 /**
  * BackupTraitTest class
@@ -55,19 +55,19 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getAbsolutePath()` method
      * @test
+     * @uses \DatabaseBackup\BackupTrait::getAbsolutePath()
      */
     public function testGetAbsolutePath(): void
     {
-        $expected = Configure::read('DatabaseBackup.target') . DS . 'file.txt';
+        $expected = Configure::readOrFail('DatabaseBackup.target') . DS . 'file.txt';
         $this->assertEquals($expected, $this->Trait->getAbsolutePath('file.txt'));
         $this->assertEquals($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
     }
 
     /**
-     * Test for `getCompression()` method
      * @test
+     * @uses \DatabaseBackup\BackupTrait::getCompression()
      */
     public function testGetCompression(): void
     {
@@ -84,8 +84,8 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getConnection()` method
      * @test
+     * @uses \DatabaseBackup\BackupTrait::getConnection()
      */
     public function testGetConnection(): void
     {
@@ -106,8 +106,8 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getDriver()` method
      * @test
+     * @uses \DatabaseBackup\BackupTrait::getDriver()
      */
     public function testGetDriver(): void
     {
@@ -116,19 +116,15 @@ class BackupTraitTest extends TestCase
         }
 
         //With a no existing driver
-        $connection = $this->getMockBuilder(Connection::class)
-            ->onlyMethods(['__debuginfo', 'getDriver'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection->method('getDriver')->will($this->returnValue(new Sqlserver()));
-        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
-        $this->Trait->getDriver($connection);
+        $Connection = $this->createPartialMock(Connection::class, ['__debuginfo', 'getDriver']);
+        $Connection->method('getDriver')->willReturn(new Sqlserver());
+        $this->Trait->getDriver($Connection);
     }
 
     /**
-     * Test for `getExtension()` method
      * @test
+     * @uses \DatabaseBackup\BackupTrait::getExtension()
      */
     public function testGetExtension(): void
     {
@@ -150,8 +146,8 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * Test for `getValidCompressions()` method
      * @test
+     * @uses \DatabaseBackup\BackupTrait::getValidCompressions()
      */
     public function testGetValidCompressions(): void
     {

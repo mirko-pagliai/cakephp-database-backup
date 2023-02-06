@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -17,15 +18,17 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
-use InvalidArgumentException;
 use Tools\Exception\NotReadableException;
 use Tools\Filesystem;
+use Tools\TestSuite\ReflectionTrait;
 
 /**
  * BackupImportTest class
  */
 class BackupImportTest extends TestCase
 {
+    use ReflectionTrait;
+
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
@@ -51,6 +54,7 @@ class BackupImportTest extends TestCase
     /**
      * Test for `filename()` method. This tests also `$compression` property
      * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::filename()
      */
     public function testFilename(): void
     {
@@ -75,24 +79,17 @@ class BackupImportTest extends TestCase
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);
-        $this->expectExceptionMessage('File or directory `' . TMP . 'noExistingDir' . DS . 'backup.sql` does not exist');
+        $this->expectExceptionMessage('File or directory `' . TMP . 'noExistingDir' . DS . 'backup.sql` is not readable');
         $this->BackupImport->filename(TMP . 'noExistingDir' . DS . 'backup.sql');
-    }
 
-    /**
-     * Test for `filename()` method, with invalid extension
-     * @test
-     */
-    public function testFilenameWithInvalidExtension(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
+        //With invalid extension
         $this->expectExceptionMessage('Invalid file extension');
         $this->BackupImport->filename(Filesystem::instance()->createTmpFile());
     }
 
     /**
-     * Test for `import()` method, without compression
      * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function testImport(): void
     {
@@ -111,7 +108,6 @@ class BackupImportTest extends TestCase
         $filename = $this->BackupImport->filename($backup)->import();
         $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
 
-        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
     }

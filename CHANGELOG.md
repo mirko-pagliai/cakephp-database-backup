@@ -1,4 +1,12 @@
 # 2.x branch
+## 2.11 branch
+### 2.11.0
+* requires at least PHP 7.4;
+* added `MySql::getAuthFile()` method. So the `MySql::$auth` property is now private;
+* `createBackup()` and `createSomeBackups()` are now testing global functions and no longer methods provided by the
+  `TestCase` class;
+* added `CommandTestCase` to test commands.
+
 ## 2.10 branch
 ### 2.10.2
 * added tests for PHP 8.1;

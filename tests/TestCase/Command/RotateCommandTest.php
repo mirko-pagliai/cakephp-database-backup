@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -14,55 +15,39 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\TestCase;
-use MeTools\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\CommandTestCase;
+use DatabaseBackup\Utility\BackupManager;
 
 /**
  * RotateCommandTest class
  */
-class RotateCommandTest extends TestCase
+class RotateCommandTest extends CommandTestCase
 {
-    use ConsoleIntegrationTestTrait;
-
     /**
-     * @var string
-     */
-    protected $command = 'database_backup.rotate -v';
-
-    /**
-     * Test for `execute()` method
      * @test
+     * @uses \DatabaseBackup\Command\RotateCommand::execute()
      */
     public function testExecute(): void
     {
-        $this->createSomeBackups();
-        $this->exec($this->command . ' 1');
-        $this->assertExitWithSuccess();
+        $command = 'database_backup.rotate -v';
+
+        createSomeBackups();
+        $this->exec($command . ' 1');
+        $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql\.bz2` has been deleted/');
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql` has been deleted/');
         $this->assertOutputContains('<success>Deleted backup files: 2</success>');
-    }
 
-    /**
-     * Test for `execute()` method, with an invalid value
-     * @test
-     */
-    public function testExecuteInvalidValue(): void
-    {
-        $this->exec($this->command . ' string');
-        $this->assertExitWithError();
-    }
-
-    /**
-     * Test for `execute()` method, with no backups
-     * @test
-     */
-    public function testExecuteNoBackups(): void
-    {
-        $this->exec($this->command . ' 1');
-        $this->assertExitWithSuccess();
+        //With no backups
+        BackupManager::deleteAll();
+        $this->exec($command . ' 1');
+        $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');
+
+        //With an invalid value
+        $this->exec($command . ' string');
+        $this->assertExitError();
     }
 }

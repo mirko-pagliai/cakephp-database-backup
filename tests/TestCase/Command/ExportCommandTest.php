@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -14,65 +15,69 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\TestCase;
-use MeTools\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\CommandTestCase;
 
 /**
  * ExportCommandTest class
  */
-class ExportCommandTest extends TestCase
+class ExportCommandTest extends CommandTestCase
 {
-    use ConsoleIntegrationTestTrait;
-
     /**
      * @var string
      */
     protected $command = 'database_backup.export -v';
 
     /**
-     * Test for `execute()` method
      * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecute(): void
     {
         $this->exec($this->command);
-        $this->assertExitWithSuccess();
+        $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
+
+        //With an invalid option value
+        $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
+        $this->assertExitError();
     }
 
     /**
      * Test for `execute()` method, with `compression` param
      * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteCompressionParam(): void
     {
         $this->exec($this->command . ' --compression bzip2');
-        $this->assertExitWithSuccess();
+        $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql\.bz2` has been exported/');
     }
 
     /**
      * Test for `execute()` method, with `filename` param
      * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteFilenameParam(): void
     {
         $this->exec($this->command . ' --filename backup.sql');
-        $this->assertExitWithSuccess();
+        $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup.sql` has been exported/');
     }
 
     /**
      * Test for `execute()` method, with `rotate` param
      * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteRotateParam(): void
     {
-        $files = $this->createSomeBackups();
+        $files = createSomeBackups();
         $this->exec($this->command . ' --rotate 3 -v');
-        $this->assertExitWithSuccess();
+        $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename(array_value_first($files)) . '` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
@@ -81,22 +86,13 @@ class ExportCommandTest extends TestCase
     /**
      * Test for `execute()` method, with `send` param
      * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteSendParam(): void
     {
         $this->exec($this->command . ' --send mymail@example.com');
-        $this->assertExitWithSuccess();
+        $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` was sent via mail/');
-    }
-
-    /**
-     * Test for `execute()` method, with an invalid option value
-     * @test
-     */
-    public function testExecuteInvalidOptionValue(): void
-    {
-        $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
-        $this->assertExitWithError();
     }
 }

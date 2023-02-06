@@ -21,7 +21,6 @@ use Cake\I18n\FrozenTime;
 use Cake\Mailer\Mailer;
 use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
-use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Tools\Exceptionist;
@@ -36,11 +35,9 @@ class BackupManager
 
     /**
      * Deletes a backup file
-     * @param string $filename Filename of the backup that you want to delete.
-     *  The path can be relative to the backup directory
+     * @param string $filename Backup filename you want to delete. The path can be relative to the backup directory
      * @return string Deleted backup file
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
-     * @throws \Tools\Exception\FileNotExistsException
      * @throws \Tools\Exception\NotWritableException
      */
     public static function delete(string $filename): string
@@ -53,7 +50,7 @@ class BackupManager
 
     /**
      * Deletes all backup files
-     * @return array<string> List of deleted backup files
+     * @return string[] List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
      */
@@ -86,16 +83,15 @@ class BackupManager
     /**
      * Rotates backups.
      *
-     * You must indicate the number of backups you want to keep. So, it will
-     *  delete all backups that are older.
+     * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
      * @param int $rotate Number of backups that you want to keep
      * @return array<\Cake\ORM\Entity> Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
-     * @throws \InvalidArgumentException
+     * @throws \ErrorException
      */
     public static function rotate(int $rotate): array
     {
-        Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'), InvalidArgumentException::class);
+        Exceptionist::isPositive($rotate, __d('database_backup', 'Invalid rotate value'));
         $backupsToBeDeleted = self::index()->skip($rotate);
         array_map([__CLASS__, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 
@@ -103,8 +99,7 @@ class BackupManager
     }
 
     /**
-     * Internal method to get an email instance with all options to send a
-     *  backup file via email
+     * Internal method to get an email instance with all options to send a backup file via email
      * @param string $backup Backup you want to send
      * @param string $recipient Recipient's email address
      * @return \Cake\Mailer\Mailer
@@ -125,10 +120,10 @@ class BackupManager
 
     /**
      * Sends a backup file via email
-     * @param string $filename Filename of the backup that you want to send via
-     *  email. The path can be relative to the backup directory
+     * @param string $filename Backup filename you want to send via email. The path can be relative to the backup directory
      * @param string $recipient Recipient's email address
      * @return array{headers: string, message: string}
+     * @throws \Tools\Exception\NotReadableException
      * @since 1.1.0
      */
     public static function send(string $filename, string $recipient): array
