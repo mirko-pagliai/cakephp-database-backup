@@ -77,8 +77,8 @@ abstract class DriverTestCase extends TestCase
         $connection = $this->getConnection('test');
 
         foreach (['Articles', 'Comments'] as $name) {
-            if (empty($this->$name)) {
-                $this->$name = $this->getTable($name, compact('connection'));
+            if (empty($this->{$name})) {
+                $this->{$name} = $this->getTable($name, compact('connection'));
             }
         }
 
@@ -100,7 +100,7 @@ abstract class DriverTestCase extends TestCase
     final protected function getAllRecords(): array
     {
         foreach (['Articles', 'Comments'] as $name) {
-            $records[$name] = $this->$name->find()->enableHydration(false)->toArray();
+            $records[$name] = $this->{$name}->find()->enableHydration(false)->toArray();
         }
 
         return $records;
