@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.11 branch
 ### 2.11.1
-* updated for `php-tools` 1.7.4.
+* updated for `php-tools` 1.7.4;
+* tests have been made compatible with Xampp on Windows.
 
 ### 2.11.0
 * requires at least PHP 7.4;
