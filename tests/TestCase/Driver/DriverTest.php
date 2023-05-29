@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 /** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
@@ -83,7 +83,7 @@ class DriverTest extends TestCase
      */
     public function testGetBinary(): void
     {
-        $this->assertStringEndsWith('mysql', $this->Driver->getBinary('mysql'));
+        $this->assertMatchesRegularExpression('/mysql(\.exe)?$/', $this->Driver->getBinary('mysql'));
 
         //With a binary not available
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
