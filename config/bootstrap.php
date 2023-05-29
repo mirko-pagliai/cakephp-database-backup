@@ -72,7 +72,7 @@ foreach ([
 
 //Default target directory
 if (!Configure::check('DatabaseBackup.target')) {
-    Configure::write('DatabaseBackup.target',ROOT . 'backups');
+    Configure::write('DatabaseBackup.target', ROOT . 'backups');
 }
 
 //Checks for the target directory
