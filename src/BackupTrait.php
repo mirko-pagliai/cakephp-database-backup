@@ -34,7 +34,7 @@ trait BackupTrait
      */
     public static function getAbsolutePath(string $path): string
     {
-        return Filesystem::instance()->makePathAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+        return Filesystem::makePathAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }
 
     /**
@@ -98,7 +98,7 @@ trait BackupTrait
      */
     public static function getExtension(string $path): ?string
     {
-        $extension = Filesystem::instance()->getExtension($path);
+        $extension = Filesystem::getExtension($path);
 
         return in_array($extension, array_keys(DATABASE_BACKUP_EXTENSIONS)) ? $extension : null;
     }

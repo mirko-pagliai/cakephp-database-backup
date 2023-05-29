@@ -21,7 +21,6 @@ use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
-use Tools\Filesystem;
 
 /**
  * Imports a database backup
@@ -56,7 +55,7 @@ class ImportCommand extends Command
 
         try {
             $file = (new BackupImport())->filename((string)$args->getArgument('filename'))->import();
-            $io->success(__d('database_backup', 'Backup `{0}` has been imported', Filesystem::instance()->rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();

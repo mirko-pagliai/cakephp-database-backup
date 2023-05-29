@@ -21,7 +21,6 @@ use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
-use Tools\Filesystem;
 
 /**
  * Exports a database backup
@@ -78,9 +77,8 @@ class ExportCommand extends Command
 
         try {
             $BackupExport = new BackupExport();
-            //Sets the output filename or the compression type.
-            //Regarding the `rotate` option, the `BackupShell::rotate()` method
-            //  will be called at the end, instead of `BackupExport::rotate()`
+            //Sets the output filename or the compression type. Regarding the `rotate` option, the
+            //`BackupShell::rotate()` method will be called at the end, instead of `BackupExport::rotate()`
             if ($args->getOption('filename')) {
                 $BackupExport->filename((string)$args->getOption('filename'));
             } elseif ($args->getOption('compression')) {
@@ -89,7 +87,7 @@ class ExportCommand extends Command
 
             //Exports
             $file = $BackupExport->export();
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', Filesystem::instance()->rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
             $verbose = $args->getOption('verbose');
             $quiet = $args->getOption('quiet');

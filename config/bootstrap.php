@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
-use Tools\Filesystem;
 
 /**
  * Executables. Name of driver as keys, Then, as value, an array that contains
@@ -73,7 +72,7 @@ foreach ([
 
 //Default target directory
 if (!Configure::check('DatabaseBackup.target')) {
-    Configure::write('DatabaseBackup.target', Filesystem::instance()->concatenate(ROOT, 'backups'));
+    Configure::write('DatabaseBackup.target',ROOT . 'backups');
 }
 
 //Checks for the target directory

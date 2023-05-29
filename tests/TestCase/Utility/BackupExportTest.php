@@ -73,7 +73,7 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename('backup.sql.bz2');
         $this->assertEquals(
-            Filesystem::instance()->concatenate(Configure::read('DatabaseBackup.target'), 'backup.sql.bz2'),
+            Filesystem::concatenate(Configure::read('DatabaseBackup.target'), 'backup.sql.bz2'),
             $this->getProperty($this->BackupExport, 'filename')
         );
         $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));

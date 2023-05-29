@@ -55,7 +55,7 @@ class Mysql extends Driver
             $content
         );
 
-        $this->auth = Filesystem::instance()->createTmpFile($content, null, 'auth');
+        $this->auth = Filesystem::createTmpFile($content, null, 'auth');
 
         return $this->auth != false;
     }

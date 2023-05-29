@@ -20,7 +20,6 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
-use Tools\Filesystem;
 
 /**
  * Deletes all backup files
@@ -57,7 +56,7 @@ class DeleteAllCommand extends Command
         }
 
         foreach ($files as $file) {
-            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', Filesystem::instance()->rtr($file)));
+            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', rtr($file)));
         }
 
         $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));

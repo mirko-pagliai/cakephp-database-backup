@@ -84,7 +84,7 @@ class BackupImportTest extends TestCase
 
         //With invalid extension
         $this->expectExceptionMessage('Invalid file extension');
-        $this->BackupImport->filename(Filesystem::instance()->createTmpFile());
+        $this->BackupImport->filename(Filesystem::createTmpFile());
     }
 
     /**

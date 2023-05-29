@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.11 branch
+### 2.11.1
+* updated for `php-tools` 1.7.4.
+
 ### 2.11.0
 * requires at least PHP 7.4;
 * added `MySql::getAuthFile()` method. So the `MySql::$auth` property is now private;
