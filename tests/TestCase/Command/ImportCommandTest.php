@@ -28,17 +28,16 @@ class ImportCommandTest extends CommandTestCase
      */
     public function testExecute(): void
     {
-        $command = 'database_backup.import -v';
-
         $backup = createBackup();
-        $this->exec($command . ' ' . $backup);
+        $this->exec('database_backup.import -v ' . $backup);
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
+        $this->assertErrorEmpty();
 
         //With a no existing file
-        $this->exec($command . ' /noExistingDir/backup.sql');
+        $this->exec('database_backup.import -v /noExistingDir/backup.sql');
         $this->assertExitError();
     }
 }
