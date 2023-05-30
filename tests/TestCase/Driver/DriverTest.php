@@ -1,4 +1,4 @@
-<?php /** @noinspection ALL */
+<?php
 /** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
@@ -40,10 +40,12 @@ class DriverTest extends TestCase
      */
     protected function getMockForAbstractDriver(array $mockedMethods = []): Driver
     {
-        /** @var \Cake\Database\Connection $connection */
-        $connection = $this->getConnection('test');
+        /** @var \Cake\Database\Connection $Connection */
+        $Connection = $this->getConnection('test');
+        /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
+        $Driver = $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods, [$Connection]);
 
-        return $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods, [$connection]);
+        return $Driver;
     }
 
     /**

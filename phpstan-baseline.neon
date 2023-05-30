@@ -5,8 +5,3 @@ parameters:
 			count: 1
 			path: tests/TestCase/BackupTraitTest.php
 
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: tests/bootstrap.php
-
