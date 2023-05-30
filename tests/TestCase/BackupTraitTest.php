@@ -111,14 +111,13 @@ class BackupTraitTest extends TestCase
      */
     public function testGetDriver(): void
     {
-        foreach ([ConnectionManager::get('test'), null] as $driver) {
-            $this->assertInstanceof(Driver::class, $this->Trait->getDriver($driver));
+        foreach ([ConnectionManager::get('test'), null] as $connection) {
+            $this->assertInstanceof(Driver::class, $this->Trait->getDriver($connection));
         }
 
         //With a no existing driver
         $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
-        $Connection = $this->createPartialMock(Connection::class, ['__debuginfo', 'getDriver']);
-        $Connection->method('getDriver')->willReturn(new Sqlserver());
+        $Connection = $this->createConfiguredMock(Connection::class, ['__debuginfo' => [], 'getDriver' => new Sqlserver()]);
         $this->Trait->getDriver($Connection);
     }
 

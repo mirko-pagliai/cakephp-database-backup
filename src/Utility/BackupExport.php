@@ -199,8 +199,12 @@ class BackupExport
         $this->Driver->export($filename);
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
-        $this->emailRecipient ? $this->BackupManager->send($filename, $this->emailRecipient) : null;
-        $this->rotate ? $this->BackupManager->rotate($this->rotate) : null;
+        if ($this->emailRecipient) {
+            $this->BackupManager->send($filename, $this->emailRecipient);
+        }
+        if ($this->rotate) {
+            $this->BackupManager->rotate($this->rotate);
+        }
 
         return $filename;
     }
