@@ -42,15 +42,9 @@ define('CACHE', TMP . 'cache' . DS);
 define('LOGS', TMP . 'cakephp_log' . DS);
 define('SESSIONS', TMP . 'sessions' . DS);
 
-foreach ([
-    TMP,
-    LOGS,
-    SESSIONS,
-    CACHE . 'models',
-    CACHE . 'persistent',
-    CACHE . 'views',
-] as $dir) {
-    @mkdir($dir, 0777, true);
+$dirs = [TMP, LOGS, SESSIONS, CACHE . 'models', CACHE . 'persistent', CACHE . 'views'];
+foreach (array_filter($dirs, fn(string $dir): bool => !file_exists($dir)) as $dir) {
+    mkdir($dir, 0777, true);
 }
 
 require dirname(__DIR__) . '/vendor/autoload.php';

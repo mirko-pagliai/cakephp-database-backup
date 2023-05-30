@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Driver;
 
-use DatabaseBackup\Driver\Driver;
 use Tools\Filesystem;
 
 /**
@@ -86,7 +85,7 @@ class Mysql extends Driver
      * It stores the authentication data, to be used to export the database, in a temporary file.
      *
      * For security reasons, it's recommended to specify the password in a configuration file and not in the command (a
-     *  user can execute a `ps aux | grep mysqldump` and see the password).
+     * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
      * @return bool
      * @throws \ErrorException
@@ -106,8 +105,8 @@ class Mysql extends Driver
      * It stores the authentication data, to be used to import the database, in a temporary file.
      *
      * For security reasons, it's recommended to specify the password in a configuration file and not in the command (a
-     *  user can execute a `ps aux | grep mysqldump` and see the password).
-     *  So it creates a temporary file to store the configuration options.
+     * user can execute a `ps aux | grep mysqldump` and see the password).
+     * So it creates a temporary file to store the configuration options.
      * @return bool
      * @throws \ErrorException
      * @since 2.1.0
@@ -133,7 +132,7 @@ class Mysql extends Driver
         }
 
         //Deletes the temporary file with the authentication data
-        @unlink($authFile);
+        Filesystem::instance()->remove($authFile);
         unset($this->auth);
 
         return true;

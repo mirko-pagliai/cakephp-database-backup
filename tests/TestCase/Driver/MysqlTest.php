@@ -73,7 +73,7 @@ class MysqlTest extends DriverTestCase
         $auth = $this->invokeMethod($this->Driver, 'getAuthFile');
         $this->assertStringEqualsFile($auth, $expected);
 
-        @unlink($auth);
+        unlink($auth);
     }
 
     /**
@@ -91,7 +91,7 @@ class MysqlTest extends DriverTestCase
         $auth = $this->invokeMethod($this->Driver, 'getAuthFile');
         $this->assertStringEqualsFile($auth, $expected);
 
-        @unlink($auth);
+        unlink($auth);
     }
 
     /**
