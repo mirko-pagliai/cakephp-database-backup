@@ -43,7 +43,7 @@ class ExportCommand extends Command
                 ],
                 'filename' => [
                     'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
-                        'patterns. The compression type will be automatically setted'),
+                        'patterns. The compression type will be automatically set'),
                     'short' => 'f',
                 ],
                 'rotate' => [
