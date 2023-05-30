@@ -170,8 +170,8 @@ abstract class DriverTestCase extends TestCase
             $this->assertCount(1, $diff['Comments']);
 
             //Difference is article with ID 2 and comment with ID 4
-            $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
-            $this->assertEquals(4, collection($diff['Comments'])->extract('id')->first());
+            $this->assertSame(2, collection($diff['Articles'])->extract('id')->first());
+            $this->assertSame(4, collection($diff['Comments'])->extract('id')->first());
         }
     }
 

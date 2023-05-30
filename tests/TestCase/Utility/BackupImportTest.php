@@ -61,21 +61,21 @@ class BackupImportTest extends TestCase
         //Creates a `sql` backup
         $backup = $this->BackupExport->filename('backup.sql')->export();
         $this->BackupImport->filename($backup);
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //Creates a `sql.bz2` backup
         $backup = $this->BackupExport->filename('backup.sql.bz2')->export();
         $this->BackupImport->filename($backup);
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //Creates a `sql.gz` backup
         $backup = $this->BackupExport->filename('backup.sql.gz')->export();
         $this->BackupImport->filename($backup);
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //With a relative path
         $this->BackupImport->filename(basename($backup));
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);

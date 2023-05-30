@@ -81,7 +81,7 @@ class BackupManagerTest extends TestCase
     public function testDeleteAll(): void
     {
         $createdFiles = createSomeBackups();
-        $this->assertEquals(array_reverse($createdFiles), $this->BackupManager->deleteAll());
+        $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
         $this->expectException(NotWritableException::class);
@@ -103,15 +103,15 @@ class BackupManagerTest extends TestCase
 
         //Checks compressions
         $compressions = $files->extract('compression')->toList();
-        $this->assertEquals(['gzip', 'bzip2', false], $compressions);
+        $this->assertSame(['gzip', 'bzip2', null], $compressions);
 
         //Checks filenames
         $filenames = $files->extract('filename')->toList();
-        $this->assertEquals(array_reverse(array_map('basename', $createdFiles)), $filenames);
+        $this->assertSame(array_reverse(array_map('basename', $createdFiles)), $filenames);
 
         //Checks extensions
         $extensions = $files->extract('extension')->toList();
-        $this->assertEquals(['sql.gz', 'sql.bz2', 'sql'], $extensions);
+        $this->assertSame(['sql.gz', 'sql.bz2', 'sql'], $extensions);
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
@@ -127,7 +127,7 @@ class BackupManagerTest extends TestCase
      */
     public function testRotate(): void
     {
-        $this->assertEquals([], BackupManager::rotate(1));
+        $this->assertSame([], BackupManager::rotate(1));
 
         createSomeBackups();
 
@@ -140,12 +140,10 @@ class BackupManagerTest extends TestCase
         //Now there are two files. Only uncompressed file was deleted
         $filesAfterRotate = $this->BackupManager->index();
         $this->assertCount(2, $filesAfterRotate);
-        $this->assertEquals(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
+        $this->assertSame(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), function (Entity $first, Entity $second): int {
-            return strcmp($first->get('filename'), $second->get('filename'));
-        });
+        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), fn(Entity $first, Entity $second): int => strcmp($first->get('filename'), $second->get('filename')));
 
         //Again, only 1 backup was deleted. The difference is the same
         $this->assertCount(1, $diff);
