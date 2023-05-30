@@ -29,25 +29,25 @@ class RotateCommandTest extends CommandTestCase
      */
     public function testExecute(): void
     {
-        $command = 'database_backup.rotate -v';
-
         createSomeBackups();
-        $this->exec($command . ' 1');
+        $this->exec('database_backup.rotate -v 1');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql\.bz2` has been deleted/');
         $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql` has been deleted/');
         $this->assertOutputContains('<success>Deleted backup files: 2</success>');
+        $this->assertErrorEmpty();
 
         //With no backups
         BackupManager::deleteAll();
-        $this->exec($command . ' 1');
+        $this->exec('database_backup.rotate -v 1');
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');
+        $this->assertErrorEmpty();
 
         //With an invalid value
-        $this->exec($command . ' string');
+        $this->exec('database_backup.rotate -v string');
         $this->assertExitError();
     }
 }

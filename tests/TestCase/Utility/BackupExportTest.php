@@ -19,7 +19,6 @@ use Cake\Core\Configure;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
-use Tools\Filesystem;
 use Tools\TestSuite\ReflectionTrait;
 
 /**
@@ -43,9 +42,7 @@ class BackupExportTest extends TestCase
     {
         parent::setUp();
 
-        if (empty($this->BackupExport)) {
-            $this->BackupExport = new BackupExport();
-        }
+        $this->BackupExport ??= new BackupExport();
     }
 
     /**
@@ -72,10 +69,7 @@ class BackupExportTest extends TestCase
     public function testFilename(): void
     {
         $this->BackupExport->filename('backup.sql.bz2');
-        $this->assertSame(
-            Filesystem::concatenate(Configure::read('DatabaseBackup.target'), 'backup.sql.bz2'),
-            $this->getProperty($this->BackupExport, 'filename')
-        );
+        $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->getProperty($this->BackupExport, 'filename'));
         $this->assertSame('bzip2', $this->getProperty($this->BackupExport, 'compression'));
         $this->assertSame('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 

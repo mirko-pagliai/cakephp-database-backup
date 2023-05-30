@@ -60,9 +60,9 @@ class BackupTraitTest extends TestCase
      */
     public function testGetAbsolutePath(): void
     {
-        $expected = Configure::readOrFail('DatabaseBackup.target') . DS . 'file.txt';
+        $expected = Configure::readOrFail('DatabaseBackup.target') . 'file.txt';
         $this->assertSame($expected, $this->Trait->getAbsolutePath('file.txt'));
-        $this->assertSame($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
+        $this->assertSame($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . 'file.txt'));
     }
 
     /**

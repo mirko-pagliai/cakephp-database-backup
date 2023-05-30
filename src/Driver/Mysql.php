@@ -27,16 +27,16 @@ class Mysql extends Driver
      * @since 2.1.0
      * @var string
      */
-    private string $auth;
+    private string $auth = '';
 
     /**
      * Internal method to get the auth file
-     * @return string|null
+     * @return string
      * @since 2.11.0
      */
-    protected function getAuthFile(): ?string
+    protected function getAuthFile(): string
     {
-        return empty($this->auth) || !file_exists($this->auth) ? null : $this->auth;
+        return $this->auth && file_exists($this->auth) ? $this->auth : '';
     }
 
     /**
