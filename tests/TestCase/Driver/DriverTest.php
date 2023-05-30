@@ -72,9 +72,7 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        if (empty($this->Driver)) {
-            $this->Driver = $this->getMockForAbstractDriver();
-        }
+        $this->Driver ??= $this->getMockForAbstractDriver();
     }
 
     /**
@@ -83,7 +81,7 @@ class DriverTest extends TestCase
      */
     public function testGetBinary(): void
     {
-        $this->assertMatchesRegularExpression('/mysql(\.exe)?$/', $this->Driver->getBinary('mysql'));
+        $this->assertStringEndsWith('mysql' . (IS_WIN ? '.exe' : ''), $this->Driver->getBinary('mysql'));
 
         //With a binary not available
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
