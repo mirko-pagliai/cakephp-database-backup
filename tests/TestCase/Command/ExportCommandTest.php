@@ -25,7 +25,7 @@ class ExportCommandTest extends CommandTestCase
     /**
      * @var string
      */
-    protected $command = 'database_backup.export -v';
+    protected string $command = 'database_backup.export -v';
 
     /**
      * @test

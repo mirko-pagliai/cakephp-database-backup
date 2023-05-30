@@ -37,12 +37,12 @@ class BackupManagerTest extends TestCase
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
-    protected $BackupExport;
+    protected BackupExport $BackupExport;
 
     /**
      * @var \DatabaseBackup\Utility\BackupManager
      */
-    protected $BackupManager;
+    protected BackupManager $BackupManager;
 
     /**
      * Called before every test method
@@ -52,8 +52,8 @@ class BackupManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?: new BackupExport();
-        $this->BackupManager = $this->BackupManager ?: new BackupManager();
+        $this->BackupExport ??= new BackupExport();
+        $this->BackupManager ??= new BackupManager();
     }
 
     /**

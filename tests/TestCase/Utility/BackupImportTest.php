@@ -32,12 +32,12 @@ class BackupImportTest extends TestCase
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
-    protected $BackupExport;
+    protected BackupExport $BackupExport;
 
     /**
      * @var \DatabaseBackup\Utility\BackupImport
      */
-    protected $BackupImport;
+    protected BackupImport $BackupImport;
 
     /**
      * Called before every test method
@@ -47,8 +47,8 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?: new BackupExport();
-        $this->BackupImport = $this->BackupImport ?: new BackupImport();
+        $this->BackupExport ??= new BackupExport();
+        $this->BackupImport ??= new BackupImport();
     }
 
     /**
