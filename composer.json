@@ -19,7 +19,7 @@
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^4.4",
         "cakephp/migrations": "^3.2",
-        "mirko-pagliai/me-tools": "~2.23",
+        "mirko-pagliai/me-tools": "^2.20.9",
         "phpunit/phpunit": "^9.1|^9.5",
         "phpstan/phpstan": "^1.7",
         "psalm/phar": "^4.24"

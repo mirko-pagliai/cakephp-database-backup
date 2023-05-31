@@ -29,11 +29,13 @@ class RotateCommandTest extends CommandTestCase
      */
     public function testExecute(): void
     {
-        createSomeBackups();
+        $expectedFiles = createSomeBackups();
+        array_pop($expectedFiles);
         $this->exec('database_backup.rotate -v 1');
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql\.bz2` has been deleted/');
-        $this->assertOutputRegExp('/Backup `backup_test_\d+\.sql` has been deleted/');
+        foreach ($expectedFiles as $expectedFile) {
+            $this->assertOutputContains('Backup `' . basename($expectedFile) . '` has been deleted');
+        }
         $this->assertOutputContains('<success>Deleted backup files: 2</success>');
         $this->assertErrorEmpty();
 

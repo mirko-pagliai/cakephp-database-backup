@@ -111,6 +111,16 @@ $loader->loadInternalFile(CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'schema.php');
 
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
 
+/**
+ * @todo to be removed in a later release. These allow it to work with older versions of me-tools and cakephp
+ */
+if (!trait_exists('Tools\ReflectionTrait')) {
+    class_alias('Tools\TestSuite\ReflectionTrait', 'Tools\ReflectionTrait');
+}
+if (!class_exists('MeTools\TestSuite\CommandTestCase')) {
+    class_alias('DatabaseBackup\TestSuite\BaseCommandTestCase', 'MeTools\TestSuite\CommandTestCase');
+}
+
 if (!function_exists('createBackup')) {
     /**
      * Global function to create a backup file
@@ -134,7 +144,7 @@ if (!function_exists('createSomeBackups')) {
     {
         $timestamp = time();
 
-        foreach (['sql.gz', 'sql.bz2', 'sql'] as $extension) {
+        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
             $file = createBackup('backup_test_' . $timestamp . '.' . $extension);
             touch($file, $timestamp--);
             $files[] = $file;

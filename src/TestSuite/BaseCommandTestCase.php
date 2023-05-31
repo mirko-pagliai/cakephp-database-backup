@@ -15,22 +15,15 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
-use DatabaseBackup\Utility\BackupManager;
-use MeTools\TestSuite\CommandTestCase as BaseCommandTestCase;
+use MeTools\TestSuite\ConsoleIntegrationTestTrait;
+use MeTools\TestSuite\TestCase;
 
 /**
- * Abstract class for test commands
+ * BaseCommandTestCase
+ * @todo to be removed in a later release. This allows it to work with older versions of me-tools and cakephp
+ *
  */
-abstract class CommandTestCase extends BaseCommandTestCase
+class BaseCommandTestCase extends TestCase
 {
-    /**
-     * Called after every test method
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        BackupManager::deleteAll();
-
-        parent::tearDown();
-    }
+    use ConsoleIntegrationTestTrait;
 }
