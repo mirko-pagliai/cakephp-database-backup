@@ -103,7 +103,7 @@ class BackupManagerTest extends TestCase
 
         //Checks compressions
         $compressions = $files->extract('compression')->toList();
-        $this->assertSame(['gzip', 'bzip2', null], $compressions);
+        $this->assertSame(['bzip2', 'gzip', null], $compressions);
 
         //Checks filenames
         $filenames = $files->extract('filename')->toList();
@@ -111,7 +111,7 @@ class BackupManagerTest extends TestCase
 
         //Checks extensions
         $extensions = $files->extract('extension')->toList();
-        $this->assertSame(['sql.gz', 'sql.bz2', 'sql'], $extensions);
+        $this->assertSame(['sql.bz2', 'sql.gz', 'sql'], $extensions);
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
@@ -140,7 +140,7 @@ class BackupManagerTest extends TestCase
         //Now there are two files. Only uncompressed file was deleted
         $filesAfterRotate = $this->BackupManager->index();
         $this->assertCount(2, $filesAfterRotate);
-        $this->assertSame(['gzip', 'bzip2'], $filesAfterRotate->extract('compression')->toList());
+        $this->assertSame(['bzip2', 'gzip'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
         $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), fn(Entity $first, Entity $second): int => strcmp($first->get('filename'), $second->get('filename')));

@@ -133,7 +133,7 @@ if (!function_exists('createSomeBackups')) {
     {
         $timestamp = time();
 
-        foreach (['sql.gz', 'sql.bz2', 'sql'] as $extension) {
+        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
             $file = createBackup('backup_test_' . $timestamp . '.' . $extension);
             touch($file, $timestamp--);
             $files[] = $file;
