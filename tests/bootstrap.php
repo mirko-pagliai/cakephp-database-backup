@@ -106,9 +106,8 @@ Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 
-$scheme = ConnectionManager::getConfigOrFail('test')['scheme'];
 $loader = new SchemaLoader();
-$loader->loadInternalFile(TESTS . 'schema.php');
+$loader->loadInternalFile(CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'schema.php');
 
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
 
