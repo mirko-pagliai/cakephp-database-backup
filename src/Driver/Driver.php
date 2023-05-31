@@ -38,8 +38,8 @@ abstract class Driver implements EventListenerInterface
     protected Connection $connection;
 
     /**
-     * Construct
-     * @param \Cake\Database\Connection $connection Connection instance
+     * Constructor
+     * @param \Cake\Database\Connection $connection A `Connection` instance
      */
     public function __construct(Connection $connection)
     {
@@ -67,17 +67,17 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Internal method to execute an external program
-     * @param string $command The command that will be executed
+     * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
+     * @param string $command The command line to pass to the shell of the OS
      * @return \Symfony\Component\Process\Process
      * @since 2.8.7
      */
     protected function _exec(string $command): Process
     {
-        $process = Process::fromShellCommandline($command);
-        $process->run();
+        $Process = Process::fromShellCommandline($command);
+        $Process->run();
 
-        return $process;
+        return $Process;
     }
 
     /**

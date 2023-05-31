@@ -50,7 +50,9 @@ trait BackupTrait
     }
 
     /**
-     * Gets the `Connection` instance
+     * Gets the `Connection` instance.
+     *
+     * You can pass the name of the connection. By default, the connection set in the configuration will be used.
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface
      */
@@ -60,8 +62,10 @@ trait BackupTrait
     }
 
     /**
-     * Gets the `Driver` instance containing all methods to export/import database backups, according to the connection
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` object
+     * Gets the `Driver` instance, containing all methods to export/import database backups.
+     *
+     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
      * @return \DatabaseBackup\Driver\Driver A `Driver` instance
      * @throws \ErrorException|\ReflectionException
      * @since 2.0.0
@@ -78,8 +82,10 @@ trait BackupTrait
     }
 
     /**
-     * Gets the driver name, according to the connection
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` object
+     * Gets the driver name, according to the connection.
+     *
+     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
      * @return string Driver name
      * @throws \ReflectionException
      * @since 2.9.2
@@ -92,7 +98,7 @@ trait BackupTrait
     }
 
     /**
-     * Returns the extension for a backup file
+     * Takes and gets the extension of a backup file
      * @param string $path File path
      * @return string|null Extension or `null` for invalid extensions
      */
@@ -104,8 +110,8 @@ trait BackupTrait
     }
 
     /**
-     * Returns all valid compressions
-     * @return array<string, string>
+     * Returns all valid compressions available
+     * @return array<string, string> An array with extensions as keys and compressions as values
      * @since 2.4.0
      */
     public static function getValidCompressions(): array
