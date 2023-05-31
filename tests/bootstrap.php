@@ -116,6 +116,9 @@ echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_
 if (!trait_exists('Tools\ReflectionTrait')) {
     class_alias('Tools\TestSuite\ReflectionTrait', 'Tools\ReflectionTrait');
 }
+if (!trait_exists('MeTools\TestSuite\ConsoleIntegrationTestTrait')) {
+    class_alias('Cake\TestSuite\ConsoleIntegrationTestTrait', 'MeTools\TestSuite\ConsoleIntegrationTestTrait');
+}
 if (!class_exists('MeTools\TestSuite\CommandTestCase')) {
     class_alias('DatabaseBackup\TestSuite\BaseCommandTestCase', 'MeTools\TestSuite\CommandTestCase');
 }
