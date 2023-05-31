@@ -47,7 +47,7 @@ class BackupTraitTest extends TestCase
      * Called before every test method
      * @return void
      */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
