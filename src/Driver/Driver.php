@@ -38,8 +38,8 @@ abstract class Driver implements EventListenerInterface
     protected Connection $connection;
 
     /**
-     * Construct
-     * @param \Cake\Database\Connection $connection Connection instance
+     * Constructor
+     * @param \Cake\Database\Connection $connection A `Connection` instance
      */
     public function __construct(Connection $connection)
     {
@@ -67,17 +67,17 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Internal method to execute an external program
-     * @param string $command The command that will be executed
+     * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
+     * @param string $command The command line to pass to the shell of the OS
      * @return \Symfony\Component\Process\Process
      * @since 2.8.7
      */
     protected function _exec(string $command): Process
     {
-        $process = Process::fromShellCommandline($command);
-        $process->run();
+        $Process = Process::fromShellCommandline($command);
+        $Process->run();
 
-        return $process;
+        return $Process;
     }
 
     /**
@@ -95,7 +95,7 @@ abstract class Driver implements EventListenerInterface
     protected function _getExecutable(string $type): string
     {
         Exceptionist::inArray($type, ['export', 'import']);
-        $driver = strtolower($this->getDriverName());
+        $driver = strtolower(self::getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFile') && $this->getAuthFile() ? escapeshellarg($this->getAuthFile()) : '',
@@ -120,7 +120,7 @@ abstract class Driver implements EventListenerInterface
     protected function _getExportExecutable(string $filename): string
     {
         $exec = $this->_getExecutable('export');
-        $compression = $this->getCompression($filename);
+        $compression = self::getCompression($filename);
         if ($compression) {
             $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
         }
@@ -139,7 +139,7 @@ abstract class Driver implements EventListenerInterface
     protected function _getImportExecutable(string $filename): string
     {
         $exec = $this->_getExecutable('import');
-        $compression = $this->getCompression($filename);
+        $compression = self::getCompression($filename);
         if ($compression) {
             return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
         }
@@ -193,7 +193,7 @@ abstract class Driver implements EventListenerInterface
      */
     final public function getBinary(string $name): string
     {
-        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), sprintf('Binary for `%s` could not be found. You have to set its path manually', $name));
+        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), 'Binary for `' . $name . '` could not be found. You have to set its path manually');
     }
 
     /**

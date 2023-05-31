@@ -28,21 +28,21 @@ class DeleteAllCommandTest extends CommandTestCase
      */
     public function testExecute(): void
     {
-        $command = 'database_backup.delete_all -v';
-
         $files = createSomeBackups();
-        $this->exec($command);
+        $this->exec('database_backup.delete_all -v');
         $this->assertExitSuccess();
         foreach ($files as $file) {
             $this->assertOutputContains('Backup `' . $file . '` has been deleted');
         }
         $this->assertOutputContains('<success>Deleted backup files: 3</success>');
+        $this->assertErrorEmpty();
 
         //With no backups
-        $this->exec($command);
+        $this->exec('database_backup.delete_all -v');
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');
+        $this->assertErrorEmpty();
     }
 }

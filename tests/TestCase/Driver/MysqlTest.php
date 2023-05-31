@@ -1,5 +1,5 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocMissingThrowsInspection, PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -27,7 +27,7 @@ class MysqlTest extends DriverTestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -73,7 +73,7 @@ class MysqlTest extends DriverTestCase
         $auth = $this->invokeMethod($this->Driver, 'getAuthFile');
         $this->assertStringEqualsFile($auth, $expected);
 
-        @unlink($auth);
+        unlink($auth);
     }
 
     /**
@@ -91,7 +91,7 @@ class MysqlTest extends DriverTestCase
         $auth = $this->invokeMethod($this->Driver, 'getAuthFile');
         $this->assertStringEqualsFile($auth, $expected);
 
-        @unlink($auth);
+        unlink($auth);
     }
 
     /**

@@ -42,15 +42,9 @@ define('CACHE', TMP . 'cache' . DS);
 define('LOGS', TMP . 'cakephp_log' . DS);
 define('SESSIONS', TMP . 'sessions' . DS);
 
-foreach ([
-    TMP,
-    LOGS,
-    SESSIONS,
-    CACHE . 'models',
-    CACHE . 'persistent',
-    CACHE . 'views',
-] as $dir) {
-    @mkdir($dir, 0777, true);
+$dirs = [TMP, LOGS, SESSIONS, CACHE . 'models', CACHE . 'persistent', CACHE . 'views'];
+foreach (array_filter($dirs, fn(string $dir): bool => !file_exists($dir)) as $dir) {
+    mkdir($dir, 0777, true);
 }
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -102,8 +96,15 @@ if (!getenv('db_dsn')) {
 ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 
 Configure::write('DatabaseBackup.connection', 'test');
-Configure::write('DatabaseBackup.target', TMP . 'backups');
+Configure::write('DatabaseBackup.target', TMP . 'backups' . DS);
 Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+/**
+ * For Xampp
+ */
+if (IS_WIN && file_exists('C:\\xampp\\mysql\\bin\\mysql.exe')) {
+    Configure::write('DatabaseBackup.binaries.mysql', 'C:\\xampp\\mysql\\bin\\mysql.exe');
+    Configure::write('DatabaseBackup.binaries.mysqldump', 'C:\\xampp\\mysql\\bin\\mysqldump.exe');
+}
 Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';

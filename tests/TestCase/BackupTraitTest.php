@@ -47,7 +47,7 @@ class BackupTraitTest extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -60,9 +60,9 @@ class BackupTraitTest extends TestCase
      */
     public function testGetAbsolutePath(): void
     {
-        $expected = Configure::readOrFail('DatabaseBackup.target') . DS . 'file.txt';
-        $this->assertEquals($expected, $this->Trait->getAbsolutePath('file.txt'));
-        $this->assertEquals($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . DS . 'file.txt'));
+        $expected = Configure::readOrFail('DatabaseBackup.target') . 'file.txt';
+        $this->assertSame($expected, $this->Trait->getAbsolutePath('file.txt'));
+        $this->assertSame($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . 'file.txt'));
     }
 
     /**
@@ -72,14 +72,14 @@ class BackupTraitTest extends TestCase
     public function testGetCompression(): void
     {
         foreach ([
-            'backup.sql' => false,
+            'backup.sql' => null,
             'backup.sql.bz2' => 'bzip2',
             DS . 'backup.sql.bz2' => 'bzip2',
             Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'bzip2',
             'backup.sql.gz' => 'gzip',
             'text.txt' => null,
         ] as $filename => $expectedCompression) {
-            $this->assertEquals($expectedCompression, $this->Trait->getCompression($filename));
+            $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
         }
     }
 
@@ -92,13 +92,13 @@ class BackupTraitTest extends TestCase
         foreach ([null, Configure::read('DatabaseBackup.connection')] as $name) {
             $connection = $this->Trait->getConnection($name);
             $this->assertInstanceof(Connection::class, $connection);
-            $this->assertEquals('test', $connection->config()['name']);
+            $this->assertSame('test', $connection->config()['name']);
         }
 
         ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
         $connection = $this->Trait->getConnection('fake');
         $this->assertInstanceof(Connection::class, $connection);
-        $this->assertEquals('fake', $connection->config()['name']);
+        $this->assertSame('fake', $connection->config()['name']);
 
         $this->expectException(MissingDatasourceConfigException::class);
         $this->expectExceptionMessage('The datasource configuration "noExisting" was not found');
@@ -111,14 +111,13 @@ class BackupTraitTest extends TestCase
      */
     public function testGetDriver(): void
     {
-        foreach ([ConnectionManager::get('test'), null] as $driver) {
-            $this->assertInstanceof(Driver::class, $this->Trait->getDriver($driver));
+        foreach ([ConnectionManager::get('test'), null] as $connection) {
+            $this->assertInstanceof(Driver::class, $this->Trait->getDriver($connection));
         }
 
         //With a no existing driver
         $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
-        $Connection = $this->createPartialMock(Connection::class, ['__debuginfo', 'getDriver']);
-        $Connection->method('getDriver')->willReturn(new Sqlserver());
+        $Connection = $this->createConfiguredMock(Connection::class, ['__debuginfo' => [], 'getDriver' => new Sqlserver()]);
         $this->Trait->getDriver($Connection);
     }
 
@@ -141,7 +140,7 @@ class BackupTraitTest extends TestCase
             'text' => null,
             '.txt' => null,
         ] as $filename => $expectedExtension) {
-            $this->assertEquals($expectedExtension, $this->Trait->getExtension($filename));
+            $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
         }
     }
 

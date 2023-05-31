@@ -49,7 +49,7 @@ abstract class DriverTestCase extends TestCase
      * @since 2.5.1
      * @var class-string<\DatabaseBackup\Driver\Driver>
      */
-    protected $DriverClass;
+    protected string $DriverClass;
 
     /**
      * Name of the database connection
@@ -69,7 +69,7 @@ abstract class DriverTestCase extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -77,9 +77,7 @@ abstract class DriverTestCase extends TestCase
         $connection = $this->getConnection('test');
 
         foreach (['Articles', 'Comments'] as $name) {
-            if (empty($this->$name)) {
-                $this->$name = $this->getTable($name, compact('connection'));
-            }
+            $this->{$name} ??= $this->getTable($name, compact('connection'));
         }
 
         if (empty($this->DriverClass) || empty($this->Driver)) {
@@ -100,7 +98,7 @@ abstract class DriverTestCase extends TestCase
     final protected function getAllRecords(): array
     {
         foreach (['Articles', 'Comments'] as $name) {
-            $records[$name] = $this->$name->find()->enableHydration(false)->toArray();
+            $records[$name] = $this->{$name}->find()->enableHydration(false)->toArray();
         }
 
         return $records;
@@ -154,8 +152,7 @@ abstract class DriverTestCase extends TestCase
             $final = $this->getAllRecords();
             $this->assertEquals($initial, $final);
 
-            //Gets the difference (`$diff`) between records after delete and
-            //  records after import (`$final`)
+            //Gets the difference (`$diff`) between records after delete and records after import (`$final`)
             $diff = $final;
             foreach ($final as $model => $finalValues) {
                 foreach ($finalValues as $finalKey => $finalValue) {
@@ -170,8 +167,8 @@ abstract class DriverTestCase extends TestCase
             $this->assertCount(1, $diff['Comments']);
 
             //Difference is article with ID 2 and comment with ID 4
-            $this->assertEquals(2, collection($diff['Articles'])->extract('id')->first());
-            $this->assertEquals(4, collection($diff['Comments'])->extract('id')->first());
+            $this->assertSame(2, collection($diff['Articles'])->extract('id')->first());
+            $this->assertSame(4, collection($diff['Comments'])->extract('id')->first());
         }
     }
 
@@ -187,11 +184,7 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_getExportExecutable', [$filename]);
-            $expected = sprintf(
-                ' | %s > %s',
-                escapeshellarg($this->Driver->getBinary($compression)),
-                escapeshellarg($filename)
-            );
+            $expected = sprintf(' | %s > %s', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
             $this->assertStringEndsWith($expected, $result);
         }
     }
@@ -222,11 +215,7 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
             $result = $this->invokeMethod($this->Driver, '_getImportExecutable', [$filename]);
-            $expected = sprintf(
-                '%s -dc %s | ',
-                escapeshellarg($this->Driver->getBinary($compression)),
-                escapeshellarg($filename)
-            );
+            $expected = sprintf('%s -dc %s | ', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
             $this->assertStringStartsWith($expected, $result);
         }
     }

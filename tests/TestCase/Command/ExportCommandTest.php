@@ -25,7 +25,7 @@ class ExportCommandTest extends CommandTestCase
     /**
      * @var string
      */
-    protected $command = 'database_backup.export -v';
+    protected string $command = 'database_backup.export -v';
 
     /**
      * @test
@@ -38,6 +38,7 @@ class ExportCommandTest extends CommandTestCase
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
+        $this->assertErrorEmpty();
 
         //With an invalid option value
         $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
@@ -54,6 +55,7 @@ class ExportCommandTest extends CommandTestCase
         $this->exec($this->command . ' --compression bzip2');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql\.bz2` has been exported/');
+        $this->assertErrorEmpty();
     }
 
     /**
@@ -66,6 +68,7 @@ class ExportCommandTest extends CommandTestCase
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup.sql` has been exported/');
+        $this->assertErrorEmpty();
     }
 
     /**
@@ -81,6 +84,7 @@ class ExportCommandTest extends CommandTestCase
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename(array_value_first($files)) . '` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
+        $this->assertErrorEmpty();
     }
 
     /**
@@ -94,5 +98,6 @@ class ExportCommandTest extends CommandTestCase
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` was sent via mail/');
+        $this->assertErrorEmpty();
     }
 }

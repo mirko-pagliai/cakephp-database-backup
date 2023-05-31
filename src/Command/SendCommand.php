@@ -21,7 +21,6 @@ use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 use Exception;
-use Tools\Filesystem;
 
 /**
  * Sends a backup file via email
@@ -62,7 +61,7 @@ class SendCommand extends Command
 
         try {
             BackupManager::send($args->getArgument('filename') ?: '', $args->getArgument('recipient') ?: '');
-            $io->success(__d('database_backup', 'Backup `{0}` was sent via mail', Filesystem::instance()->rtr($args->getArgument('filename') ?: '')));
+            $io->success(__d('database_backup', 'Backup `{0}` was sent via mail', rtr($args->getArgument('filename') ?: '')));
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();

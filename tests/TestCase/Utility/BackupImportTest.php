@@ -32,23 +32,23 @@ class BackupImportTest extends TestCase
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
-    protected $BackupExport;
+    protected BackupExport $BackupExport;
 
     /**
      * @var \DatabaseBackup\Utility\BackupImport
      */
-    protected $BackupImport;
+    protected BackupImport $BackupImport;
 
     /**
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->BackupExport = $this->BackupExport ?: new BackupExport();
-        $this->BackupImport = $this->BackupImport ?: new BackupImport();
+        $this->BackupExport ??= new BackupExport();
+        $this->BackupImport ??= new BackupImport();
     }
 
     /**
@@ -61,21 +61,21 @@ class BackupImportTest extends TestCase
         //Creates a `sql` backup
         $backup = $this->BackupExport->filename('backup.sql')->export();
         $this->BackupImport->filename($backup);
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //Creates a `sql.bz2` backup
         $backup = $this->BackupExport->filename('backup.sql.bz2')->export();
         $this->BackupImport->filename($backup);
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //Creates a `sql.gz` backup
         $backup = $this->BackupExport->filename('backup.sql.gz')->export();
         $this->BackupImport->filename($backup);
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //With a relative path
         $this->BackupImport->filename(basename($backup));
-        $this->assertEquals($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);
@@ -84,7 +84,7 @@ class BackupImportTest extends TestCase
 
         //With invalid extension
         $this->expectExceptionMessage('Invalid file extension');
-        $this->BackupImport->filename(Filesystem::instance()->createTmpFile());
+        $this->BackupImport->filename(Filesystem::createTmpFile());
     }
 
     /**

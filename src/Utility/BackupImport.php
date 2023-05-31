@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Driver\Driver;
 use Tools\Exceptionist;
 
 /**
@@ -29,13 +30,13 @@ class BackupImport
      * Driver containing all methods to export/import database backups according to the connection
      * @var \DatabaseBackup\Driver\Driver
      */
-    protected $Driver;
+    protected Driver $Driver;
 
     /**
      * Filename where to import the database
      * @var string
      */
-    protected $filename;
+    protected string $filename;
 
     /**
      * Construct

@@ -63,12 +63,11 @@ class IndexCommand extends Command
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
         ];
-        $cells = $backups->map(function (Entity $backup): array {
-            return $backup->set('compression', $backup->get('compression') ?: '')
-                ->set('datetime', $backup->get('datetime')->nice())
-                ->set('size', Number::toReadableSize($backup->get('size')))
-                ->toArray();
-        });
+        $cells = $backups->map(fn(Entity $backup): array => $backup
+            ->set('compression', $backup->get('compression') ?: '')
+            ->set('datetime', $backup->get('datetime')->nice())
+            ->set('size', Number::toReadableSize($backup->get('size')))
+            ->toArray());
         $io->helper('table')->output(array_merge([$headers], $cells->toList()));
     }
 }

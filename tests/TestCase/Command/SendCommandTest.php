@@ -29,10 +29,8 @@ class SendCommandTest extends CommandTestCase
      */
     public function testExecute(): void
     {
-        $command = 'database_backup.send -v';
-
         $file = createBackup();
-        $this->exec($command . ' ' . $file . ' recipient@example.com');
+        $this->exec('database_backup.send -v' . ' ' . $file . ' recipient@example.com');
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
@@ -40,11 +38,11 @@ class SendCommandTest extends CommandTestCase
 
         //With no sender configuration
         Configure::write('DatabaseBackup.mailSender', false);
-        $this->exec($command . ' file.sql recipient@example.com');
+        $this->exec('database_backup.send -v file.sql recipient@example.com');
         $this->assertExitError();
 
         //With no existing file
-        $this->exec($command . ' /noExistingDir/backup.sql');
+        $this->exec('database_backup.send -v /noExistingDir/backup.sql');
         $this->assertExitError();
     }
 }

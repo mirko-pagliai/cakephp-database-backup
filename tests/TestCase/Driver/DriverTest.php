@@ -40,10 +40,12 @@ class DriverTest extends TestCase
      */
     protected function getMockForAbstractDriver(array $mockedMethods = []): Driver
     {
-        /** @var \Cake\Database\Connection $connection */
-        $connection = $this->getConnection('test');
+        /** @var \Cake\Database\Connection $Connection */
+        $Connection = $this->getConnection('test');
+        /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
+        $Driver = $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods, [$Connection]);
 
-        return @$this->getMockForAbstractClass(Driver::class, [$connection], '', true, true, true, $mockedMethods);
+        return $Driver;
     }
 
     /**
@@ -54,12 +56,9 @@ class DriverTest extends TestCase
      */
     protected function getMockForAbstractDriverWithErrorProcess(string $errorMessage): Driver
     {
-        $Process = $this->createPartialMock(Process::class, ['getErrorOutput', 'isSuccessful']);
-        $Process->method('getErrorOutput')->willReturn($errorMessage . PHP_EOL);
-        $Process->method('isSuccessful')->willReturn(false);
-
         $Driver = $this->getMockForAbstractDriver(['_exec']);
-        $Driver->method('_exec')->willReturn($Process);
+        $Driver->method('_exec')
+            ->willReturn($this->createConfiguredMock(Process::class, ['getErrorOutput' => $errorMessage . PHP_EOL, 'isSuccessful' => false]));
 
         return $Driver;
     }
@@ -72,9 +71,7 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        if (empty($this->Driver)) {
-            $this->Driver = $this->getMockForAbstractDriver();
-        }
+        $this->Driver ??= $this->getMockForAbstractDriver();
     }
 
     /**
@@ -83,7 +80,7 @@ class DriverTest extends TestCase
      */
     public function testGetBinary(): void
     {
-        $this->assertStringEndsWith('mysql', $this->Driver->getBinary('mysql'));
+        $this->assertStringEndsWith('mysql' . (IS_WIN ? '.exe' : ''), $this->Driver->getBinary('mysql'));
 
         //With a binary not available
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
@@ -134,7 +131,6 @@ class DriverTest extends TestCase
     public function testImportOnFailure(): void
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
-
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
         $Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
         $Driver->import($this->getAbsolutePath('example.sql'));
@@ -148,7 +144,7 @@ class DriverTest extends TestCase
     public function testImportStoppedByBeforeExport(): void
     {
         $Driver = $this->getMockForAbstractDriver(['beforeImport']);
-        $Driver->method('beforeImport')->will($this->returnValue(false));
+        $Driver->method('beforeImport')->willReturn(false);
         $this->assertFalse($Driver->import($this->getAbsolutePath('example.sql')));
     }
 }

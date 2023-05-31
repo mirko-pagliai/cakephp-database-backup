@@ -17,9 +17,11 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailTrait;
+use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
-use Tools\Filesystem;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process;
 use Tools\TestSuite\ReflectionTrait;
 
 /**
@@ -39,13 +41,11 @@ class BackupExportTest extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        if (empty($this->BackupExport)) {
-            $this->BackupExport = new BackupExport();
-        }
+        $this->BackupExport ??= new BackupExport();
     }
 
     /**
@@ -56,8 +56,8 @@ class BackupExportTest extends TestCase
     public function testCompression(): void
     {
         $this->BackupExport->compression('bzip2');
-        $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
+        $this->assertSame('bzip2', $this->getProperty($this->BackupExport, 'compression'));
+        $this->assertSame('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 
         //With an invalid type
         $this->expectExceptionMessage('Invalid compression type');
@@ -72,22 +72,19 @@ class BackupExportTest extends TestCase
     public function testFilename(): void
     {
         $this->BackupExport->filename('backup.sql.bz2');
-        $this->assertEquals(
-            Filesystem::instance()->concatenate(Configure::read('DatabaseBackup.target'), 'backup.sql.bz2'),
-            $this->getProperty($this->BackupExport, 'filename')
-        );
-        $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
+        $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->getProperty($this->BackupExport, 'filename'));
+        $this->assertSame('bzip2', $this->getProperty($this->BackupExport, 'compression'));
+        $this->assertSame('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 
         //Compression is ignored, because there's a filename
         $this->BackupExport->compression('gzip')->filename('backup.sql.bz2');
-        $this->assertEquals('backup.sql.bz2', basename($this->getProperty($this->BackupExport, 'filename')));
-        $this->assertEquals('bzip2', $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertEquals('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
+        $this->assertSame('backup.sql.bz2', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertSame('bzip2', $this->getProperty($this->BackupExport, 'compression'));
+        $this->assertSame('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
 
         //Filename with `{$DATABASE}` pattern
         $this->BackupExport->filename('{$DATABASE}.sql');
-        $this->assertEquals('test.sql', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertSame('test.sql', basename($this->getProperty($this->BackupExport, 'filename')));
 
         //Filename with `{$DATETIME}` pattern
         $this->BackupExport->filename('{$DATETIME}.sql');
@@ -95,7 +92,7 @@ class BackupExportTest extends TestCase
 
         //Filename with `{$HOSTNAME}` pattern
         $this->BackupExport->filename('{$HOSTNAME}.sql');
-        $this->assertEquals('localhost.sql', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertSame('localhost.sql', basename($this->getProperty($this->BackupExport, 'filename')));
 
         //Filename with `{$TIMESTAMP}` pattern
         $this->BackupExport->filename('{$TIMESTAMP}.sql');
@@ -113,7 +110,7 @@ class BackupExportTest extends TestCase
     public function testRotate(): void
     {
         $this->BackupExport->rotate(10);
-        $this->assertEquals(10, $this->getProperty($this->BackupExport, 'rotate'));
+        $this->assertSame(10, $this->getProperty($this->BackupExport, 'rotate'));
 
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupExport->rotate(-1)->export();
@@ -130,7 +127,7 @@ class BackupExportTest extends TestCase
 
         $recipient = 'recipient@example.com';
         $this->BackupExport->send($recipient);
-        $this->assertEquals($recipient, $this->getProperty($this->BackupExport, 'emailRecipient'));
+        $this->assertSame($recipient, $this->getProperty($this->BackupExport, 'emailRecipient'));
     }
 
     /**
@@ -151,7 +148,7 @@ class BackupExportTest extends TestCase
         //Exports with `filename()`
         $file = $this->BackupExport->filename('backup.sql.bz2')->export();
         $this->assertFileExists($file);
-        $this->assertEquals('backup.sql.bz2', basename($file));
+        $this->assertSame('backup.sql.bz2', basename($file));
 
         //Exports with `send()`
         $recipient = 'recipient@example.com';
@@ -172,13 +169,32 @@ class BackupExportTest extends TestCase
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
-    public function testExportWithDifferendChmod(): void
+    public function testExportWithDifferentChmod(): void
     {
         $file = $this->BackupExport->filename('exportWithNormalChmod.sql')->export();
-        $this->assertEquals('0664', substr(sprintf('%o', fileperms($file)), -4));
+        $this->assertSame('0664', substr(sprintf('%o', fileperms($file)), -4));
 
         Configure::write('DatabaseBackup.chmod', 0777);
         $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
-        $this->assertEquals('0777', substr(sprintf('%o', fileperms($file)), -4));
+        $this->assertSame('0777', substr(sprintf('%o', fileperms($file)), -4));
+    }
+
+    /**
+     * Test for `export()` method, exceeding the timeout
+     * @see https://symfony.com/doc/current/components/process.html#process-timeout
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
+     */
+    public function testExportExceedingTimeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
+
+        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
+        $Driver = $this->createPartialMockForAbstractClass(Driver::class, ['_exec'], [$this->getConnection('test')]);
+        $Driver->method('_exec')->willThrowException($ProcessTimedOutException);
+        $this->BackupExport->Driver = $Driver;
+        $this->BackupExport->export();
     }
 }

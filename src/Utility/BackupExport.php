@@ -17,6 +17,7 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Driver\Driver;
 use Tools\Exceptionist;
 use Tools\Filesystem;
 
@@ -30,56 +31,56 @@ class BackupExport
     /**
      * @var \DatabaseBackup\Utility\BackupManager
      */
-    public $BackupManager;
+    public BackupManager $BackupManager;
 
     /**
      * Driver containing all methods to export/import database backups according to the connection
      * @since 2.0.0
      * @var \DatabaseBackup\Driver\Driver
      */
-    public $Driver;
+    public Driver $Driver;
 
     /**
      * Compression type
      * @var string|null
      */
-    protected $compression = null;
+    protected ?string $compression = null;
 
     /**
      * Database configuration
      * @var array
      */
-    protected $config;
+    protected array $config;
 
     /**
      * Default extension
      * @var string
      */
-    protected $defaultExtension = 'sql';
+    protected string $defaultExtension = 'sql';
 
     /**
      * Recipient of the email, if you want to send the backup via mail
      * @var string|null
      */
-    protected $emailRecipient = null;
+    protected ?string $emailRecipient = null;
 
     /**
      * Filename extension
      * @var string
      */
-    protected $extension;
+    protected string $extension;
 
     /**
      * Filename where to export the database
      * @var string
      */
-    protected $filename;
+    protected string $filename;
 
     /**
      * Rotate limit. This is the number of backups you want to keep. So, it will delete all backups that are older
      * @var int
      */
-    protected $rotate = 0;
+    protected int $rotate = 0;
 
     /**
      * Construct
@@ -188,7 +189,7 @@ class BackupExport
     public function export(): string
     {
         if (empty($this->filename)) {
-            $this->extension = $this->extension ?: $this->defaultExtension;
+            $this->extension ??= $this->defaultExtension;
             $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
         }
 
@@ -199,8 +200,12 @@ class BackupExport
         $this->Driver->export($filename);
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
-        $this->emailRecipient ? $this->BackupManager->send($filename, $this->emailRecipient) : null;
-        $this->rotate ? $this->BackupManager->rotate($this->rotate) : null;
+        if ($this->emailRecipient) {
+            $this->BackupManager->send($filename, $this->emailRecipient);
+        }
+        if ($this->rotate) {
+            $this->BackupManager->rotate($this->rotate);
+        }
 
         return $filename;
     }
