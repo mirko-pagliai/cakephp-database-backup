@@ -19,23 +19,23 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\TransportFactory;
+use Cake\TestSuite\Fixture\SchemaLoader;
 use Cake\TestSuite\TestEmailTransport;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
-use Migrations\TestSuite\Migrator;
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 ini_set('intl.default_locale', 'en_US');
 
 define('ROOT', dirname(__DIR__) . DS);
-define('CAKE_CORE_INCLUDE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp');
+define('CAKE_CORE_INCLUDE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
 define('CORE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
 define('CAKE', CORE_PATH . 'src' . DS);
-define('TESTS', ROOT . 'tests');
+define('TESTS', ROOT . 'tests' . DS);
 define('APP', ROOT . 'tests' . DS . 'test_app' . DS);
-define('APP_DIR', 'test_app');
-define('WEBROOT_DIR', 'webroot');
+define('APP_DIR', 'test_app' . DS);
+define('WEBROOT_DIR', 'webroot' . DS);
 define('WWW_ROOT', APP . 'webroot' . DS);
 define('TMP', sys_get_temp_dir() . DS . 'cakephp-database-backup' . DS);
 define('CONFIG', APP . 'config' . DS);
@@ -106,8 +106,9 @@ Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 
-$migrator = new Migrator();
-$migrator->run();
+$scheme = ConnectionManager::getConfigOrFail('test')['scheme'];
+$loader = new SchemaLoader();
+$loader->loadInternalFile(TESTS . 'schema.php');
 
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
 
