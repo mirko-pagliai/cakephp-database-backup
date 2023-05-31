@@ -110,6 +110,16 @@ Configure::write('pluginsToLoad', ['DatabaseBackup']);
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
 
+/**
+ * @todo to be removed in a later release. These allow it to work with older versions of me-tools and cakephp
+ */
+if (!trait_exists('Tools\ReflectionTrait')) {
+    class_alias('Tools\TestSuite\ReflectionTrait', 'Tools\ReflectionTrait');
+}
+if (!class_exists('MeTools\TestSuite\CommandTestCase')) {
+    class_alias('DatabaseBackup\TestSuite\BaseCommandTestCase', 'MeTools\TestSuite\CommandTestCase');
+}
+
 if (!function_exists('createBackup')) {
     /**
      * Global function to create a backup file

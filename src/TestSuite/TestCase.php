@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
      * Called after every test method
      * @return void
      */
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         BackupManager::deleteAll();
 

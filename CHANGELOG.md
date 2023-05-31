@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.11 branch
 ### 2.11.1
+* guaranteed to work with all versions of CakePHP 4;
 * added all property types to all classes;
 * updated for `php-tools` 1.7.4;
 * tests have been made compatible with Xampp on Windows;
