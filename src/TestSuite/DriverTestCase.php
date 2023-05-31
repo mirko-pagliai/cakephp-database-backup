@@ -60,10 +60,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * @var array<string>
      */
-    public $fixtures = [
-        'core.Articles',
-        'core.Comments',
-    ];
+    public $fixtures = ['core.Articles', 'core.Comments'];
 
     /**
      * Called before every test method

@@ -22,6 +22,7 @@ use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\TestEmailTransport;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
+use Migrations\TestSuite\Migrator;
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
@@ -65,10 +66,6 @@ Configure::write('App', [
     'cssBaseUrl' => 'css/',
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
-/**
- * @todo Upgrade fixtures: https://book.cakephp.org/4/en/appendices/fixture-upgrade.html
- */
-Configure::write('Error.ignoredDeprecationPaths', ['tureInjector.php', '*/cakephp/src/TestSuite/Fixture/FixtureInjector.php']);
 
 Cache::setConfig([
     '_cake_core_' => [
@@ -108,6 +105,10 @@ if (IS_WIN && file_exists('C:\\xampp\\mysql\\bin\\mysql.exe')) {
 Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
+
+$migrator = new Migrator();
+$migrator->run();
+
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
 
 if (!function_exists('createBackup')) {
