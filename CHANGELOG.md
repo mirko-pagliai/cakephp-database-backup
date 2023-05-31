@@ -3,6 +3,7 @@
 ### 2.11.1
 * guaranteed to work with all versions of CakePHP 4;
 * added all property types to all classes;
+* upgraded to the new fixture system;
 * updated for `php-tools` 1.7.4;
 * tests have been made compatible with Xampp on Windows;
 * many, small improvements to the code and tests, also suggested by PhpStorm.
