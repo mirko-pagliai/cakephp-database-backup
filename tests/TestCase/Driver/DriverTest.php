@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -112,6 +113,23 @@ class DriverTest extends TestCase
     }
 
     /**
+     * Test for `export()` method, exceeding the timeout
+     * @see https://symfony.com/doc/current/components/process.html#process-timeout
+     * @test
+     * @uses \DatabaseBackup\Driver\Driver::_exec()
+     * @uses \DatabaseBackup\Driver\Driver::export()
+     */
+    public function testExportExceedingTimeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
+        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        $Driver = $this->getMockForAbstractDriver(['_exec']);
+        $Driver->method('_exec')->willThrowException($ProcessTimedOutException);
+        $Driver->export($this->getAbsolutePath('example.sql'));
+    }
+
+    /**
      * Test for `export()` method. Export is stopped because the `beforeExport()` method returns `false`
      * @test
      * @uses \DatabaseBackup\Driver\Driver::export()
@@ -133,6 +151,23 @@ class DriverTest extends TestCase
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
         $Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
+        $Driver->import($this->getAbsolutePath('example.sql'));
+    }
+
+    /**
+     * Test for `import()` method, exceeding the timeout
+     * @see https://symfony.com/doc/current/components/process.html#process-timeout
+     * @test
+     * @uses \DatabaseBackup\Driver\Driver::_exec()
+     * @uses \DatabaseBackup\Driver\Driver::import()
+     */
+    public function testImportExceedingTimeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
+        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        $Driver = $this->getMockForAbstractDriver(['_exec']);
+        $Driver->method('_exec')->willThrowException($ProcessTimedOutException);
         $Driver->import($this->getAbsolutePath('example.sql'));
     }
 
