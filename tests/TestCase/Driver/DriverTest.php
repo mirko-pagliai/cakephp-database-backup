@@ -57,9 +57,9 @@ class DriverTest extends TestCase
      */
     protected function getMockForAbstractDriverWithErrorProcess(string $errorMessage): Driver
     {
+        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $errorMessage . PHP_EOL, 'isSuccessful' => false]);
         $Driver = $this->getMockForAbstractDriver(['_exec']);
-        $Driver->method('_exec')
-            ->willReturn($this->createConfiguredMock(Process::class, ['getErrorOutput' => $errorMessage . PHP_EOL, 'isSuccessful' => false]));
+        $Driver->method('_exec')->willReturn($Process);
 
         return $Driver;
     }
