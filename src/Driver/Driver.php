@@ -75,6 +75,7 @@ abstract class Driver implements EventListenerInterface
     protected function _exec(string $command): Process
     {
         $Process = Process::fromShellCommandline($command);
+        $Process->setTimeout(Configure::read('DatabaseBackup.processTimeout', 60));
         $Process->run();
 
         return $Process;
