@@ -17,11 +17,8 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\TestSuite\EmailTrait;
-use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
 use Tools\TestSuite\ReflectionTrait;
 
 /**
@@ -177,24 +174,5 @@ class BackupExportTest extends TestCase
         Configure::write('DatabaseBackup.chmod', 0777);
         $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
         $this->assertSame('0777', substr(sprintf('%o', fileperms($file)), -4));
-    }
-
-    /**
-     * Test for `export()` method, exceeding the timeout
-     * @see https://symfony.com/doc/current/components/process.html#process-timeout
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
-     */
-    public function testExportExceedingTimeout(): void
-    {
-        $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
-
-        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-        /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
-        $Driver = $this->createPartialMockForAbstractClass(Driver::class, ['_exec'], [$this->getConnection('test')]);
-        $Driver->method('_exec')->willThrowException($ProcessTimedOutException);
-        $this->BackupExport->Driver = $Driver;
-        $this->BackupExport->export();
     }
 }

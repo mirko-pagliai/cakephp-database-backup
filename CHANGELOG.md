@@ -1,8 +1,13 @@
 # 2.x branch
 ## 2.11 branch
 ### 2.11.1
+* added the `DatabaseBackup.processTimeout` configuration, which allows you to set a timeout for commands that will be 
+  executed in sub-processes (which by default is 60 seconds) and which can be useful for exporting/importing large
+  databases (see [issue #88](https://github.com/mirko-pagliai/cakephp-database-backup/issues/88)). Any options to change
+  this timeout from `ImportCommand`/`ExportCommand` will be implemented later;
 * guaranteed to work with all versions of CakePHP 4;
 * added all property types to all classes;
+* upgraded to the new fixture system;
 * updated for `php-tools` 1.7.4;
 * tests have been made compatible with Xampp on Windows;
 * many, small improvements to the code and tests, also suggested by PhpStorm.
