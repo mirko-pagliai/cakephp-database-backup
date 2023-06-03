@@ -135,25 +135,25 @@ class BackupExportTest extends TestCase
      */
     public function testExport(): void
     {
-        $file = $this->BackupExport->export();
+        $file = $this->BackupExport->export() ?: '';
         $this->assertFileExists($file);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($file));
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Driver->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Driver->getEventManager());
 
         //Exports with `compression()`
-        $file = $this->BackupExport->compression('bzip2')->export();
+        $file = $this->BackupExport->compression('bzip2')->export() ?: '';
         $this->assertFileExists($file);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql\.bz2$/', basename($file));
 
         //Exports with `filename()`
-        $file = $this->BackupExport->filename('backup.sql.bz2')->export();
+        $file = $this->BackupExport->filename('backup.sql.bz2')->export() ?: '';
         $this->assertFileExists($file);
         $this->assertSame('backup.sql.bz2', basename($file));
 
         //Exports with `send()`
         $recipient = 'recipient@example.com';
-        $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export();
+        $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export() ?: '';
         $this->assertMailSentFrom(Configure::readOrFail('DatabaseBackup.mailSender'));
         $this->assertMailSentTo($recipient);
         $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
@@ -172,11 +172,11 @@ class BackupExportTest extends TestCase
      */
     public function testExportWithDifferentChmod(): void
     {
-        $file = $this->BackupExport->filename('exportWithNormalChmod.sql')->export();
+        $file = $this->BackupExport->filename('exportWithNormalChmod.sql')->export() ?: '';
         $this->assertSame('0664', substr(sprintf('%o', fileperms($file)), -4));
 
         Configure::write('DatabaseBackup.chmod', 0777);
-        $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
+        $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export() ?: '';
         $this->assertSame('0777', substr(sprintf('%o', fileperms($file)), -4));
     }
 

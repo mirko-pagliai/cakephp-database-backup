@@ -21,6 +21,7 @@ use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
+use Tools\Exceptionist;
 
 /**
  * Imports a database backup
@@ -54,7 +55,15 @@ class ImportCommand extends Command
         parent::execute($args, $io);
 
         try {
-            $file = (new BackupImport())->filename((string)$args->getArgument('filename'))->import();
+            $BackupImport = new BackupImport();
+            $BackupImport->filename((string)$args->getArgument('filename'));
+
+            /**
+             * Imports
+             * @var string $file
+             */
+            $file = $BackupImport->import();
+            Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());

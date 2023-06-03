@@ -62,13 +62,13 @@ class BackupManagerTest extends TestCase
      */
     public function testDelete(): void
     {
-        $filename = $this->BackupExport->export();
+        $filename = $this->BackupExport->export() ?: '';
         $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete($filename));
         $this->assertFileDoesNotExist($filename);
 
         //With a relative path
-        $filename = $this->BackupExport->export();
+        $filename = $this->BackupExport->export() ?: '';
         $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
         $this->assertFileDoesNotExist($filename);

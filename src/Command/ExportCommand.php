@@ -21,6 +21,7 @@ use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
+use Tools\Exceptionist;
 
 /**
  * Exports a database backup
@@ -85,8 +86,12 @@ class ExportCommand extends Command
                 $BackupExport->compression((string)$args->getOption('compression'));
             }
 
-            //Exports
+            /**
+             * Exports
+             * @var string $file
+             */
             $file = $BackupExport->export();
+            Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
             $verbose = $args->getOption('verbose');
