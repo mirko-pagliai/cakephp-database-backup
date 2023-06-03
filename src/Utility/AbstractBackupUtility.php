@@ -54,7 +54,7 @@ abstract class AbstractBackupUtility
      * @return \Symfony\Component\Process\Process
      * @since 2.8.7
      */
-    public function _exec(string $command): Process
+    protected function getProcess(string $command): Process
     {
         $Process = Process::fromShellCommandline($command);
         $Process->setTimeout(Configure::read('DatabaseBackup.processTimeout', 60));

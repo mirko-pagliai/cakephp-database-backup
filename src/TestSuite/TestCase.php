@@ -19,7 +19,6 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\Utility\BackupManager;
 use MeTools\TestSuite\TestCase as BaseTestCase;
-use Symfony\Component\Process\Process;
 
 /**
  * TestCase class
@@ -50,21 +49,6 @@ abstract class TestCase extends BaseTestCase
         $Connection = $this->getConnection('test');
         /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
         $Driver = $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods, [$Connection]);
-
-        return $Driver;
-    }
-
-    /**
-     * Internal method to get a mock for `Driver` abstract class, with the `_exec()` method that returns a `Process`
-     *  instance with a failure and a custom error message
-     * @param string $errorMessage The error message
-     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockForAbstractDriverWithErrorProcess(string $errorMessage): Driver
-    {
-        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $errorMessage . PHP_EOL, 'isSuccessful' => false]);
-        $Driver = $this->getMockForAbstractDriver(['_exec']);
-        $Driver->method('_exec')->willReturn($Process);
 
         return $Driver;
     }

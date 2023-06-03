@@ -206,9 +206,9 @@ class BackupExportTest extends TestCase
         $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
         $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['_exec'])
+            ->onlyMethods(['getProcess'])
             ->getMock();
-        $BackupExport->method('_exec')->willReturn($Process);
+        $BackupExport->method('getProcess')->willReturn($Process);
         $BackupExport->export();
     }
 
@@ -224,9 +224,9 @@ class BackupExportTest extends TestCase
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
         $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['_exec'])
+            ->onlyMethods(['getProcess'])
             ->getMock();
-        $BackupExport->method('_exec')->willThrowException($ProcessTimedOutException);
+        $BackupExport->method('getProcess')->willThrowException($ProcessTimedOutException);
         $BackupExport->export();
     }
 }
