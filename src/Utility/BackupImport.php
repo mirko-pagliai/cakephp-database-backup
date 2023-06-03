@@ -15,29 +15,13 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
-use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
 use Tools\Exceptionist;
 
 /**
  * Utility to import databases
  */
-class BackupImport
+class BackupImport extends AbstractBackupUtility
 {
-    use BackupTrait;
-
-    /**
-     * Driver containing all methods to export/import database backups according to the connection
-     * @var \DatabaseBackup\Driver\Driver
-     */
-    public Driver $Driver;
-
-    /**
-     * Filename where to import the database
-     * @var string
-     */
-    protected string $filename;
-
     /**
      * Construct
      * @throws \ErrorException|\ReflectionException
@@ -96,7 +80,6 @@ class BackupImport
         //Imports
         $Process = $this->Driver->_exec($this->Driver->_getImportExecutable($filename));
         Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
-//        $this->Driver->import($filename);
 
         //Dispatches the `Backup.afterImport` event implemented by the driver
         $this->Driver->dispatchEvent('Backup.afterImport');

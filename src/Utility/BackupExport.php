@@ -16,29 +16,18 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
-use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
 use Tools\Exceptionist;
 use Tools\Filesystem;
 
 /**
  * Utility to export databases
  */
-class BackupExport
+class BackupExport extends AbstractBackupUtility
 {
-    use BackupTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupManager
      */
     public BackupManager $BackupManager;
-
-    /**
-     * Driver containing all methods to export/import database backups according to the connection
-     * @since 2.0.0
-     * @var \DatabaseBackup\Driver\Driver
-     */
-    public Driver $Driver;
 
     /**
      * Compression type
@@ -69,12 +58,6 @@ class BackupExport
      * @var string
      */
     protected string $extension;
-
-    /**
-     * Filename where to export the database
-     * @var string
-     */
-    protected string $filename;
 
     /**
      * Rotate limit. This is the number of backups you want to keep. So, it will delete all backups that are older
