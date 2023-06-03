@@ -181,12 +181,18 @@ class BackupExport
     }
 
     /**
-     * Exports the database
-     * @return string Filename path
+     * Exports the database.
+     *
+     * When exporting, this method will trigger these events (implemented by the driver instance):
+     *  - `Backup.beforeExport`: will be triggered before export;
+     *  - `Backup.afterExport`: will be triggered after export.
+     * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
      * @throws \Exception
+     * @see \DatabaseBackup\Driver\Driver::afterExport()
+     * @see \DatabaseBackup\Driver\Driver::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      */
-    public function export(): string
+    public function export()
     {
         if (empty($this->filename)) {
             $this->extension ??= $this->defaultExtension;
@@ -197,8 +203,18 @@ class BackupExport
         $filename = $this->filename;
         unset($this->filename);
 
+        //Dispatches the `Backup.beforeExport` event implemented by the driver
+        $BeforeExport = $this->Driver->dispatchEvent('Backup.beforeExport');
+        if ($BeforeExport->isStopped()) {
+            return false;
+        }
+
+        //Exports
         $this->Driver->export($filename);
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
+
+        //Dispatches the `Backup.afterExport` event implemented by the driver
+        $this->Driver->dispatchEvent('Backup.afterExport');
 
         if ($this->emailRecipient) {
             $this->BackupManager->send($filename, $this->emailRecipient);

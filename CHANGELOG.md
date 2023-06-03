@@ -1,4 +1,12 @@
 # 2.x branch
+## 2.12 branch
+### 2.12.0
+* the events (`Backup.beforeExport`, `Backup.afterExport`, `Backup.beforeImport`, `Backup.afterImport`, which remain
+  implemented by the driver classes) are directly dispatched by the `BackupExport::export()` and `BackupImport::import()`
+  methods, and no longer by the drivers themselves;
+* the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`
+  if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped.
+
 ## 2.11 branch
 ### 2.11.1
 * added the `DatabaseBackup.processTimeout` configuration, which allows you to set a timeout for commands that will be 

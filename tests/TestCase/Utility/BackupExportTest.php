@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Event\EventList;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -43,6 +44,7 @@ class BackupExportTest extends TestCase
         parent::setUp();
 
         $this->BackupExport ??= new BackupExport();
+        $this->BackupExport->Driver->getEventManager()->setEventList(new EventList());
     }
 
     /**
@@ -136,6 +138,8 @@ class BackupExportTest extends TestCase
         $file = $this->BackupExport->export();
         $this->assertFileExists($file);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($file));
+        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Driver->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Driver->getEventManager());
 
         //Exports with `compression()`
         $file = $this->BackupExport->compression('bzip2')->export();
@@ -174,5 +178,18 @@ class BackupExportTest extends TestCase
         Configure::write('DatabaseBackup.chmod', 0777);
         $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export();
         $this->assertSame('0777', substr(sprintf('%o', fileperms($file)), -4));
+    }
+
+    /**
+     * Test for `export()` method. Export is stopped by the `Backup.beforeExport` event (implemented by driver)
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
+     */
+    public function testExportStoppedByBeforeExport(): void
+    {
+        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
+        $Driver->method('beforeExport')->willReturn(false);
+        $this->BackupExport->Driver = $Driver;
+        $this->assertFalse($this->BackupExport->export());
     }
 }

@@ -110,10 +110,9 @@ abstract class DriverTestCase extends TestCase
     {
         $backup = $this->getAbsolutePath('example.sql');
         $this->assertFileDoesNotExist($backup);
+        $this->Driver->dispatchEvent('Backup.beforeExport');
         $this->assertTrue($this->Driver->export($backup));
         $this->assertFileExists($backup);
-        $this->assertEventFired('Backup.beforeExport', $this->Driver->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->Driver->getEventManager());
     }
 
     /**
@@ -135,7 +134,9 @@ abstract class DriverTestCase extends TestCase
             $this->assertCount(6, $initial['Comments']);
 
             //Exports backup and deletes article with ID 2 and comment with ID 4
+            $this->Driver->dispatchEvent('Backup.beforeExport');
             $this->assertTrue($this->Driver->export($backup));
+            $this->Driver->dispatchEvent('Backup.afterExport');
             $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
             $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);
 
@@ -145,7 +146,9 @@ abstract class DriverTestCase extends TestCase
             $this->assertCount(count($initial['Comments']) - 1, $afterDelete['Comments']);
 
             //Imports backup. Now initial records are the same of final records
+            $this->Driver->dispatchEvent('Backup.beforeImport');
             $this->assertTrue($this->Driver->import($backup));
+            $this->Driver->dispatchEvent('Backup.afterImport');
             $final = $this->getAllRecords();
             $this->assertEquals($initial, $final);
 
@@ -194,10 +197,11 @@ abstract class DriverTestCase extends TestCase
     public function testImport(): void
     {
         $backup = $this->getAbsolutePath('example.sql');
+        $this->Driver->dispatchEvent('Backup.beforeExport');
         $this->assertTrue($this->Driver->export($backup));
+        $this->Driver->dispatchEvent('Backup.afterExport');
+        $this->Driver->dispatchEvent('Backup.beforeImport');
         $this->assertTrue($this->Driver->import($backup));
-        $this->assertEventFired('Backup.beforeImport', $this->Driver->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $this->Driver->getEventManager());
     }
 
     /**

@@ -211,53 +211,31 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Exports the database.
-     *
-     * When exporting, this method will trigger these events:
-     *  - `Backup.beforeExport`: will be triggered before export;
-     *  - `Backup.afterExport`: will be triggered after export.
+     * Exports the database
      * @param string $filename Filename where you want to export the database
      * @return bool `true` on success
      * @throws \Exception
      */
     final public function export(string $filename): bool
     {
-        $beforeExport = $this->dispatchEvent('Backup.beforeExport');
-        if ($beforeExport->isStopped()) {
-            return false;
-        }
-
         $process = $this->_exec($this->_getExportExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($process->getErrorOutput())));
-
-        $this->dispatchEvent('Backup.afterExport');
 
         return file_exists($filename);
     }
 
     /**
-     * Imports the database.
-     *
-     * When importing, this method will trigger these events:
-     *  - `Backup.beforeImport`: will be triggered before import;
-     *  - `Backup.afterImport`: will be triggered after import.
+     * Imports the database
      * @param string $filename Filename from which you want to import the database
-     * @return bool true on success
+     * @return bool `true` on success
      * @throws \Tools\Exception\NotInArrayException
      * @throws \ReflectionException
      * @throws \ErrorException
      */
     final public function import(string $filename): bool
     {
-        $beforeImport = $this->dispatchEvent('Backup.beforeImport');
-        if ($beforeImport->isStopped()) {
-            return false;
-        }
-
         $process = $this->_exec($this->_getImportExecutable($filename));
         Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($process->getErrorOutput())));
-
-        $this->dispatchEvent('Backup.afterImport');
 
         return true;
     }

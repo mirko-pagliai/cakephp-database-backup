@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use Cake\Event\EventList;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
@@ -49,6 +50,7 @@ class BackupImportTest extends TestCase
 
         $this->BackupExport ??= new BackupExport();
         $this->BackupImport ??= new BackupImport();
+        $this->BackupImport->Driver->getEventManager()->setEventList(new EventList());
     }
 
     /**
@@ -97,6 +99,8 @@ class BackupImportTest extends TestCase
         $backup = $this->BackupExport->compression(null)->export();
         $filename = $this->BackupImport->filename($backup)->import();
         $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
+        $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Driver->getEventManager());
+        $this->assertEventFired('Backup.afterImport', $this->BackupImport->Driver->getEventManager());
 
         //Exports and imports with `bzip2` compression
         $backup = $this->BackupExport->compression('bzip2')->export();
@@ -110,5 +114,19 @@ class BackupImportTest extends TestCase
 
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
+    }
+
+    /**
+     * Test for `import()` method. Export is stopped by the `Backup.beforeImport` event (implemented by driver)
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     */
+    public function testImportStoppedByBeforeExport(): void
+    {
+        $Driver = $this->getMockForAbstractDriver(['beforeImport']);
+        $Driver->method('beforeImport')->willReturn(false);
+        $this->BackupImport->Driver = $Driver;
+        $this->BackupImport->filename(createBackup());
+        $this->assertFalse($this->BackupImport->import());
     }
 }

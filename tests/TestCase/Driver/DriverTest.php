@@ -115,18 +115,6 @@ class DriverTest extends TestCase
     }
 
     /**
-     * Test for `export()` method. Export is stopped because the `beforeExport()` method returns `false`
-     * @test
-     * @uses \DatabaseBackup\Driver\Driver::export()
-     */
-    public function testExportStoppedByBeforeExport(): void
-    {
-        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
-        $Driver->method('beforeExport')->willReturn(false);
-        $this->assertFalse($Driver->export($this->getAbsolutePath('example.sql')));
-    }
-
-    /**
      * Test for `import()` method on failure
      * @test
      * @uses \DatabaseBackup\Driver\Driver::import()
@@ -154,17 +142,5 @@ class DriverTest extends TestCase
         $Driver = $this->getMockForAbstractDriver(['_exec']);
         $Driver->method('_exec')->willThrowException($ProcessTimedOutException);
         $Driver->import($this->getAbsolutePath('example.sql'));
-    }
-
-    /**
-     * Test for `import()` method. Import is stopped because the `beforeImport()` method returns `false`
-     * @test
-     * @uses \DatabaseBackup\Driver\Driver::import()
-     */
-    public function testImportStoppedByBeforeExport(): void
-    {
-        $Driver = $this->getMockForAbstractDriver(['beforeImport']);
-        $Driver->method('beforeImport')->willReturn(false);
-        $this->assertFalse($Driver->import($this->getAbsolutePath('example.sql')));
     }
 }
