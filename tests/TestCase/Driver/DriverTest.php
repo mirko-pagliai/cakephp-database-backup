@@ -35,21 +35,6 @@ class DriverTest extends TestCase
     protected Driver $Driver;
 
     /**
-     * Internal method to get a mock for `Driver` abstract class, with the `_exec()` method that returns a `Process`
-     *  instance with a failure and a custom error message
-     * @param string $errorMessage The error message
-     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockForAbstractDriverWithErrorProcess(string $errorMessage): Driver
-    {
-        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $errorMessage . PHP_EOL, 'isSuccessful' => false]);
-        $Driver = $this->getMockForAbstractDriver(['_exec']);
-        $Driver->method('_exec')->willReturn($Process);
-
-        return $Driver;
-    }
-
-    /**
      * Called before every test method
      * @return void
      */
