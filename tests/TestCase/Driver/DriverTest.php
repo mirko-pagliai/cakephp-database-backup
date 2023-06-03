@@ -35,21 +35,6 @@ class DriverTest extends TestCase
     protected Driver $Driver;
 
     /**
-     * Internal method to get a mock for `Driver` abstract class
-     * @param array $mockedMethods Mocked methods
-     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockForAbstractDriver(array $mockedMethods = []): Driver
-    {
-        /** @var \Cake\Database\Connection $Connection */
-        $Connection = $this->getConnection('test');
-        /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
-        $Driver = $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods, [$Connection]);
-
-        return $Driver;
-    }
-
-    /**
      * Internal method to get a mock for `Driver` abstract class, with the `_exec()` method that returns a `Process`
      *  instance with a failure and a custom error message
      * @param string $errorMessage The error message
