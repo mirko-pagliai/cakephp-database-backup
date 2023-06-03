@@ -4,9 +4,10 @@
 * the events (`Backup.beforeExport`, `Backup.afterExport`, `Backup.beforeImport`, `Backup.afterImport`, which remain
   implemented by the driver classes) are directly dispatched by the `BackupExport::export()` and `BackupImport::import()`
   methods, and no longer by the drivers themselves;
+* added the `AbstractBackupUtility` abstract class that provides the code common to `BackupExport` and `BackupImport`;
+* `Driver::_exec()` method has been moved to the `AbstractBackupUtility` class;
 * the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`
   if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped;
-* added the `AbstractBackupUtility` abstract class that provides the code common to `BackupExport` and `BackupImport`;
 * the code of `Driver::export()` and `Driver::import()` methods has been absorbed by `BackupExport::export()` and
   `BackupImport::import()` and therefore those methods no longer exist;
 * completely improved the `BackupImportTest` tests.

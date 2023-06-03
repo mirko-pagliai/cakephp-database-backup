@@ -15,8 +15,10 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
+use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
+use Symfony\Component\Process\Process;
 
 /**
  * AbstractBackupUtility.
@@ -45,4 +47,19 @@ abstract class AbstractBackupUtility
      * @return $this
      */
     abstract function filename(string $filename);
+
+    /**
+     * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
+     * @param string $command The command line to pass to the shell of the OS
+     * @return \Symfony\Component\Process\Process
+     * @since 2.8.7
+     */
+    public function _exec(string $command): Process
+    {
+        $Process = Process::fromShellCommandline($command);
+        $Process->setTimeout(Configure::read('DatabaseBackup.processTimeout', 60));
+        $Process->run();
+
+        return $Process;
+    }
 }

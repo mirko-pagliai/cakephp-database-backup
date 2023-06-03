@@ -20,7 +20,6 @@ use Cake\Database\Connection;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
-use Symfony\Component\Process\Process;
 use Tools\Exceptionist;
 
 /**
@@ -64,21 +63,6 @@ abstract class Driver implements EventListenerInterface
             'Backup.beforeExport' => 'beforeExport',
             'Backup.beforeImport' => 'beforeImport',
         ];
-    }
-
-    /**
-     * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
-     * @param string $command The command line to pass to the shell of the OS
-     * @return \Symfony\Component\Process\Process
-     * @since 2.8.7
-     */
-    public function _exec(string $command): Process
-    {
-        $Process = Process::fromShellCommandline($command);
-        $Process->setTimeout(Configure::read('DatabaseBackup.processTimeout', 60));
-        $Process->run();
-
-        return $Process;
     }
 
     /**

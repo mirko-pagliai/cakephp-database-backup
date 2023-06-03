@@ -118,9 +118,12 @@ class BackupImportTest extends TestCase
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
-        $this->BackupImport->Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
-        $this->BackupImport->filename(createBackup());
-        $this->BackupImport->import();
+        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
+        $BackupImport = $this->getMockBuilder(BackupImport::class)
+            ->onlyMethods(['_exec'])
+            ->getMock();
+        $BackupImport->method('_exec')->willReturn($Process);
+        $BackupImport->filename(createBackup())->import();
     }
 
     /**
@@ -134,9 +137,10 @@ class BackupImportTest extends TestCase
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-        $this->BackupImport->Driver = $this->getMockForAbstractDriver(['_exec']);
-        $this->BackupImport->Driver->method('_exec')->willThrowException($ProcessTimedOutException);
-        $this->BackupImport->filename(createBackup());
-        $this->BackupImport->import();
+        $BackupImport = $this->getMockBuilder(BackupImport::class)
+            ->onlyMethods(['_exec'])
+            ->getMock();
+        $BackupImport->method('_exec')->willThrowException($ProcessTimedOutException);
+        $BackupImport->filename(createBackup())->import();
     }
 }

@@ -204,8 +204,12 @@ class BackupExportTest extends TestCase
     {
         $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
         $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
-        $this->BackupExport->Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
-        $this->BackupExport->export();
+        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
+        $BackupExport = $this->getMockBuilder(BackupExport::class)
+            ->onlyMethods(['_exec'])
+            ->getMock();
+        $BackupExport->method('_exec')->willReturn($Process);
+        $BackupExport->export();
     }
 
     /**
@@ -219,8 +223,10 @@ class BackupExportTest extends TestCase
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-        $this->BackupExport->Driver = $this->getMockForAbstractDriver(['_exec']);
-        $this->BackupExport->Driver->method('_exec')->willThrowException($ProcessTimedOutException);
-        $this->BackupExport->export();
+        $BackupExport = $this->getMockBuilder(BackupExport::class)
+            ->onlyMethods(['_exec'])
+            ->getMock();
+        $BackupExport->method('_exec')->willThrowException($ProcessTimedOutException);
+        $BackupExport->export();
     }
 }

@@ -193,7 +193,7 @@ class BackupExport extends AbstractBackupUtility
         }
 
         //Exports
-        $Process = $this->Driver->_exec($this->Driver->_getExportExecutable($filename));
+        $Process = $this->_exec($this->Driver->_getExportExecutable($filename));
         Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
