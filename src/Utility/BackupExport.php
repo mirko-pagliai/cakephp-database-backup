@@ -210,7 +210,8 @@ class BackupExport
         }
 
         //Exports
-        $this->Driver->export($filename);
+        $Process = $this->Driver->_exec($this->Driver->_getExportExecutable($filename));
+        Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
         //Dispatches the `Backup.afterExport` event implemented by the driver

@@ -18,6 +18,8 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Event\EventList;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process;
 use Tools\Exception\NotReadableException;
 use Tools\Filesystem;
 use Tools\TestSuite\ReflectionTrait;
@@ -105,5 +107,36 @@ class BackupImportTest extends TestCase
         $this->BackupImport->Driver = $Driver;
         $this->BackupImport->filename(createBackup());
         $this->assertFalse($this->BackupImport->import());
+    }
+
+    /**
+     * Test for `import()` method, on failure (error for `Process`)
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     */
+    public function testImportOnFailure(): void
+    {
+        $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
+        $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
+        $this->BackupImport->Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
+        $this->BackupImport->filename(createBackup());
+        $this->BackupImport->import();
+    }
+
+    /**
+     * Test for `import()` method, exceeding the timeout
+     * @see https://symfony.com/doc/current/components/process.html#process-timeout
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     */
+    public function testImportExceedingTimeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
+        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        $this->BackupImport->Driver = $this->getMockForAbstractDriver(['_exec']);
+        $this->BackupImport->Driver->method('_exec')->willThrowException($ProcessTimedOutException);
+        $this->BackupImport->filename(createBackup());
+        $this->BackupImport->import();
     }
 }

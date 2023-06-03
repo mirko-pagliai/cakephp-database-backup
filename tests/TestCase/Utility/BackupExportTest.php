@@ -20,6 +20,8 @@ use Cake\Event\EventList;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process;
 use Tools\TestSuite\ReflectionTrait;
 
 /**
@@ -191,5 +193,34 @@ class BackupExportTest extends TestCase
         $Driver->method('beforeExport')->willReturn(false);
         $this->BackupExport->Driver = $Driver;
         $this->assertFalse($this->BackupExport->export());
+    }
+
+    /**
+     * Test for `export()` method, on failure (error for `Process`)
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
+     */
+    public function testExportOnFailure(): void
+    {
+        $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
+        $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
+        $this->BackupExport->Driver = $this->getMockForAbstractDriverWithErrorProcess($expectedError);
+        $this->BackupExport->export();
+    }
+
+    /**
+     * Test for `export()` method, exceeding the timeout
+     * @see https://symfony.com/doc/current/components/process.html#process-timeout
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
+     */
+    public function testExportExceedingTimeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
+        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        $this->BackupExport->Driver = $this->getMockForAbstractDriver(['_exec']);
+        $this->BackupExport->Driver->method('_exec')->willThrowException($ProcessTimedOutException);
+        $this->BackupExport->export();
     }
 }

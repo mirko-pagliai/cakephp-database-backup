@@ -6,6 +6,8 @@
   methods, and no longer by the drivers themselves;
 * the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`
   if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped;
+* the code of `Driver::export()` and `Driver::import()` methods has been absorbed by `BackupExport::export()` and
+  `BackupImport::import()` and therefore those methods no longer exist;
 * completely improved the `BackupImportTest` tests.
 
 ## 2.11 branch

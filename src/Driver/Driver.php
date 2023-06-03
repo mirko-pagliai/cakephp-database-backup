@@ -72,7 +72,7 @@ abstract class Driver implements EventListenerInterface
      * @return \Symfony\Component\Process\Process
      * @since 2.8.7
      */
-    protected function _exec(string $command): Process
+    public function _exec(string $command): Process
     {
         $Process = Process::fromShellCommandline($command);
         $Process->setTimeout(Configure::read('DatabaseBackup.processTimeout', 60));
@@ -118,7 +118,7 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    protected function _getExportExecutable(string $filename): string
+    public function _getExportExecutable(string $filename): string
     {
         $exec = $this->_getExecutable('export');
         $compression = self::getCompression($filename);
@@ -137,7 +137,7 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    protected function _getImportExecutable(string $filename): string
+    public function _getImportExecutable(string $filename): string
     {
         $exec = $this->_getExecutable('import');
         $compression = self::getCompression($filename);
@@ -208,35 +208,5 @@ abstract class Driver implements EventListenerInterface
         $config = $this->connection->config();
 
         return $key ? $config[$key] ?? null : $config;
-    }
-
-    /**
-     * Exports the database
-     * @param string $filename Filename where you want to export the database
-     * @return bool `true` on success
-     * @throws \Exception
-     */
-    final public function export(string $filename): bool
-    {
-        $process = $this->_exec($this->_getExportExecutable($filename));
-        Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($process->getErrorOutput())));
-
-        return file_exists($filename);
-    }
-
-    /**
-     * Imports the database
-     * @param string $filename Filename from which you want to import the database
-     * @return bool `true` on success
-     * @throws \Tools\Exception\NotInArrayException
-     * @throws \ReflectionException
-     * @throws \ErrorException
-     */
-    final public function import(string $filename): bool
-    {
-        $process = $this->_exec($this->_getImportExecutable($filename));
-        Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($process->getErrorOutput())));
-
-        return true;
     }
 }

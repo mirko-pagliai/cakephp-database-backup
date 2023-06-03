@@ -94,7 +94,9 @@ class BackupImport
         }
 
         //Imports
-        $this->Driver->import($filename);
+        $Process = $this->Driver->_exec($this->Driver->_getImportExecutable($filename));
+        Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
+//        $this->Driver->import($filename);
 
         //Dispatches the `Backup.afterImport` event implemented by the driver
         $this->Driver->dispatchEvent('Backup.afterImport');
