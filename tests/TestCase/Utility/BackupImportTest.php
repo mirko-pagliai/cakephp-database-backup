@@ -102,11 +102,9 @@ class BackupImportTest extends TestCase
      */
     public function testImportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockForAbstractDriver(['beforeImport']);
-        $Driver->method('beforeImport')->willReturn(false);
-        $this->BackupImport->Driver = $Driver;
-        $this->BackupImport->filename(createBackup());
-        $this->assertFalse($this->BackupImport->import());
+        $this->BackupImport->Driver = $this->getMockForAbstractDriver(['beforeImport']);
+        $this->BackupImport->Driver->method('beforeImport')->willReturn(false);
+        $this->assertFalse($this->BackupImport->filename(createBackup())->import());
     }
 
     /**

@@ -189,9 +189,8 @@ class BackupExportTest extends TestCase
      */
     public function testExportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
-        $Driver->method('beforeExport')->willReturn(false);
-        $this->BackupExport->Driver = $Driver;
+        $this->BackupExport->Driver = $this->getMockForAbstractDriver(['beforeExport']);
+        $this->BackupExport->Driver->method('beforeExport')->willReturn(false);
         $this->assertFalse($this->BackupExport->export());
     }
 
