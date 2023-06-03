@@ -15,10 +15,13 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
+use Cake\Core\App;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 use Symfony\Component\Process\Process;
+use Tools\Exceptionist;
 
 /**
  * AbstractBackupUtility.
@@ -47,6 +50,26 @@ abstract class AbstractBackupUtility
      * @return $this
      */
     abstract function filename(string $filename);
+
+    /**
+     * Gets the `Driver` instance, containing all methods to export/import database backups.
+     *
+     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
+     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
+     * @return \DatabaseBackup\Driver\Driver A `Driver` instance
+     * @throws \ErrorException|\ReflectionException
+     * @since 2.0.0
+     */
+    public function getDriver(?ConnectionInterface $connection = null): Driver
+    {
+        $connection = $connection ?: $this->getConnection();
+        $name = $this->getDriverName($connection);
+        /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
+        $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
+        Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name));
+
+        return new $Driver($connection);
+    }
 
     /**
      * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.

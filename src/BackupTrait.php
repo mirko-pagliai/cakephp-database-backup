@@ -14,12 +14,9 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup;
 
-use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\Driver\Driver;
-use Tools\Exceptionist;
 use Tools\Filesystem;
 
 /**
@@ -59,26 +56,6 @@ trait BackupTrait
     public static function getConnection(?string $name = null): ConnectionInterface
     {
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
-    }
-
-    /**
-     * Gets the `Driver` instance, containing all methods to export/import database backups.
-     *
-     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
-     * @return \DatabaseBackup\Driver\Driver A `Driver` instance
-     * @throws \ErrorException|\ReflectionException
-     * @since 2.0.0
-     */
-    public static function getDriver(?ConnectionInterface $connection = null): Driver
-    {
-        $connection = $connection ?: self::getConnection();
-        $name = self::getDriverName($connection);
-        /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
-        $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
-        Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name));
-
-        return new $Driver($connection);
     }
 
     /**
