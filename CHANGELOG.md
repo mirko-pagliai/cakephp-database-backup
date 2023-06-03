@@ -5,7 +5,8 @@
   implemented by the driver classes) are directly dispatched by the `BackupExport::export()` and `BackupImport::import()`
   methods, and no longer by the drivers themselves;
 * the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`
-  if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped.
+  if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped;
+* completely improved the `BackupImportTest` tests.
 
 ## 2.11 branch
 ### 2.11.1

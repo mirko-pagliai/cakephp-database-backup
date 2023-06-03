@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Event\EventList;
 use DatabaseBackup\TestSuite\TestCase;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 use Tools\Exception\NotReadableException;
 use Tools\Filesystem;
@@ -29,11 +28,6 @@ use Tools\TestSuite\ReflectionTrait;
 class BackupImportTest extends TestCase
 {
     use ReflectionTrait;
-
-    /**
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
-    protected BackupExport $BackupExport;
 
     /**
      * @var \DatabaseBackup\Utility\BackupImport
@@ -48,7 +42,6 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport ??= new BackupExport();
         $this->BackupImport ??= new BackupImport();
         $this->BackupImport->Driver->getEventManager()->setEventList(new EventList());
     }
@@ -60,24 +53,16 @@ class BackupImportTest extends TestCase
      */
     public function testFilename(): void
     {
-        //Creates a `sql` backup
-        $backup = $this->BackupExport->filename('backup.sql')->export() ?: '';
-        $this->BackupImport->filename($backup);
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
-
-        //Creates a `sql.bz2` backup
-        $backup = $this->BackupExport->filename('backup.sql.bz2')->export() ?: '';
-        $this->BackupImport->filename($backup);
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
-
-        //Creates a `sql.gz` backup
-        $backup = $this->BackupExport->filename('backup.sql.gz')->export() ?: '';
-        $this->BackupImport->filename($backup);
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
+        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
+            $result = createBackup('backup.' . $extension);
+            $this->BackupImport->filename($result);
+            $this->assertSame($result, $this->getProperty($this->BackupImport, 'filename'));
+        }
 
         //With a relative path
-        $this->BackupImport->filename(basename($backup));
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $result = createBackup('backup_' . time() . '.sql');
+        $this->BackupImport->filename(basename($result));
+        $this->assertSame($result, $this->getProperty($this->BackupImport, 'filename'));
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);
@@ -95,22 +80,14 @@ class BackupImportTest extends TestCase
      */
     public function testImport(): void
     {
-        //Exports and imports with no compression
-        $backup = $this->BackupExport->compression(null)->export() ?: '';
-        $filename = $this->BackupImport->filename($backup)->import() ?: '';
-        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
-        $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Driver->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $this->BackupImport->Driver->getEventManager());
-
-        //Exports and imports with `bzip2` compression
-        $backup = $this->BackupExport->compression('bzip2')->export() ?: '';
-        $filename = $this->BackupImport->filename($backup)->import() ?: '';
-        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
-
-        //Exports and imports with `gzip` compression
-        $backup = $this->BackupExport->compression('gzip')->export() ?: '';
-        $filename = $this->BackupImport->filename($backup)->import() ?: '';
-        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
+        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
+            $expectedFilename = createBackup('backup.' . $extension);
+            $result = $this->BackupImport->filename($expectedFilename)->import() ?: '';
+            $this->assertStringEndsWith('backup.' . $extension, $result);
+            $this->assertSame($expectedFilename, $result);
+            $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Driver->getEventManager());
+            $this->assertEventFired('Backup.afterImport', $this->BackupImport->Driver->getEventManager());
+        }
 
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
