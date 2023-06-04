@@ -14,6 +14,7 @@
   `Driver::getExecutable()`, `Driver::getExportExecutable()` and `Driver::getImportExecutable()`;
 * the code of `Driver::export()` and `Driver::import()` methods has been absorbed by `BackupExport::export()` and
   `BackupImport::import()` and therefore those methods no longer exist;
+* `MySql::deleteAuthFile()` method returns void (there is no need for it to return anything);
 * removed useless `BackupExport::$config` property;
 * completely improved the `BackupImportTest` tests.
 

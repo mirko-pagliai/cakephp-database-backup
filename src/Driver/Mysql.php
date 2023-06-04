@@ -121,20 +121,17 @@ class Mysql extends Driver
 
     /**
      * Deletes the temporary file with the database authentication data
-     * @return bool `true` on success
+     * @return void
      * @since 2.1.0
      */
-    protected function deleteAuthFile(): bool
+    protected function deleteAuthFile(): void
     {
         $authFile = $this->getAuthFile();
-        if (!$authFile) {
-            return false;
+        if ($authFile) {
+            //Deletes the temporary file with the authentication data
+            Filesystem::instance()->remove($authFile);
         }
 
-        //Deletes the temporary file with the authentication data
-        Filesystem::instance()->remove($authFile);
         unset($this->auth);
-
-        return true;
     }
 }
