@@ -5,6 +5,7 @@
   implemented by the driver classes) are directly dispatched by the `BackupExport::export()` and `BackupImport::import()`
   methods, and no longer by the drivers themselves;
 * added the `AbstractBackupUtility` abstract class that provides the code common to `BackupExport` and `BackupImport`;
+* removed `$Driver` public property for `BackupExport`/`BackupImport` and added `AbstractBackupUtility::getDriver()` method;
 * `Driver::_exec()` method has become `AbstractBackupUtility::getProcess()`;
 * `BackupTrait::getDriver()` method has become `AbstractBackupUtility::getDriver()`;
 * the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`

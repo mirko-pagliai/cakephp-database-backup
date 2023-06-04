@@ -22,7 +22,6 @@ use Tools\Exceptionist;
  */
 class BackupImport extends AbstractBackupUtility
 {
-
     /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
@@ -64,17 +63,17 @@ class BackupImport extends AbstractBackupUtility
         unset($this->filename);
 
         //Dispatches the `Backup.beforeImport` event implemented by the driver
-        $BeforeImport = $this->Driver->dispatchEvent('Backup.beforeImport');
+        $BeforeImport = $this->getDriver()->dispatchEvent('Backup.beforeImport');
         if ($BeforeImport->isStopped()) {
             return false;
         }
 
         //Imports
-        $Process = $this->getProcess($this->Driver->_getImportExecutable($filename));
+        $Process = $this->getProcess($this->getDriver()->_getImportExecutable($filename));
         Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
 
         //Dispatches the `Backup.afterImport` event implemented by the driver
-        $this->Driver->dispatchEvent('Backup.afterImport');
+        $this->getDriver()->dispatchEvent('Backup.afterImport');
 
         return $filename;
     }

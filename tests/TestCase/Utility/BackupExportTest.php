@@ -46,7 +46,7 @@ class BackupExportTest extends TestCase
         parent::setUp();
 
         $this->BackupExport ??= new BackupExport();
-        $this->BackupExport->Driver->getEventManager()->setEventList(new EventList());
+        $this->BackupExport->getDriver()->getEventManager()->setEventList(new EventList());
     }
 
     /**
@@ -140,8 +140,8 @@ class BackupExportTest extends TestCase
         $file = $this->BackupExport->export() ?: '';
         $this->assertFileExists($file);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($file));
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Driver->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Driver->getEventManager());
+        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->getDriver()->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $this->BackupExport->getDriver()->getEventManager());
 
         //Exports with `compression()`
         $file = $this->BackupExport->compression('bzip2')->export() ?: '';
@@ -189,9 +189,11 @@ class BackupExportTest extends TestCase
      */
     public function testExportStoppedByBeforeExport(): void
     {
-        $this->BackupExport->Driver = $this->getMockForAbstractDriver(['beforeExport']);
-        $this->BackupExport->Driver->method('beforeExport')->willReturn(false);
-        $this->assertFalse($this->BackupExport->export());
+        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
+        $Driver->method('beforeExport')->willReturn(false);
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getDriver']);
+        $BackupExport->method('getDriver')->willReturn($Driver);
+        $this->assertFalse($BackupExport->export());
     }
 
     /**
@@ -204,9 +206,7 @@ class BackupExportTest extends TestCase
         $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
         $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
-        $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['getProcess'])
-            ->getMock();
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
         $BackupExport->method('getProcess')->willReturn($Process);
         $BackupExport->export();
     }
@@ -222,9 +222,7 @@ class BackupExportTest extends TestCase
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-        $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['getProcess'])
-            ->getMock();
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
         $BackupExport->method('getProcess')->willThrowException($ProcessTimedOutException);
         $BackupExport->export();
     }

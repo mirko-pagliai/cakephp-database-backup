@@ -39,26 +39,16 @@ abstract class AbstractBackupUtility
     protected string $filename;
 
     /**
-     * Driver containing all methods to export/import database backups according to the connection
      * @var \DatabaseBackup\Driver\Driver
      */
-    public Driver $Driver;
-
-    /**
-     * Construct
-     * @throws \ErrorException|\ReflectionException
-     */
-    public function __construct()
-    {
-        $this->Driver = $this->getDriver();
-    }
+    protected Driver $Driver;
 
     /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
      * @return $this
      */
-    abstract function filename(string $filename);
+    public abstract function filename(string $filename);
 
     /**
      * Gets the `Driver` instance, containing all methods to export/import database backups.
@@ -71,13 +61,17 @@ abstract class AbstractBackupUtility
      */
     public function getDriver(?ConnectionInterface $connection = null): Driver
     {
-        $connection = $connection ?: $this->getConnection();
-        $name = $this->getDriverName($connection);
-        /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
-        $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
-        Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name));
+        if (empty($this->Driver)) {
+            $connection = $connection ?: $this->getConnection();
+            $name = $this->getDriverName($connection);
+            /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
+            $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
+            Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name));
 
-        return new $Driver($connection);
+            $this->Driver = new $Driver($connection);
+        }
+
+        return $this->Driver;
     }
 
     /**

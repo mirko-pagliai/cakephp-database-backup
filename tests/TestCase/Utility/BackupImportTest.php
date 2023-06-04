@@ -45,7 +45,7 @@ class BackupImportTest extends TestCase
         parent::setUp();
 
         $this->BackupImport ??= new BackupImport();
-        $this->BackupImport->Driver->getEventManager()->setEventList(new EventList());
+        $this->BackupImport->getDriver()->getEventManager()->setEventList(new EventList());
     }
 
     /**
@@ -87,8 +87,8 @@ class BackupImportTest extends TestCase
             $result = $this->BackupImport->filename($expectedFilename)->import() ?: '';
             $this->assertStringEndsWith('backup.' . $extension, $result);
             $this->assertSame($expectedFilename, $result);
-            $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Driver->getEventManager());
-            $this->assertEventFired('Backup.afterImport', $this->BackupImport->Driver->getEventManager());
+            $this->assertEventFired('Backup.beforeImport', $this->BackupImport->getDriver()->getEventManager());
+            $this->assertEventFired('Backup.afterImport', $this->BackupImport->getDriver()->getEventManager());
         }
 
         $this->expectExceptionMessage('You must first set the filename');
@@ -102,9 +102,11 @@ class BackupImportTest extends TestCase
      */
     public function testImportStoppedByBeforeExport(): void
     {
-        $this->BackupImport->Driver = $this->getMockForAbstractDriver(['beforeImport']);
-        $this->BackupImport->Driver->method('beforeImport')->willReturn(false);
-        $this->assertFalse($this->BackupImport->filename(createBackup())->import());
+        $Driver = $this->getMockForAbstractDriver(['beforeImport']);
+        $Driver->method('beforeImport')->willReturn(false);
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getDriver']);
+        $BackupImport->method('getDriver')->willReturn($Driver);
+        $this->assertFalse($BackupImport->filename(createBackup())->import());
     }
 
     /**
@@ -117,9 +119,7 @@ class BackupImportTest extends TestCase
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
-        $BackupImport = $this->getMockBuilder(BackupImport::class)
-            ->onlyMethods(['getProcess'])
-            ->getMock();
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
         $BackupImport->method('getProcess')->willReturn($Process);
         $BackupImport->filename(createBackup())->import();
     }
@@ -135,9 +135,7 @@ class BackupImportTest extends TestCase
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-        $BackupImport = $this->getMockBuilder(BackupImport::class)
-            ->onlyMethods(['getProcess'])
-            ->getMock();
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
         $BackupImport->method('getProcess')->willThrowException($ProcessTimedOutException);
         $BackupImport->filename(createBackup())->import();
     }

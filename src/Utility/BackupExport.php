@@ -61,12 +61,9 @@ class BackupExport extends AbstractBackupUtility
 
     /**
      * Construct
-     * @throws \ErrorException|\ReflectionException
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->BackupManager = new BackupManager();
     }
 
@@ -182,18 +179,18 @@ class BackupExport extends AbstractBackupUtility
         unset($this->filename);
 
         //Dispatches the `Backup.beforeExport` event implemented by the driver
-        $BeforeExport = $this->Driver->dispatchEvent('Backup.beforeExport');
+        $BeforeExport = $this->getDriver()->dispatchEvent('Backup.beforeExport');
         if ($BeforeExport->isStopped()) {
             return false;
         }
 
         //Exports
-        $Process = $this->getProcess($this->Driver->_getExportExecutable($filename));
+        $Process = $this->getProcess($this->getDriver()->_getExportExecutable($filename));
         Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
         //Dispatches the `Backup.afterExport` event implemented by the driver
-        $this->Driver->dispatchEvent('Backup.afterExport');
+        $this->getDriver()->dispatchEvent('Backup.afterExport');
 
         if ($this->emailRecipient) {
             $this->BackupManager->send($filename, $this->emailRecipient);
