@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Core\App;
 use DatabaseBackup\Driver\Driver;
 
 /**
@@ -38,12 +39,12 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
-        /** @var \Cake\Database\Connection $connection */
-        $connection = $this->getConnection('test');
+        if (empty($this->Driver)) {
+            /** @var \Cake\Database\Connection $connection */
+            $connection = $this->getConnection('test');
 
-        if (empty($this->DriverClass) || empty($this->Driver)) {
             /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
-            $DriverClass = 'DatabaseBackup\\Driver\\' . get_class_short_name($connection->config()['driver']);
+            $DriverClass = App::className('DatabaseBackup.' . get_class_short_name($connection->config()['driver']), 'Driver');
             $this->Driver = new $DriverClass($connection);
         }
     }
@@ -58,7 +59,8 @@ abstract class DriverTestCase extends TestCase
         $this->assertNotEmpty($this->Driver->getExportExecutable('backup.sql'));
 
         //Gzip and Bzip2 compressions
-        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
+        foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
+            $filename = 'backup.' . $extension;
             $result = $this->Driver->getExportExecutable($filename);
             $expected = sprintf(' | %s > %s', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
             $this->assertStringEndsWith($expected, $result);
@@ -75,7 +77,8 @@ abstract class DriverTestCase extends TestCase
         $this->assertNotEmpty($this->Driver->getImportExecutable('backup.sql'));
 
         //Gzip and Bzip2 compressions
-        foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
+        foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
+            $filename = 'backup.' . $extension;
             $result = $this->Driver->getImportExecutable($filename);
             $expected = sprintf('%s -dc %s | ', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
             $this->assertStringStartsWith($expected, $result);
