@@ -36,12 +36,6 @@ class BackupExport extends AbstractBackupUtility
     protected ?string $compression = null;
 
     /**
-     * Database configuration
-     * @var array
-     */
-    protected array $config;
-
-    /**
      * Default extension
      * @var string
      */
@@ -74,7 +68,6 @@ class BackupExport extends AbstractBackupUtility
         parent::__construct();
 
         $this->BackupManager = new BackupManager();
-        $this->config = $this->getConnection()->config();
     }
 
     /**
@@ -114,11 +107,13 @@ class BackupExport extends AbstractBackupUtility
      */
     public function filename(string $filename)
     {
+        $config = $this->getConnection()->config();
+
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
-            pathinfo($this->config['database'], PATHINFO_FILENAME),
+            pathinfo($config['database'], PATHINFO_FILENAME),
             date('YmdHis'),
-            str_replace(['127.0.0.1', '::1'], 'localhost', $this->config['host'] ?? 'localhost'),
+            str_replace(['127.0.0.1', '::1'], 'localhost', $config['host'] ?? 'localhost'),
             time(),
         ], $filename);
 
