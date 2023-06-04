@@ -71,10 +71,10 @@ class BackupExport extends AbstractBackupUtility
      */
     public function __construct()
     {
-        $connection = $this->getConnection();
+        parent::__construct();
+
         $this->BackupManager = new BackupManager();
-        $this->Driver = $this->getDriver($connection);
-        $this->config = $connection->config();
+        $this->config = $this->getConnection()->config();
     }
 
     /**
@@ -179,7 +179,7 @@ class BackupExport extends AbstractBackupUtility
     {
         if (empty($this->filename)) {
             $this->extension ??= $this->defaultExtension;
-            $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
+            $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->extension);
         }
 
         //This allows the filename to be set again with a next call of this method

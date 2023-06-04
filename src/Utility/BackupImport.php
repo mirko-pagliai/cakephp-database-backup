@@ -22,14 +22,6 @@ use Tools\Exceptionist;
  */
 class BackupImport extends AbstractBackupUtility
 {
-    /**
-     * Construct
-     * @throws \ErrorException|\ReflectionException
-     */
-    public function __construct()
-    {
-        $this->Driver = $this->getDriver();
-    }
 
     /**
      * Sets the filename

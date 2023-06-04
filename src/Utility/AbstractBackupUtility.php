@@ -45,6 +45,15 @@ abstract class AbstractBackupUtility
     public Driver $Driver;
 
     /**
+     * Construct
+     * @throws \ErrorException|\ReflectionException
+     */
+    public function __construct()
+    {
+        $this->Driver = $this->getDriver();
+    }
+
+    /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
      * @return $this
