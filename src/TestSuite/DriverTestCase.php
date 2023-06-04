@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use DatabaseBackup\Driver\Driver;
-use Tools\TestSuite\ReflectionTrait;
 
 /**
  * DriverTestCase class.
@@ -26,13 +25,10 @@ use Tools\TestSuite\ReflectionTrait;
  */
 abstract class DriverTestCase extends TestCase
 {
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Driver\Driver
      */
     protected Driver $Driver;
-
 
     /**
      * Called before every test method
@@ -55,15 +51,15 @@ abstract class DriverTestCase extends TestCase
     /**
      * @return void
      * @throws \ReflectionException|\ErrorException
-     * @uses \DatabaseBackup\Driver\Driver::_getExportExecutable()
+     * @uses \DatabaseBackup\Driver\Driver::getExportExecutable()
      */
     public function testGetExportExecutable(): void
     {
-        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_getExportExecutable', ['backup.sql']));
+        $this->assertNotEmpty($this->Driver->getExportExecutable('backup.sql'));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_getExportExecutable', [$filename]);
+            $result = $this->Driver->getExportExecutable($filename);
             $expected = sprintf(' | %s > %s', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
             $this->assertStringEndsWith($expected, $result);
         }
@@ -72,15 +68,15 @@ abstract class DriverTestCase extends TestCase
     /**
      * @return void
      * @throws \ReflectionException|\ErrorException
-     * @uses \DatabaseBackup\Driver\Driver::_getImportExecutable()
+     * @uses \DatabaseBackup\Driver\Driver::getImportExecutable()
      */
     public function testGetImportExecutable(): void
     {
-        $this->assertNotEmpty($this->invokeMethod($this->Driver, '_getImportExecutable', ['backup.sql']));
+        $this->assertNotEmpty($this->Driver->getImportExecutable('backup.sql'));
 
         //Gzip and Bzip2 compressions
         foreach (['gzip' => 'backup.sql.gz', 'bzip2' => 'backup.sql.bz2'] as $compression => $filename) {
-            $result = $this->invokeMethod($this->Driver, '_getImportExecutable', [$filename]);
+            $result = $this->Driver->getImportExecutable($filename);
             $expected = sprintf('%s -dc %s | ', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
             $this->assertStringStartsWith($expected, $result);
         }

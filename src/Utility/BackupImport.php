@@ -69,7 +69,7 @@ class BackupImport extends AbstractBackupUtility
         }
 
         //Imports
-        $Process = $this->getProcess($this->getDriver()->_getImportExecutable($filename));
+        $Process = $this->getProcess($this->getDriver()->getImportExecutable($filename));
         Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
 
         //Dispatches the `Backup.afterImport` event implemented by the driver

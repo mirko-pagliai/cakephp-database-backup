@@ -77,7 +77,7 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    protected function _getExecutable(string $type): string
+    protected function getExecutable(string $type): string
     {
         Exceptionist::inArray($type, ['export', 'import']);
         $driver = strtolower(self::getDriverName());
@@ -102,9 +102,9 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    public function _getExportExecutable(string $filename): string
+    public function getExportExecutable(string $filename): string
     {
-        $exec = $this->_getExecutable('export');
+        $exec = $this->getExecutable('export');
         $compression = self::getCompression($filename);
         if ($compression) {
             $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
@@ -121,9 +121,9 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    public function _getImportExecutable(string $filename): string
+    public function getImportExecutable(string $filename): string
     {
-        $exec = $this->_getExecutable('import');
+        $exec = $this->getExecutable('import');
         $compression = self::getCompression($filename);
         if ($compression) {
             return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;

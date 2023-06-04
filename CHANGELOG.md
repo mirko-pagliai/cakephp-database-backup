@@ -10,6 +10,8 @@
 * `BackupTrait::getDriver()` method has become `AbstractBackupUtility::getDriver()`;
 * the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`
   if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped;
+* `Driver::_getExecutable()`, `Driver::_getExportExecutable()` and `Driver::_getImportExecutable()` have become 
+  `Driver::getExecutable()`, `Driver::getExportExecutable()` and `Driver::getImportExecutable()`;
 * the code of `Driver::export()` and `Driver::import()` methods has been absorbed by `BackupExport::export()` and
   `BackupImport::import()` and therefore those methods no longer exist;
 * removed useless `BackupExport::$config` property;

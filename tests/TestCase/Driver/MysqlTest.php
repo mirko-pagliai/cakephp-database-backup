@@ -17,12 +17,15 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
+use Tools\ReflectionTrait;
 
 /**
  * MysqlTest class
  */
 class MysqlTest extends DriverTestCase
 {
+    use ReflectionTrait;
+
     /**
      * Called before every test method
      * @return void
