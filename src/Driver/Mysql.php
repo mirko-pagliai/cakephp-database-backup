@@ -35,7 +35,7 @@ class Mysql extends Driver
      * @return string
      * @since 2.11.0
      */
-    protected function getAuthFile(): string
+    protected function getAuthFilePath(): string
     {
         return $this->auth ??= TMP . uniqid('auth');
     }
@@ -54,7 +54,7 @@ class Mysql extends Driver
             $content
         );
 
-        return (bool)Filesystem::createFile($this->getAuthFile(), $content);
+        return (bool)Filesystem::createFile($this->getAuthFilePath(), $content);
     }
 
     /**
@@ -122,7 +122,7 @@ class Mysql extends Driver
      */
     protected function deleteAuthFile(): void
     {
-        Filesystem::instance()->remove($this->getAuthFile());
+        Filesystem::instance()->remove($this->getAuthFilePath());
         unset($this->auth);
     }
 }

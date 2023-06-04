@@ -83,7 +83,7 @@ abstract class Driver implements EventListenerInterface
         $driver = strtolower(self::getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
-            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFile') && $this->getAuthFile() ? escapeshellarg($this->getAuthFile()) : '',
+            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFile') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),

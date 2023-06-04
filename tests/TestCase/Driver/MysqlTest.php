@@ -44,7 +44,7 @@ class MysqlTest extends DriverTestCase
 
         $this->Driver ??= $this->getMockBuilder(Mysql::class)
             ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFile', 'deleteAuthFile', 'writeAuthFile'])
+            ->onlyMethods(['getAuthFilePath', 'deleteAuthFile', 'writeAuthFile'])
             ->getMock();
 
         parent::setUp();
@@ -61,9 +61,9 @@ class MysqlTest extends DriverTestCase
 
         $Driver = $this->getMockBuilder(Mysql::class)
             ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFile'])
+            ->onlyMethods(['getAuthFilePath'])
             ->getMock();
-        $Driver->method('getAuthFile')->willReturn($expectedAuthFile);
+        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
         $Driver->dispatchEvent('Backup.afterExport');
         $this->assertFileDoesNotExist($expectedAuthFile);
     }
@@ -79,9 +79,9 @@ class MysqlTest extends DriverTestCase
 
         $Driver = $this->getMockBuilder(Mysql::class)
             ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFile'])
+            ->onlyMethods(['getAuthFilePath'])
             ->getMock();
-        $Driver->method('getAuthFile')->willReturn($expectedAuthFile);
+        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
         $Driver->dispatchEvent('Backup.afterImport');
         $this->assertFileDoesNotExist($expectedAuthFile);
     }
@@ -135,9 +135,9 @@ class MysqlTest extends DriverTestCase
 
         $Driver = $this->getMockBuilder(Mysql::class)
             ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFile'])
+            ->onlyMethods(['getAuthFilePath'])
             ->getMock();
-        $Driver->method('getAuthFile')->willReturn($expectedAuthFile);
+        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
 
         //Dispatches an event that calls and returns `writeAuthFile()`
         $this->assertTrue($Driver->dispatchEvent('Backup.beforeExport')->getResult());
