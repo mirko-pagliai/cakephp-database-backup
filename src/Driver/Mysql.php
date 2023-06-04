@@ -23,27 +23,27 @@ use Tools\Filesystem;
 class Mysql extends Driver
 {
     /**
-     * Temporary file with the database authentication data
      * @since 2.1.0
      * @var string
      */
-    private string $auth = '';
+    private string $auth;
 
     /**
-     * Internal method to get the auth file
+     * Internal method to get the auth file path.
+     *
+     * This method returns only the path that will be used and does not verify that the file already exists.
      * @return string
      * @since 2.11.0
      */
     protected function getAuthFile(): string
     {
-        return $this->auth && file_exists($this->auth) ? $this->auth : '';
+        return $this->auth ??= TMP . uniqid('auth');
     }
 
     /**
      * Internal method to write an auth file
      * @param string $content Content
      * @return bool
-     * @throws \ErrorException
      * @since 2.3.0
      */
     protected function writeAuthFile(string $content): bool
@@ -54,9 +54,7 @@ class Mysql extends Driver
             $content
         );
 
-        $this->auth = Filesystem::createTmpFile($content, null, 'auth');
-
-        return $this->auth != false;
+        return (bool)Filesystem::createFile($this->getAuthFile(), $content);
     }
 
     /**
@@ -88,7 +86,6 @@ class Mysql extends Driver
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
      * @return bool
-     * @throws \ErrorException
      * @since 2.1.0
      */
     public function beforeExport(): bool
@@ -108,7 +105,6 @@ class Mysql extends Driver
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
      * @return bool
-     * @throws \ErrorException
      * @since 2.1.0
      */
     public function beforeImport(): bool
@@ -126,12 +122,7 @@ class Mysql extends Driver
      */
     protected function deleteAuthFile(): void
     {
-        $authFile = $this->getAuthFile();
-        if ($authFile) {
-            //Deletes the temporary file with the authentication data
-            Filesystem::instance()->remove($authFile);
-        }
-
+        Filesystem::instance()->remove($this->getAuthFile());
         unset($this->auth);
     }
 }
