@@ -48,7 +48,7 @@ abstract class AbstractBackupUtility
      * @param string $filename Filename. It can be an absolute path
      * @return $this
      */
-    public abstract function filename(string $filename);
+    abstract public function filename(string $filename);
 
     /**
      * Gets the `Driver` instance, containing all methods to export/import database backups.
