@@ -32,18 +32,10 @@ abstract class Driver implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * @var \Cake\Database\Connection
-     */
-    protected Connection $connection;
-
-    /**
      * Constructor
-     * @param \Cake\Database\Connection $connection A `Connection` instance
      */
-    public function __construct(Connection $connection)
+    public function __construct()
     {
-        $this->connection = $connection;
-
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
@@ -77,7 +69,7 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    protected function getExecutable(string $type): string
+    private function getExecutable(string $type): string
     {
         Exceptionist::inArray($type, ['export', 'import']);
         $driverName = strtolower(self::getDriverName());
@@ -176,7 +168,7 @@ abstract class Driver implements EventListenerInterface
      * @return string
      * @throws \ErrorException
      */
-    final public function getBinary(string $name): string
+    public function getBinary(string $name): string
     {
         return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), 'Binary for `' . $name . '` could not be found. You have to set its path manually');
     }
@@ -187,8 +179,8 @@ abstract class Driver implements EventListenerInterface
      * @return mixed Config value or `null` if the key doesn't exist
      * @since 2.3.0
      */
-    final public function getConfig(string $key)
+    protected function getConfig(string $key)
     {
-        return $this->connection->config()[$key] ?? null;
+        return $this->getConnection()->config()[$key] ?? null;
     }
 }

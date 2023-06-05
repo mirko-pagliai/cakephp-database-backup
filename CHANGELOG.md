@@ -10,6 +10,7 @@
 * `BackupTrait::getDriver()` method has become `AbstractBackupUtility::getDriver()`;
 * `BackupTrait::getDriverName()` and `AbstractBackupUtility::getDriver()` no longer accept a connection as argument, but 
   directly use the one set by the configuration;
+* the `Driver` class no longer accepts a connection as constructor argument, but directly uses the one set by the configuration;
 * the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`
   if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped;
 * `Driver::_getExecutable()`, `Driver::_getExportExecutable()` and `Driver::_getImportExecutable()` have become 

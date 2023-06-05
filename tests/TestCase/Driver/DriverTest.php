@@ -55,14 +55,4 @@ class DriverTest extends TestCase
         $this->expectExceptionMessage('Binary for `noExisting` could not be found. You have to set its path manually');
         $this->Driver->getBinary('noExisting');
     }
-
-    /**
-     * @test
-     * @uses \DatabaseBackup\Driver\Driver::getConfig()
-     */
-    public function testGetConfig(): void
-    {
-        $this->assertNotEmpty($this->Driver->getConfig('name'));
-        $this->assertNull($this->Driver->getConfig('noExistingKey'));
-    }
 }
