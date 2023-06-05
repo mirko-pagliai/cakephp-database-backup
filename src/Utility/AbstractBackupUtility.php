@@ -51,24 +51,20 @@ abstract class AbstractBackupUtility
     abstract public function filename(string $filename);
 
     /**
-     * Gets the `Driver` instance, containing all methods to export/import database backups.
-     *
-     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
+     * Gets the `Driver` instance, containing all methods to export/import database backups
      * @return \DatabaseBackup\Driver\Driver A `Driver` instance
      * @throws \ErrorException|\ReflectionException
      * @since 2.0.0
      */
-    public function getDriver(?ConnectionInterface $connection = null): Driver
+    public function getDriver(): Driver
     {
         if (empty($this->Driver)) {
-            $connection = $connection ?: $this->getConnection();
-            $name = $this->getDriverName($connection);
-            /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
-            $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
-            Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name));
+            $name = $this->getDriverName($this->getConnection());
+            /** @var class-string<\DatabaseBackup\Driver\Driver> $className */
+            $className = App::classname('DatabaseBackup.' . $name, 'Driver');
+            Exceptionist::isTrue($className, __d('database_backup', 'The `{0}` driver does not exist', $name));
 
-            $this->Driver = new $Driver($connection);
+            $this->Driver = new $className($this->getConnection());
         }
 
         return $this->Driver;
