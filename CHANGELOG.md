@@ -21,6 +21,7 @@
   `BackupImport::import()` and therefore those methods no longer exist;
 * `MySql::getAuthFile()` method has become `getAuthFilePath()`, to be more understandable;
 * `MySql::deleteAuthFile()` method returns void (there is no need for it to return anything);
+* removed useless `TestCase::getMockForAbstractDriver()` method;
 * removed useless `BackupExport::$config` property;
 * completely improved the `BackupImportTest` tests.
 

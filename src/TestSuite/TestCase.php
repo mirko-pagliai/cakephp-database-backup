@@ -45,10 +45,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getMockForAbstractDriver(array $mockedMethods = []): Driver
     {
-        /** @var \Cake\Database\Connection $Connection */
-        $Connection = $this->getConnection('test');
         /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
-        $Driver = $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods, [$Connection]);
+        $Driver = $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods);
 
         return $Driver;
     }

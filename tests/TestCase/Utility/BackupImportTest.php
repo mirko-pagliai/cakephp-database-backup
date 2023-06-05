@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Event\EventList;
+use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -102,8 +103,9 @@ class BackupImportTest extends TestCase
      */
     public function testImportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockForAbstractDriver(['beforeImport']);
+        $Driver = $this->createPartialMock(Sqlite::class, ['beforeImport']);
         $Driver->method('beforeImport')->willReturn(false);
+        $Driver->getEventManager()->on($Driver);
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getDriver']);
         $BackupImport->method('getDriver')->willReturn($Driver);
         $this->assertFalse($BackupImport->filename(createBackup())->import());

@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\Event\EventList;
 use Cake\TestSuite\EmailTrait;
+use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -189,8 +190,9 @@ class BackupExportTest extends TestCase
      */
     public function testExportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockForAbstractDriver(['beforeExport']);
+        $Driver = $this->createPartialMock(Sqlite::class, ['beforeExport']);
         $Driver->method('beforeExport')->willReturn(false);
+        $Driver->getEventManager()->on($Driver);
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getDriver']);
         $BackupExport->method('getDriver')->willReturn($Driver);
         $this->assertFalse($BackupExport->export());

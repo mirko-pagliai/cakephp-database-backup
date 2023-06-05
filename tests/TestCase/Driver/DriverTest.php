@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\Driver\Driver;
+use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -40,7 +41,7 @@ class DriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->Driver ??= $this->getMockForAbstractDriver();
+        $this->Driver ??= $this->createPartialMock(Sqlite::class, []);
     }
 
     /**
