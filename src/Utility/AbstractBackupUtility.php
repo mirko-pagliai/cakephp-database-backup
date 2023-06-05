@@ -17,7 +17,6 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\App;
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\Driver;
 use Symfony\Component\Process\Process;
