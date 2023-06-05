@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 use Cake\Core\Configure;
-use Cake\Database\Connection;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;

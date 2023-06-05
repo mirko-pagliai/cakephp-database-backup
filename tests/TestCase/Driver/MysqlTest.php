@@ -36,16 +36,13 @@ class MysqlTest extends DriverTestCase
      */
     public function setUp(): void
     {
-        $this->Driver ??= $this->getMockBuilder(Mysql::class)
-            ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFilePath', 'deleteAuthFile', 'writeAuthFile'])
-            ->getMock();
+        $this->Driver ??= $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
 
-        $connection = $this->getConnection('test');
-
-        if (get_class_short_name($connection->getDriver()) !== 'Mysql') {
+        if (!$this->Driver instanceof Mysql) {
             $this->markTestSkipped('Skipping tests for Mysql, current driver is ' . $this->Driver->getDriverName());
         }
+
+        $this->Driver->getEventManager()->on($this->Driver);
 
         parent::setUp();
     }
@@ -59,10 +56,8 @@ class MysqlTest extends DriverTestCase
         $expectedAuthFile = Filesystem::createTmpFile();
         $this->assertFileExists($expectedAuthFile);
 
-        $Driver = $this->getMockBuilder(Mysql::class)
-            ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFilePath'])
-            ->getMock();
+        $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
+        $Driver->getEventManager()->on($Driver);
         $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
         $Driver->dispatchEvent('Backup.afterExport');
         $this->assertFileDoesNotExist($expectedAuthFile);
@@ -77,10 +72,8 @@ class MysqlTest extends DriverTestCase
         $expectedAuthFile = Filesystem::createTmpFile();
         $this->assertFileExists($expectedAuthFile);
 
-        $Driver = $this->getMockBuilder(Mysql::class)
-            ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFilePath'])
-            ->getMock();
+        $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
+        $Driver->getEventManager()->on($Driver);
         $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
         $Driver->dispatchEvent('Backup.afterImport');
         $this->assertFileDoesNotExist($expectedAuthFile);
@@ -133,10 +126,8 @@ class MysqlTest extends DriverTestCase
         $expectedAuthFile = TMP . 'auth' . uniqid();
         $this->assertFileDoesNotExist($expectedAuthFile);
 
-        $Driver = $this->getMockBuilder(Mysql::class)
-            ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFilePath'])
-            ->getMock();
+        $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
+        $Driver->getEventManager()->on($Driver);
         $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
 
         //Dispatches an event that calls and returns `writeAuthFile()`
