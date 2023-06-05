@@ -80,16 +80,16 @@ abstract class Driver implements EventListenerInterface
     protected function getExecutable(string $type): string
     {
         Exceptionist::inArray($type, ['export', 'import']);
-        $driver = strtolower(self::getDriverName());
+        $driverName = strtolower(self::getDriverName());
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
+            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$type])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
-        $exec = Configure::readOrFail('DatabaseBackup.' . $driver . '.' . $type);
+        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $type);
 
         return str_replace(array_keys($replacements), $replacements, $exec);
     }

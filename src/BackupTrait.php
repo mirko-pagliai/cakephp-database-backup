@@ -59,19 +59,14 @@ trait BackupTrait
     }
 
     /**
-     * Gets the driver name, according to the connection.
-     *
-     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
+     * Gets the driver name, according to the connection
      * @return string Driver name
      * @throws \ReflectionException
      * @since 2.9.2
      */
-    public static function getDriverName(?ConnectionInterface $connection = null): string
+    public static function getDriverName(): string
     {
-        $connection = $connection ?: self::getConnection();
-
-        return get_class_short_name($connection->getDriver());
+        return get_class_short_name(self::getConnection()->getDriver());
     }
 
     /**

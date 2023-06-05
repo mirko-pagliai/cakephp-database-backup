@@ -59,7 +59,7 @@ abstract class AbstractBackupUtility
     public function getDriver(): Driver
     {
         if (empty($this->Driver)) {
-            $name = $this->getDriverName($this->getConnection());
+            $name = $this->getDriverName();
             /** @var class-string<\DatabaseBackup\Driver\Driver> $className */
             $className = App::classname('DatabaseBackup.' . $name, 'Driver');
             Exceptionist::isTrue($className, __d('database_backup', 'The `{0}` driver does not exist', $name));
