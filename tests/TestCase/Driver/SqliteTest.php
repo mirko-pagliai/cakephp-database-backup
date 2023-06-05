@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpDocMissingThrowsInspection, PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -15,7 +14,6 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
 /**
