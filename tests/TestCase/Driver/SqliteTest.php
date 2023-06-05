@@ -31,8 +31,8 @@ class SqliteTest extends DriverTestCase
     {
         parent::setUp();
 
-        if (!$this->Driver instanceof Sqlite) {
-            $this->markTestSkipped('Skipping tests for Sqlite, current driver is ' . $this->Driver->getDriverName());
+        if ($this->getConnection()->config()['scheme'] !== 'sqlite') {
+            $this->markTestSkipped('Skipping tests for sqlite, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
         }
     }
 }

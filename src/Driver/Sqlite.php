@@ -27,17 +27,19 @@ class Sqlite extends Driver
      */
     public function beforeImport(): bool
     {
+        /** @var \Cake\Database\Connection $connection */
+        $connection = $this->getConnection();
         /** @var \Cake\Database\Schema\Collection $schemaCollection */
-        $schemaCollection = $this->connection->getSchemaCollection();
+        $schemaCollection = $connection->getSchemaCollection();
 
         //Drops each table
         foreach ($schemaCollection->listTables() as $table) {
-            array_map([$this->connection, 'execute'], $schemaCollection->describe($table)->dropSql($this->connection));
+            array_map([$connection, 'execute'], $schemaCollection->describe($table)->dropSql($connection));
         }
 
         //Needs disconnect and re-connect because the database schema has changed
-        $this->connection->disconnect();
-        $this->connection->connect();
+        $connection->disconnect();
+        $connection->connect();
 
         return true;
     }

@@ -46,7 +46,7 @@ class BackupTraitTest extends TestCase
     {
         parent::setUp();
 
-        $this->Trait = $this->Trait ?: $this->getMockForTrait(BackupTrait::class);
+        $this->Trait ??= $this->getMockForTrait(BackupTrait::class);
     }
 
     /**

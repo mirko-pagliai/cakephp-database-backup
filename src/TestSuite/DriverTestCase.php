@@ -40,13 +40,12 @@ abstract class DriverTestCase extends TestCase
         parent::setUp();
 
         if (empty($this->Driver)) {
-            /** @var \Cake\Database\Connection $connection */
-            $connection = $this->getConnection('test');
-
             /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
-            $DriverClass = App::className('DatabaseBackup.' . get_class_short_name($connection->config()['driver']), 'Driver');
-            $this->Driver = new $DriverClass($connection);
+            $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
+            $this->Driver = new $DriverClass();
         }
+
+        $this->Driver->getEventManager()->on($this->Driver);
     }
 
     /**

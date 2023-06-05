@@ -36,13 +36,11 @@ class MysqlTest extends DriverTestCase
      */
     public function setUp(): void
     {
-        $this->Driver ??= $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
-
-        if (!$this->Driver instanceof Mysql) {
-            $this->markTestSkipped('Skipping tests for Mysql, current driver is ' . $this->Driver->getDriverName());
+        if ($this->getConnection()->config()['scheme'] !== 'mysql') {
+            $this->markTestSkipped('Skipping tests for mysql, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
         }
 
-        $this->Driver->getEventManager()->on($this->Driver);
+        $this->Driver ??= $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
 
         parent::setUp();
     }
@@ -57,8 +55,8 @@ class MysqlTest extends DriverTestCase
         $this->assertFileExists($expectedAuthFile);
 
         $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
-        $Driver->getEventManager()->on($Driver);
         $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
+        $Driver->getEventManager()->on($Driver);
         $Driver->dispatchEvent('Backup.afterExport');
         $this->assertFileDoesNotExist($expectedAuthFile);
     }
@@ -127,8 +125,8 @@ class MysqlTest extends DriverTestCase
         $this->assertFileDoesNotExist($expectedAuthFile);
 
         $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
-        $Driver->getEventManager()->on($Driver);
         $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
+        $Driver->getEventManager()->on($Driver);
 
         //Dispatches an event that calls and returns `writeAuthFile()`
         $this->assertTrue($Driver->dispatchEvent('Backup.beforeExport')->getResult());
