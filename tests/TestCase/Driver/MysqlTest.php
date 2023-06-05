@@ -36,16 +36,16 @@ class MysqlTest extends DriverTestCase
      */
     public function setUp(): void
     {
+        $this->Driver ??= $this->getMockBuilder(Mysql::class)
+            ->setConstructorArgs([$this->getConnection('test')])
+            ->onlyMethods(['getAuthFilePath', 'deleteAuthFile', 'writeAuthFile'])
+            ->getMock();
+
         $connection = $this->getConnection('test');
 
         if (get_class_short_name($connection->getDriver()) !== 'Mysql') {
             $this->markTestSkipped('Skipping tests for Mysql, current driver is ' . $this->Driver->getDriverName());
         }
-
-        $this->Driver ??= $this->getMockBuilder(Mysql::class)
-            ->setConstructorArgs([$this->getConnection('test')])
-            ->onlyMethods(['getAuthFilePath', 'deleteAuthFile', 'writeAuthFile'])
-            ->getMock();
 
         parent::setUp();
     }
