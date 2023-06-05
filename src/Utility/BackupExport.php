@@ -25,11 +25,6 @@ use Tools\Filesystem;
 class BackupExport extends AbstractBackupUtility
 {
     /**
-     * @var \DatabaseBackup\Utility\BackupManager
-     */
-    public BackupManager $BackupManager;
-
-    /**
      * Compression type
      * @var string|null
      */
@@ -58,14 +53,6 @@ class BackupExport extends AbstractBackupUtility
      * @var int
      */
     protected int $rotate = 0;
-
-    /**
-     * Construct
-     */
-    public function __construct()
-    {
-        $this->BackupManager = new BackupManager();
-    }
 
     /**
      * Sets the compression.
@@ -193,10 +180,10 @@ class BackupExport extends AbstractBackupUtility
         $this->getDriver()->dispatchEvent('Backup.afterExport');
 
         if ($this->emailRecipient) {
-            $this->BackupManager->send($filename, $this->emailRecipient);
+            BackupManager::send($filename, $this->emailRecipient);
         }
         if ($this->rotate) {
-            $this->BackupManager->rotate($this->rotate);
+            BackupManager::rotate($this->rotate);
         }
 
         return $filename;
