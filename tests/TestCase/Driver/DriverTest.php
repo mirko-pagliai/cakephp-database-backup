@@ -62,7 +62,6 @@ class DriverTest extends TestCase
      */
     public function testGetConfig(): void
     {
-        $this->assertIsArrayNotEmpty($this->Driver->getConfig());
         $this->assertNotEmpty($this->Driver->getConfig('name'));
         $this->assertNull($this->Driver->getConfig('noExistingKey'));
     }

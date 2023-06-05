@@ -12,9 +12,11 @@
   if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped;
 * `Driver::_getExecutable()`, `Driver::_getExportExecutable()` and `Driver::_getImportExecutable()` have become 
   `Driver::getExecutable()`, `Driver::getExportExecutable()` and `Driver::getImportExecutable()`;
+* the `Driver::getConfig()` method no longer accepts `null` as argument, but only a string as key, since there is no
+  need to return the whole configuration;
 * the code of `Driver::export()` and `Driver::import()` methods has been absorbed by `BackupExport::export()` and
   `BackupImport::import()` and therefore those methods no longer exist;
-* `MySql::getAuthFile()` method has become `getAuthFilePath()`, so as to be more understandable;
+* `MySql::getAuthFile()` method has become `getAuthFilePath()`, to be more understandable;
 * `MySql::deleteAuthFile()` method returns void (there is no need for it to return anything);
 * removed useless `BackupExport::$config` property;
 * completely improved the `BackupImportTest` tests.

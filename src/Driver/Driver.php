@@ -69,7 +69,7 @@ abstract class Driver implements EventListenerInterface
      * Gets and parses executable commands from the configuration, according to the type of requested operation
      *  (`export` or `import`) and the connection driver.
      *
-     * These executables are not yet final, use instead `_getExportExecutable()` and `_getImportExecutable()` methods to
+     * These executables are not yet final, use instead `getExportExecutable()` and `getImportExecutable()` methods to
      *  have the final executables, including compression.
      * @param string $type Type or the request operation (`export` or `import`)
      * @return string
@@ -83,7 +83,7 @@ abstract class Driver implements EventListenerInterface
         $driver = strtolower(self::getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
-            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFile') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
+            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),
@@ -182,15 +182,13 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Gets a config value or the whole configuration of the connection
-     * @param string|null $key Config key or `null` to get all config values
-     * @return mixed Config value, `null` if the key doesn't exist or all config values if no key was specified
+     * Gets a config value of the connection
+     * @param string $key Config key
+     * @return mixed Config value or `null` if the key doesn't exist
      * @since 2.3.0
      */
-    final public function getConfig(?string $key = null)
+    final public function getConfig(string $key)
     {
-        $config = $this->connection->config();
-
-        return $key ? $config[$key] ?? null : $config;
+        return $this->connection->config()[$key] ?? null;
     }
 }
