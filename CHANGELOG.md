@@ -23,6 +23,7 @@
 * `MySql::deleteAuthFile()` method returns void (there is no need for it to return anything);
 * removed useless `TestCase::getMockForAbstractDriver()` method;
 * removed useless `BackupExport::$config` property;
+* improved the `ExportCommand` class;
 * completely improved the `BackupImportTest` tests.
 
 ## 2.11 branch

@@ -78,6 +78,7 @@ class ExportCommand extends Command
 
         try {
             $BackupExport = new BackupExport();
+
             //Sets the output filename or the compression type. Regarding the `rotate` option, the
             //`BackupShell::rotate()` method will be called at the end, instead of `BackupExport::rotate()`
             if ($args->getOption('filename')) {
@@ -94,27 +95,13 @@ class ExportCommand extends Command
             Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
-            $verbose = $args->getOption('verbose');
-            $quiet = $args->getOption('quiet');
-
-            //Sends via email
+            //Sends via email and/or rotates
+            $extraOptions = array_filter([$args->getOption('verbose') ? '--verbose' : '', $args->getOption('quiet') ? '--quiet' : '']);
             if ($args->getOption('send')) {
-                $SendCommand = new SendCommand();
-                $SendCommand->execute(new Arguments(
-                    [$file, (string)$args->getOption('send')],
-                    compact('verbose', 'quiet'),
-                    $SendCommand->getOptionParser()->argumentNames()
-                ), $io);
+                $this->executeCommand(SendCommand::class, array_merge([$file, (string)$args->getOption('send')], $extraOptions), $io);
             }
-
-            //Rotates
             if ($args->getOption('rotate')) {
-                $RotateCommand = new RotateCommand();
-                $RotateCommand->execute(new Arguments(
-                    [(string)$args->getOption('rotate')],
-                    compact('verbose', 'quiet'),
-                    $RotateCommand->getOptionParser()->argumentNames()
-                ), $io);
+                $this->executeCommand(RotateCommand::class, array_merge([(string)$args->getOption('rotate')], $extraOptions), $io);
             }
         } catch (Exception $e) {
             $io->error($e->getMessage());
