@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\Utility\BackupManager;
 use MeTools\TestSuite\TestCase as BaseTestCase;
 
@@ -36,18 +35,5 @@ abstract class TestCase extends BaseTestCase
         BackupManager::deleteAll();
 
         parent::tearDown();
-    }
-
-    /**
-     * Internal method to get a mock for `Driver` abstract class
-     * @param array $mockedMethods Mocked methods
-     * @return \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockForAbstractDriver(array $mockedMethods = []): Driver
-    {
-        /** @var \DatabaseBackup\Driver\Driver&\PHPUnit\Framework\MockObject\MockObject $Driver */
-        $Driver = $this->createPartialMockForAbstractClass(Driver::class, $mockedMethods);
-
-        return $Driver;
     }
 }
