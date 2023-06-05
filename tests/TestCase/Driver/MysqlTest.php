@@ -131,9 +131,10 @@ class MysqlTest extends DriverTestCase
         //Dispatches an event that calls and returns `writeAuthFile()`
         $this->assertTrue($Driver->dispatchEvent('Backup.beforeExport')->getResult());
         $this->assertFileExists($expectedAuthFile);
+        $config = $Driver->getConnection()->config();
         $this->assertSame('[mysqldump]' . PHP_EOL .
-            'user=travis' . PHP_EOL .
-            'password=""' . PHP_EOL .
-            'host=localhost', file_get_contents($expectedAuthFile));
+            'user=' . $config['username'] . PHP_EOL .
+            'password="' . ($config['password'] ?? '') . '"' . PHP_EOL .
+            'host=' . $config['host'], file_get_contents($expectedAuthFile));
     }
 }
