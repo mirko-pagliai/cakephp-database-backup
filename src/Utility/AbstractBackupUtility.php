@@ -19,6 +19,7 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\AbstractDriver;
+use LogicException;
 use Symfony\Component\Process\Process;
 use Tools\Exceptionist;
 
@@ -55,9 +56,14 @@ abstract class AbstractBackupUtility
      * @param string $name Property name
      * @return mixed
      * @since 2.12.0
+     * @throw \LogicException
      */
     public function __get(string $name)
     {
+        if (!property_exists($this, $name)) {
+            throw new LogicException('Undefined property: ' . get_class($this) . '::$' . $name);
+        }
+
         return $this->$name;
     }
 
