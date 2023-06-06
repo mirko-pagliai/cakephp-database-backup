@@ -26,7 +26,7 @@ class IndexCommandTest extends CommandTestCase
      * @test
      * @uses \DatabaseBackup\Command\IndexCommand::execute()
      */
-    public function testExecuteWithNoBackups(): void
+    public function testExecute(): void
     {
         //With no backups
         $this->exec('database_backup.index -v');
