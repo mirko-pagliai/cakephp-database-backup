@@ -15,7 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use DatabaseBackup\Driver\Driver;
+use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use Tools\Filesystem;
@@ -28,7 +28,7 @@ class MysqlTest extends DriverTestCase
     /**
      * @var \DatabaseBackup\Driver\Mysql&\PHPUnit\Framework\MockObject\MockObject
      */
-    protected Driver $Driver;
+    protected AbstractDriver $Driver;
 
     /**
      * Called before every test method

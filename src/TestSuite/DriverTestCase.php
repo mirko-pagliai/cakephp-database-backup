@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
-use DatabaseBackup\Driver\Driver;
+use DatabaseBackup\Driver\AbstractDriver;
 
 /**
  * DriverTestCase class.
@@ -27,9 +27,9 @@ use DatabaseBackup\Driver\Driver;
 abstract class DriverTestCase extends TestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Driver
+     * @var \DatabaseBackup\Driver\AbstractDriver
      */
-    protected Driver $Driver;
+    protected AbstractDriver $Driver;
 
     /**
      * Called before every test method
@@ -40,7 +40,7 @@ abstract class DriverTestCase extends TestCase
         parent::setUp();
 
         if (empty($this->Driver)) {
-            /** @var class-string<\DatabaseBackup\Driver\Driver> $DriverClass */
+            /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
             $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
             $this->Driver = new $DriverClass();
         }
@@ -51,7 +51,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * @return void
      * @throws \ReflectionException|\ErrorException
-     * @uses \DatabaseBackup\Driver\Driver::getExportExecutable()
+     * @uses \DatabaseBackup\Driver\AbstractDriver::getExportExecutable()
      */
     public function testGetExportExecutable(): void
     {
@@ -69,7 +69,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * @return void
      * @throws \ReflectionException|\ErrorException
-     * @uses \DatabaseBackup\Driver\Driver::getImportExecutable()
+     * @uses \DatabaseBackup\Driver\AbstractDriver::getImportExecutable()
      */
     public function testGetImportExecutable(): void
     {

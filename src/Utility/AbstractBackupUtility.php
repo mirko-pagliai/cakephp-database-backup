@@ -18,7 +18,7 @@ namespace DatabaseBackup\Utility;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
+use DatabaseBackup\Driver\AbstractDriver;
 use Symfony\Component\Process\Process;
 use Tools\Exceptionist;
 
@@ -46,9 +46,9 @@ abstract class AbstractBackupUtility
     protected int $timeout;
 
     /**
-     * @var \DatabaseBackup\Driver\Driver
+     * @var \DatabaseBackup\Driver\AbstractDriver
      */
-    private Driver $Driver;
+    private AbstractDriver $Driver;
 
     /**
      * Magic method for reading data from inaccessible (protected or private) or non-existing properties
@@ -84,16 +84,16 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Gets the `Driver` instance, containing all methods to export/import database backups
-     * @return \DatabaseBackup\Driver\Driver A `Driver` instance
+     * Gets the driver instance
+     * @return \DatabaseBackup\Driver\AbstractDriver A driver instance
      * @throws \ErrorException|\ReflectionException
      * @since 2.0.0
      */
-    public function getDriver(): Driver
+    public function getDriver(): AbstractDriver
     {
         if (empty($this->Driver)) {
             $name = $this->getDriverName();
-            /** @var class-string<\DatabaseBackup\Driver\Driver> $className */
+            /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $className */
             $className = App::classname('DatabaseBackup.' . $name, 'Driver');
             Exceptionist::isTrue($className, __d('database_backup', 'The `{0}` driver does not exist', $name));
 

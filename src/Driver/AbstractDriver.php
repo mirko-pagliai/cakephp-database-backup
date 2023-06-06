@@ -25,7 +25,7 @@ use Tools\Exceptionist;
  * Represents a driver containing all methods to export/import database backups according to the connection
  * @method \Cake\Event\EventManager getEventManager()
  */
-abstract class Driver implements EventListenerInterface
+abstract class AbstractDriver implements EventListenerInterface
 {
     use BackupTrait;
     use EventDispatcherTrait;

@@ -20,7 +20,7 @@ use Tools\Filesystem;
 /**
  * Mysql driver to export/import database backups
  */
-class Mysql extends Driver
+class Mysql extends AbstractDriver
 {
     /**
      * @since 2.1.0

@@ -50,8 +50,8 @@ class BackupImport extends AbstractBackupUtility
      *  - `Backup.afterImport`: will be triggered after import.
      * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
      * @throws \ErrorException|\ReflectionException
-     * @see \DatabaseBackup\Driver\Driver::afterImport()
-     * @see \DatabaseBackup\Driver\Driver::beforeImport()
+     * @see \DatabaseBackup\Driver\AbstractDriver::afterImport()
+     * @see \DatabaseBackup\Driver\AbstractDriver::beforeImport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      */
     public function import()

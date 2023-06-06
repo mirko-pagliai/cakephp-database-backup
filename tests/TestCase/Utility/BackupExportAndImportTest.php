@@ -83,7 +83,7 @@ class BackupExportAndImportTest extends TestCase
      */
     public function testGetMagicMethod(): void
     {
-        $this->assertNotEmpty($this->BackupExport->rotate);
+        $this->assertNull($this->BackupExport->emailRecipient);
 
         //With a no existing property
         $this->expectWarning();
