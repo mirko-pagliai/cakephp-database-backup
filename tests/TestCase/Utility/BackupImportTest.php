@@ -79,6 +79,16 @@ class BackupImportTest extends TestCase
 
     /**
      * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::timeout()
+     */
+    public function testTimeout(): void
+    {
+        $this->BackupImport->timeout(120);
+        $this->assertSame(120, $this->getProperty($this->BackupImport, 'timeout'));
+    }
+
+    /**
+     * @test
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function testImport(): void

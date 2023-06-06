@@ -134,6 +134,16 @@ class BackupExportTest extends TestCase
 
     /**
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::timeout()
+     */
+    public function testTimeout(): void
+    {
+        $this->BackupExport->timeout(120);
+        $this->assertSame(120, $this->getProperty($this->BackupExport, 'timeout'));
+    }
+
+    /**
+     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExport(): void

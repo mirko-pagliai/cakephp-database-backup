@@ -38,6 +38,12 @@ abstract class AbstractBackupUtility
     protected string $filename;
 
     /**
+     * Timeout for shell commands
+     * @var int
+     */
+    protected int $timeout;
+
+    /**
      * @var \DatabaseBackup\Driver\Driver
      */
     protected Driver $Driver;
@@ -48,6 +54,18 @@ abstract class AbstractBackupUtility
      * @return $this
      */
     abstract public function filename(string $filename);
+
+    /**
+     * Sets the timeout for shell commands
+     * @param int $timeout Timeout in seconds
+     * @return $this
+     */
+    public function timeout(int $timeout)
+    {
+        $this->timeout = $timeout;
+
+        return $this;
+    }
 
     /**
      * Gets the `Driver` instance, containing all methods to export/import database backups
@@ -78,7 +96,7 @@ abstract class AbstractBackupUtility
     protected function getProcess(string $command): Process
     {
         $Process = Process::fromShellCommandline($command);
-        $Process->setTimeout(Configure::readOrFail('DatabaseBackup.processTimeout'));
+        $Process->setTimeout($this->timeout ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
         $Process->run();
 
         return $Process;
