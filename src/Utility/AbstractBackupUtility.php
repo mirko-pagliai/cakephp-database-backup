@@ -59,6 +59,7 @@ abstract class AbstractBackupUtility
      * Sets the timeout for shell commands
      * @param int $timeout Timeout in seconds
      * @return $this
+     * @since 2.12.0
      */
     public function timeout(int $timeout)
     {
