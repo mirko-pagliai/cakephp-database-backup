@@ -85,7 +85,7 @@ class BackupExportAndImportTest extends TestCase
     {
         $this->assertNull($this->BackupExport->emailRecipient);
 
-        $this->expectExceptionMessage('Undefined property: ' . get_class($this->BackupExport) . '::$noExistingProperty');
+        $this->expectExceptionMessage('Undefined property: ' . BackupExport::class . '::$noExistingProperty');
         $this->BackupExport->noExistingProperty;
     }
 

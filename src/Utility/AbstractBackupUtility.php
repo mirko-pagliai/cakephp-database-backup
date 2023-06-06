@@ -61,7 +61,8 @@ abstract class AbstractBackupUtility
     public function __get(string $name)
     {
         if (!property_exists($this, $name)) {
-            throw new LogicException('Undefined property: ' . get_class($this) . '::$' . $name);
+            $class = &$this;
+            throw new LogicException('Undefined property: ' . get_class($class) . '::$' . $name);
         }
 
         return $this->$name;
