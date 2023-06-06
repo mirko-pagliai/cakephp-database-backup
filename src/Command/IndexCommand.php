@@ -25,6 +25,7 @@ use DatabaseBackup\Utility\BackupManager;
 
 /**
  * Lists database backups
+ * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#index
  */
 class IndexCommand extends Command
 {
@@ -44,7 +45,6 @@ class IndexCommand extends Command
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
      * @throws \ReflectionException
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#index
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

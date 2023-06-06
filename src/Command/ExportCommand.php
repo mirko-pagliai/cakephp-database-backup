@@ -26,6 +26,7 @@ use Tools\Exceptionist;
 
 /**
  * Exports a database backup
+ * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#export
  */
 class ExportCommand extends Command
 {
@@ -75,7 +76,6 @@ class ExportCommand extends Command
      * @return void
      * @throws \Cake\Console\Exception\StopException
      * @throws \ReflectionException
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
