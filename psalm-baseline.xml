@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="4.x-dev@">
+  <file src="src/Driver/Mysql.php">
+    <RedundantPropertyInitializationCheck occurrences="2">
+      <code>$this-&gt;auth</code>
+      <code>TMP . uniqid('auth')</code>
+    </RedundantPropertyInitializationCheck>
+  </file>
   <file src="src/TestSuite/DriverTestCase.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>empty($this-&gt;Driver)</code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="src/Utility/AbstractBackupUtility.php">
+    <RedundantPropertyInitializationCheck occurrences="2">
+      <code>$this-&gt;timeout</code>
+      <code>Configure::readOrFail('DatabaseBackup.processTimeout')</code>
+    </RedundantPropertyInitializationCheck>
     <TypeDoesNotContainType occurrences="1">
       <code>empty($this-&gt;Driver)</code>
     </TypeDoesNotContainType>

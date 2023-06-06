@@ -1,4 +1,33 @@
 # 2.x branch
+## 2.12 branch
+### 2.12.0
+* added `AbstractBackupUtility::timeout()` method, so now `BackupExport`/`BackupImport` utilities have a method to set the
+  timeout for shell commands at runtime. Added `--timeout` option (short: `-t`) for `ExportCommand`/`ImportCommand`;
+* the events (`Backup.beforeExport`, `Backup.afterExport`, `Backup.beforeImport`, `Backup.afterImport`, which remain
+  implemented by the driver classes) are directly dispatched by the `BackupExport::export()` and `BackupImport::import()`
+  methods, and no longer by the drivers themselves;
+* added the `AbstractBackupUtility` abstract class that provides the code common to `BackupExport` and `BackupImport`;
+* removed `$Driver` public property for `BackupExport`/`BackupImport` and added `AbstractBackupUtility::getDriver()` method;
+* `Driver::_exec()` method has become `AbstractBackupUtility::getProcess()`;
+* `BackupTrait::getDriver()` method has become `AbstractBackupUtility::getDriver()`;
+* `BackupTrait::getDriverName()` and `AbstractBackupUtility::getDriver()` no longer accept a connection as argument, but 
+  directly use the one set by the configuration;
+* the `Driver` class no longer accepts a connection as constructor argument, but directly uses the one set by the configuration;
+* the `BackupExport::export()` and `BackupImport::import()` methods can return the filename path on success or `false`
+  if the `Backup.beforeExport`/`Backup.beforeImport` events are stopped;
+* `Driver::_getExecutable()`, `Driver::_getExportExecutable()` and `Driver::_getImportExecutable()` have become 
+  `Driver::getExecutable()`, `Driver::getExportExecutable()` and `Driver::getImportExecutable()`;
+* the `Driver::getConfig()` method no longer accepts `null` as argument, but only a string as key, since there is no
+  need to return the whole configuration;
+* the code of `Driver::export()` and `Driver::import()` methods has been absorbed by `BackupExport::export()` and
+  `BackupImport::import()` and therefore those methods no longer exist;
+* `MySql::getAuthFile()` method has become `getAuthFilePath()`, to be more understandable;
+* `MySql::deleteAuthFile()` method returns void (there is no need for it to return anything);
+* removed useless `TestCase::getMockForAbstractDriver()` method;
+* removed useless `BackupExport::$config` property;
+* improved the `ExportCommand` class;
+* completely improved the `BackupImportTest` tests.
+
 ## 2.11 branch
 ### 2.11.1
 * added the `DatabaseBackup.processTimeout` configuration, which allows you to set a timeout for commands that will be 

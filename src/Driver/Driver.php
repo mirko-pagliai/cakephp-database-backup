@@ -16,11 +16,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 use Cake\Core\Configure;
-use Cake\Database\Connection;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
-use Symfony\Component\Process\Process;
 use Tools\Exceptionist;
 
 /**
@@ -33,18 +31,10 @@ abstract class Driver implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * @var \Cake\Database\Connection
-     */
-    protected Connection $connection;
-
-    /**
      * Constructor
-     * @param \Cake\Database\Connection $connection A `Connection` instance
      */
-    public function __construct(Connection $connection)
+    public function __construct()
     {
-        $this->connection = $connection;
-
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
@@ -67,25 +57,10 @@ abstract class Driver implements EventListenerInterface
     }
 
     /**
-     * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
-     * @param string $command The command line to pass to the shell of the OS
-     * @return \Symfony\Component\Process\Process
-     * @since 2.8.7
-     */
-    protected function _exec(string $command): Process
-    {
-        $Process = Process::fromShellCommandline($command);
-        $Process->setTimeout(Configure::read('DatabaseBackup.processTimeout', 60));
-        $Process->run();
-
-        return $Process;
-    }
-
-    /**
      * Gets and parses executable commands from the configuration, according to the type of requested operation
      *  (`export` or `import`) and the connection driver.
      *
-     * These executables are not yet final, use instead `_getExportExecutable()` and `_getImportExecutable()` methods to
+     * These executables are not yet final, use instead `getExportExecutable()` and `getImportExecutable()` methods to
      *  have the final executables, including compression.
      * @param string $type Type or the request operation (`export` or `import`)
      * @return string
@@ -93,19 +68,19 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    protected function _getExecutable(string $type): string
+    private function getExecutable(string $type): string
     {
         Exceptionist::inArray($type, ['export', 'import']);
-        $driver = strtolower(self::getDriverName());
+        $driverName = strtolower(self::getDriverName());
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driver][$type])),
-            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFile') && $this->getAuthFile() ? escapeshellarg($this->getAuthFile()) : '',
+            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$type])),
+            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
-        $exec = Configure::readOrFail('DatabaseBackup.' . $driver . '.' . $type);
+        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $type);
 
         return str_replace(array_keys($replacements), $replacements, $exec);
     }
@@ -118,9 +93,9 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    protected function _getExportExecutable(string $filename): string
+    public function getExportExecutable(string $filename): string
     {
-        $exec = $this->_getExecutable('export');
+        $exec = $this->getExecutable('export');
         $compression = self::getCompression($filename);
         if ($compression) {
             $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
@@ -137,9 +112,9 @@ abstract class Driver implements EventListenerInterface
      * @throws \ReflectionException
      * @throws \ErrorException
      */
-    protected function _getImportExecutable(string $filename): string
+    public function getImportExecutable(string $filename): string
     {
-        $exec = $this->_getExecutable('import');
+        $exec = $this->getExecutable('import');
         $compression = self::getCompression($filename);
         if ($compression) {
             return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
@@ -192,73 +167,19 @@ abstract class Driver implements EventListenerInterface
      * @return string
      * @throws \ErrorException
      */
-    final public function getBinary(string $name): string
+    public function getBinary(string $name): string
     {
         return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), 'Binary for `' . $name . '` could not be found. You have to set its path manually');
     }
 
     /**
-     * Gets a config value or the whole configuration of the connection
-     * @param string|null $key Config key or `null` to get all config values
-     * @return mixed Config value, `null` if the key doesn't exist or all config values if no key was specified
+     * Gets a config value of the connection
+     * @param string $key Config key
+     * @return mixed Config value or `null` if the key doesn't exist
      * @since 2.3.0
      */
-    final public function getConfig(?string $key = null)
+    protected function getConfig(string $key)
     {
-        $config = $this->connection->config();
-
-        return $key ? $config[$key] ?? null : $config;
-    }
-
-    /**
-     * Exports the database.
-     *
-     * When exporting, this method will trigger these events:
-     *  - `Backup.beforeExport`: will be triggered before export;
-     *  - `Backup.afterExport`: will be triggered after export.
-     * @param string $filename Filename where you want to export the database
-     * @return bool `true` on success
-     * @throws \Exception
-     */
-    final public function export(string $filename): bool
-    {
-        $beforeExport = $this->dispatchEvent('Backup.beforeExport');
-        if ($beforeExport->isStopped()) {
-            return false;
-        }
-
-        $process = $this->_exec($this->_getExportExecutable($filename));
-        Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($process->getErrorOutput())));
-
-        $this->dispatchEvent('Backup.afterExport');
-
-        return file_exists($filename);
-    }
-
-    /**
-     * Imports the database.
-     *
-     * When importing, this method will trigger these events:
-     *  - `Backup.beforeImport`: will be triggered before import;
-     *  - `Backup.afterImport`: will be triggered after import.
-     * @param string $filename Filename from which you want to import the database
-     * @return bool true on success
-     * @throws \Tools\Exception\NotInArrayException
-     * @throws \ReflectionException
-     * @throws \ErrorException
-     */
-    final public function import(string $filename): bool
-    {
-        $beforeImport = $this->dispatchEvent('Backup.beforeImport');
-        if ($beforeImport->isStopped()) {
-            return false;
-        }
-
-        $process = $this->_exec($this->_getImportExecutable($filename));
-        Exceptionist::isTrue($process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($process->getErrorOutput())));
-
-        $this->dispatchEvent('Backup.afterImport');
-
-        return true;
+        return $this->getConnection()->config()[$key] ?? null;
     }
 }

@@ -14,12 +14,9 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup;
 
-use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\Driver\Driver;
-use Tools\Exceptionist;
 use Tools\Filesystem;
 
 /**
@@ -62,39 +59,14 @@ trait BackupTrait
     }
 
     /**
-     * Gets the `Driver` instance, containing all methods to export/import database backups.
-     *
-     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
-     * @return \DatabaseBackup\Driver\Driver A `Driver` instance
-     * @throws \ErrorException|\ReflectionException
-     * @since 2.0.0
-     */
-    public static function getDriver(?ConnectionInterface $connection = null): Driver
-    {
-        $connection = $connection ?: self::getConnection();
-        $name = self::getDriverName($connection);
-        /** @var class-string<\DatabaseBackup\Driver\Driver> $Driver */
-        $Driver = App::classname('DatabaseBackup.' . $name, 'Driver');
-        Exceptionist::isTrue($Driver, __d('database_backup', 'The `{0}` driver does not exist', $name));
-
-        return new $Driver($connection);
-    }
-
-    /**
-     * Gets the driver name, according to the connection.
-     *
-     * You can pass a `Connection` instance. By default, the connection set in the configuration will be used.
-     * @param \Cake\Datasource\ConnectionInterface|null $connection A `Connection` instance
+     * Gets the driver name, according to the connection
      * @return string Driver name
      * @throws \ReflectionException
      * @since 2.9.2
      */
-    public static function getDriverName(?ConnectionInterface $connection = null): string
+    public static function getDriverName(): string
     {
-        $connection = $connection ?: self::getConnection();
-
-        return get_class_short_name($connection->getDriver());
+        return get_class_short_name(self::getConnection()->getDriver());
     }
 
     /**

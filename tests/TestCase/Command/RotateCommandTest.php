@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use DatabaseBackup\TestSuite\CommandTestCase;
-use DatabaseBackup\Utility\BackupManager;
 
 /**
  * RotateCommandTest class
@@ -29,6 +28,14 @@ class RotateCommandTest extends CommandTestCase
      */
     public function testExecute(): void
     {
+        //With no backups
+        $this->exec('database_backup.rotate -v 1');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Connection: test');
+        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
+        $this->assertOutputContains('No backup has been deleted');
+        $this->assertErrorEmpty();
+
         $expectedFiles = createSomeBackups();
         array_pop($expectedFiles);
         $this->exec('database_backup.rotate -v 1');
@@ -37,15 +44,6 @@ class RotateCommandTest extends CommandTestCase
             $this->assertOutputContains('Backup `' . basename($expectedFile) . '` has been deleted');
         }
         $this->assertOutputContains('<success>Deleted backup files: 2</success>');
-        $this->assertErrorEmpty();
-
-        //With no backups
-        BackupManager::deleteAll();
-        $this->exec('database_backup.rotate -v 1');
-        $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
-        $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
 
         //With an invalid value

@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use DatabaseBackup\TestSuite\CommandTestCase;
-use DatabaseBackup\Utility\BackupManager;
 
 /**
  * IndexCommandTest class
@@ -29,6 +28,14 @@ class IndexCommandTest extends CommandTestCase
      */
     public function testExecute(): void
     {
+        //With no backups
+        $this->exec('database_backup.index -v');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Connection: test');
+        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
+        $this->assertOutputContains('Backup files found: 0');
+        $this->assertErrorEmpty();
+
         createSomeBackups();
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
@@ -36,15 +43,6 @@ class IndexCommandTest extends CommandTestCase
         $this->assertOutputRegExp('/backup\.sql\.gz\s+|\s+sql\.gz\s+|\s+gzip\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
         $this->assertOutputRegExp('/backup\.sql\.bz2\s+|\s+sql\.bz2\s+|\s+bzip2\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
         $this->assertOutputRegExp('/backup\.sq\s+|\s+sql\s+|\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
-        $this->assertErrorEmpty();
-
-        //With no backups
-        BackupManager::deleteAll();
-        $this->exec('database_backup.index -v');
-        $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
-        $this->assertOutputContains('Backup files found: 0');
         $this->assertErrorEmpty();
     }
 }

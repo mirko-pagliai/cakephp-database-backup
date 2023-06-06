@@ -17,11 +17,9 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
 use Cake\Database\Connection;
-use Cake\Database\Driver\Sqlserver;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -48,7 +46,7 @@ class BackupTraitTest extends TestCase
     {
         parent::setUp();
 
-        $this->Trait = $this->Trait ?: $this->getMockForTrait(BackupTrait::class);
+        $this->Trait ??= $this->getMockForTrait(BackupTrait::class);
     }
 
     /**
@@ -100,22 +98,6 @@ class BackupTraitTest extends TestCase
         $this->expectException(MissingDatasourceConfigException::class);
         $this->expectExceptionMessage('The datasource configuration "noExisting" was not found');
         $this->getConnection('noExisting');
-    }
-
-    /**
-     * @test
-     * @uses \DatabaseBackup\BackupTrait::getDriver()
-     */
-    public function testGetDriver(): void
-    {
-        foreach ([ConnectionManager::get('test'), null] as $connection) {
-            $this->assertInstanceof(Driver::class, $this->Trait->getDriver($connection));
-        }
-
-        //With a no existing driver
-        $this->expectExceptionMessage('The `Sqlserver` driver does not exist');
-        $Connection = $this->createConfiguredMock(Connection::class, ['__debuginfo' => [], 'getDriver' => new Sqlserver()]);
-        $this->Trait->getDriver($Connection);
     }
 
     /**

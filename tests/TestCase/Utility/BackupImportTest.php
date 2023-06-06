@@ -15,9 +15,12 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use Cake\Event\EventList;
+use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process;
 use Tools\Exception\NotReadableException;
 use Tools\Filesystem;
 use Tools\TestSuite\ReflectionTrait;
@@ -28,11 +31,6 @@ use Tools\TestSuite\ReflectionTrait;
 class BackupImportTest extends TestCase
 {
     use ReflectionTrait;
-
-    /**
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
-    protected BackupExport $BackupExport;
 
     /**
      * @var \DatabaseBackup\Utility\BackupImport
@@ -47,8 +45,8 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport ??= new BackupExport();
         $this->BackupImport ??= new BackupImport();
+        $this->BackupImport->getDriver()->getEventManager()->setEventList(new EventList());
     }
 
     /**
@@ -58,24 +56,16 @@ class BackupImportTest extends TestCase
      */
     public function testFilename(): void
     {
-        //Creates a `sql` backup
-        $backup = $this->BackupExport->filename('backup.sql')->export();
-        $this->BackupImport->filename($backup);
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
-
-        //Creates a `sql.bz2` backup
-        $backup = $this->BackupExport->filename('backup.sql.bz2')->export();
-        $this->BackupImport->filename($backup);
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
-
-        //Creates a `sql.gz` backup
-        $backup = $this->BackupExport->filename('backup.sql.gz')->export();
-        $this->BackupImport->filename($backup);
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
+        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
+            $result = createBackup('backup.' . $extension);
+            $this->BackupImport->filename($result);
+            $this->assertSame($result, $this->getProperty($this->BackupImport, 'filename'));
+        }
 
         //With a relative path
-        $this->BackupImport->filename(basename($backup));
-        $this->assertSame($backup, $this->getProperty($this->BackupImport, 'filename'));
+        $result = createBackup('backup_' . time() . '.sql');
+        $this->BackupImport->filename(basename($result));
+        $this->assertSame($result, $this->getProperty($this->BackupImport, 'filename'));
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);
@@ -89,26 +79,76 @@ class BackupImportTest extends TestCase
 
     /**
      * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::timeout()
+     */
+    public function testTimeout(): void
+    {
+        $this->BackupImport->timeout(120);
+        $this->assertSame(120, $this->getProperty($this->BackupImport, 'timeout'));
+    }
+
+    /**
+     * @test
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function testImport(): void
     {
-        //Exports and imports with no compression
-        $backup = $this->BackupExport->compression(null)->export();
-        $filename = $this->BackupImport->filename($backup)->import();
-        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql$/', basename($filename));
-
-        //Exports and imports with `bzip2` compression
-        $backup = $this->BackupExport->compression('bzip2')->export();
-        $filename = $this->BackupImport->filename($backup)->import();
-        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql\.bz2$/', basename($filename));
-
-        //Exports and imports with `gzip` compression
-        $backup = $this->BackupExport->compression('gzip')->export();
-        $filename = $this->BackupImport->filename($backup)->import();
-        $this->assertMatchesRegularExpression('/^backup_test_[0-9]{14}\.sql\.gz$/', basename($filename));
+        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
+            $expectedFilename = createBackup('backup.' . $extension);
+            $result = $this->BackupImport->filename($expectedFilename)->import() ?: '';
+            $this->assertStringEndsWith('backup.' . $extension, $result);
+            $this->assertSame($expectedFilename, $result);
+            $this->assertEventFired('Backup.beforeImport', $this->BackupImport->getDriver()->getEventManager());
+            $this->assertEventFired('Backup.afterImport', $this->BackupImport->getDriver()->getEventManager());
+        }
 
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
+    }
+
+    /**
+     * Test for `import()` method. Export is stopped by the `Backup.beforeImport` event (implemented by driver)
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     */
+    public function testImportStoppedByBeforeExport(): void
+    {
+        $Driver = $this->createPartialMock(Sqlite::class, ['beforeImport']);
+        $Driver->method('beforeImport')->willReturn(false);
+        $Driver->getEventManager()->on($Driver);
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getDriver']);
+        $BackupImport->method('getDriver')->willReturn($Driver);
+        $this->assertFalse($BackupImport->filename(createBackup())->import());
+    }
+
+    /**
+     * Test for `import()` method, on failure (error for `Process`)
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     */
+    public function testImportOnFailure(): void
+    {
+        $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
+        $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
+        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
+        $BackupImport->method('getProcess')->willReturn($Process);
+        $BackupImport->filename(createBackup())->import();
+    }
+
+    /**
+     * Test for `import()` method, exceeding the timeout
+     * @see https://symfony.com/doc/current/components/process.html#process-timeout
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     */
+    public function testImportExceedingTimeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
+        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
+        $BackupImport->method('getProcess')->willThrowException($ProcessTimedOutException);
+        $BackupImport->filename(createBackup())->import();
     }
 }
