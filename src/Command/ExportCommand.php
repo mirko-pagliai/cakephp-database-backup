@@ -18,6 +18,7 @@ namespace DatabaseBackup\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
@@ -58,6 +59,10 @@ class ExportCommand extends Command
                         'to indicate the recipient\'s email address'),
                     'short' => 's',
                 ],
+                'timeout' => [
+                    'help' => __d('database_backup', 'Timeout for shell commands. Default value: {0} seconds', Configure::readOrFail('DatabaseBackup.processTimeout')),
+                    'short' => 't',
+                ],
             ]);
     }
 
@@ -86,11 +91,12 @@ class ExportCommand extends Command
             } elseif ($args->getOption('compression')) {
                 $BackupExport->compression((string)$args->getOption('compression'));
             }
+            //Sets the timeout
+            if ($args->getOption('timeout')) {
+                $BackupExport->timeout((int)$args->getOption('timeout'));
+            }
 
-            /**
-             * Exports
-             * @var string $file
-             */
+            /** @var string $file */
             $file = $BackupExport->export();
             Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));

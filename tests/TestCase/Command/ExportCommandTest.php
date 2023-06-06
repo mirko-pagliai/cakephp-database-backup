@@ -46,11 +46,11 @@ class ExportCommandTest extends CommandTestCase
     }
 
     /**
-     * Test for `execute()` method, with `compression` param
+     * Test for `execute()` method, with `compression` option
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
-    public function testExecuteCompressionParam(): void
+    public function testExecuteCompressionOption(): void
     {
         $this->exec($this->command . ' --compression bzip2');
         $this->assertExitSuccess();
@@ -59,11 +59,11 @@ class ExportCommandTest extends CommandTestCase
     }
 
     /**
-     * Test for `execute()` method, with `filename` param
+     * Test for `execute()` method, with `filename` option
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
-    public function testExecuteFilenameParam(): void
+    public function testExecuteFilenameOption(): void
     {
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitSuccess();
@@ -72,11 +72,11 @@ class ExportCommandTest extends CommandTestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` param
+     * Test for `execute()` method, with `rotate` option
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
-    public function testExecuteRotateParam(): void
+    public function testExecuteRotateOption(): void
     {
         $files = createSomeBackups();
         $this->exec($this->command . ' --rotate 3 -v');
@@ -88,16 +88,29 @@ class ExportCommandTest extends CommandTestCase
     }
 
     /**
-     * Test for `execute()` method, with `send` param
+     * Test for `execute()` method, with `send` option
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
-    public function testExecuteSendParam(): void
+    public function testExecuteSendOption(): void
     {
         $this->exec($this->command . ' --send mymail@example.com');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` was sent via mail/');
+        $this->assertErrorEmpty();
+    }
+
+    /**
+     * Test for `execute()` method, with `timeout` option
+     * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    public function testExecuteTimeoutOption(): void
+    {
+        $this->exec($this->command . ' --timeout 10');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Timeout for shell commands: 10 seconds');
         $this->assertErrorEmpty();
     }
 }

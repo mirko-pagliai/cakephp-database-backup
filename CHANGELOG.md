@@ -1,8 +1,8 @@
 # 2.x branch
 ## 2.12 branch
 ### 2.12.0
-* added `AbstractBackupUtility::timeout()` method, so now the `BackupExport`/`BackupImport` utilities have a method to
-    set the timeout for shell commands at runtime;
+* added `AbstractBackupUtility::timeout()` method, so now `BackupExport`/`BackupImport` utilities have a method to set the
+  timeout for shell commands at runtime. Added `--timeout` option (short: `-t`) for `ExportCommand`/`ImportCommand`;
 * the events (`Backup.beforeExport`, `Backup.afterExport`, `Backup.beforeImport`, `Backup.afterImport`, which remain
   implemented by the driver classes) are directly dispatched by the `BackupExport::export()` and `BackupImport::import()`
   methods, and no longer by the drivers themselves;

@@ -23,13 +23,18 @@ use DatabaseBackup\TestSuite\CommandTestCase;
 class ImportCommandTest extends CommandTestCase
 {
     /**
+     * @var string
+     */
+    protected string $command = 'database_backup.import -v';
+
+    /**
      * @test
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecute(): void
     {
         $backup = createBackup();
-        $this->exec('database_backup.import -v ' . $backup);
+        $this->exec($this->command . ' ' . $backup);
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
@@ -37,7 +42,21 @@ class ImportCommandTest extends CommandTestCase
         $this->assertErrorEmpty();
 
         //With a no existing file
-        $this->exec('database_backup.import -v /noExistingDir/backup.sql');
+        $this->exec($this->command . ' /noExistingDir/backup.sql');
         $this->assertExitError();
+    }
+
+    /**
+     * Test for `execute()` method, with `timeout` option
+     * @test
+     * @uses \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    public function testExecuteTimeoutOption(): void
+    {
+        $backup = createBackup();
+        $this->exec($this->command . ' --timeout 10 ' . $backup);
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Timeout for shell commands: 10 seconds');
+        $this->assertErrorEmpty();
     }
 }

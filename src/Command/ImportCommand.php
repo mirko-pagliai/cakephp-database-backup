@@ -18,6 +18,7 @@ namespace DatabaseBackup\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
@@ -39,6 +40,10 @@ class ImportCommand extends Command
             ->addArgument('filename', [
                 'help' => __d('database_backup', 'Filename. It can be an absolute path'),
                 'required' => true,
+            ])
+            ->addOption('timeout', [
+                'help' => __d('database_backup', 'Timeout for shell commands. Default value: {0} seconds', Configure::readOrFail('DatabaseBackup.processTimeout')),
+                'short' => 't',
             ]);
     }
 
@@ -56,12 +61,15 @@ class ImportCommand extends Command
 
         try {
             $BackupImport = new BackupImport();
+
             $BackupImport->filename((string)$args->getArgument('filename'));
 
-            /**
-             * Imports
-             * @var string $file
-             */
+            //Sets the timeout
+            if ($args->getOption('timeout')) {
+                $BackupImport->timeout((int)$args->getOption('timeout'));
+            }
+
+            /** @var string $file */
             $file = $BackupImport->import();
             Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
