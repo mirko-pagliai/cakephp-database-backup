@@ -21,6 +21,10 @@ use Tools\Filesystem;
 
 /**
  * Utility to export databases
+ * @property ?string $compression
+ * @property ?string $emailRecipient
+ * @property string $extension
+ * @property int $rotate
  */
 class BackupExport extends AbstractBackupUtility
 {
@@ -34,7 +38,7 @@ class BackupExport extends AbstractBackupUtility
      * Default extension
      * @var string
      */
-    protected string $defaultExtension = 'sql';
+    private string $defaultExtension = 'sql';
 
     /**
      * Recipient of the email, if you want to send the backup via mail

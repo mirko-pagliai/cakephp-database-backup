@@ -26,6 +26,8 @@ use Tools\Exceptionist;
  * AbstractBackupUtility.
  *
  * Provides the code common to the `BackupExport` and `BackupImport` classes.
+ * @property string $filename
+ * @property int $timeout
  */
 abstract class AbstractBackupUtility
 {
@@ -46,7 +48,18 @@ abstract class AbstractBackupUtility
     /**
      * @var \DatabaseBackup\Driver\Driver
      */
-    protected Driver $Driver;
+    private Driver $Driver;
+
+    /**
+     * Magic method for reading data from inaccessible (protected or private) or non-existing properties
+     * @param string $name Property name
+     * @return mixed
+     * @since 2.12.0
+     */
+    public function __get(string $name)
+    {
+        return $this->$name;
+    }
 
     /**
      * Sets the filename

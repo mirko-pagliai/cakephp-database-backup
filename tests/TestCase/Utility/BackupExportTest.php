@@ -23,7 +23,6 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use Tools\TestSuite\ReflectionTrait;
 
 /**
  * BackupExportTest class
@@ -31,7 +30,6 @@ use Tools\TestSuite\ReflectionTrait;
 class BackupExportTest extends TestCase
 {
     use EmailTrait;
-    use ReflectionTrait;
 
     /**
      * @var \DatabaseBackup\Utility\BackupExport
@@ -58,8 +56,8 @@ class BackupExportTest extends TestCase
     public function testCompression(): void
     {
         $this->BackupExport->compression('bzip2');
-        $this->assertSame('bzip2', $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertSame('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
+        $this->assertSame('bzip2', $this->BackupExport->compression);
+        $this->assertSame('sql.bz2', $this->BackupExport->extension);
 
         //With an invalid type
         $this->expectExceptionMessage('Invalid compression type');
@@ -74,31 +72,31 @@ class BackupExportTest extends TestCase
     public function testFilename(): void
     {
         $this->BackupExport->filename('backup.sql.bz2');
-        $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->getProperty($this->BackupExport, 'filename'));
-        $this->assertSame('bzip2', $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertSame('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
+        $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->BackupExport->filename);
+        $this->assertSame('bzip2', $this->BackupExport->compression);
+        $this->assertSame('sql.bz2', $this->BackupExport->extension);
 
         //Compression is ignored, because there's a filename
         $this->BackupExport->compression('gzip')->filename('backup.sql.bz2');
-        $this->assertSame('backup.sql.bz2', basename($this->getProperty($this->BackupExport, 'filename')));
-        $this->assertSame('bzip2', $this->getProperty($this->BackupExport, 'compression'));
-        $this->assertSame('sql.bz2', $this->getProperty($this->BackupExport, 'extension'));
+        $this->assertSame('backup.sql.bz2', basename($this->BackupExport->filename));
+        $this->assertSame('bzip2', $this->BackupExport->compression);
+        $this->assertSame('sql.bz2', $this->BackupExport->extension);
 
         //Filename with `{$DATABASE}` pattern
         $this->BackupExport->filename('{$DATABASE}.sql');
-        $this->assertSame('test.sql', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertSame('test.sql', basename($this->BackupExport->filename));
 
         //Filename with `{$DATETIME}` pattern
         $this->BackupExport->filename('{$DATETIME}.sql');
-        $this->assertMatchesRegularExpression('/^\d{14}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertMatchesRegularExpression('/^\d{14}\.sql$/', basename($this->BackupExport->filename));
 
         //Filename with `{$HOSTNAME}` pattern
         $this->BackupExport->filename('{$HOSTNAME}.sql');
-        $this->assertSame('localhost.sql', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertSame('localhost.sql', basename($this->BackupExport->filename));
 
         //Filename with `{$TIMESTAMP}` pattern
         $this->BackupExport->filename('{$TIMESTAMP}.sql');
-        $this->assertMatchesRegularExpression('/^\d{10}\.sql$/', basename($this->getProperty($this->BackupExport, 'filename')));
+        $this->assertMatchesRegularExpression('/^\d{10}\.sql$/', basename($this->BackupExport->filename));
 
         //With invalid extension
         $this->expectExceptionMessage('Invalid `txt` file extension');
@@ -112,7 +110,7 @@ class BackupExportTest extends TestCase
     public function testRotate(): void
     {
         $this->BackupExport->rotate(10);
-        $this->assertSame(10, $this->getProperty($this->BackupExport, 'rotate'));
+        $this->assertSame(10, $this->BackupExport->rotate);
 
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupExport->rotate(-1)->export();
@@ -125,11 +123,11 @@ class BackupExportTest extends TestCase
     public function testSend(): void
     {
         $this->BackupExport->send();
-        $this->assertNull($this->getProperty($this->BackupExport, 'emailRecipient'));
+        $this->assertNull($this->BackupExport->emailRecipient);
 
         $recipient = 'recipient@example.com';
         $this->BackupExport->send($recipient);
-        $this->assertSame($recipient, $this->getProperty($this->BackupExport, 'emailRecipient'));
+        $this->assertSame($recipient, $this->BackupExport->emailRecipient);
     }
 
     /**
@@ -139,7 +137,7 @@ class BackupExportTest extends TestCase
     public function testTimeout(): void
     {
         $this->BackupExport->timeout(120);
-        $this->assertSame(120, $this->getProperty($this->BackupExport, 'timeout'));
+        $this->assertSame(120, $this->BackupExport->timeout);
     }
 
     /**

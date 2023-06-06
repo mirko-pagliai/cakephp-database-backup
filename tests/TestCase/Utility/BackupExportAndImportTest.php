@@ -20,12 +20,22 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 
+/**
+ * BackupExportAndImportTest class.
+ *
+ * Performs tests common to the `BackupExport` and `BackupImport` classes.
+ */
 class BackupExportAndImportTest extends TestCase
 {
     /**
      * @var \Cake\ORM\Table
      */
     protected Table $Articles;
+
+    /**
+     * @var \DatabaseBackup\Utility\BackupExport
+     */
+    protected BackupExport $BackupExport;
 
     /**
      * @var \Cake\ORM\Table
@@ -58,6 +68,8 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::setUp();
 
+        $this->BackupExport ??= new BackupExport();
+
         /** @var \Cake\Database\Connection $connection */
         $connection = $this->getConnection('test');
         foreach (['Articles', 'Comments'] as $name) {
@@ -66,13 +78,27 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
+     * @test
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::__get()
+     */
+    public function testGetMagicMethod(): void
+    {
+        $this->assertNotEmpty($this->BackupExport->rotate);
+
+        //With a no existing property
+        $this->expectWarning();
+        $this->expectExceptionMessage('Undefined property: ' . get_class($this->BackupExport) . '::$noExistingProperty');
+        $this->BackupExport->noExistingProperty;
+    }
+
+    /**
      * Test for `export()` and `import()` methods. It tests that the backup is properly exported and then imported
+     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function testExportAndImport(): void
     {
-        $BackupExport = new BackupExport();
         $BackupImport = new BackupImport();
 
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
@@ -84,7 +110,7 @@ class BackupExportAndImportTest extends TestCase
             $this->assertCount(6, $initial['Comments']);
 
             //Exports backup and deletes article with ID 2 and comment with ID 4
-            $result = $BackupExport->filename($expectedFilename)->export();
+            $result = $this->BackupExport->filename($expectedFilename)->export();
             $this->assertSame($expectedFilename, $result);
             $this->Articles->delete($this->Articles->get(2), ['atomic' => false]);
             $this->Comments->delete($this->Comments->get(4), ['atomic' => false]);

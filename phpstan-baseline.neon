@@ -5,3 +5,13 @@ parameters:
 			count: 1
 			path: tests/TestCase/BackupTraitTest.php
 
+		-
+			message: "#^Access to an undefined property DatabaseBackup\\\\Utility\\\\BackupExport\\:\\:\\$noExistingProperty\\.$#"
+			count: 1
+			path: tests/TestCase/Utility/BackupExportAndImportTest.php
+
+		-
+			message: "#^Expression \"\\$this\\-\\>BackupExport\\-\\>noExistingProperty\" on a separate line does not do anything\\.$#"
+			count: 1
+			path: tests/TestCase/Utility/BackupExportAndImportTest.php
+

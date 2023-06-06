@@ -6,7 +6,8 @@
 * the events (`Backup.beforeExport`, `Backup.afterExport`, `Backup.beforeImport`, `Backup.afterImport`, which remain
   implemented by the driver classes) are directly dispatched by the `BackupExport::export()` and `BackupImport::import()`
   methods, and no longer by the drivers themselves;
-* added the `AbstractBackupUtility` abstract class that provides the code common to `BackupExport` and `BackupImport`;
+* added the `AbstractBackupUtility` abstract class that provides the code common to `BackupExport` and `BackupImport`,
+  with the new `AbstractBackupUtility::__get()` magic method for reading `BackupExport`/`BackupImport` properties;
 * removed `$Driver` public property for `BackupExport`/`BackupImport` and added `AbstractBackupUtility::getDriver()` method;
 * `Driver::_exec()` method has become `AbstractBackupUtility::getProcess()`;
 * `BackupTrait::getDriver()` method has become `AbstractBackupUtility::getDriver()`;

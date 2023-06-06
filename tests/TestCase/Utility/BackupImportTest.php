@@ -23,15 +23,12 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use Tools\Exception\NotReadableException;
 use Tools\Filesystem;
-use Tools\TestSuite\ReflectionTrait;
 
 /**
  * BackupImportTest class
  */
 class BackupImportTest extends TestCase
 {
-    use ReflectionTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupImport
      */
@@ -59,13 +56,13 @@ class BackupImportTest extends TestCase
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
             $result = createBackup('backup.' . $extension);
             $this->BackupImport->filename($result);
-            $this->assertSame($result, $this->getProperty($this->BackupImport, 'filename'));
+            $this->assertSame($result, $this->BackupImport->filename);
         }
 
         //With a relative path
         $result = createBackup('backup_' . time() . '.sql');
         $this->BackupImport->filename(basename($result));
-        $this->assertSame($result, $this->getProperty($this->BackupImport, 'filename'));
+        $this->assertSame($result, $this->BackupImport->filename);
 
         //With an invalid directory
         $this->expectException(NotReadableException::class);
@@ -84,7 +81,7 @@ class BackupImportTest extends TestCase
     public function testTimeout(): void
     {
         $this->BackupImport->timeout(120);
-        $this->assertSame(120, $this->getProperty($this->BackupImport, 'timeout'));
+        $this->assertSame(120, $this->BackupImport->timeout);
     }
 
     /**
