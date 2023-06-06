@@ -18,6 +18,6 @@ namespace DatabaseBackup\Driver;
 /**
  * Postgres driver to export/import database backups
  */
-class Postgres extends Driver
+class Postgres extends AbstractDriver
 {
 }

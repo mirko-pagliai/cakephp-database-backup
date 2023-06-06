@@ -38,8 +38,9 @@ if (!defined('DATABASE_BACKUP_EXTENSIONS')) {
 
 //Writes default configuration values
 $defaults = [
-    'DatabaseBackup.connection' => 'default',
     'DatabaseBackup.chmod' => 0664,
+    'DatabaseBackup.connection' => 'default',
+    'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.target' => ROOT . 'backups',
     'DatabaseBackup.mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
     'DatabaseBackup.mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',

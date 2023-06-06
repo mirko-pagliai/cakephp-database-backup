@@ -16,30 +16,18 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
-use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
 use Tools\Exceptionist;
 use Tools\Filesystem;
 
 /**
  * Utility to export databases
+ * @property ?string $compression
+ * @property ?string $emailRecipient
+ * @property string $extension
+ * @property int $rotate
  */
-class BackupExport
+class BackupExport extends AbstractBackupUtility
 {
-    use BackupTrait;
-
-    /**
-     * @var \DatabaseBackup\Utility\BackupManager
-     */
-    public BackupManager $BackupManager;
-
-    /**
-     * Driver containing all methods to export/import database backups according to the connection
-     * @since 2.0.0
-     * @var \DatabaseBackup\Driver\Driver
-     */
-    public Driver $Driver;
-
     /**
      * Compression type
      * @var string|null
@@ -47,16 +35,10 @@ class BackupExport
     protected ?string $compression = null;
 
     /**
-     * Database configuration
-     * @var array
-     */
-    protected array $config;
-
-    /**
      * Default extension
      * @var string
      */
-    protected string $defaultExtension = 'sql';
+    private string $defaultExtension = 'sql';
 
     /**
      * Recipient of the email, if you want to send the backup via mail
@@ -71,28 +53,10 @@ class BackupExport
     protected string $extension;
 
     /**
-     * Filename where to export the database
-     * @var string
-     */
-    protected string $filename;
-
-    /**
      * Rotate limit. This is the number of backups you want to keep. So, it will delete all backups that are older
      * @var int
      */
     protected int $rotate = 0;
-
-    /**
-     * Construct
-     * @throws \ErrorException|\ReflectionException
-     */
-    public function __construct()
-    {
-        $connection = $this->getConnection();
-        $this->BackupManager = new BackupManager();
-        $this->Driver = $this->getDriver($connection);
-        $this->config = $connection->config();
-    }
 
     /**
      * Sets the compression.
@@ -105,6 +69,7 @@ class BackupExport
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws \ErrorException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function compression(?string $compression)
     {
@@ -126,16 +91,18 @@ class BackupExport
      * @param string $filename Filename. It can be an absolute path and may contain patterns
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
-     * @throws \ErrorException
-     * @throws \Tools\Exception\NotWritableException
+     * @throws \ErrorException|\Tools\Exception\NotWritableException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function filename(string $filename)
     {
+        $config = $this->getConnection()->config();
+
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
-            pathinfo($this->config['database'], PATHINFO_FILENAME),
+            pathinfo($config['database'], PATHINFO_FILENAME),
             date('YmdHis'),
-            str_replace(['127.0.0.1', '::1'], 'localhost', $this->config['host'] ?? 'localhost'),
+            str_replace(['127.0.0.1', '::1'], 'localhost', $config['host'] ?? 'localhost'),
             time(),
         ], $filename);
 
@@ -159,6 +126,7 @@ class BackupExport
      * @param int $rotate Number of backups you want to keep
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function rotate(int $rotate)
     {
@@ -172,6 +140,7 @@ class BackupExport
      * @param string|null $recipient Recipient's email address or `null` to disable
      * @return $this
      * @since 1.1.0
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function send(?string $recipient = null)
     {
@@ -181,30 +150,47 @@ class BackupExport
     }
 
     /**
-     * Exports the database
-     * @return string Filename path
+     * Exports the database.
+     *
+     * When exporting, this method will trigger these events (implemented by the driver instance):
+     *  - `Backup.beforeExport`: will be triggered before export;
+     *  - `Backup.afterExport`: will be triggered after export.
+     * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
      * @throws \Exception
+     * @see \DatabaseBackup\Driver\AbstractDriver::afterExport()
+     * @see \DatabaseBackup\Driver\AbstractDriver::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      */
-    public function export(): string
+    public function export()
     {
         if (empty($this->filename)) {
             $this->extension ??= $this->defaultExtension;
-            $this->filename(sprintf('backup_{$DATABASE}_{$DATETIME}.%s', $this->extension));
+            $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->extension);
         }
 
         //This allows the filename to be set again with a next call of this method
         $filename = $this->filename;
         unset($this->filename);
 
-        $this->Driver->export($filename);
+        //Dispatches the `Backup.beforeExport` event implemented by the driver
+        $BeforeExport = $this->getDriver()->dispatchEvent('Backup.beforeExport');
+        if ($BeforeExport->isStopped()) {
+            return false;
+        }
+
+        //Exports
+        $Process = $this->getProcess($this->getDriver()->getExportExecutable($filename));
+        Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
+        //Dispatches the `Backup.afterExport` event implemented by the driver
+        $this->getDriver()->dispatchEvent('Backup.afterExport');
+
         if ($this->emailRecipient) {
-            $this->BackupManager->send($filename, $this->emailRecipient);
+            BackupManager::send($filename, $this->emailRecipient);
         }
         if ($this->rotate) {
-            $this->BackupManager->rotate($this->rotate);
+            BackupManager::rotate($this->rotate);
         }
 
         return $filename;

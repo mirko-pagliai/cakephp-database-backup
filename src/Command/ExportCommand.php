@@ -18,12 +18,15 @@ namespace DatabaseBackup\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
+use Tools\Exceptionist;
 
 /**
  * Exports a database backup
+ * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#export
  */
 class ExportCommand extends Command
 {
@@ -57,6 +60,10 @@ class ExportCommand extends Command
                         'to indicate the recipient\'s email address'),
                     'short' => 's',
                 ],
+                'timeout' => [
+                    'help' => __d('database_backup', 'Timeout for shell commands. Default value: {0} seconds', Configure::readOrFail('DatabaseBackup.processTimeout')),
+                    'short' => 't',
+                ],
             ]);
     }
 
@@ -69,7 +76,6 @@ class ExportCommand extends Command
      * @return void
      * @throws \Cake\Console\Exception\StopException
      * @throws \ReflectionException
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#export
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
@@ -77,6 +83,7 @@ class ExportCommand extends Command
 
         try {
             $BackupExport = new BackupExport();
+
             //Sets the output filename or the compression type. Regarding the `rotate` option, the
             //`BackupShell::rotate()` method will be called at the end, instead of `BackupExport::rotate()`
             if ($args->getOption('filename')) {
@@ -84,32 +91,23 @@ class ExportCommand extends Command
             } elseif ($args->getOption('compression')) {
                 $BackupExport->compression((string)$args->getOption('compression'));
             }
-
-            //Exports
-            $file = $BackupExport->export();
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
-
-            $verbose = $args->getOption('verbose');
-            $quiet = $args->getOption('quiet');
-
-            //Sends via email
-            if ($args->getOption('send')) {
-                $SendCommand = new SendCommand();
-                $SendCommand->execute(new Arguments(
-                    [$file, (string)$args->getOption('send')],
-                    compact('verbose', 'quiet'),
-                    $SendCommand->getOptionParser()->argumentNames()
-                ), $io);
+            //Sets the timeout
+            if ($args->getOption('timeout')) {
+                $BackupExport->timeout((int)$args->getOption('timeout'));
             }
 
-            //Rotates
+            /** @var string $file */
+            $file = $BackupExport->export();
+            Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
+
+            //Sends via email and/or rotates
+            $extraOptions = array_filter([$args->getOption('verbose') ? '--verbose' : '', $args->getOption('quiet') ? '--quiet' : '']);
+            if ($args->getOption('send')) {
+                $this->executeCommand(SendCommand::class, array_merge([$file, (string)$args->getOption('send')], $extraOptions), $io);
+            }
             if ($args->getOption('rotate')) {
-                $RotateCommand = new RotateCommand();
-                $RotateCommand->execute(new Arguments(
-                    [(string)$args->getOption('rotate')],
-                    compact('verbose', 'quiet'),
-                    $RotateCommand->getOptionParser()->argumentNames()
-                ), $io);
+                $this->executeCommand(RotateCommand::class, array_merge([(string)$args->getOption('rotate')], $extraOptions), $io);
             }
         } catch (Exception $e) {
             $io->error($e->getMessage());

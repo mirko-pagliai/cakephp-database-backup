@@ -133,7 +133,7 @@ if (!function_exists('createBackup')) {
      */
     function createBackup(string $filename = 'backup.sql'): string
     {
-        return (new BackupExport())->filename($filename)->export();
+        return (new BackupExport())->filename($filename)->export() ?: '';
     }
 }
 

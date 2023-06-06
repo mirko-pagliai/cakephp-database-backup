@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="4.x-dev@">
+  <file src="src/Driver/Mysql.php">
+    <RedundantPropertyInitializationCheck occurrences="2">
+      <code>$this-&gt;auth</code>
+      <code>TMP . uniqid('auth')</code>
+    </RedundantPropertyInitializationCheck>
+  </file>
   <file src="src/TestSuite/DriverTestCase.php">
     <TypeDoesNotContainType occurrences="1">
       <code>empty($this-&gt;Driver)</code>
     </TypeDoesNotContainType>
   </file>
-  <file src="src/Utility/BackupExport.php">
-    <RedundantPropertyInitializationCheck occurrences="2">
-      <code>$this-&gt;defaultExtension</code>
-      <code>$this-&gt;extension</code>
-    </RedundantPropertyInitializationCheck>
+  <file src="src/Utility/AbstractBackupUtility.php">
+    <TypeDoesNotContainType occurrences="1">
+      <code>empty($this-&gt;Driver)</code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/Utility/BackupManager.php">
     <TooManyTemplateParams occurrences="1">

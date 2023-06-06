@@ -20,30 +20,30 @@ use Tools\Filesystem;
 /**
  * Mysql driver to export/import database backups
  */
-class Mysql extends Driver
+class Mysql extends AbstractDriver
 {
     /**
-     * Temporary file with the database authentication data
      * @since 2.1.0
      * @var string
      */
-    private string $auth = '';
+    private string $auth;
 
     /**
-     * Internal method to get the auth file
+     * Internal method to get the auth file path.
+     *
+     * This method returns only the path that will be used and does not verify that the file already exists.
      * @return string
      * @since 2.11.0
      */
-    protected function getAuthFile(): string
+    protected function getAuthFilePath(): string
     {
-        return $this->auth && file_exists($this->auth) ? $this->auth : '';
+        return $this->auth ??= TMP . uniqid('auth');
     }
 
     /**
      * Internal method to write an auth file
      * @param string $content Content
      * @return bool
-     * @throws \ErrorException
      * @since 2.3.0
      */
     protected function writeAuthFile(string $content): bool
@@ -54,9 +54,7 @@ class Mysql extends Driver
             $content
         );
 
-        $this->auth = Filesystem::createTmpFile($content, null, 'auth');
-
-        return $this->auth != false;
+        return (bool)Filesystem::createFile($this->getAuthFilePath(), $content);
     }
 
     /**
@@ -88,7 +86,6 @@ class Mysql extends Driver
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
      * @return bool
-     * @throws \ErrorException
      * @since 2.1.0
      */
     public function beforeExport(): bool
@@ -108,7 +105,6 @@ class Mysql extends Driver
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
      * @return bool
-     * @throws \ErrorException
      * @since 2.1.0
      */
     public function beforeImport(): bool
@@ -121,20 +117,12 @@ class Mysql extends Driver
 
     /**
      * Deletes the temporary file with the database authentication data
-     * @return bool `true` on success
+     * @return void
      * @since 2.1.0
      */
-    protected function deleteAuthFile(): bool
+    protected function deleteAuthFile(): void
     {
-        $authFile = $this->getAuthFile();
-        if (!$authFile) {
-            return false;
-        }
-
-        //Deletes the temporary file with the authentication data
-        Filesystem::instance()->remove($authFile);
+        Filesystem::instance()->remove($this->getAuthFilePath());
         unset($this->auth);
-
-        return true;
     }
 }

@@ -32,8 +32,8 @@ abstract class TestCase extends BaseTestCase
      */
     public function tearDown(): void
     {
-        BackupManager::deleteAll();
-
         parent::tearDown();
+
+        BackupManager::deleteAll();
     }
 }

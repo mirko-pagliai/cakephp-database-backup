@@ -88,6 +88,7 @@ class BackupManager
      * @return array<\Cake\ORM\Entity> Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws \ErrorException
+     * @noinspection PhpDocRedundantThrowsInspection
      */
     public static function rotate(int $rotate): array
     {

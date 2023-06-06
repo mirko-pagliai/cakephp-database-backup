@@ -15,45 +15,20 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
-use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\Driver;
 use Tools\Exceptionist;
 
 /**
  * Utility to import databases
  */
-class BackupImport
+class BackupImport extends AbstractBackupUtility
 {
-    use BackupTrait;
-
-    /**
-     * Driver containing all methods to export/import database backups according to the connection
-     * @var \DatabaseBackup\Driver\Driver
-     */
-    protected Driver $Driver;
-
-    /**
-     * Filename where to import the database
-     * @var string
-     */
-    protected string $filename;
-
-    /**
-     * Construct
-     * @throws \ErrorException|\ReflectionException
-     */
-    public function __construct()
-    {
-        $this->Driver = $this->getDriver();
-    }
-
     /**
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
-     * @throws \ErrorException
-     * @throws \Tools\Exception\NotReadableException
+     * @throws \ErrorException|\Tools\Exception\NotReadableException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function filename(string $filename)
     {
@@ -68,12 +43,18 @@ class BackupImport
     }
 
     /**
-     * Imports the database
-     * @return string Filename path
+     * Imports the database.
+     *
+     * When importing, this method will trigger these events (implemented by the driver instance):
+     *  - `Backup.beforeImport`: will be triggered before import;
+     *  - `Backup.afterImport`: will be triggered after import.
+     * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
      * @throws \ErrorException|\ReflectionException
+     * @see \DatabaseBackup\Driver\AbstractDriver::afterImport()
+     * @see \DatabaseBackup\Driver\AbstractDriver::beforeImport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      */
-    public function import(): string
+    public function import()
     {
         Exceptionist::isTrue(!empty($this->filename), __d('database_backup', 'You must first set the filename'));
 
@@ -81,7 +62,18 @@ class BackupImport
         $filename = $this->filename;
         unset($this->filename);
 
-        $this->Driver->import($filename);
+        //Dispatches the `Backup.beforeImport` event implemented by the driver
+        $BeforeImport = $this->getDriver()->dispatchEvent('Backup.beforeImport');
+        if ($BeforeImport->isStopped()) {
+            return false;
+        }
+
+        //Imports
+        $Process = $this->getProcess($this->getDriver()->getImportExecutable($filename));
+        Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
+
+        //Dispatches the `Backup.afterImport` event implemented by the driver
+        $this->getDriver()->dispatchEvent('Backup.afterImport');
 
         return $filename;
     }

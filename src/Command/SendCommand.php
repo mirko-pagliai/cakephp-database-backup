@@ -24,6 +24,7 @@ use Exception;
 
 /**
  * Sends a backup file via email
+ * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#send
  */
 class SendCommand extends Command
 {
@@ -52,7 +53,6 @@ class SendCommand extends Command
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell#send
      * @throws \Cake\Console\Exception\StopException|\ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
