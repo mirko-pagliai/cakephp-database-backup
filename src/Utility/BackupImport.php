@@ -27,8 +27,8 @@ class BackupImport extends AbstractBackupUtility
      * @param string $filename Filename. It can be an absolute path
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
-     * @throws \ErrorException
-     * @throws \Tools\Exception\NotReadableException
+     * @throws \ErrorException|\Tools\Exception\NotReadableException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function filename(string $filename)
     {

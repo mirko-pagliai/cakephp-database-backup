@@ -65,6 +65,7 @@ abstract class AbstractBackupUtility
      * Sets the filename
      * @param string $filename Filename. It can be an absolute path
      * @return $this
+     * @noinspection PhpMissingReturnTypeInspection
      */
     abstract public function filename(string $filename);
 
@@ -73,6 +74,7 @@ abstract class AbstractBackupUtility
      * @param int $timeout Timeout in seconds
      * @return $this
      * @since 2.12.0
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function timeout(int $timeout)
     {

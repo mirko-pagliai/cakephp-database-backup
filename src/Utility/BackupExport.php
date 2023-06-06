@@ -69,6 +69,7 @@ class BackupExport extends AbstractBackupUtility
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      * @throws \ErrorException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function compression(?string $compression)
     {
@@ -90,8 +91,8 @@ class BackupExport extends AbstractBackupUtility
      * @param string $filename Filename. It can be an absolute path and may contain patterns
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
-     * @throws \ErrorException
-     * @throws \Tools\Exception\NotWritableException
+     * @throws \ErrorException|\Tools\Exception\NotWritableException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function filename(string $filename)
     {
@@ -125,6 +126,7 @@ class BackupExport extends AbstractBackupUtility
      * @param int $rotate Number of backups you want to keep
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function rotate(int $rotate)
     {
@@ -138,6 +140,7 @@ class BackupExport extends AbstractBackupUtility
      * @param string|null $recipient Recipient's email address or `null` to disable
      * @return $this
      * @since 1.1.0
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function send(?string $recipient = null)
     {
