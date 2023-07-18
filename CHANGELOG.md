@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.12 branch
 ### 2.12.1
+* fixed a little bug in the `bootstrap.php` file;
 * the `Exceptionist` class provided by me-tools is no longer used (in anticipation of an upcoming deprecation).
 
 ### 2.12.0

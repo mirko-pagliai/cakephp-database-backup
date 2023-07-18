@@ -41,7 +41,7 @@ $defaults = [
     'DatabaseBackup.chmod' => 0664,
     'DatabaseBackup.connection' => 'default',
     'DatabaseBackup.processTimeout' => 60,
-    'DatabaseBackup.target' => ROOT . 'backups',
+    'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
     'DatabaseBackup.mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
     'DatabaseBackup.mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
     'DatabaseBackup.postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
