@@ -21,7 +21,6 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\AbstractDriver;
 use LogicException;
 use Symfony\Component\Process\Process;
-use Tools\Exceptionist;
 
 /**
  * AbstractBackupUtility.
@@ -93,7 +92,8 @@ abstract class AbstractBackupUtility
     /**
      * Gets the driver instance
      * @return \DatabaseBackup\Driver\AbstractDriver A driver instance
-     * @throws \ErrorException|\ReflectionException
+     * @throws \LogicException
+     * @throws \ReflectionException
      * @since 2.0.0
      */
     public function getDriver(): AbstractDriver
@@ -102,7 +102,9 @@ abstract class AbstractBackupUtility
             $name = $this->getDriverName();
             /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $className */
             $className = App::classname('DatabaseBackup.' . $name, 'Driver');
-            Exceptionist::isTrue($className, __d('database_backup', 'The `{0}` driver does not exist', $name));
+            if (!$className) {
+                throw new LogicException(__d('database_backup', 'The `{0}` driver does not exist', $name));
+            }
 
             $this->Driver = new $className($this->getConnection());
         }

@@ -21,7 +21,6 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use Tools\Exception\NotReadableException;
 use Tools\Filesystem;
 
 /**
@@ -65,11 +64,17 @@ class BackupImportTest extends TestCase
         $this->assertSame($result, $this->BackupImport->filename);
 
         //With an invalid directory
-        $this->expectException(NotReadableException::class);
         $this->expectExceptionMessage('File or directory `' . TMP . 'noExistingDir' . DS . 'backup.sql` is not readable');
         $this->BackupImport->filename(TMP . 'noExistingDir' . DS . 'backup.sql');
+    }
 
-        //With invalid extension
+    /**
+     * Test for `filename()` method, with an invalid file extension
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupImport::filename()
+     */
+    public function testFilenameWithInvalidFileExtension(): void
+    {
         $this->expectExceptionMessage('Invalid file extension');
         $this->BackupImport->filename(Filesystem::createTmpFile());
     }

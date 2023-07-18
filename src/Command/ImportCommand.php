@@ -22,7 +22,6 @@ use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
-use Tools\Exceptionist;
 
 /**
  * Imports a database backup
@@ -53,7 +52,7 @@ class ImportCommand extends Command
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @throws \Cake\Console\Exception\StopException|\ReflectionException
+     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
@@ -71,7 +70,10 @@ class ImportCommand extends Command
 
             /** @var string $file */
             $file = $BackupImport->import();
-            Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
+            if (!$file) {
+                $io->error(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
+                $this->abort();
+            }
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (Exception $e) {
             $io->error($e->getMessage());

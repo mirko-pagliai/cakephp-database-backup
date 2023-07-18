@@ -23,8 +23,6 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
-use Tools\Exception\NotReadableException;
-use Tools\Exception\NotWritableException;
 use Tools\Filesystem;
 
 /**
@@ -84,7 +82,6 @@ class BackupManagerTest extends TestCase
         $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
-        $this->expectException(NotWritableException::class);
         $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` is not writable');
         $this->BackupManager->delete('noExistingFile');
     }
@@ -173,10 +170,16 @@ class BackupManagerTest extends TestCase
         unlink($file);
         Configure::write('DatabaseBackup.mailSender', 'invalidSender');
         $this->BackupManager->send(createBackup(), 'recipient@example.com');
+    }
 
-        //With an invalid file
-        $this->expectException(NotReadableException::class);
-        $this->expectExceptionMessage('File or directory `' . Configure::readOrFail('DatabaseBackup.target') . DS . 'noExistingFile` is not readable');
+    /**
+     * Test for `send()` method, with an invalid file
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::send()
+     */
+    public function testSendWithInvalidFile(): void
+    {
+        $this->expectExceptionMessage('File or directory `' . Configure::readOrFail('DatabaseBackup.target') . 'noExistingFile` is not readable');
         $this->BackupManager->send('noExistingFile', 'recipient@example.com');
     }
 }
