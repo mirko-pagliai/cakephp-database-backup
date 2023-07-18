@@ -62,7 +62,7 @@ class BackupImport extends AbstractBackupUtility
     public function import()
     {
         if (empty($this->filename)) {
-            throw new LogicException( __d('database_backup', 'You must first set the filename'));
+            throw new LogicException(__d('database_backup', 'You must first set the filename'));
         }
 
         //This allows the filename to be set again with a next call of this method
