@@ -73,7 +73,7 @@ class BackupExportAndImportTest extends TestCase
         /** @var \Cake\Database\Connection $connection */
         $connection = $this->getConnection('test');
         foreach (['Articles', 'Comments'] as $name) {
-            $this->{$name} ??= $this->getTable($name, compact('connection'));
+            $this->{$name} ??= $this->fetchTable($name, compact('connection'));
         }
     }
 

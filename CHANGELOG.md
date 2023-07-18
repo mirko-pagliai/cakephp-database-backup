@@ -1,5 +1,9 @@
 # 2.x branch
 ## 2.12 branch
+### 2.12.1
+* fixed a little bug in the `bootstrap.php` file;
+* the `Exceptionist` class provided by me-tools is no longer used (in anticipation of an upcoming deprecation).
+
 ### 2.12.0
 * added `AbstractBackupUtility::timeout()` method, so now `BackupExport`/`BackupImport` utilities have a method to set the
   timeout for shell commands at runtime. Added `--timeout` option (short: `-t`) for `ExportCommand`/`ImportCommand`;

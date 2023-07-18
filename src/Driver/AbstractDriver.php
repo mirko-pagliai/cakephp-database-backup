@@ -19,7 +19,7 @@ use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
-use Tools\Exceptionist;
+use LogicException;
 
 /**
  * Represents a driver containing all methods to export/import database backups according to the connection
@@ -64,13 +64,14 @@ abstract class AbstractDriver implements EventListenerInterface
      *  have the final executables, including compression.
      * @param string $type Type or the request operation (`export` or `import`)
      * @return string
-     * @throws \Tools\Exception\NotInArrayException
+     * @throws \LogicException
      * @throws \ReflectionException
-     * @throws \ErrorException
      */
     private function getExecutable(string $type): string
     {
-        Exceptionist::inArray($type, ['export', 'import']);
+        if (!in_array($type, ['export', 'import'])) {
+            throw new LogicException(__d('database_backup', '`$type` parameter should be `export` or `import`'));
+        }
         $driverName = strtolower(self::getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$type])),
@@ -89,9 +90,8 @@ abstract class AbstractDriver implements EventListenerInterface
      * Gets the executable command to export the database, with compression if requested
      * @param string $filename Filename where you want to export the database
      * @return string
-     * @throws \Tools\Exception\NotInArrayException
+     * @throws \LogicException
      * @throws \ReflectionException
-     * @throws \ErrorException
      */
     public function getExportExecutable(string $filename): string
     {
@@ -108,9 +108,8 @@ abstract class AbstractDriver implements EventListenerInterface
      * Gets the executable command to import the database, with compression if requested
      * @param string $filename Filename from which you want to import the database
      * @return string
-     * @throws \Tools\Exception\NotInArrayException
+     * @throws \LogicException
      * @throws \ReflectionException
-     * @throws \ErrorException
      */
     public function getImportExecutable(string $filename): string
     {
@@ -165,11 +164,16 @@ abstract class AbstractDriver implements EventListenerInterface
      * Gets a binary path
      * @param string $name Binary name
      * @return string
-     * @throws \ErrorException
+     * @throws \LogicException
      */
     public function getBinary(string $name): string
     {
-        return Exceptionist::isTrue(Configure::read('DatabaseBackup.binaries.' . $name), 'Binary for `' . $name . '` could not be found. You have to set its path manually');
+        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
+        if (!$binary) {
+            throw new LogicException(__d('database_backup', 'Binary for `{0}` could not be found. You have to set its path manually', $name));
+        }
+
+        return $binary;
     }
 
     /**

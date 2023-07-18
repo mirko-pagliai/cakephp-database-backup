@@ -22,7 +22,6 @@ use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
-use Tools\Exceptionist;
 
 /**
  * Exports a database backup
@@ -98,7 +97,10 @@ class ExportCommand extends Command
 
             /** @var string $file */
             $file = $BackupExport->export();
-            Exceptionist::isTrue($file, __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
+            if (!$file) {
+                $io->error(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
+                $this->abort();
+            }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
             //Sends via email and/or rotates

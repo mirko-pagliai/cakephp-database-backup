@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
-use Tools\Exceptionist;
+use LogicException;
 use Tools\Filesystem;
 
 /**
@@ -68,7 +68,7 @@ class BackupExport extends AbstractBackupUtility
      * @param string|null $compression Compression type name
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
-     * @throws \ErrorException
+     * @throws \LogicException
      * @noinspection PhpMissingReturnTypeInspection
      */
     public function compression(?string $compression)
@@ -77,7 +77,9 @@ class BackupExport extends AbstractBackupUtility
 
         if ($compression) {
             $this->extension = (string)array_search($compression, $this->getValidCompressions());
-            Exceptionist::isTrue($this->extension, __d('database_backup', 'Invalid compression type'));
+            if (!$this->extension) {
+                throw new LogicException(__d('database_backup', 'Invalid compression type'));
+            }
         }
         $this->compression = $compression;
 
@@ -91,7 +93,7 @@ class BackupExport extends AbstractBackupUtility
      * @param string $filename Filename. It can be an absolute path and may contain patterns
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
-     * @throws \ErrorException|\Tools\Exception\NotWritableException
+     * @throws \LogicException
      * @noinspection PhpMissingReturnTypeInspection
      */
     public function filename(string $filename)
@@ -107,11 +109,15 @@ class BackupExport extends AbstractBackupUtility
         ], $filename);
 
         $filename = $this->getAbsolutePath($filename);
-        Exceptionist::isWritable(dirname($filename));
-        Exceptionist::isTrue(!file_exists($filename), __d('database_backup', 'File `{0}` already exists', $filename));
-
-        //Checks for extension
-        Exceptionist::isTrue($this->getExtension($filename), __d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION)));
+        if (!is_writable(dirname($filename))) {
+            throw new LogicException(__d('database_backup', 'File or directory `' . dirname($filename) . '` is not writable'));
+        }
+        if (file_exists($filename)) {
+            throw new LogicException(__d('database_backup', 'File `{0}` already exists', $filename));
+        }
+        if (!$this->getExtension($filename)) {
+            throw new LogicException(__d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION)));
+        }
 
         //Sets the compression
         $this->compression($this->getCompression($filename));
@@ -156,7 +162,8 @@ class BackupExport extends AbstractBackupUtility
      *  - `Backup.beforeExport`: will be triggered before export;
      *  - `Backup.afterExport`: will be triggered after export.
      * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
-     * @throws \Exception
+     * @throws \LogicException
+     * @throws \ReflectionException
      * @see \DatabaseBackup\Driver\AbstractDriver::afterExport()
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
@@ -180,7 +187,9 @@ class BackupExport extends AbstractBackupUtility
 
         //Exports
         $Process = $this->getProcess($this->getDriver()->getExportExecutable($filename));
-        Exceptionist::isTrue($Process->isSuccessful(), __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
+        if (!$Process->isSuccessful()) {
+            throw new LogicException(__d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
+        }
         Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
         //Dispatches the `Backup.afterExport` event implemented by the driver
