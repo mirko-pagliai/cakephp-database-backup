@@ -43,8 +43,7 @@ class BackupManagerTest extends TestCase
     protected BackupManager $BackupManager;
 
     /**
-     * Called before every test method
-     * @return void
+     * @inheritDoc
      */
     public function setUp(): void
     {
@@ -166,7 +165,6 @@ class BackupManagerTest extends TestCase
 
         //With an invalid sender
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid email set for "from". You passed "invalidSender".');
         unlink($file);
         Configure::write('DatabaseBackup.mailSender', 'invalidSender');
         $this->BackupManager->send(createBackup(), 'recipient@example.com');

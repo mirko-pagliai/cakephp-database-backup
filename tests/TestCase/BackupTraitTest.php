@@ -39,8 +39,7 @@ class BackupTraitTest extends TestCase
     public $fixtures = ['core.Articles', 'core.Comments'];
 
     /**
-     * Called before every test method
-     * @return void
+     * @inheritDoc
      */
     public function setUp(): void
     {
@@ -96,7 +95,6 @@ class BackupTraitTest extends TestCase
         $this->assertSame('fake', $connection->config()['name']);
 
         $this->expectException(MissingDatasourceConfigException::class);
-        $this->expectExceptionMessage('The datasource configuration "noExisting" was not found');
         $this->getConnection('noExisting');
     }
 

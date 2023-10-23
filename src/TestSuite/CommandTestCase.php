@@ -32,7 +32,12 @@ abstract class CommandTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->useCommandRunner();
+        /**
+         * @todo remove on CakePHP >= 5
+         */
+        if (method_exists($this, 'useCommandRunner')) {
+            $this->useCommandRunner();
+        }
     }
 
     /**

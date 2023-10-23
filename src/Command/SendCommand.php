@@ -29,9 +29,7 @@ use Exception;
 class SendCommand extends Command
 {
     /**
-     * Hook method for defining this command's option parser
-     * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
-     * @return \Cake\Console\ConsoleOptionParser
+     * @inheritDoc
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
@@ -53,7 +51,8 @@ class SendCommand extends Command
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @throws \Cake\Console\Exception\StopException|\ReflectionException
+     * @throws \Cake\Console\Exception\StopException
+     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.12 branch
 ### 2.12.2
+* some, possible changes that prepare it for CakePHP 5 and PHPUnit 10;
 * it no longer needs the `me-tools` package. This removes several (useless) dependencies;
 * little fixes. Fixed some deprecations for CakePHP 4.5 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
 * removed (old and useless) `BaseCommandTestCase` class.

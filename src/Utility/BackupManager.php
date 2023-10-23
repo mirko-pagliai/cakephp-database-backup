@@ -15,6 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
+use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
@@ -71,7 +72,7 @@ class BackupManager
     {
         $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::readOrFail('DatabaseBackup.target'));
 
-        return collection($finder)->map(function (SplFileInfo $file) {
+        return (new Collection($finder))->map(function (SplFileInfo $file) {
             $filename = $file->getFilename();
 
             return new Entity(compact('filename') + [
