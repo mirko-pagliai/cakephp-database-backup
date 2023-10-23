@@ -113,7 +113,7 @@ class BackupManagerTest extends TestCase
         //Checks for properties of each backup object
         foreach ($files as $file) {
             $this->assertInstanceOf(Entity::class, $file);
-            $this->assertIsPositive($file->get('size'));
+            $this->assertGreaterThan(0, $file->get('size'));
             $this->assertInstanceOf(FrozenTime::class, $file->get('datetime'));
         }
     }
