@@ -116,7 +116,7 @@ $loader->loadInternalFile(CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'schema.php');
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
 
 /**
- * @todo to be removed in a later release. These allow it to work with older versions of me-tools and cakephp
+ * @todo to be removed in a later release. These allow it to work with older versions of me-tools
  */
 if (!trait_exists('Tools\ReflectionTrait')) {
     class_alias('Tools\TestSuite\ReflectionTrait', 'Tools\ReflectionTrait');
