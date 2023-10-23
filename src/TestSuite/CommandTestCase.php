@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use DatabaseBackup\Utility\BackupManager;
-use MeTools\TestSuite\CommandTestCase as BaseCommandTestCase;
 
 /**
  * Abstract class for test commands
@@ -24,8 +23,17 @@ use MeTools\TestSuite\CommandTestCase as BaseCommandTestCase;
 abstract class CommandTestCase extends BaseCommandTestCase
 {
     /**
-     * Called after every test method
-     * @return void
+     * @inheritDoc
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->useCommandRunner();
+    }
+
+    /**
+     * @inheritDoc
      */
     public function tearDown(): void
     {

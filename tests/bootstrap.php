@@ -28,6 +28,10 @@ date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 ini_set('intl.default_locale', 'en_US');
 
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
+
 define('ROOT', dirname(__DIR__) . DS);
 define('CAKE_CORE_INCLUDE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
 define('CORE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
@@ -118,10 +122,7 @@ if (!trait_exists('Tools\ReflectionTrait')) {
     class_alias('Tools\TestSuite\ReflectionTrait', 'Tools\ReflectionTrait');
 }
 if (!trait_exists('MeTools\TestSuite\ConsoleIntegrationTestTrait')) {
-    class_alias('Cake\TestSuite\ConsoleIntegrationTestTrait', 'MeTools\TestSuite\ConsoleIntegrationTestTrait');
-}
-if (!class_exists('MeTools\TestSuite\CommandTestCase')) {
-    class_alias('DatabaseBackup\TestSuite\BaseCommandTestCase', 'MeTools\TestSuite\CommandTestCase');
+    class_alias('Cake\Console\TestSuite\ConsoleIntegrationTestTrait', 'MeTools\TestSuite\ConsoleIntegrationTestTrait');
 }
 
 if (!function_exists('createBackup')) {
@@ -129,7 +130,8 @@ if (!function_exists('createBackup')) {
      * Global function to create a backup file
      * @param string $filename Filename
      * @return string
-     * @throws \Tools\Exception\NotWritableException|\ErrorException
+     * @throws \LogicException
+     * @throws \ReflectionException
      */
     function createBackup(string $filename = 'backup.sql'): string
     {
@@ -141,7 +143,8 @@ if (!function_exists('createSomeBackups')) {
     /**
      * Global function to create some backup files
      * @return array
-     * @throws \Tools\Exception\NotWritableException|\ErrorException
+     * @throws \LogicException
+     * @throws \ReflectionException
      */
     function createSomeBackups(): array
     {
@@ -153,6 +156,6 @@ if (!function_exists('createSomeBackups')) {
             $files[] = $file;
         }
 
-        return array_reverse($files);
+        return array_reverse($files ?? []);
     }
 }

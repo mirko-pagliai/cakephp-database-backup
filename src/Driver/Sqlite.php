@@ -38,8 +38,8 @@ class Sqlite extends AbstractDriver
         }
 
         //Needs disconnect and re-connect because the database schema has changed
-        $connection->disconnect();
-        $connection->connect();
+        $connection->getDriver()->disconnect();
+        $connection->getDriver()->connect();
 
         return true;
     }
