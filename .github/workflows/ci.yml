@@ -105,7 +105,7 @@ jobs:
         - name: Setup PHP
           uses: shivammathur/setup-php@v2
           with:
-            php-version: '8.2'
+            php-version: '8.1'
             coverage: none
             tools: cs2pr
 
@@ -126,7 +126,7 @@ jobs:
           if: success() || failure()
           env:
             db_dsn: 'sqlite:///:memory:'
-          run: vendor/bin/psalm.phar --output-format=github --php-version=8.0
+          run: vendor/bin/psalm.phar --output-format=github --php-version=8.1
 
         - name: Run phpstan
           if: success() || failure()
