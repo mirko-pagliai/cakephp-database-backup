@@ -15,13 +15,16 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\Utility\BackupManager;
 
 /**
  * Abstract class for test commands
  */
-abstract class CommandTestCase extends BaseCommandTestCase
+abstract class CommandTestCase extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @inheritDoc
      */

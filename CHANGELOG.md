@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.12 branch
 ### 2.12.2
-* little fixes. Fixed some deprecations for CakePHP 4.5.
+* little fixes. Fixed some deprecations for CakePHP 4.5 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
+* removed (old and useless) `BaseCommandTestCase` class.
 
 ### 2.12.1
 * fixed a little bug in the `bootstrap.php` file;
