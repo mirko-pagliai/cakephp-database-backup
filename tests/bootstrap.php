@@ -115,6 +115,13 @@ $loader->loadInternalFile(CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'schema.php');
 
 echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
 
+/**
+ * @todo remove on CakePHP >= 5
+ */
+if (!trait_exists('Cake\Console\TestSuite\ConsoleIntegrationTestTrait')) {
+    class_alias('Cake\TestSuite\ConsoleIntegrationTestTrait', 'Cake\Console\TestSuite\ConsoleIntegrationTestTrait');
+}
+
 if (!function_exists('createBackup')) {
     /**
      * Global function to create a backup file
