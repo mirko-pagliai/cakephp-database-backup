@@ -153,6 +153,6 @@ if (!function_exists('createSomeBackups')) {
             $files[] = $file;
         }
 
-        return array_reverse($files ?? []);
+        return array_reverse($files);
     }
 }
