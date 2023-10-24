@@ -83,6 +83,7 @@ abstract class AbstractDriver implements EventListenerInterface
             '{{DB_HOST}}' => $this->getConfig('host'),
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
+        /** @var string $exec */
         $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $type);
 
         return str_replace(array_keys($replacements), $replacements, $exec);
