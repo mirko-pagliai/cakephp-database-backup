@@ -113,7 +113,7 @@ require_once ROOT . 'config' . DS . 'bootstrap.php';
 $loader = new SchemaLoader();
 $loader->loadInternalFile(CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'schema.php');
 
-echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
+echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver ' . PHP_EOL;
 
 /**
  * @todo remove on CakePHP >= 5

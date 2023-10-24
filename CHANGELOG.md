@@ -5,6 +5,8 @@
 * improved and fixed a bug for `ExportCommand` and `ImportCommand`, in handling some exceptions;
 * it no longer needs the `me-tools` package. This removes several (useless) dependencies;
 * little fixes. Fixed some deprecations for CakePHP 4.5 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
+* some testing methods that have been missing for a long time have been added;
+* the `BackupTrait::getDriverName()` method can no longer be static;
 * removed (old and useless) `BaseCommandTestCase` class.
 
 ### 2.12.1
