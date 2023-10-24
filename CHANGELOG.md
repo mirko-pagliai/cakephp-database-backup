@@ -1,9 +1,9 @@
 # 2.x branch
 ## 2.12 branch
 ### 2.12.2
-* some, possible changes that prepare it for CakePHP 5 and PHPUnit 10;
 * improved and fixed a bug for `ExportCommand` and `ImportCommand`, in handling some exceptions;
 * it no longer needs the `me-tools` package. This removes several (useless) dependencies;
+* some, possible changes that prepare it for CakePHP 5 and PHPUnit 10 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
 * little fixes. Fixed some deprecations for CakePHP 4.5 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
 * some testing methods that have been missing for a long time have been added;
 * the `BackupTrait::getDriverName()` method can no longer be static;
