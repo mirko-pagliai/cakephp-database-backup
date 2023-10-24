@@ -15,7 +15,13 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
+use Cake\Console\ConsoleIo;
+use Cake\Console\Exception\StopException;
+use Cake\Console\TestSuite\StubConsoleInput;
+use Cake\Console\TestSuite\StubConsoleOutput;
+use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\CommandTestCase;
+use DatabaseBackup\Utility\BackupExport;
 
 /**
  * ExportCommandTest class
@@ -43,6 +49,22 @@ class ExportCommandTest extends CommandTestCase
         //With an invalid option value
         $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
         $this->assertExitError();
+    }
+
+    /**
+     * Test for `execute()` method on stopped event
+     * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    public function testExecuteOnStoppedEvent()
+    {
+        $this->expectException(StopException::class);
+        $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['export']);
+        $BackupExport->method('export')->willReturn(false);
+        $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
+        $ExportCommand->method('getBackupExport')->willReturn($BackupExport);
+        $ExportCommand->run(['-v'], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**
