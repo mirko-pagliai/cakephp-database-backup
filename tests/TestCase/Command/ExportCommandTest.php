@@ -56,7 +56,7 @@ class ExportCommandTest extends CommandTestCase
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
-    public function testExecuteOnStoppedEvent()
+    public function testExecuteOnStoppedEvent(): void
     {
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
