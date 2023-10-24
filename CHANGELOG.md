@@ -7,7 +7,8 @@
 * little fixes. Fixed some deprecations for CakePHP 4.5 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
 * some testing methods that have been missing for a long time have been added;
 * the `BackupTrait::getDriverName()` method can no longer be static;
-* removed (old and useless) `BaseCommandTestCase` class.
+* removed (old and useless) `BaseCommandTestCase` class;
+* added tests for PHP 8.2.
 
 ### 2.12.1
 * fixed a little bug in the `bootstrap.php` file;

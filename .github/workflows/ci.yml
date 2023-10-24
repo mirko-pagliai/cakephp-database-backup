@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.1']
+        php-version: ['7.4', '8.0', '8.1', '8.2']
         db-type: [sqlite, mysql, pgsql]
         prefer-lowest: ['']
         exclude:
@@ -28,6 +28,9 @@ jobs:
             db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
           - php-version: '8.1'
+            db-type: 'mysql'
+            prefer-lowest: 'prefer-lowest'
+          - php-version: '8.2'
             db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
 
