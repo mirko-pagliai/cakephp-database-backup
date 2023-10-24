@@ -34,7 +34,9 @@ class Sqlite extends AbstractDriver
 
         //Drops each table
         foreach ($schemaCollection->listTables() as $table) {
-            array_map([$connection, 'execute'], $schemaCollection->describe($table)->dropSql($connection));
+            /** @var \Cake\Database\Schema\TableSchema $TableSchema */
+            $TableSchema = $schemaCollection->describe($table);
+            array_map([$connection, 'execute'], $TableSchema->dropSql($connection));
         }
 
         //Needs disconnect and re-connect because the database schema has changed
