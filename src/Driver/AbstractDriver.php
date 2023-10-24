@@ -69,6 +69,7 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     private function getExecutable(string $type): string
     {
+        /** @codeCoverageIgnore  */
         if (!in_array($type, ['export', 'import'])) {
             throw new LogicException(__d('database_backup', '`$type` parameter should be `export` or `import`'));
         }
