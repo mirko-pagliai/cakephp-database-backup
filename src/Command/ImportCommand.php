@@ -18,6 +18,7 @@ namespace DatabaseBackup\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Console\Exception\StopException;
 use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
@@ -48,6 +49,15 @@ class ImportCommand extends Command
     }
 
     /**
+     * Internal method to get a `BackupImport` instance
+     * @return \DatabaseBackup\Utility\BackupImport
+     */
+    protected function getBackupImport(): BackupImport
+    {
+        return new BackupImport();
+    }
+
+    /**
      * Imports a database backup
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
@@ -59,7 +69,7 @@ class ImportCommand extends Command
         parent::execute($args, $io);
 
         try {
-            $BackupImport = new BackupImport();
+            $BackupImport = $this->getBackupImport();
 
             $BackupImport->filename((string)$args->getArgument('filename'));
 
@@ -68,16 +78,13 @@ class ImportCommand extends Command
                 $BackupImport->timeout((int)$args->getOption('timeout'));
             }
 
-            /** @var string $file */
             $file = $BackupImport->import();
             if (!$file) {
-                $io->error(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
-                $this->abort();
+                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (Exception $e) {
-            $io->error($e->getMessage());
-            $this->abort();
+            $io->abort($e->getMessage());
         }
     }
 }

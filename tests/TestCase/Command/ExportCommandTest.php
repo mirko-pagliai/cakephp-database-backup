@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\ConsoleIo;
 use Cake\Console\Exception\StopException;
-use Cake\Console\TestSuite\StubConsoleInput;
 use Cake\Console\TestSuite\StubConsoleOutput;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\CommandTestCase;
@@ -60,11 +59,9 @@ class ExportCommandTest extends CommandTestCase
     {
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
-        $BackupExport = $this->createPartialMock(BackupExport::class, ['export']);
-        $BackupExport->method('export')->willReturn(false);
-        $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
-        $ExportCommand->method('getBackupExport')->willReturn($BackupExport);
-        $ExportCommand->run(['-v'], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+        $Command = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
+        $Command->method('getBackupExport')->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
+        $Command->run([], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**

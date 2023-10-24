@@ -105,10 +105,9 @@ class ExportCommand extends Command
                 $BackupExport->timeout((int)$args->getOption('timeout'));
             }
 
-            /** @var string $file */
             $file = $BackupExport->export();
             if (!$file) {
-                throw new StopException(__d('database_backup', 'The `Backup.beforeExport` event stopped the operation'));
+                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
@@ -120,8 +119,7 @@ class ExportCommand extends Command
             if ($args->getOption('rotate')) {
                 $this->executeCommand(RotateCommand::class, array_merge([(string)$args->getOption('rotate')], $extraOptions), $io);
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $io->abort($e->getMessage());
         }
     }
