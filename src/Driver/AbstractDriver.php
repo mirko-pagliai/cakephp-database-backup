@@ -69,10 +69,11 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     private function getExecutable(string $type): string
     {
+        // @codeCoverageIgnoreStart
         if (!in_array($type, ['export', 'import'])) {
-            /** @codeCoverageIgnore */
             throw new LogicException(__d('database_backup', '`$type` parameter should be `export` or `import`'));
         }
+        // @codeCoverageIgnoreEnd
         $driverName = strtolower($this->getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$type])),
