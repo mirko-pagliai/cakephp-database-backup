@@ -73,9 +73,11 @@ class BackupManager
         $Finder = new Finder();
         $Finder->files()
             ->in(Configure::readOrFail('DatabaseBackup.target'))
-            ->name('/\.sql(\.(gz|bz2))?$/') ;
+            ->name('/\.sql(\.(gz|bz2))?$/')
+            ->sortByModifiedTime()
+            ->reverseSorting();
 
-        return (new Collection($Finder))->map(function (SplFileInfo $File) {
+        return (new Collection($Finder))->map(function (SplFileInfo $File): Entity {
             $filename = $File->getFilename();
 
             return new Entity(compact('filename') + [
@@ -84,7 +86,7 @@ class BackupManager
                 'size' => $File->getSize(),
                 'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
             ]);
-        })->sortBy('datetime');
+        })->compile(false);
     }
 
     /**
