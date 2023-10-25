@@ -70,16 +70,19 @@ class BackupManager
      */
     public static function index(): CollectionInterface
     {
-        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::readOrFail('DatabaseBackup.target'));
+        $Finder = new Finder();
+        $Finder->files()
+            ->in(Configure::readOrFail('DatabaseBackup.target'))
+            ->name('/\.sql(\.(gz|bz2))?$/') ;
 
-        return (new Collection($finder))->map(function (SplFileInfo $file) {
-            $filename = $file->getFilename();
+        return (new Collection($Finder))->map(function (SplFileInfo $File) {
+            $filename = $File->getFilename();
 
             return new Entity(compact('filename') + [
                 'extension' => self::getExtension($filename),
                 'compression' => self::getCompression($filename),
-                'size' => $file->getSize(),
-                'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
+                'size' => $File->getSize(),
+                'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
             ]);
         })->sortBy('datetime');
     }
