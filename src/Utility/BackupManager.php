@@ -20,7 +20,6 @@ use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Mailer;
-use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
 use LogicException;
 use Symfony\Component\Finder\Finder;
@@ -65,7 +64,7 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return \Cake\Collection\CollectionInterface<\Cake\ORM\Entity> Backups
+     * @return \Cake\Collection\CollectionInterface Array of backups
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
@@ -77,16 +76,13 @@ class BackupManager
             ->sortByModifiedTime()
             ->reverseSorting();
 
-        return (new Collection($Finder))->map(function (SplFileInfo $File): Entity {
-            $filename = $File->getFilename();
-
-            return new Entity(compact('filename') + [
-                'extension' => self::getExtension($filename),
-                'compression' => self::getCompression($filename),
-                'size' => $File->getSize(),
-                'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
-            ]);
-        })->compile(false);
+        return (new Collection($Finder))->map(fn(SplFileInfo $File): array => [
+            'filename' => $File->getFilename(),
+            'extension' => self::getExtension($File->getFilename()),
+            'compression' => self::getCompression($File->getFilename()),
+            'size' => $File->getSize(),
+            'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
+        ])->compile(false);
     }
 
     /**
