@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<php-doc-maker>
-    <title>cakephp-database-backup</title>
-    <target>../cakephp-database-backup-gh-pages</target>
-</php-doc-maker>

@@ -1,5 +1,18 @@
 # 2.x branch
 ## 2.12 branch
+### 2.12.2
+* improved and fixed a bug for `ExportCommand` and `ImportCommand`, in handling some exceptions;
+* it no longer needs the `me-tools` package. This removes several (useless) dependencies;
+* some, possible changes that prepare it for CakePHP 5 and PHPUnit 10 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
+* little fixes. Fixed some deprecations for CakePHP 4.5 ([issue #97](https://github.com/mirko-pagliai/cakephp-database-backup/issues/97));
+* improved `BackuManager::index()` method, also regarding the correct files sorting. This also solves a small bug for
+  the `rotate()` method (which precisely affects `index()`). The `index()` method now returns a collection of arrays (
+  and no longer a collection of `Entity`);
+* some testing methods that have been missing for a long time have been added;
+* the `BackupTrait::getDriverName()` method can no longer be static;
+* removed (old and useless) `BaseCommandTestCase` class;
+* added tests for PHP 8.2.
+
 ### 2.12.1
 * fixed a little bug in the `bootstrap.php` file;
 * the `Exceptionist` class provided by me-tools is no longer used (in anticipation of an upcoming deprecation).

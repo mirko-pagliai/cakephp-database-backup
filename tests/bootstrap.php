@@ -28,6 +28,10 @@ date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 ini_set('intl.default_locale', 'en_US');
 
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
+
 define('ROOT', dirname(__DIR__) . DS);
 define('CAKE_CORE_INCLUDE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
 define('CORE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
@@ -109,19 +113,16 @@ require_once ROOT . 'config' . DS . 'bootstrap.php';
 $loader = new SchemaLoader();
 $loader->loadInternalFile(CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'schema.php');
 
-echo 'Running tests for `' . BackupManager::getDriverName() . '` driver ' . PHP_EOL;
+echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver ' . PHP_EOL;
 
 /**
- * @todo to be removed in a later release. These allow it to work with older versions of me-tools and cakephp
+ * @todo remove on CakePHP >= 5
  */
-if (!trait_exists('Tools\ReflectionTrait')) {
-    class_alias('Tools\TestSuite\ReflectionTrait', 'Tools\ReflectionTrait');
+if (!trait_exists('Cake\Console\TestSuite\ConsoleIntegrationTestTrait')) {
+    class_alias('Cake\TestSuite\ConsoleIntegrationTestTrait', 'Cake\Console\TestSuite\ConsoleIntegrationTestTrait');
 }
-if (!trait_exists('MeTools\TestSuite\ConsoleIntegrationTestTrait')) {
-    class_alias('Cake\TestSuite\ConsoleIntegrationTestTrait', 'MeTools\TestSuite\ConsoleIntegrationTestTrait');
-}
-if (!class_exists('MeTools\TestSuite\CommandTestCase')) {
-    class_alias('DatabaseBackup\TestSuite\BaseCommandTestCase', 'MeTools\TestSuite\CommandTestCase');
+if (!class_exists('Cake\Console\TestSuite\StubConsoleOutput')) {
+    class_alias('Cake\TestSuite\Stub\ConsoleOutput', 'Cake\Console\TestSuite\StubConsoleOutput');
 }
 
 if (!function_exists('createBackup')) {
@@ -129,7 +130,8 @@ if (!function_exists('createBackup')) {
      * Global function to create a backup file
      * @param string $filename Filename
      * @return string
-     * @throws \Tools\Exception\NotWritableException|\ErrorException
+     * @throws \LogicException
+     * @throws \ReflectionException
      */
     function createBackup(string $filename = 'backup.sql'): string
     {
@@ -141,15 +143,17 @@ if (!function_exists('createSomeBackups')) {
     /**
      * Global function to create some backup files
      * @return array
-     * @throws \Tools\Exception\NotWritableException|\ErrorException
+     * @throws \LogicException
+     * @throws \ReflectionException
      */
     function createSomeBackups(): array
     {
         $timestamp = time();
 
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
+            $timestamp--;
             $file = createBackup('backup_test_' . $timestamp . '.' . $extension);
-            touch($file, $timestamp--);
+            touch($file, $timestamp);
             $files[] = $file;
         }
 

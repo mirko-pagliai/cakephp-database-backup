@@ -15,11 +15,11 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Utility;
 
+use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use Cake\Mailer\Mailer;
-use Cake\ORM\Entity;
 use DatabaseBackup\BackupTrait;
 use LogicException;
 use Symfony\Component\Finder\Finder;
@@ -64,23 +64,25 @@ class BackupManager
 
     /**
      * Returns a list of database backups
-     * @return \Cake\Collection\CollectionInterface<\Cake\ORM\Entity> Backups
+     * @return \Cake\Collection\CollectionInterface Array of backups
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
     {
-        $finder = (new Finder())->files()->name('/\.sql(\.(gz|bz2))?$/')->in(Configure::readOrFail('DatabaseBackup.target'));
+        $Finder = new Finder();
+        $Finder->files()
+            ->in(Configure::readOrFail('DatabaseBackup.target'))
+            ->name('/\.sql(\.(gz|bz2))?$/')
+            ->sortByModifiedTime()
+            ->reverseSorting();
 
-        return collection($finder)->map(function (SplFileInfo $file) {
-            $filename = $file->getFilename();
-
-            return new Entity(compact('filename') + [
-                'extension' => self::getExtension($filename),
-                'compression' => self::getCompression($filename),
-                'size' => $file->getSize(),
-                'datetime' => FrozenTime::createFromTimestamp($file->getMTime()),
-            ]);
-        })->sortBy('datetime');
+        return (new Collection($Finder))->map(fn(SplFileInfo $File): array => [
+            'filename' => $File->getFilename(),
+            'extension' => self::getExtension($File->getFilename()),
+            'compression' => self::getCompression($File->getFilename()),
+            'size' => $File->getSize(),
+            'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
+        ])->compile(false);
     }
 
     /**

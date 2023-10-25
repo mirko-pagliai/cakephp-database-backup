@@ -64,9 +64,9 @@ trait BackupTrait
      * @throws \ReflectionException
      * @since 2.9.2
      */
-    public static function getDriverName(): string
+    public function getDriverName(): string
     {
-        return get_class_short_name(self::getConnection()->getDriver());
+        return get_class_short_name($this->getConnection()->getDriver());
     }
 
     /**

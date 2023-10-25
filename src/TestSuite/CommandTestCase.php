@@ -15,17 +15,33 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\Utility\BackupManager;
-use MeTools\TestSuite\CommandTestCase as BaseCommandTestCase;
 
 /**
  * Abstract class for test commands
  */
-abstract class CommandTestCase extends BaseCommandTestCase
+abstract class CommandTestCase extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
-     * Called after every test method
-     * @return void
+     * @inheritDoc
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        /**
+         * @todo remove on CakePHP >= 5
+         */
+        if (method_exists($this, 'useCommandRunner')) {
+            $this->useCommandRunner();
+        }
+    }
+
+    /**
+     * @inheritDoc
      */
     public function tearDown(): void
     {

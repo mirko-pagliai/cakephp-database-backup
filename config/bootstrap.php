@@ -18,6 +18,13 @@ use Cake\Core\Configure;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
+ * @todo remove the `file_exists()` on CakePHP >= 5
+ */
+if (file_exists(CAKE . 'functions.php')) {
+    require CAKE . 'functions.php';
+}
+
+/**
  * Executables. Name of driver as keys, Then, as value, an array that contains
  *  first the executable to export and then the executable to import backups.
  */

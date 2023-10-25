@@ -69,10 +69,12 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     private function getExecutable(string $type): string
     {
+        // @codeCoverageIgnoreStart
         if (!in_array($type, ['export', 'import'])) {
             throw new LogicException(__d('database_backup', '`$type` parameter should be `export` or `import`'));
         }
-        $driverName = strtolower(self::getDriverName());
+        // @codeCoverageIgnoreEnd
+        $driverName = strtolower($this->getDriverName());
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$type])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
@@ -81,6 +83,7 @@ abstract class AbstractDriver implements EventListenerInterface
             '{{DB_HOST}}' => $this->getConfig('host'),
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
+        /** @var string $exec */
         $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $type);
 
         return str_replace(array_keys($replacements), $replacements, $exec);

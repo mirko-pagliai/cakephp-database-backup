@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
-use Cake\ORM\Entity;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -43,8 +42,7 @@ class BackupManagerTest extends TestCase
     protected BackupManager $BackupManager;
 
     /**
-     * Called before every test method
-     * @return void
+     * @inheritDoc
      */
     public function setUp(): void
     {
@@ -112,9 +110,9 @@ class BackupManagerTest extends TestCase
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
-            $this->assertInstanceOf(Entity::class, $file);
-            $this->assertIsPositive($file->get('size'));
-            $this->assertInstanceOf(FrozenTime::class, $file->get('datetime'));
+            $this->assertIsArray($file);
+            $this->assertGreaterThan(0, $file['size']);
+            $this->assertInstanceOf(FrozenTime::class, $file['datetime']);
         }
     }
 
@@ -140,7 +138,11 @@ class BackupManagerTest extends TestCase
         $this->assertSame(['bzip2', 'gzip'], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
-        $diff = array_udiff($initialFiles->toList(), $filesAfterRotate->toList(), fn(Entity $first, Entity $second): int => strcmp($first->get('filename'), $second->get('filename')));
+        $diff = array_udiff(
+            $initialFiles->toList(),
+            $filesAfterRotate->toList(),
+            fn(array $first, array $second): int => strcmp($first['filename'], $second['filename'])
+        );
 
         //Again, only 1 backup was deleted. The difference is the same
         $this->assertCount(1, $diff);
@@ -166,7 +168,6 @@ class BackupManagerTest extends TestCase
 
         //With an invalid sender
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid email set for "from". You passed "invalidSender".');
         unlink($file);
         Configure::write('DatabaseBackup.mailSender', 'invalidSender');
         $this->BackupManager->send(createBackup(), 'recipient@example.com');

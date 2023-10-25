@@ -15,9 +15,9 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\TestSuite;
 
+use Cake\TestSuite\TestCase as BaseTestCase;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupManager;
-use MeTools\TestSuite\TestCase as BaseTestCase;
 
 /**
  * TestCase class

@@ -14,4 +14,3 @@ parameters:
 			message: "#^Expression \"\\$this\\-\\>BackupExport\\-\\>noExistingProperty\" on a separate line does not do anything\\.$#"
 			count: 1
 			path: tests/TestCase/Utility/BackupExportAndImportTest.php
-

@@ -15,7 +15,12 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
+use Cake\Console\ConsoleIo;
+use Cake\Console\Exception\StopException;
+use Cake\Console\TestSuite\StubConsoleOutput;
+use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\TestSuite\CommandTestCase;
+use DatabaseBackup\Utility\BackupImport;
 
 /**
  * ImportCommandTest class
@@ -47,14 +52,27 @@ class ImportCommandTest extends CommandTestCase
     }
 
     /**
+     * Test for `execute()` method on stopped event
+     * @test
+     * @uses \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    public function testExecuteOnStoppedEvent(): void
+    {
+        $this->expectException(StopException::class);
+        $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
+        $Command = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
+        $Command->method('getBackupImport')->willReturn($this->createConfiguredMock(BackupImport::class, ['import' => false]));
+        $Command->run(['--filename' => createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+    }
+
+    /**
      * Test for `execute()` method, with `timeout` option
      * @test
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecuteTimeoutOption(): void
     {
-        $backup = createBackup();
-        $this->exec($this->command . ' --timeout 10 ' . $backup);
+        $this->exec($this->command . ' --timeout 10 ' . createBackup());
         $this->assertExitSuccess();
         $this->assertOutputContains('Timeout for shell commands: 10 seconds');
         $this->assertErrorEmpty();

@@ -19,7 +19,6 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\I18n\Number;
-use Cake\ORM\Entity;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 
@@ -63,11 +62,11 @@ class IndexCommand extends Command
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
         ];
-        $cells = $backups->map(fn(Entity $backup): array => $backup
-            ->set('compression', $backup->get('compression') ?: '')
-            ->set('datetime', $backup->get('datetime')->nice())
-            ->set('size', Number::toReadableSize($backup->get('size')))
-            ->toArray());
+        $cells = $backups->map(fn(array $backup): array => [
+           'compression' => $backup['compression'] ?: '',
+           'datetime' => $backup['datetime']->nice(),
+           'size' => Number::toReadableSize($backup['size']),
+       ] + $backup);
         $io->helper('table')->output(array_merge([$headers], $cells->toList()));
     }
 }

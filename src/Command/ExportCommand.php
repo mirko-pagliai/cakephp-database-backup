@@ -18,6 +18,7 @@ namespace DatabaseBackup\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Console\Exception\StopException;
 use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
@@ -67,6 +68,15 @@ class ExportCommand extends Command
     }
 
     /**
+     * Internal method to get a `BackupExport` instance
+     * @return \DatabaseBackup\Utility\BackupExport
+     */
+    protected function getBackupExport(): BackupExport
+    {
+        return new BackupExport();
+    }
+
+    /**
      * Exports a database backup.
      *
      * This command uses `RotateCommand` and `SendCommand`.
@@ -81,7 +91,7 @@ class ExportCommand extends Command
         parent::execute($args, $io);
 
         try {
-            $BackupExport = new BackupExport();
+            $BackupExport = $this->getBackupExport();
 
             //Sets the output filename or the compression type. Regarding the `rotate` option, the
             //`BackupShell::rotate()` method will be called at the end, instead of `BackupExport::rotate()`
@@ -95,11 +105,9 @@ class ExportCommand extends Command
                 $BackupExport->timeout((int)$args->getOption('timeout'));
             }
 
-            /** @var string $file */
             $file = $BackupExport->export();
             if (!$file) {
-                $io->error(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
-                $this->abort();
+                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
@@ -112,8 +120,7 @@ class ExportCommand extends Command
                 $this->executeCommand(RotateCommand::class, array_merge([(string)$args->getOption('rotate')], $extraOptions), $io);
             }
         } catch (Exception $e) {
-            $io->error($e->getMessage());
-            $this->abort();
+            $io->abort($e->getMessage());
         }
     }
 }
