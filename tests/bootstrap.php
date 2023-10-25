@@ -151,8 +151,9 @@ if (!function_exists('createSomeBackups')) {
         $timestamp = time();
 
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
+            $timestamp--;
             $file = createBackup('backup_test_' . $timestamp . '.' . $extension);
-            touch($file, $timestamp--);
+            touch($file, $timestamp);
             $files[] = $file;
         }
 
