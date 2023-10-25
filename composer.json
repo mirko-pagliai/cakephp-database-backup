@@ -20,8 +20,8 @@
         "cakephp/cakephp-codesniffer": "^4.4",
         "cakephp/migrations": "^3.2",
         "phpunit/phpunit": "^9.1|^9.5",
-        "phpstan/phpstan": "^1.7",
-        "psalm/phar": "^4.24"
+        "phpstan/phpstan": "^1.10.38",
+        "vimeo/psalm": "^5.15.0"
     },
     "autoload": {
         "psr-4": {
