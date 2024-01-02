@@ -57,7 +57,7 @@ abstract class AbstractBackupUtility
      * @since 2.12.0
      * @throw \LogicException
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         if (!property_exists($this, $name)) {
             $class = &$this;
