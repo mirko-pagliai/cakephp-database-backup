@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.13 branch
+### 2.13.0
+* added tests for PHP 8.3.
+
 ## 2.12 branch
 ### 2.12.3
 * updated for `php-tools` 1.8.
