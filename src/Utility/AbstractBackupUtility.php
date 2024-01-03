@@ -64,7 +64,7 @@ abstract class AbstractBackupUtility
             throw new LogicException('Undefined property: ' . get_class($class) . '::$' . $name);
         }
 
-        return $this->$name;
+        return $this->{$name};
     }
 
     /**

@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.12 branch
+### 2.12.3
+* updated for `php-tools` 1.8.
+
 ### 2.12.2
 * improved and fixed a bug for `ExportCommand` and `ImportCommand`, in handling some exceptions;
 * it no longer needs the `me-tools` package. This removes several (useless) dependencies;
