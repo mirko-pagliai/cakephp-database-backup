@@ -33,19 +33,16 @@ if (!defined('DS')) {
 }
 
 define('ROOT', dirname(__DIR__) . DS);
-define('CAKE_CORE_INCLUDE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
-define('CORE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
-define('CAKE', CORE_PATH . 'src' . DS);
-define('TESTS', ROOT . 'tests' . DS);
-define('APP', ROOT . 'tests' . DS . 'test_app' . DS);
-define('APP_DIR', 'test_app' . DS);
-define('WEBROOT_DIR', 'webroot' . DS);
-define('WWW_ROOT', APP . 'webroot' . DS);
+const CORE_PATH = ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS;
+const CAKE = CORE_PATH . 'src' . DS;
+const APP = ROOT . 'tests' . DS . 'test_app' . DS;
+const APP_DIR = 'test_app' . DS;
+const WWW_ROOT = APP . 'webroot' . DS;
 define('TMP', sys_get_temp_dir() . DS . 'cakephp-database-backup' . DS);
-define('CONFIG', APP . 'config' . DS);
-define('CACHE', TMP . 'cache' . DS);
-define('LOGS', TMP . 'cakephp_log' . DS);
-define('SESSIONS', TMP . 'sessions' . DS);
+const CONFIG = APP . 'config' . DS;
+const CACHE = TMP . 'cache' . DS;
+const LOGS = TMP . 'cakephp_log' . DS;
+const SESSIONS = TMP . 'sessions' . DS;
 
 $dirs = [TMP, LOGS, SESSIONS, CACHE . 'models', CACHE . 'persistent', CACHE . 'views'];
 foreach (array_filter($dirs, fn(string $dir): bool => !file_exists($dir)) as $dir) {
@@ -106,12 +103,11 @@ if (IS_WIN && file_exists('C:\\xampp\\mysql\\bin\\mysql.exe')) {
     Configure::write('DatabaseBackup.binaries.mysql', 'C:\\xampp\\mysql\\bin\\mysql.exe');
     Configure::write('DatabaseBackup.binaries.mysqldump', 'C:\\xampp\\mysql\\bin\\mysqldump.exe');
 }
-Configure::write('pluginsToLoad', ['DatabaseBackup']);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 
 $loader = new SchemaLoader();
-$loader->loadInternalFile(CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'schema.php');
+$loader->loadInternalFile(ROOT . 'vendor/cakephp/cakephp/tests/schema.php');
 
 echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver ' . PHP_EOL;
 
