@@ -144,6 +144,7 @@ if (!function_exists('createSomeBackups')) {
      */
     function createSomeBackups(): array
     {
+        $files = [];
         $timestamp = time();
 
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
@@ -153,6 +154,6 @@ if (!function_exists('createSomeBackups')) {
             $files[] = $file;
         }
 
-        return array_reverse($files ?? []);
+        return array_reverse($files);
     }
 }
