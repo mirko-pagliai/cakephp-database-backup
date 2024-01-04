@@ -134,6 +134,7 @@ if (!function_exists('createSomeBackups')) {
      */
     function createSomeBackups(): array
     {
+        $files = [];
         $timestamp = time();
 
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
