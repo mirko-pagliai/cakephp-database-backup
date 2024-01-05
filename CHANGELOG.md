@@ -1,4 +1,9 @@
 # 2.x branch
+## 2.13 branch
+### 2.13.0
+* requires at least PHP 8.1, PHPUnit 10 and CakePHP 5.0;
+* added tests for PHP 8.3.
+
 ## 2.12 branch
 ### 2.12.3
 * updated for `php-tools` 1.8.

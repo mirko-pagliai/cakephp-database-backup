@@ -45,7 +45,7 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @var array<string>
      */
-    public $fixtures = ['core.Articles', 'core.Comments'];
+    public array $fixtures = ['core.Articles', 'core.Comments'];
 
     /**
      * Internal method to get all records from the database

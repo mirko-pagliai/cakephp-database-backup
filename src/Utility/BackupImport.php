@@ -59,7 +59,7 @@ class BackupImport extends AbstractBackupUtility
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeImport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      */
-    public function import()
+    public function import(): string|false
     {
         if (empty($this->filename)) {
             throw new LogicException(__d('database_backup', 'You must first set the filename'));

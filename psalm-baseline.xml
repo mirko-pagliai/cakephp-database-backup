@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.x-dev@">
+<files psalm-version="5.18.0@b113f3ed0259fd6e212d87c3df80eec95a6abf19">
+  <file src="src/Driver/AbstractDriver.php">
+    <MissingTemplateParam>
+      <code>EventDispatcherTrait</code>
+    </MissingTemplateParam>
+  </file>
   <file src="src/Driver/Mysql.php">
-    <RedundantPropertyInitializationCheck occurrences="2">
-      <code>$this-&gt;auth</code>
-      <code>TMP . uniqid('auth')</code>
+    <RedundantPropertyInitializationCheck>
+      <code><![CDATA[$this->auth]]></code>
+      <code><![CDATA[TMP . uniqid('auth')]]></code>
     </RedundantPropertyInitializationCheck>
   </file>
   <file src="src/TestSuite/DriverTestCase.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>empty($this-&gt;Driver)</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[empty($this->Driver)]]></code>
     </TypeDoesNotContainType>
   </file>
   <file src="src/Utility/AbstractBackupUtility.php">
-    <TypeDoesNotContainType occurrences="1">
-      <code>empty($this-&gt;Driver)</code>
+    <TypeDoesNotContainType>
+      <code><![CDATA[empty($this->Driver)]]></code>
     </TypeDoesNotContainType>
   </file>
 </files>

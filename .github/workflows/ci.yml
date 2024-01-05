@@ -12,25 +12,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2']
+        php-version: ['8.1', '8.2', 8.3]
         db-type: [sqlite, mysql, pgsql]
         prefer-lowest: ['']
         exclude:
-          - php-version: '7.4'
+          - php-version: '8.1'
             db-type: 'sqlite'
-          - php-version: '7.4'
+          - php-version: '8.1'
             db-type: 'pgsql'
         include:
-          - php-version: '7.4'
-            db-type: 'mysql'
-            prefer-lowest: 'prefer-lowest'
-          - php-version: '8.0'
-            db-type: 'mysql'
-            prefer-lowest: 'prefer-lowest'
           - php-version: '8.1'
             db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
           - php-version: '8.2'
+            db-type: 'mysql'
+            prefer-lowest: 'prefer-lowest'
+          - php-version: '8.3'
             db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
 
@@ -89,7 +86,7 @@ jobs:
             if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_dsn='postgres://postgres:postgres@127.0.0.1/test'; fi
 
             if [[ ${{ matrix.php-version }} == '8.0' ]]; then
-             export XDEBUG_MODE=coverage && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
+             export XDEBUG_MODE=coverage && vendor/bin/phpunit --coverage-clover=coverage.xml
             else
               vendor/bin/phpunit
             fi
@@ -140,11 +137,11 @@ jobs:
 
   testsuite-windows:
     runs-on: windows-2019
-    name: Windows - PHP 7.4
+    name: Windows - PHP 8.2
 
     env:
       EXTENSIONS: mbstring, intl, pdo_mysql
-      PHP_VERSION: '7.4'
+      PHP_VERSION: '8.2'
 
     steps:
     - uses: actions/checkout@v3
@@ -178,4 +175,4 @@ jobs:
       env:
         db_dsn: 'mysql://root@localhost/test'
       run: |
-          vendor/bin/phpunit --verbose --group mysql
+          vendor/bin/phpunit --group mysql
