@@ -41,12 +41,25 @@ $ mkdir backups/ && chmod 775 backups/
 If you want to use a different directory, read the [Configuration](#configuration) section.
 
 ### Installation on older CakePHP and PHP versions
-Recent packages and the master branch require at least CakePHP 4.0 and PHP 7.4 and the current development of the code
+Recent packages and the master branch require at least CakePHP 5.0 and PHP 8.1 and the current development of the code
 is based on these and later versions of CakePHP and PHP.  
 However, there are still some branches compatible with previous versions of PHP.
 
+#### For CakePHP 4.0 and PHP 8.0 or later
+Instead, the [cakephp4](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp4) branch requires at least PHP
+`>=7.4.0` and CakePHP `^4.0`.
+
+In this case, you can install the package as well:
+```bash
+$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp4
+```
+
+Note that the `cakephp4` branch will no longer be updated as of January 05, 2024,
+except for security patches, and it matches the
+[2.12.3](//github.com/mirko-pagliai/cakephp-database-backup/releases/tag/2.12.3) version.
+
 #### For CakePHP 3.0 and PHP 5.6 or later
-Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3) branch  requires at least PHP
+Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3) branch requires at least PHP
 `>=5.6 <7.4` and CakePHP `^3.5.1`.
 
 In this case, you can install the package as well:
