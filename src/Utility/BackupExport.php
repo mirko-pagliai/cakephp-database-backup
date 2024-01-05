@@ -168,7 +168,7 @@ class BackupExport extends AbstractBackupUtility
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      */
-    public function export()
+    public function export(): string|false
     {
         if (empty($this->filename)) {
             $this->extension ??= $this->defaultExtension;

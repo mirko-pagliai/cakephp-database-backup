@@ -11,15 +11,16 @@
         }
     ],
     "require": {
-        "php": ">=7.4.0",
+        "php": ">=8.1",
         "ext-fileinfo": "*",
-        "cakephp/cakephp": "^4.0",
-        "mirko-pagliai/php-tools": "^1.7.4"
+        "cakephp/cakephp": "^5.0",
+        "mirko-pagliai/php-tools": "~1.9.2",
+        "symfony/process": "^6.0|^7.0"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "^4.4",
-        "cakephp/migrations": "^3.2",
-        "phpunit/phpunit": "^9.1|^9.5",
+        "cakephp/cakephp-codesniffer": "^5.0",
+        "cakephp/migrations": "^4.0",
+        "phpunit/phpunit": "^10.1.0 <=10.5.3",
         "phpstan/phpstan": "^1.10.38",
         "vimeo/psalm": "^5.15.0"
     },
@@ -44,12 +45,12 @@
             "@test",
             "@stan"
         ],
-        "cs-check": "phpcs --standard=phpcs.xml.dist",
-        "cs-fix": "phpcbf --standard=phpcs.xml.dist",
+        "cs-check": "phpcs --standard=phpcs.xml",
+        "cs-fix": "phpcbf --standard=phpcs.xml",
         "test": "rm -f -r /tmp/cake* && phpunit && driver_test=sqlite phpunit && driver_test=postgres phpunit",
         "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
-        "phpstan": "phpstan.phar analyse",
-        "psalm": "psalm.phar --php-version=8.0",
+        "phpstan": "phpstan analyse",
+        "psalm": "psalm --php-version=8.2",
         "stan": [
             "@phpstan",
             "@psalm"

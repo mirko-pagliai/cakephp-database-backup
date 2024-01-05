@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<ruleset name="cakephp-database-backup">
-    <arg value="p"/>
-    <file>.</file>
-
-    <rule ref="./vendor/mirko-pagliai/php-tools/sniffer-ruleset.xml"/>
-</ruleset>
