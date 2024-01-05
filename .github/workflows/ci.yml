@@ -86,7 +86,7 @@ jobs:
             if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_dsn='postgres://postgres:postgres@127.0.0.1/test'; fi
 
             if [[ ${{ matrix.php-version }} == '8.0' ]]; then
-             export XDEBUG_MODE=coverage && vendor/bin/phpunit --verbose --coverage-clover=coverage.xml
+             export XDEBUG_MODE=coverage && vendor/bin/phpunit --coverage-clover=coverage.xml
             else
               vendor/bin/phpunit
             fi
@@ -175,4 +175,4 @@ jobs:
       env:
         db_dsn: 'mysql://root@localhost/test'
       run: |
-          vendor/bin/phpunit --verbose --group mysql
+          vendor/bin/phpunit --group mysql
