@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="5.18.0@b113f3ed0259fd6e212d87c3df80eec95a6abf19">
+<files psalm-version="5.23.1@8471a896ccea3526b26d082f4461eeea467f10a4">
   <file src="src/Driver/AbstractDriver.php">
     <MissingTemplateParam>
-      <code>EventDispatcherTrait</code>
+      <code><![CDATA[EventDispatcherTrait]]></code>
     </MissingTemplateParam>
   </file>
   <file src="src/Driver/Mysql.php">
@@ -14,10 +14,12 @@
   <file src="src/TestSuite/DriverTestCase.php">
     <TypeDoesNotContainType>
       <code><![CDATA[empty($this->Driver)]]></code>
+      <code><![CDATA[empty($this->Driver)]]></code>
     </TypeDoesNotContainType>
   </file>
   <file src="src/Utility/AbstractBackupUtility.php">
     <TypeDoesNotContainType>
+      <code><![CDATA[empty($this->Driver)]]></code>
       <code><![CDATA[empty($this->Driver)]]></code>
     </TypeDoesNotContainType>
   </file>
