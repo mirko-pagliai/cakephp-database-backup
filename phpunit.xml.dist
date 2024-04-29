@@ -14,9 +14,9 @@
       <directory>./tests/TestCase</directory>
     </testsuite>
   </testsuites>
-  <extensions>
-    <extension class="\Cake\TestSuite\Fixture\PHPUnitExtension"/>
-  </extensions>
+<extensions>
+    <bootstrap class="Cake\TestSuite\Fixture\Extension\PHPUnitExtension"/>
+</extensions>
   <!-- configure code coverage -->
   <source>
     <include>
