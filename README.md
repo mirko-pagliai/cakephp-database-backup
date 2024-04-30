@@ -15,6 +15,16 @@ even a coffee is enough! Thank you.
 
 [![Make a donation](https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_carte.jpg)](//paypal.me/mirkopagliai)
 
+  * [Installation](#installation)
+    + [Installation on older CakePHP and PHP versions](#installation-on-older-cakephp-and-php-versions)
+      - [For PHP 7.4 and CakePHP 4.0 later](#for-php-74-and-cakephp-40-later)
+      - [For CakePHP 3.0 and PHP 5.6 or later](#for-cakephp-30-and-php-56-or-later)
+  * [Requirements](#requirements)
+  * [Configuration](#configuration)
+  * [How to use](#how-to-use)
+  * [Testing](#testing)
+  * [Versioning](#versioning)
+
 ## Installation
 You can install the plugin via composer:
 
@@ -45,7 +55,7 @@ Recent packages and the master branch require at least CakePHP 5.0 and PHP 8.1 a
 is based on these and later versions of CakePHP and PHP.  
 However, there are still some branches compatible with previous versions of PHP.
 
-#### For CakePHP 4.0 and PHP 8.0 or later
+#### For PHP 7.4 and CakePHP 4.0 later
 Instead, the [cakephp4](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp4) branch requires at least PHP
 `>=7.4.0` and CakePHP `^4.0`.
 

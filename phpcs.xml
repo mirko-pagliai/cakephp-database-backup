@@ -13,4 +13,6 @@
     <rule ref="CakePHP.Functions.ClosureDeclaration.SpaceAfterFunction">
         <severity>0</severity>
     </rule>
+
+    <exclude-pattern>/coverage/</exclude-pattern>
 </ruleset>
