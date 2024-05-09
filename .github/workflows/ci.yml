@@ -40,7 +40,7 @@ jobs:
                 docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.6
             fi
 
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
 
         - name: Validate composer.json and composer.lock
           run: composer validate --strict
@@ -53,7 +53,7 @@ jobs:
 
         - name: Cache Composer packages
           id: composer-cache
-          uses: actions/cache@v3
+          uses: actions/cache@v4
           with:
             path: vendor
             key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
 
         - name: Setup PHP
           uses: shivammathur/setup-php@v2
@@ -144,7 +144,7 @@ jobs:
       PHP_VERSION: '8.2'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -161,7 +161,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
