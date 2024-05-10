@@ -40,7 +40,7 @@ jobs:
 
         - name: Setup PostgreSQL latest
           if: matrix.db-type == 'pgsql'
-          run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres
+          run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.6
 
         - uses: actions/checkout@v4
 
