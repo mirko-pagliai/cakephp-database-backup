@@ -91,7 +91,9 @@ jobs:
 
         - name: Submit code coverage
           if: matrix.php-version == '8.3'
-          uses: codecov/codecov-action@v3
+          uses: codecov/codecov-action@v4
+          env:
+            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   cs-stan:
     name: Coding Standard & Static Analysis
