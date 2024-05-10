@@ -72,12 +72,8 @@ jobs:
           run: composer show
 
         - name: Wait for MySQL
-          run: |
-              if ${{ matrix.db-type == 'mysql' }}; then
-                while ! mysqladmin ping --host=127.0.0.1 --password=$MYSQL_ROOT_PASSWORD --silent; do
-                  sleep 1
-                done
-              fi
+          if: matrix.db-type == 'mysql' || matrix.db-type == 'mariadb'
+          run: while ! `mysqladmin ping -h 127.0.0.1 --silent`; do printf 'Waiting for MySQL...\n'; sleep 2; done;
 
         - name: Run PHPUnit
           run: |
