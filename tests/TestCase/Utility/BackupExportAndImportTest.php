@@ -45,16 +45,19 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @var array<string>
      */
-    public array $fixtures = ['core.Articles', 'core.Comments'];
+    public array $fixtures = [
+        'core.Articles',
+        'core.Comments',
+    ];
 
     /**
      * Internal method to get all records from the database
-     * @return array<string, array>
+     * @return non-empty-array<'Articles'|'Comments', mixed>
      */
     protected function getAllRecords(): array
     {
         foreach (['Articles', 'Comments'] as $name) {
-            $records[$name] = $this->{$name}->find()->enableHydration(false)->toArray();
+            $records[$name] = $this->{$name}->find()->enableHydration(false)->all()->toArray();
         }
 
         return $records;

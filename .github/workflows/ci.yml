@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', 8.3]
+        php-version: ['8.1', '8.2', '8.3']
         db-type: [sqlite, mysql, pgsql]
         prefer-lowest: ['']
         exclude:
@@ -90,8 +90,10 @@ jobs:
             fi
 
         - name: Submit code coverage
-          if: matrix.php-version == '8.0'
-          uses: codecov/codecov-action@v3
+          if: matrix.php-version == '8.3'
+          uses: codecov/codecov-action@v4
+          env:
+            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   cs-stan:
     name: Coding Standard & Static Analysis
@@ -155,7 +157,7 @@ jobs:
     - uses: ankane/setup-mysql@v1
       with:
         database: test
-        mysql-version: 5.7
+        mysql-version: 8.0
 
     - name: Cache Composer packages
       id: composer-cache

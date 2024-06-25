@@ -12,8 +12,10 @@ parameters:
     bootstrapFiles:
         - tests/bootstrap.php
 
-    checkGenericClassInNonGenericObjectType: false
-    checkMissingIterableValueType: false
+    ignoreErrors:
+            -
+                    identifier: missingType.generics
+
     treatPhpDocTypesAsCertain: false
 
     excludePaths:
