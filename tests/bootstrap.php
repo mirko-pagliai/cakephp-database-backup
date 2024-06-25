@@ -128,7 +128,7 @@ if (!function_exists('createBackup')) {
 if (!function_exists('createSomeBackups')) {
     /**
      * Global function to create some backup files
-     * @return array
+     * @return string[]
      * @throws \LogicException
      * @throws \ReflectionException
      */
