@@ -157,7 +157,7 @@ jobs:
     - uses: ankane/setup-mysql@v1
       with:
         database: test
-        mysql-version: 5.7
+        mysql-version: 8.0
 
     - name: Cache Composer packages
       id: composer-cache
