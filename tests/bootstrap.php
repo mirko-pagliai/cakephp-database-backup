@@ -99,6 +99,9 @@ Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 /**
  * For Xampp
  */
+if (!defined('IS_WIN')) {
+    define('IS_WIN', DIRECTORY_SEPARATOR === '\\');
+}
 if (IS_WIN && file_exists('C:\\xampp\\mysql\\bin\\mysql.exe')) {
     Configure::write('DatabaseBackup.binaries.mysql', 'C:\\xampp\\mysql\\bin\\mysql.exe');
     Configure::write('DatabaseBackup.binaries.mysqldump', 'C:\\xampp\\mysql\\bin\\mysqldump.exe');
