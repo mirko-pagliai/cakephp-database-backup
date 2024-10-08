@@ -76,7 +76,7 @@ class BackupManager
             ->sortByModifiedTime()
             ->reverseSorting();
 
-        return (new Collection($Finder))->map(fn(SplFileInfo $File): array => [
+        return (new Collection($Finder))->map(fn (SplFileInfo $File): array => [
             'filename' => $File->getFilename(),
             'extension' => self::getExtension($File->getFilename()),
             'compression' => self::getCompression($File->getFilename()),

@@ -141,7 +141,7 @@ class BackupManagerTest extends TestCase
         $diff = array_udiff(
             $initialFiles->toList(),
             $filesAfterRotate->toList(),
-            fn(array $first, array $second): int => strcmp($first['filename'], $second['filename'])
+            fn (array $first, array $second): int => strcmp($first['filename'], $second['filename'])
         );
 
         //Again, only 1 backup was deleted. The difference is the same

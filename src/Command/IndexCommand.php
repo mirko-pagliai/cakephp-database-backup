@@ -62,7 +62,7 @@ class IndexCommand extends Command
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
         ];
-        $cells = $backups->map(fn(array $backup): array => [
+        $cells = $backups->map(fn (array $backup): array => [
            'compression' => $backup['compression'] ?: '',
            'datetime' => $backup['datetime']->nice(),
            'size' => Number::toReadableSize($backup['size']),

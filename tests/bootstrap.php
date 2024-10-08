@@ -45,7 +45,7 @@ const LOGS = TMP . 'cakephp_log' . DS;
 const SESSIONS = TMP . 'sessions' . DS;
 
 $dirs = [TMP, LOGS, SESSIONS, CACHE . 'models', CACHE . 'persistent', CACHE . 'views'];
-foreach (array_filter($dirs, fn(string $dir): bool => !file_exists($dir)) as $dir) {
+foreach (array_filter($dirs, fn (string $dir): bool => !file_exists($dir)) as $dir) {
     mkdir($dir, 0777, true);
 }
 
