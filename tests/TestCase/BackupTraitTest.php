@@ -33,8 +33,7 @@ class BackupTraitTest extends TestCase
     protected $Trait;
 
     /**
-     * Fixtures
-     * @var array<string>
+     * @inheritDoc
      */
     public array $fixtures = ['core.Articles', 'core.Comments'];
 

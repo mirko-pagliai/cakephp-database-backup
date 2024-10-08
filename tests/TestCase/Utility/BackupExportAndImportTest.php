@@ -43,7 +43,7 @@ class BackupExportAndImportTest extends TestCase
     protected Table $Comments;
 
     /**
-     * @var array<string>
+     * @inheritDoc
      */
     public array $fixtures = [
         'core.Articles',
