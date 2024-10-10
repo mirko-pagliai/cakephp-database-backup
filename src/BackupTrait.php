@@ -17,7 +17,7 @@ namespace DatabaseBackup;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use Tools\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -31,7 +31,12 @@ trait BackupTrait
      */
     public static function getAbsolutePath(string $path): string
     {
-        return Filesystem::makePathAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+        $Filesystem = new Filesystem();
+        if ($Filesystem->isAbsolutePath($path)) {
+            return $path;
+        }
+
+        return rtrim(Configure::readOrFail('DatabaseBackup.target'), DS) . DS . $path;
     }
 
     /**
@@ -61,12 +66,13 @@ trait BackupTrait
     /**
      * Gets the driver name, according to the connection
      * @return string Driver name
-     * @throws \ReflectionException
      * @since 2.9.2
      */
     public function getDriverName(): string
     {
-        return get_class_short_name($this->getConnection()->getDriver());
+        $className = get_class($this->getConnection()->getDriver());
+
+        return substr($className, strrpos($className, '\\') + 1);
     }
 
     /**
@@ -76,9 +82,15 @@ trait BackupTrait
      */
     public static function getExtension(string $path): ?string
     {
-        $extension = Filesystem::getExtension($path);
+        $path = strtolower($path);
 
-        return in_array($extension, array_keys(DATABASE_BACKUP_EXTENSIONS)) ? $extension : null;
+        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
+            if (str_ends_with($path, '.' . $extension)) {
+                return $extension;
+            }
+        }
+
+        return null;
     }
 
     /**

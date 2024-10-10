@@ -45,7 +45,7 @@ const LOGS = TMP . 'cakephp_log' . DS;
 const SESSIONS = TMP . 'sessions' . DS;
 
 $dirs = [TMP, LOGS, SESSIONS, CACHE . 'models', CACHE . 'persistent', CACHE . 'views'];
-foreach (array_filter($dirs, fn(string $dir): bool => !file_exists($dir)) as $dir) {
+foreach (array_filter($dirs, fn (string $dir): bool => !file_exists($dir)) as $dir) {
     mkdir($dir, 0777, true);
 }
 
@@ -99,6 +99,9 @@ Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 /**
  * For Xampp
  */
+if (!defined('IS_WIN')) {
+    define('IS_WIN', DIRECTORY_SEPARATOR === '\\');
+}
 if (IS_WIN && file_exists('C:\\xampp\\mysql\\bin\\mysql.exe')) {
     Configure::write('DatabaseBackup.binaries.mysql', 'C:\\xampp\\mysql\\bin\\mysql.exe');
     Configure::write('DatabaseBackup.binaries.mysqldump', 'C:\\xampp\\mysql\\bin\\mysqldump.exe');
@@ -128,7 +131,7 @@ if (!function_exists('createBackup')) {
 if (!function_exists('createSomeBackups')) {
     /**
      * Global function to create some backup files
-     * @return array
+     * @return string[]
      * @throws \LogicException
      * @throws \ReflectionException
      */

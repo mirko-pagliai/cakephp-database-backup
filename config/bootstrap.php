@@ -56,12 +56,12 @@ $defaults = [
     'DatabaseBackup.sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
     'DatabaseBackup.sqlite.import' => '{{BINARY}} {{DB_NAME}}',
 ];
-Configure::write(array_filter($defaults, fn(string $key): bool => !Configure::check($key), ARRAY_FILTER_USE_KEY));
+Configure::write(array_filter($defaults, fn (string $key): bool => !Configure::check($key), ARRAY_FILTER_USE_KEY));
 
 //Auto-discovers binaries
 $ExecutableFinder = new ExecutableFinder();
 $binaries = array_unique(array_merge(['bzip2', 'gzip'], ...array_values(array_map('array_values', DATABASE_BACKUP_EXECUTABLES))));
-foreach (array_filter($binaries, fn(string $binary): bool => !Configure::check('DatabaseBackup.binaries.' . $binary)) as $binary) {
+foreach (array_filter($binaries, fn (string $binary): bool => !Configure::check('DatabaseBackup.binaries.' . $binary)) as $binary) {
     Configure::write('DatabaseBackup.binaries.' . $binary, $ExecutableFinder->find($binary));
 }
 
