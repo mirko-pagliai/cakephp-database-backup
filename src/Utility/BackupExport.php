@@ -17,7 +17,7 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use LogicException;
-use Tools\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Utility to export databases
@@ -190,7 +190,7 @@ class BackupExport extends AbstractBackupUtility
         if (!$Process->isSuccessful()) {
             throw new LogicException(__d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
         }
-        Filesystem::instance()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
+        (new Filesystem())->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
         //Dispatches the `Backup.afterExport` event implemented by the driver
         $this->getDriver()->dispatchEvent('Backup.afterExport');

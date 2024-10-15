@@ -22,7 +22,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
-use Tools\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * BackupManagerTest class
@@ -91,7 +91,7 @@ class BackupManagerTest extends TestCase
     public function testIndex(): void
     {
         //Creates a text file. This file should be ignored
-        Filesystem::createFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt');
+        (new Filesystem())->dumpFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
         $createdFiles = createSomeBackups();
         $files = $this->BackupManager->index();
