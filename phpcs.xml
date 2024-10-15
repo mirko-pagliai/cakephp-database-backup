@@ -5,8 +5,6 @@
 
     <file>.</file>
 
-    <rule ref="./vendor/mirko-pagliai/php-tools/sniffer-ruleset.xml"/>
-
     <rule ref="CakePHP.Commenting.TypeHint.IncorrectFormat">
         <severity>0</severity>
     </rule>
@@ -15,4 +13,5 @@
     </rule>
 
     <exclude-pattern>/coverage/</exclude-pattern>
+    <exclude-pattern>/vendor</exclude-pattern>
 </ruleset>
