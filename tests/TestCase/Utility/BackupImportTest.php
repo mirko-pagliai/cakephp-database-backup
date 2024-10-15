@@ -21,7 +21,6 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use Tools\Filesystem;
 
 /**
  * BackupImportTest class
@@ -76,7 +75,7 @@ class BackupImportTest extends TestCase
     public function testFilenameWithInvalidFileExtension(): void
     {
         $this->expectExceptionMessage('Invalid file extension');
-        $this->BackupImport->filename(Filesystem::createTmpFile());
+        $this->BackupImport->filename(tempnam(TMP, 'invalidFile'));
     }
 
     /**
