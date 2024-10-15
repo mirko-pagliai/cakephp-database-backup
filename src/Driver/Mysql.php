@@ -15,7 +15,7 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Driver;
 
-use Tools\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Mysql driver to export/import database backups
@@ -54,7 +54,10 @@ class Mysql extends AbstractDriver
             $content
         );
 
-        return (bool)Filesystem::createFile($this->getAuthFilePath(), $content);
+        $Filesystem = new Filesystem();
+        $Filesystem->dumpFile($this->getAuthFilePath(), $content);
+
+        return $Filesystem->exists($this->getAuthFilePath());
     }
 
     /**
@@ -122,7 +125,7 @@ class Mysql extends AbstractDriver
      */
     protected function deleteAuthFile(): void
     {
-        Filesystem::instance()->remove($this->getAuthFilePath());
+        (new Filesystem())->remove($this->getAuthFilePath());
         unset($this->auth);
     }
 }
