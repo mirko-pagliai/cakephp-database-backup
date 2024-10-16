@@ -17,16 +17,19 @@ namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\ConsoleIo;
 use Cake\Console\Exception\StopException;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Console\TestSuite\StubConsoleOutput;
 use DatabaseBackup\Command\ExportCommand;
-use DatabaseBackup\TestSuite\CommandTestCase;
+use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 
 /**
  * ExportCommandTest class
  */
-class ExportCommandTest extends CommandTestCase
+class ExportCommandTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @var string
      */

@@ -15,14 +15,17 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Core\Configure;
-use DatabaseBackup\TestSuite\CommandTestCase;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * SendCommandTest class
  */
-class SendCommandTest extends CommandTestCase
+class SendCommandTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @test
      * @uses \DatabaseBackup\Command\SendCommand::execute()
