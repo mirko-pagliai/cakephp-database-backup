@@ -70,6 +70,11 @@ if (!is_dir($target) || !is_writeable($target)) {
 }
 
 if (!function_exists('rtr')) {
+    /**
+     * Returns a path relative to the root path
+     * @param string $path Absolute path
+     * @return string Relative path
+     */
     function rtr(string $path): string
     {
         if (!str_starts_with($path, ROOT)) {
