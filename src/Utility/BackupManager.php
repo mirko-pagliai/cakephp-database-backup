@@ -22,9 +22,9 @@ use Cake\I18n\FrozenTime;
 use Cake\Mailer\Mailer;
 use DatabaseBackup\BackupTrait;
 use LogicException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Tools\Filesystem;
 
 /**
  * Utility to manage database backups
@@ -46,7 +46,7 @@ class BackupManager
         if (!is_writable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `' . $filename . '` is not writable'));
         }
-        Filesystem::instance()->remove($filename);
+        (new Filesystem())->remove($filename);
 
         return $filename;
     }
@@ -96,7 +96,7 @@ class BackupManager
      */
     public static function rotate(int $rotate): array
     {
-        if (!is_positive($rotate)) {
+        if (!($rotate >= 1)) {
             throw new LogicException(__d('database_backup', 'Invalid rotate value'));
         }
         $backupsToBeDeleted = self::index()->skip($rotate);

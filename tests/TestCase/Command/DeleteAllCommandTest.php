@@ -15,13 +15,16 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\CommandTestCase;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * DeleteAllCommandTest class
  */
-class DeleteAllCommandTest extends CommandTestCase
+class DeleteAllCommandTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @test
      * @uses \DatabaseBackup\Command\DeleteAllCommand::execute()

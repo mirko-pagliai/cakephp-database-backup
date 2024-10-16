@@ -17,12 +17,7 @@ declare(strict_types=1);
 use Cake\Core\Configure;
 use Symfony\Component\Process\ExecutableFinder;
 
-/**
- * @todo remove the `file_exists()` on CakePHP >= 5
- */
-if (file_exists(CAKE . 'functions.php')) {
-    require CAKE . 'functions.php';
-}
+require_once CAKE . 'functions.php';
 
 /**
  * Executables. Name of driver as keys, Then, as value, an array that contains
@@ -72,4 +67,20 @@ if (!file_exists($target)) {
 }
 if (!is_dir($target) || !is_writeable($target)) {
     trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target), E_USER_ERROR);
+}
+
+if (!function_exists('rtr')) {
+    /**
+     * Returns a path relative to the root path
+     * @param string $path Absolute path
+     * @return string Relative path
+     */
+    function rtr(string $path): string
+    {
+        if (!str_starts_with($path, ROOT)) {
+            return $path;
+        }
+
+        return rtrim(substr($path, strlen(ROOT)), DS);
+    }
 }

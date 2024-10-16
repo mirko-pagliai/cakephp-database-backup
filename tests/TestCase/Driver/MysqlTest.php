@@ -18,7 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
-use Tools\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * MysqlTest class
@@ -51,7 +51,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterExport(): void
     {
-        $expectedAuthFile = Filesystem::createTmpFile();
+        $expectedAuthFile = tempnam(TMP, 'tmp');
+        $Filesystem = new Filesystem();
+        $Filesystem->dumpFile($expectedAuthFile, '');
         $this->assertFileExists($expectedAuthFile);
 
         $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
@@ -67,7 +69,9 @@ class MysqlTest extends DriverTestCase
      */
     public function testAfterImport(): void
     {
-        $expectedAuthFile = Filesystem::createTmpFile();
+        $expectedAuthFile = tempnam(TMP, 'tmp');
+        $Filesystem = new Filesystem();
+        $Filesystem->dumpFile($expectedAuthFile, '');
         $this->assertFileExists($expectedAuthFile);
 
         $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);

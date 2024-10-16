@@ -15,13 +15,16 @@ declare(strict_types=1);
  */
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use DatabaseBackup\TestSuite\CommandTestCase;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * IndexCommandTest class
  */
-class IndexCommandTest extends CommandTestCase
+class IndexCommandTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
+
     /**
      * @test
      * @uses \DatabaseBackup\Command\IndexCommand::execute()
