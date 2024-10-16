@@ -101,7 +101,7 @@ class ExportCommandTest extends CommandTestCase
         $this->exec($this->command . ' --rotate 3 -v');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
-        $this->assertOutputContains('Backup `' . basename(array_value_first($files)) . '` has been deleted');
+        $this->assertOutputContains('Backup `' . basename($files[0]) . '` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
         $this->assertErrorEmpty();
     }

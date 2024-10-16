@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
-use DatabaseBackup\Utility\BackupManager;
 
 /**
  * Abstract class for test commands
@@ -24,29 +23,4 @@ use DatabaseBackup\Utility\BackupManager;
 abstract class CommandTestCase extends TestCase
 {
     use ConsoleIntegrationTestTrait;
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        /**
-         * @todo remove on CakePHP >= 5
-         */
-        if (method_exists($this, 'useCommandRunner')) {
-            $this->useCommandRunner();
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function tearDown(): void
-    {
-        BackupManager::deleteAll();
-
-        parent::tearDown();
-    }
 }

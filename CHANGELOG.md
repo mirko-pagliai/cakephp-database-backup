@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.13 branch
+### 2.13.2
+* no longer needs `php-tools`.
+
 ### 2.13.1
 * updated for `php-tools` 1.10.0.
 
