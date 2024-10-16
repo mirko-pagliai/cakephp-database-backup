@@ -84,4 +84,3 @@ if (!function_exists('rtr')) {
         return rtrim(substr($path, strlen(ROOT)), DS);
     }
 }
-
