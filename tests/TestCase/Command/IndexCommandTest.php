@@ -45,9 +45,9 @@ class IndexCommandTest extends TestCase
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
         $this->assertOutputRegExp('/\| \<info\>Filename\<\/info\>\s+\|\s+\<info\>Extension\<\/info\>\s+\|\s+\<info\>Compression\<\/info\>\s+\|\s+\<info\>Size\<\/info\>\s+\|\s+\<info\>Datetime\<\/info\>\s+\|/');
-        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.bz2\s+\| sql\.bz2\s+\| bzip2\s+\| [\d\.]+ KB\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
-        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.gz\s+\| sql\.gz\s+\| gzip\s+\| [\d\.]+ KB\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
-        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\s+\| sql\s+\|\s+\| [\d\.]+ KB\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
+        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.bz2\s+\| sql\.bz2\s+\| bzip2\s+\| [\d\.]+ (KB|Bytes)\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
+        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.gz\s+\| sql\.gz\s+\| gzip\s+\| [\d\.]+ (KB|Bytes)\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
+        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\s+\| sql\s+\|\s+\| [\d\.]+ (KB|Bytes)\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
         $this->assertErrorEmpty();
     }
 }
