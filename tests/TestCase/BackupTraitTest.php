@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,13 +12,14 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase;
 
+use App\BackupTraitAsClass;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -28,14 +28,17 @@ use DatabaseBackup\TestSuite\TestCase;
 class BackupTraitTest extends TestCase
 {
     /**
-     * @psalm-var trait-string<\DatabaseBackup\BackupTrait>
+     * @var \App\BackupTraitAsClass
      */
-    protected $Trait;
+    protected BackupTraitAsClass $Trait;
 
     /**
      * @inheritDoc
      */
-    public array $fixtures = ['core.Articles', 'core.Comments'];
+    public array $fixtures = [
+        'core.Articles',
+        'core.Comments',
+    ];
 
     /**
      * @inheritDoc
@@ -44,7 +47,7 @@ class BackupTraitTest extends TestCase
     {
         parent::setUp();
 
-        $this->Trait ??= $this->getMockForTrait(BackupTrait::class);
+        $this->Trait ??= new BackupTraitAsClass();
     }
 
     /**
