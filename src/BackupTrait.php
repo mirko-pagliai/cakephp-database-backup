@@ -18,6 +18,7 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -36,7 +37,11 @@ trait BackupTrait
             return $path;
         }
 
-        return rtrim(Configure::readOrFail('DatabaseBackup.target'), DS) . DS . $path;
+        if (is_readable(Path::makeAbsolute($path, ROOT))) {
+            return Path::makeAbsolute($path, ROOT);
+        }
+
+        return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }
 
     /**
