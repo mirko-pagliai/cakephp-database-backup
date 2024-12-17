@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
@@ -27,6 +27,7 @@ class IndexCommandTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\IndexCommand::execute()
      */
     public function testExecute(): void
@@ -43,9 +44,10 @@ class IndexCommandTest extends TestCase
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
-        $this->assertOutputRegExp('/backup\.sql\.gz\s+|\s+sql\.gz\s+|\s+gzip\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
-        $this->assertOutputRegExp('/backup\.sql\.bz2\s+|\s+sql\.bz2\s+|\s+bzip2\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
-        $this->assertOutputRegExp('/backup\.sq\s+|\s+sql\s+|\s+|\s+[\d\.]+ \w+\s+|\s+[\d\/]+, [\d:]+ (AP)M/');
+        $this->assertOutputRegExp('/\| <info>Filename<\/info>\s+\|\s+<info>Extension<\/info>\s+\|\s+<info>Compression<\/info>\s+\|\s+<info>Size<\/info>\s+|\s+<info>Datetime<\/info>\s+\|/');
+        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.bz2\s+\| sql\.bz2\s+\| bzip2\s+\| [\d\.]+ KB\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
+        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.gz\s+\| sql\.gz\s+\| gzip\s+\| [\d\.]+ KB\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
+        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\s+\| sql\s+\|\s+\| [\d\.]+ KB\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
         $this->assertErrorEmpty();
     }
 }

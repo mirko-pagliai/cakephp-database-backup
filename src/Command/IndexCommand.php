@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.6.0
  */
+
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
@@ -43,7 +44,6 @@ class IndexCommand extends Command
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
@@ -51,6 +51,7 @@ class IndexCommand extends Command
 
         $backups = BackupManager::index();
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
+
         if ($backups->isEmpty()) {
             return;
         }
@@ -62,11 +63,13 @@ class IndexCommand extends Command
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
         ];
-        $cells = $backups->map(fn (array $backup): array => [
+
+        $rows = $backups->map(fn (array $backup): array => array_merge($backup, [
            'compression' => $backup['compression'] ?: '',
            'datetime' => $backup['datetime']->nice(),
            'size' => Number::toReadableSize($backup['size']),
-       ] + $backup);
-        $io->helper('table')->output(array_merge([$headers], $cells->toList()));
+        ]));
+
+        $io->helper('table')->output(array_merge([$headers], $rows->toList()));
     }
 }
