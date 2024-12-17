@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -120,7 +119,6 @@ if (!function_exists('createBackup')) {
      * Global function to create a backup file
      * @param string $filename Filename
      * @return string
-     * @throws \LogicException
      * @throws \ReflectionException
      */
     function createBackup(string $filename = 'backup.sql'): string
@@ -133,7 +131,6 @@ if (!function_exists('createSomeBackups')) {
     /**
      * Global function to create some backup files
      * @return string[]
-     * @throws \LogicException
      * @throws \ReflectionException
      */
     function createSomeBackups(): array
