@@ -109,8 +109,8 @@ if (IS_WIN && file_exists('C:\\xampp\\mysql\\bin\\mysql.exe')) {
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 
 $loader = new SchemaLoader();
-/** @uses vendor/cakephp/cakephp/tests/schema.php */
-$loader->loadInternalFile(ROOT . 'vendor/cakephp/cakephp/tests/schema.php');
+/** @uses tests/schema.php */
+$loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
 
 echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver ' . PHP_EOL;
 
