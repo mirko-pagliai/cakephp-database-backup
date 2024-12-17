@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.13 branch
+### 2.13.3
+* requires at least `symfony/process` `7.1.7`, due to this [security vulnerability](https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/1).
+
 ### 2.13.2
 * no longer needs `php-tools`;
 * removed useless `CommandTestCase`;
