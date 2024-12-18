@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\I18n\DateTime;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -44,11 +45,28 @@ class IndexCommandTest extends TestCase
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
-        debug($this->_out->messages());
-        $this->assertOutputRegExp('/\| \<info\>Filename\<\/info\>\s+\|\s+\<info\>Extension\<\/info\>\s+\|\s+\<info\>Compression\<\/info\>\s+\|\s+\<info\>Size\<\/info\>\s+\|\s+\<info\>Datetime\<\/info\>\s+\|/');
-        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.bz2\s+\| sql\.bz2\s+\| bzip2\s+\| [\d\.]+ (KB|Bytes)\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
-        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\.gz\s+\| sql\.gz\s+\| gzip\s+\| [\d\.]+ (KB|Bytes)\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
-        $this->assertOutputRegExp('/\| backup_test_\d+\.sql\s+\| sql\s+\|\s+\| [\d\.]+ (KB|Bytes)\s+\| \w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2} (A|P)M \|/');
+
+        /**
+         * Extracts and checks only the lines containing headers and data about backup file
+         */
+        $expectedHeaders = [
+            '<info>Filename</info>',
+            '<info>Extension</info>',
+            '<info>Compression</info>',
+            '<info>Size</info>',
+            '<info>Datetime</info>',
+        ];
+        $headers = preg_split(pattern: '/\s*\|\s*/', subject: $this->_out->messages()[7], flags: PREG_SPLIT_NO_EMPTY);
+        $this->assertSame($expectedHeaders, $headers);
+        $rows = array_map(
+            callback: fn (string $row): array  => preg_split(pattern: '/\s*\|\s*/', subject: $row, flags: PREG_SPLIT_NO_EMPTY),
+            array: array_slice($this->_out->messages(), 9, 3)
+        );
+        $this->assertMatchesRegularExpression('/^backup_test_\d+\.sql\.bz2$/', $rows[0][0]);
+        $this->assertSame('sql.bz2', $rows[0][1]);
+        $this->assertSame('bzip2', $rows[0][2]);
+        $this->assertMatchesRegularExpression('/^[\d\.]+ \w+$/', $rows[0][3]);
+        $this->assertMatchesRegularExpression('/^\w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2}/', $rows[0][4]);
         $this->assertErrorEmpty();
     }
 }
