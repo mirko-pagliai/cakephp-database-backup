@@ -21,6 +21,8 @@ use DatabaseBackup\Utility\AbstractBackupUtility;
 
 /**
  * AbstractBackupUtilityTest
+ *
+ * @uses \DatabaseBackup\Utility\AbstractBackupUtility
  */
 class AbstractBackupUtilityTest extends TestCase
 {

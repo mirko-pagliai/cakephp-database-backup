@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\ConsoleIo;
@@ -25,6 +25,8 @@ use DatabaseBackup\Utility\BackupImport;
 
 /**
  * ImportCommandTest class
+ *
+ * @uses \DatabaseBackup\Command\ImportCommand
  */
 class ImportCommandTest extends TestCase
 {
@@ -37,6 +39,7 @@ class ImportCommandTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecute(): void
@@ -57,15 +60,18 @@ class ImportCommandTest extends TestCase
     /**
      * Test for `execute()` method on stopped event
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void
     {
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
-        $Command = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
-        $Command->method('getBackupImport')->willReturn($this->createConfiguredMock(BackupImport::class, ['import' => false]));
-        $Command->run(['--filename' => createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+        $BackupImport = $this->createConfiguredMock(BackupImport::class, ['import' => false]);
+        $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
+        $ImportCommand->method('getBackupImport')->willReturn($BackupImport);
+        $ImportCommand->run(['--filename' => createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**

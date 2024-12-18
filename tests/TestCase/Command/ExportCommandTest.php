@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\ConsoleIo;
@@ -25,6 +25,8 @@ use DatabaseBackup\Utility\BackupExport;
 
 /**
  * ExportCommandTest class
+ *
+ * @uses \DatabaseBackup\Command\ExportCommand
  */
 class ExportCommandTest extends TestCase
 {
@@ -96,6 +98,7 @@ class ExportCommandTest extends TestCase
     /**
      * Test for `execute()` method, with `rotate` option
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteRotateOption(): void

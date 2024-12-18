@@ -20,6 +20,8 @@ use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * AbstractDriverTest
+ *
+ * @uses \DatabaseBackup\Driver\AbstractDriver
  */
 class AbstractDriverTest extends TestCase
 {

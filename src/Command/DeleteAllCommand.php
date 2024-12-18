@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.6.0
  */
+
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;

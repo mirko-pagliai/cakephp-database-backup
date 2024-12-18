@@ -12,18 +12,20 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\TestSuite\DriverTestCase;
 
 /**
  * PostgresTest class
+ *
+ * @uses \DatabaseBackup\Driver\Postgres
  */
 class PostgresTest extends DriverTestCase
 {
     /**
-     * Called before every test method
-     * @return void
+     * {@inheritDoc}
      */
     public function setUp(): void
     {

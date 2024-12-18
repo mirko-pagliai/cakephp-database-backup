@@ -22,6 +22,8 @@ use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * IndexCommandTest class
+ *
+ * @uses \DatabaseBackup\Command\IndexCommand
  */
 class IndexCommandTest extends TestCase
 {
@@ -57,8 +59,8 @@ class IndexCommandTest extends TestCase
             basename($filename),
             $this->getExtension($filename),
             $this->getCompression($filename) ?: '',
-            Number::toReadableSize(filesize($filename)),
-            DateTime::createFromTimestamp(filemtime($filename))->nice(),
+            Number::toReadableSize(filesize($filename) ?: 0),
+            DateTime::createFromTimestamp(filemtime($filename) ?: 0)->nice(),
             '',
         ], $backups));
         $rows = array_map(

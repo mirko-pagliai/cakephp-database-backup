@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\ORM\Table;
@@ -24,6 +24,9 @@ use DatabaseBackup\Utility\BackupImport;
  * BackupExportAndImportTest class.
  *
  * Performs tests common to the `BackupExport` and `BackupImport` classes.
+ *
+ * @uses \DatabaseBackup\Utility\BackupExport
+ * @uses \DatabaseBackup\Utility\BackupImport
  */
 class BackupExportAndImportTest extends TestCase
 {
@@ -64,8 +67,7 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * Called before every test method
-     * @return void
+     * {@inheritDoc}
      */
     public function setUp(): void
     {

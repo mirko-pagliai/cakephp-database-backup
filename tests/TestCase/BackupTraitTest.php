@@ -24,6 +24,8 @@ use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * BackupTraitTest class
+ *
+ * @uses \DatabaseBackup\BackupTrait
  */
 class BackupTraitTest extends TestCase
 {

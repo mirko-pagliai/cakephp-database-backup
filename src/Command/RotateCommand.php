@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.6.0
  */
+
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
@@ -35,7 +36,8 @@ class RotateCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
-        return $parser->setDescription(__d('database_backup', 'Rotates backups'))
+        return $parser
+            ->setDescription(__d('database_backup', 'Rotates backups'))
             ->addArgument('keep', [
                 'help' => __d('database_backup', 'Number of backups you want to keep. So, it will delete all backups that are older'),
                 'required' => true,
