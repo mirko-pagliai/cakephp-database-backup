@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
-use Cake\I18n\DateTime;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -33,16 +32,6 @@ class IndexCommandTest extends TestCase
      */
     public function testExecute(): void
     {
-        //With no backups
-        $this->exec('database_backup.index -v');
-        $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
-        $this->assertOutputContains('Backup files found: 0');
-        $this->assertErrorEmpty();
-
-        $this->_out = $this->_err = null;
-
         createSomeBackups();
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
@@ -61,7 +50,7 @@ class IndexCommandTest extends TestCase
         $headers = preg_split(pattern: '/\s*\|\s*/', subject: $this->_out->messages()[7], flags: PREG_SPLIT_NO_EMPTY);
         $this->assertSame($expectedHeaders, $headers);
         $rows = array_map(
-            callback: fn (string $row): array  => preg_split(pattern: '/\s*\|\s*/', subject: $row, flags: PREG_SPLIT_NO_EMPTY),
+            callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row, flags: PREG_SPLIT_NO_EMPTY) ?: [],
             array: array_slice($this->_out->messages(), 9, 3)
         );
         $this->assertMatchesRegularExpression('/^backup_test_\d+\.sql\.bz2$/', $rows[0][0]);
@@ -69,6 +58,21 @@ class IndexCommandTest extends TestCase
         $this->assertSame('bzip2', $rows[0][2]);
         $this->assertMatchesRegularExpression('/^[\d\.]+ \w+$/', $rows[0][3]);
         $this->assertMatchesRegularExpression('/^\w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2}/', $rows[0][4]);
+        $this->assertErrorEmpty();
+    }
+
+    /**
+     * @test
+     * @uses \DatabaseBackup\Command\IndexCommand::execute()
+     */
+    public function testExecuteWithNoFiles(): void
+    {
+        //With no backups
+        $this->exec('database_backup.index -v');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Connection: test');
+        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
+        $this->assertOutputContains('Backup files found: 0');
         $this->assertErrorEmpty();
     }
 }
