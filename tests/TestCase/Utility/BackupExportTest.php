@@ -42,7 +42,7 @@ class BackupExportTest extends TestCase
      * {@inheritDoc}
      * @throws \ReflectionException
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

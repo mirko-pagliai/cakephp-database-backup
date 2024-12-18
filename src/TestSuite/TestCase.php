@@ -28,10 +28,9 @@ abstract class TestCase extends BaseTestCase
     use BackupTrait;
 
     /**
-     * Called after every test method
-     * @return void
+     * @inheritDoc
      */
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

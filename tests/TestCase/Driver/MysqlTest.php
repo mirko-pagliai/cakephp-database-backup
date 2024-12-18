@@ -36,7 +36,7 @@ class MysqlTest extends DriverTestCase
      * {@inheritDoc}
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         if ($this->getConnection()->config()['scheme'] !== 'mysql') {
             $this->markTestSkipped('Skipping tests for mysql, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
