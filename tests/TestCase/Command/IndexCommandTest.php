@@ -41,6 +41,8 @@ class IndexCommandTest extends TestCase
         $this->assertOutputContains('Backup files found: 0');
         $this->assertErrorEmpty();
 
+        $this->_out = $this->_err = null;
+
         createSomeBackups();
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
