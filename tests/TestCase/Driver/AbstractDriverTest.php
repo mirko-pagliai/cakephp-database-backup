@@ -31,7 +31,9 @@ class AbstractDriverTest extends TestCase
      */
     public function testGetBinary(): void
     {
-        $Driver = $this->getMockForAbstractClass(AbstractDriver::class);
+        $Driver = $this->getMockBuilder(AbstractDriver::class)
+            ->onlyMethods([])
+            ->getMock();
         $this->assertNotEmpty($Driver->getBinary('mysql'));
 
         $this->expectExceptionMessage('Binary for `noExistingBinary` could not be found. You have to set its path manually');
