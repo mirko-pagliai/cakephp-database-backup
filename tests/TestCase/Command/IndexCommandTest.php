@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\I18n\DateTime;
+use Cake\I18n\Number;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -32,7 +34,7 @@ class IndexCommandTest extends TestCase
      */
     public function testExecute(): void
     {
-        createSomeBackups();
+        $backups = createSomeBackups();
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
@@ -49,16 +51,33 @@ class IndexCommandTest extends TestCase
         ];
         $headers = preg_split(pattern: '/\s*\|\s*/', subject: $this->_out->messages()[7], flags: PREG_SPLIT_NO_EMPTY);
         $this->assertSame($expectedHeaders, $headers);
+
+        $expectedRows = array_reverse(array_map(fn (string $filename): array => [
+            '',
+            basename($filename),
+            $this->getExtension($filename),
+            $this->getCompression($filename) ?: '',
+            Number::toReadableSize(filesize($filename)),
+            DateTime::createFromTimestamp(filemtime($filename))->nice(),
+            '',
+        ], $backups));
         $rows = array_map(
-            callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row, flags: PREG_SPLIT_NO_EMPTY) ?: [],
+            callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row) ?: [],
             array: array_slice($this->_out->messages(), 9, 3)
         );
-        $this->assertMatchesRegularExpression('/^backup_test_\d+\.sql\.bz2$/', $rows[0][0]);
-        $this->assertSame('sql.bz2', $rows[0][1]);
-        $this->assertSame('bzip2', $rows[0][2]);
-        $this->assertMatchesRegularExpression('/^[\d\.]+ \w+$/', $rows[0][3]);
-        $this->assertMatchesRegularExpression('/^\w{3} \d{1,2}, \d{4}, \d{1,2}:\d{2}/', $rows[0][4]);
-        $this->assertErrorEmpty();
+        $this->assertSame($expectedRows, $rows);
+
+        $this->_out = $this->_err = null;
+
+        //With `reverse` option
+        $this->exec('database_backup.index -v --reverse');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Backup files found: 3');
+        $rows = array_map(
+            callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row) ?: [],
+            array: array_slice($this->_out->messages(), 9, 3)
+        );
+        $this->assertSame(array_reverse($expectedRows), $rows);
     }
 
     /**

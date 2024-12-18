@@ -36,7 +36,12 @@ class IndexCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
-        return $parser->setDescription(__d('database_backup', 'Lists database backups'));
+        return $parser
+            ->setDescription(__d('database_backup', 'Lists database backups'))
+            ->addOption('reverse', [
+                'boolean' => true,
+                'help' => __d('database_backup', 'List database backups in reverse order (oldest first, then newest)'),
+            ]);
     }
 
     /**
@@ -64,12 +69,18 @@ class IndexCommand extends Command
             __d('database_backup', 'Datetime'),
         ];
 
-        $rows = $backups->map(fn (array $backup): array => array_merge($backup, [
-           'compression' => $backup['compression'] ?: '',
-           'datetime' => $backup['datetime']->nice(),
-           'size' => Number::toReadableSize($backup['size']),
-        ]));
+        $rows = $backups
+            ->map(fn (array $backup): array => array_merge($backup, [
+               'compression' => $backup['compression'] ?: '',
+               'datetime' => $backup['datetime']->nice(),
+               'size' => Number::toReadableSize($backup['size']),
+            ]))
+            ->toList();
 
-        $io->helper('table')->output(array_merge([$headers], $rows->toList()));
+        if ($args->getOption('reverse')) {
+            $rows = array_reverse($rows);
+        }
+
+        $io->helper('table')->output(array_merge([$headers], $rows));
     }
 }

@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.3
+* added `--reverse` option for the `IndexCommand` ([issue #96](https://github.com/mirko-pagliai/cakephp-database-backup/issues/96));
 * the `BackupTrait::getAbsolutePath()` method is now able to recognize a path relative to its `ROOT`, so as to be able
   to take advantage of the autocompletion already offered by the bash console when, for example, you use the `import`
   command from the `ROOT` and the backup directory is inside it;
