@@ -8,6 +8,7 @@
 * fixed a bug for `IndexCommand`, data was not sorted correctly on individual rows. Improved testing;
 * slightly improved backup file sorting for `BackupManager::index()` method (this is useful when you have a lot of files);
 * requires at least `symfony/process` `7.1.7`, due to this [security vulnerability](https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/1);
+* fixed some errors in localizations of some strings;
 * replaced deprecated `getMockForAbstractClass()` method in tests.
 
 ### 2.13.2

@@ -45,7 +45,7 @@ class BackupManager
     {
         $filename = self::getAbsolutePath($filename);
         if (!is_writable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `' . $filename . '` is not writable'));
+            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', $filename));
         }
         (new Filesystem())->remove($filename);
 
@@ -120,7 +120,7 @@ class BackupManager
     {
         $filename = self::getAbsolutePath($backup);
         if (!is_readable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `' . $filename . '` is not readable'));
+            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }
         $server = env('SERVER_NAME', 'localhost');
 
