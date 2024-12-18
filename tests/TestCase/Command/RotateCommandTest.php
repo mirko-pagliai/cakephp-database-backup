@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
@@ -20,6 +20,8 @@ use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * RotateCommandTest class
+ *
+ * @uses \DatabaseBackup\Command\RotateCommand
  */
 class RotateCommandTest extends TestCase
 {
@@ -27,6 +29,7 @@ class RotateCommandTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\RotateCommand::execute()
      */
     public function testExecute(): void

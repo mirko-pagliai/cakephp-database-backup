@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility
  */
+
 namespace DatabaseBackup\Utility;
 
 use LogicException;
@@ -34,7 +35,7 @@ class BackupImport extends AbstractBackupUtility
     {
         $filename = $this->getAbsolutePath($filename);
         if (!is_readable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `' . $filename . '` is not readable'));
+            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }
 
         if (!$this->getExtension($filename)) {

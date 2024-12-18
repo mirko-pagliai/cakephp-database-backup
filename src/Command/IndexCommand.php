@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.6.0
  */
+
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
@@ -35,7 +36,12 @@ class IndexCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
-        return $parser->setDescription(__d('database_backup', 'Lists database backups'));
+        return $parser
+            ->setDescription(__d('database_backup', 'Lists database backups'))
+            ->addOption('reverse', [
+                'boolean' => true,
+                'help' => __d('database_backup', 'List database backups in reverse order (oldest first, then newest)'),
+            ]);
     }
 
     /**
@@ -43,7 +49,6 @@ class IndexCommand extends Command
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
@@ -51,6 +56,7 @@ class IndexCommand extends Command
 
         $backups = BackupManager::index();
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
+
         if ($backups->isEmpty()) {
             return;
         }
@@ -62,11 +68,19 @@ class IndexCommand extends Command
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
         ];
-        $cells = $backups->map(fn (array $backup): array => [
-           'compression' => $backup['compression'] ?: '',
-           'datetime' => $backup['datetime']->nice(),
-           'size' => Number::toReadableSize($backup['size']),
-       ] + $backup);
-        $io->helper('table')->output(array_merge([$headers], $cells->toList()));
+
+        $rows = $backups
+            ->map(fn (array $backup): array => array_merge($backup, [
+               'compression' => $backup['compression'] ?: '',
+               'datetime' => $backup['datetime']->nice(),
+               'size' => Number::toReadableSize($backup['size']),
+            ]))
+            ->toList();
+
+        if ($args->getOption('reverse')) {
+            $rows = array_reverse($rows);
+        }
+
+        $io->helper('table')->output(array_merge([$headers], $rows));
     }
 }

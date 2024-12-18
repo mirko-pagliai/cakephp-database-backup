@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpDocMissingThrowsInspection, PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\Driver\AbstractDriver;
@@ -22,6 +22,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * MysqlTest class
+ *
+ * @uses \DatabaseBackup\Driver\Mysql
  */
 class MysqlTest extends DriverTestCase
 {
@@ -31,10 +33,10 @@ class MysqlTest extends DriverTestCase
     protected AbstractDriver $Driver;
 
     /**
-     * Called before every test method
-     * @return void
+     * {@inheritDoc}
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         if ($this->getConnection()->config()['scheme'] !== 'mysql') {
             $this->markTestSkipped('Skipping tests for mysql, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
@@ -47,6 +49,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::afterExport()
      */
     public function testAfterExport(): void
@@ -65,6 +68,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::afterImport()
      */
     public function testAfterImport(): void
@@ -121,6 +125,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::writeAuthFile()
      */
     public function testWriteAuthFile(): void

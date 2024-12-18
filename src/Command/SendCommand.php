@@ -33,7 +33,8 @@ class SendCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
-        return $parser->setDescription(__d('database_backup', 'Send a database backup via mail'))
+        return $parser
+            ->setDescription(__d('database_backup', 'Send a database backup via mail'))
             ->addArguments([
                 'filename' => [
                     'help' => __d('database_backup', 'Filename. It can be an absolute path'),

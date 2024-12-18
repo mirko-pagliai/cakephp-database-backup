@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.0.0
  */
+
 namespace DatabaseBackup\Driver;
 
 use Cake\Core\Configure;
@@ -71,7 +72,7 @@ abstract class AbstractDriver implements EventListenerInterface
     {
         // @codeCoverageIgnoreStart
         if (!in_array($type, ['export', 'import'])) {
-            throw new LogicException(__d('database_backup', '`$type` parameter should be `export` or `import`'));
+            throw new LogicException(__d('database_backup', '`{0}` parameter should be `{1}` or `{2}`', '$type', 'export', 'import'));
         }
         // @codeCoverageIgnoreEnd
         $driverName = strtolower($this->getDriverName());

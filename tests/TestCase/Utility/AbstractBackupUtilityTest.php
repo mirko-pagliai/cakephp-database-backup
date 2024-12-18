@@ -21,28 +21,26 @@ use DatabaseBackup\Utility\AbstractBackupUtility;
 
 /**
  * AbstractBackupUtilityTest
+ *
+ * @uses \DatabaseBackup\Utility\AbstractBackupUtility
  */
 class AbstractBackupUtilityTest extends TestCase
 {
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\AbstractBackupUtility::getDriver()
      */
     public function testGetDriver(): void
     {
-        $Utility = $this->getMockForAbstractClass(AbstractBackupUtility::class);
+        $Utility = $this->getMockBuilder(AbstractBackupUtility::class)
+            ->getMock();
         $this->assertInstanceOf(AbstractDriver::class, $Utility->getDriver());
 
         $this->expectExceptionMessage('The `noExistingDriver` driver does not exist');
-        $Utility = $this->getMockForAbstractClass(
-            AbstractBackupUtility::class,
-            [],
-            '',
-            true,
-            true,
-            true,
-            ['getDriverName']
-        );
+        $Utility = $this->getMockBuilder(AbstractBackupUtility::class)
+            ->onlyMethods(['getDriverName', 'filename'])
+            ->getMock();
         $Utility->method('getDriverName')->willReturn('noExistingDriver');
         $Utility->getDriver();
     }

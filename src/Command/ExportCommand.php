@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.6.0
  */
+
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
@@ -37,7 +38,8 @@ class ExportCommand extends Command
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
-        return $parser->setDescription(__d('database_backup', 'Exports a database backup'))
+        return $parser
+            ->setDescription(__d('database_backup', 'Exports a database backup'))
             ->addOptions([
                 'compression' => [
                     'choices' => $this->getValidCompressions(),

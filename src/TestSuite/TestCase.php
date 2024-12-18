@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.0.0
  */
+
 namespace DatabaseBackup\TestSuite;
 
 use Cake\TestSuite\TestCase as BaseTestCase;
@@ -27,10 +28,9 @@ abstract class TestCase extends BaseTestCase
     use BackupTrait;
 
     /**
-     * Called after every test method
-     * @return void
+     * @inheritDoc
      */
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

@@ -12,12 +12,14 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * A trait that provides some methods used by all other classes
@@ -36,7 +38,11 @@ trait BackupTrait
             return $path;
         }
 
-        return rtrim(Configure::readOrFail('DatabaseBackup.target'), DS) . DS . $path;
+        if (is_readable(Path::makeAbsolute($path, ROOT))) {
+            return Path::makeAbsolute($path, ROOT);
+        }
+
+        return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }
 
     /**

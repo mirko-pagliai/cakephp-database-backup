@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
@@ -26,6 +26,8 @@ use Symfony\Component\Process\Process;
 
 /**
  * BackupExportTest class
+ *
+ * @uses \DatabaseBackup\Utility\BackupExport
  */
 class BackupExportTest extends TestCase
 {
@@ -37,10 +39,10 @@ class BackupExportTest extends TestCase
     protected BackupExport $BackupExport;
 
     /**
-     * Called before every test method
-     * @return void
+     * {@inheritDoc}
+     * @throws \ReflectionException
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -142,6 +144,7 @@ class BackupExportTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExport(): void
@@ -179,6 +182,7 @@ class BackupExportTest extends TestCase
      * Test for `export()` method, with a different chmod
      * @requires OS Linux
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportWithDifferentChmod(): void
@@ -194,6 +198,8 @@ class BackupExportTest extends TestCase
     /**
      * Test for `export()` method. Export is stopped by the `Backup.beforeExport` event (implemented by driver)
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportStoppedByBeforeExport(): void
@@ -209,6 +215,8 @@ class BackupExportTest extends TestCase
     /**
      * Test for `export()` method, on failure (error for `Process`)
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportOnFailure(): void
@@ -226,6 +234,8 @@ class BackupExportTest extends TestCase
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws \ReflectionException
      */
     public function testExportExceedingTimeout(): void
     {

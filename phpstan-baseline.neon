@@ -1,9 +1,9 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Property DatabaseBackup\\\\Test\\\\TestCase\\\\BackupTraitTest\\:\\:\\$Trait has no type specified\\.$#"
-			count: 1
-			path: tests/TestCase/BackupTraitTest.php
+			message: "#^Cannot call method messages\\(\\) on Cake\\\\Console\\\\TestSuite\\\\StubConsoleOutput\\|null\\.$#"
+			count: 3
+			path: tests/TestCase/Command/IndexCommandTest.php
 
 		-
 			message: "#^Access to an undefined property DatabaseBackup\\\\Utility\\\\BackupExport\\:\\:\\$noExistingProperty\\.$#"

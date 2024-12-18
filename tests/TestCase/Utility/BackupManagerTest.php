@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -13,6 +12,7 @@ declare(strict_types=1);
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
@@ -26,6 +26,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * BackupManagerTest class
+ *
+ * @uses \DatabaseBackup\Utility\BackupManager
  */
 class BackupManagerTest extends TestCase
 {
@@ -44,7 +46,7 @@ class BackupManagerTest extends TestCase
     /**
      * @inheritDoc
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -54,6 +56,7 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::delete()
      */
     public function testDelete(): void
@@ -72,6 +75,7 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
      */
     public function testDeleteAll(): void
@@ -86,6 +90,7 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
     public function testIndex(): void
@@ -118,6 +123,7 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
     public function testRotate(): void
@@ -154,6 +160,7 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
+     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::send()
      */
     public function testSend(): void

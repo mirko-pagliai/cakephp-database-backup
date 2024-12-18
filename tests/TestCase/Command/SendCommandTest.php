@@ -1,5 +1,4 @@
 <?php
-/** @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
 /**
@@ -21,6 +20,8 @@ use DatabaseBackup\TestSuite\TestCase;
 
 /**
  * SendCommandTest class
+ *
+ * @uses \DatabaseBackup\Command\SendCommand
  */
 class SendCommandTest extends TestCase
 {

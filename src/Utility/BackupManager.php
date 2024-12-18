@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility
  */
+
 namespace DatabaseBackup\Utility;
 
 use Cake\Collection\Collection;
@@ -44,7 +45,7 @@ class BackupManager
     {
         $filename = self::getAbsolutePath($filename);
         if (!is_writable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `' . $filename . '` is not writable'));
+            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', $filename));
         }
         (new Filesystem())->remove($filename);
 
@@ -73,16 +74,18 @@ class BackupManager
         $Finder->files()
             ->in(Configure::readOrFail('DatabaseBackup.target'))
             ->name('/\.sql(\.(gz|bz2))?$/')
-            ->sortByModifiedTime()
-            ->reverseSorting();
+            //Sorts in descending order by last modified date
+            ->sort(fn (SplFileInfo $a, SplFileInfo $b): bool => $a->getMTime() < $b->getMTime());
 
-        return (new Collection($Finder))->map(fn (SplFileInfo $File): array => [
-            'filename' => $File->getFilename(),
-            'extension' => self::getExtension($File->getFilename()),
-            'compression' => self::getCompression($File->getFilename()),
-            'size' => $File->getSize(),
-            'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
-        ])->compile(false);
+        return (new Collection($Finder))
+            ->map(fn (SplFileInfo $File): array => [
+                'filename' => $File->getFilename(),
+                'extension' => self::getExtension($File->getFilename()),
+                'compression' => self::getCompression($File->getFilename()),
+                'size' => $File->getSize(),
+                'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
+            ])
+            ->compile(false);
     }
 
     /**
@@ -117,7 +120,7 @@ class BackupManager
     {
         $filename = self::getAbsolutePath($backup);
         if (!is_readable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `' . $filename . '` is not readable'));
+            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }
         $server = env('SERVER_NAME', 'localhost');
 

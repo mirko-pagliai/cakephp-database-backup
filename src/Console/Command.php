@@ -13,6 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.6.0
  */
+
 namespace DatabaseBackup\Console;
 
 use Cake\Console\Arguments;
@@ -32,7 +33,6 @@ class Command extends BaseCommand
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

@@ -9,18 +9,20 @@
 	cacheDirectory=".phpunit.cache"
 	>
 
-  <testsuites>
-    <testsuite name="cakephp-database-backup Test Cases">
-      <directory>./tests/TestCase</directory>
-    </testsuite>
-  </testsuites>
-<extensions>
-    <bootstrap class="Cake\TestSuite\Fixture\Extension\PHPUnitExtension"/>
-</extensions>
-  <!-- configure code coverage -->
-  <source>
-    <include>
-      <directory suffix=".php">./src/</directory>
-    </include>
-  </source>
+    <testsuites>
+        <testsuite name="cakephp-database-backup Test Cases">
+            <directory>./tests/TestCase</directory>
+        </testsuite>
+    </testsuites>
+
+    <extensions>
+        <bootstrap class="Cake\TestSuite\Fixture\Extension\PHPUnitExtension"/>
+    </extensions>
+
+    <!-- configure code coverage -->
+    <source>
+        <include>
+          <directory suffix=".php">./src/</directory>
+        </include>
+    </source>
 </phpunit>

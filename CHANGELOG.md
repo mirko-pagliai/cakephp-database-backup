@@ -1,5 +1,16 @@
 # 2.x branch
 ## 2.13 branch
+### 2.13.3
+* added `--reverse` option for the `IndexCommand` ([issue #96](https://github.com/mirko-pagliai/cakephp-database-backup/issues/96));
+* the `BackupTrait::getAbsolutePath()` method is now able to recognize a path relative to its `ROOT`, so as to be able
+  to take advantage of the autocompletion already offered by the bash console when, for example, you use the `import`
+  command from the `ROOT` and the backup directory is inside it;
+* fixed a bug for `IndexCommand`, data was not sorted correctly on individual rows. Improved testing;
+* slightly improved backup file sorting for `BackupManager::index()` method (this is useful when you have a lot of files);
+* requires at least `symfony/process` `7.1.7`, due to this [security vulnerability](https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/1);
+* fixed some errors in localizations of some strings;
+* replaced deprecated `getMockForAbstractClass()` method in tests.
+
 ### 2.13.2
 * no longer needs `php-tools`;
 * removed useless `CommandTestCase`;

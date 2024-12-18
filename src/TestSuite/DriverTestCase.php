@@ -14,6 +14,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  * @since       2.0.0
  */
+
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
@@ -35,7 +36,7 @@ abstract class DriverTestCase extends TestCase
      * Called before every test method
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
