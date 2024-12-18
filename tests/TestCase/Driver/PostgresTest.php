@@ -25,7 +25,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class PostgresTest extends DriverTestCase
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function setUp(): void
     {

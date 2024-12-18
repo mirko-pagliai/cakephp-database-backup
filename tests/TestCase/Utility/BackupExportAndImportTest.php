@@ -67,7 +67,7 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function setUp(): void
     {

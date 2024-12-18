@@ -25,7 +25,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 class SqliteTest extends DriverTestCase
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function setUp(): void
     {
