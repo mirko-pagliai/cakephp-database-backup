@@ -2,7 +2,8 @@
 ## 2.13 branch
 ### 2.13.4
 * the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been
-    removed and older versions are available as tags).
+    removed and older versions are available as tags);
+* updated `README` file, updated links to CakePHP documentation.
 
 ### 2.13.3
 * added `--reverse` option for the `IndexCommand` ([issue #96](https://github.com/mirko-pagliai/cakephp-database-backup/issues/96));
