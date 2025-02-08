@@ -3,7 +3,7 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
 [![CI](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml/badge.svg)](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup/graph/badge.svg?token=nkaJk4nvus)](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/cd12284c1047431c8149e09fa56536bf)](https://www.codacy.com/gh/mirko-pagliai/cakephp-database-backup/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mirko-pagliai/cakephp-database-backup&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/cd12284c1047431c8149e09fa56536bf)](https://app.codacy.com/gh/mirko-pagliai/cakephp-database-backup/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/badge)](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup)
 
 *DatabaseBackup* is a CakePHP plugin to export, import and manage database backups.
@@ -16,7 +16,9 @@ even a coffee is enough! Thank you.
 [![Make a donation](https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_carte.jpg)](//paypal.me/mirkopagliai)
 
 ## Requirements
+
 *DatabaseBackup* requires:
+
 *   `mysql` and `mysqldump` for *MySql* databases;
 *   `pg_dump` and `pg_restore` for *Postgres* databases;
 *   `sqlite3` for *Sqlite* databases.
@@ -31,6 +33,7 @@ permissions (for example, for `mysql` the user must have the `LOCK TABLES`
 permission).
 
 ## Installation
+
 You can install the plugin via composer:
 
 ```bash
@@ -58,7 +61,7 @@ If you want to use a different directory, read the [Configuration](#configuratio
 ### Installation on older CakePHP and PHP versions
 
 Compared to the current installation requirements, some tags are provided for those using older versions of CakePHP and
-PHP (until February 7, 2025, they were available as branches, now only as tags):
+PHP (*until February 7, 2025, they were available as branches, now only as tags*):
 
 - tag [`cakephp4`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp4), which requires at
 least PHP `>=7.4.0` and CakePHP `^4.0`.   
@@ -79,6 +82,7 @@ correctly so that it can send emails. For more information on how to configure
 your application, see the [Cookbook](https://book.cakephp.org/5/en/core-libraries/email.html#configuring-transports).
 
 ## How to use
+
 See our wiki:
 *   [Export backups as cron jobs](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Export-backups-as-cron-jobs)
 *   [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility)
@@ -89,16 +93,22 @@ See our wiki:
 And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
 
 ## Testing
-Tests are run for only one driver at a time, by default `mysql`.
-To choose another driver to use, you can set the `driver_test` environment variable before running `phpunit`.
+
+Normally tests are only run on one driver at a time, by default `mysql`.
+
+To run tests with another driver, you can use the scripts defined in `composer.json`:
 
 For example:
 ```bash
-driver_test=sqlite vendor/bin/phpunit
-driver_test=postgres vendor/bin/phpunit
+$ composer test
+$ composer test-postgres
+$ composer test-sqlite
 ```
 
-Alternatively, you can set the `db_dsn` environment variable, indicating the connection parameters. In this case, the driver type will still be detected automatically.
+Instead, to run tests with all drivers, you can use the `test-all` script (individual tests are chained together).
+
+For individual drivers, alternatively you can set the `db_dsn` environment variable, indicating the connection
+  parameters. In this case, the driver type will still be detected automatically.
 
 For example:
 ```bash
@@ -106,6 +116,7 @@ db_dsn=sqlite:///' . TMP . 'example.sq3 vendor/bin/phpunit
 ```
 
 ## Versioning
+
 For transparency and insight into our release cycle and to maintain backward
 compatibility, *DatabaseBackup* will be maintained under the
 [Semantic Versioning guidelines](http://semver.org).

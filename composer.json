@@ -47,15 +47,22 @@
         ],
         "cs-check": "phpcs --colors -p",
         "cs-fix": "phpcbf --colors -p",
-        "test": "rm -f -r /tmp/cake* && phpunit && driver_test=sqlite phpunit && driver_test=postgres phpunit --colors=always",
-        "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
         "phpstan": "phpstan analyse",
         "psalm": "psalm --php-version=8.2",
         "stan": [
             "@phpstan",
             "@psalm"
         ],
-        "update-lowest": "@composer update --prefer-lowest"
+        "update-lowest": "@composer update --prefer-lowest",
+        "test-all": [
+            "@test",
+            "@test-postgres",
+            "@test-sqlite"
+        ],
+        "test": "phpunit --colors=always",
+        "test-postgres": "driver_test=postgres phpunit --colors=always",
+        "test-sqlite": "driver_test=sqlite phpunit --colors=always",
+        "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage"
     },
     "config": {
         "allow-plugins": {
