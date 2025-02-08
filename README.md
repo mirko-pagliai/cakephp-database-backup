@@ -86,7 +86,7 @@ See our wiki:
 *   [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
 *   [How to use the BackupShell](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupShell)
 
-And refer to our [API](//mirko-pagliai.github.io/cakephp-database-backup).
+Before opening an issue, check this list of [common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues).
 
 ## Testing
 
