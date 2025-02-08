@@ -15,14 +15,6 @@ even a coffee is enough! Thank you.
 
 [![Make a donation](https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_carte.jpg)](//paypal.me/mirkopagliai)
 
-  * [Requirements](#requirements)
-  * [Installation](#installation)
-    + [Installation on older CakePHP and PHP versions](#installation-on-older-cakephp-and-php-versions)
-  * [Configuration](#configuration)
-  * [How to use](#how-to-use)
-  * [Testing](#testing)
-  * [Versioning](#versioning)
-
 ## Requirements
 *DatabaseBackup* requires:
 *   `mysql` and `mysqldump` for *MySql* databases;
