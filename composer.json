@@ -45,9 +45,9 @@
             "@test",
             "@stan"
         ],
-        "cs-check": "phpcs --standard=phpcs.xml",
-        "cs-fix": "phpcbf --standard=phpcs.xml",
-        "test": "rm -f -r /tmp/cake* && phpunit && driver_test=sqlite phpunit && driver_test=postgres phpunit",
+        "cs-check": "phpcs --colors -p",
+        "cs-fix": "phpcbf --colors -p",
+        "test": "rm -f -r /tmp/cake* && phpunit && driver_test=sqlite phpunit && driver_test=postgres phpunit --colors=always",
         "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
         "phpstan": "phpstan analyse",
         "psalm": "psalm --php-version=8.2",
