@@ -15,71 +15,13 @@ even a coffee is enough! Thank you.
 
 [![Make a donation](https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_carte.jpg)](//paypal.me/mirkopagliai)
 
+  * [Requirements](#requirements)
   * [Installation](#installation)
     + [Installation on older CakePHP and PHP versions](#installation-on-older-cakephp-and-php-versions)
-      - [For PHP 7.4 and CakePHP 4.0 later](#for-php-74-and-cakephp-40-later)
-      - [For CakePHP 3.0 and PHP 5.6 or later](#for-cakephp-30-and-php-56-or-later)
-  * [Requirements](#requirements)
   * [Configuration](#configuration)
   * [How to use](#how-to-use)
   * [Testing](#testing)
   * [Versioning](#versioning)
-
-## Installation
-You can install the plugin via composer:
-
-```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
-```
-
-Then you have to load the plugin. For more information on how to load the plugin,
-please refer to the [Cookbook](//book.cakephp.org/4.0/en/plugins.html#loading-a-plugin).
-
-Simply, you can execute the shell command to enable the plugin:
-```bash
-bin/cake plugin load DatabaseBackup
-```
-This would update your application's bootstrap method.
-
-By default the plugin uses the `APP/backups` directory to save the backups
-files. So you have to create the directory and make it writable:
-
-```bash
-$ mkdir backups/ && chmod 775 backups/
-```
-
-If you want to use a different directory, read the [Configuration](#configuration) section.
-
-### Installation on older CakePHP and PHP versions
-Recent packages and the master branch require at least CakePHP 5.0 and PHP 8.1 and the current development of the code
-is based on these and later versions of CakePHP and PHP.  
-However, there are still some branches compatible with previous versions of PHP.
-
-#### For PHP 7.4 and CakePHP 4.0 later
-Instead, the [cakephp4](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp4) branch requires at least PHP
-`>=7.4.0` and CakePHP `^4.0`.
-
-In this case, you can install the package as well:
-```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp4
-```
-
-Note that the `cakephp4` branch will no longer be updated as of January 05, 2024,
-except for security patches, and it matches the
-[2.12.3](//github.com/mirko-pagliai/cakephp-database-backup/releases/tag/2.12.3) version.
-
-#### For CakePHP 3.0 and PHP 5.6 or later
-Instead, the [cakephp3](//github.com/mirko-pagliai/cakephp-database-backup/tree/cakephp3) branch requires at least PHP
-`>=5.6 <7.4` and CakePHP `^3.5.1`.
-
-In this case, you can install the package as well:
-```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup:dev-cakephp3
-```
-
-Note that the `cakephp3` branch will no longer be updated as of April 29, 2021,
-except for security patches, and it matches the
-[2.8.5](//github.com/mirko-pagliai/cakephp-database-backup/releases/tag/2.8.5) version.
 
 ## Requirements
 *DatabaseBackup* requires:
@@ -95,6 +37,46 @@ The installation of these binaries may vary depending on your operating system.
 Please forward, remember that the database user must have the correct
 permissions (for example, for `mysql` the user must have the `LOCK TABLES`
 permission).
+
+## Installation
+You can install the plugin via composer:
+
+```bash
+$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
+```
+
+Then you have to load the plugin. For more information on how to load the plugin,
+please refer to the [Cookbook](//book.cakephp.org/4.0/en/plugins.html#loading-a-plugin).
+
+Simply, you can execute the shell command to enable the plugin:
+```bash
+$ bin/cake plugin load DatabaseBackup
+```
+This would update your application's bootstrap method.
+
+By default, the plugin uses the `APP/backups` directory to save the backups
+files. So you have to create the directory and make it writable:
+
+```bash
+$ mkdir backups/ && chmod 775 backups/
+```
+
+If you want to use a different directory, read the [Configuration](#configuration) section.
+
+### Installation on older CakePHP and PHP versions
+
+Compared to the current installation requirements, some tags are provided for those using older versions of CakePHP and
+PHP (until February 7, 2025, they were available as branches, now only as tags):
+
+- tag [`cakephp4`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp4), which requires at
+least PHP `>=7.4.0` and CakePHP `^4.0`.   
+  This tag no longer receives any updates as of January 5, 2024, and roughly coincides with what `2.12.3` version was.
+- tag [`cakephp3`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp3), which requires at
+least PHP `>=5.6 <7.4` and CakePHP `^3.5.1`.   
+  This tag no longer receives any updates as of April 29, 2021, and roughly coincides with what `2.8.5` version was.
+
+You can freely use these tags, even by downloading the source codes from the attached assets, but their functioning is
+no longer guaranteed, especially regarding old dependencies that may no longer be available.
 
 ## Configuration
 The plugin uses some configuration parameters. See our wiki:

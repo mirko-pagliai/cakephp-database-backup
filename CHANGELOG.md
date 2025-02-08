@@ -1,5 +1,9 @@
 # 2.x branch
 ## 2.13 branch
+### 2.13.4
+* the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been
+    removed and older versions are available as tags).
+
 ### 2.13.3
 * added `--reverse` option for the `IndexCommand` ([issue #96](https://github.com/mirko-pagliai/cakephp-database-backup/issues/96));
 * the `BackupTrait::getAbsolutePath()` method is now able to recognize a path relative to its `ROOT`, so as to be able
