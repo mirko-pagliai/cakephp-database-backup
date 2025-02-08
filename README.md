@@ -28,10 +28,6 @@ also required.
 
 The installation of these binaries may vary depending on your operating system.
 
-Please forward, remember that the database user must have the correct
-permissions (for example, for `mysql` the user must have the `LOCK TABLES`
-permission).
-
 ## Installation
 
 You can install the plugin via composer:
