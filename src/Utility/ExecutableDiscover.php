@@ -47,7 +47,7 @@ class ExecutableDiscover
         $ExecutableFinder = $this->getExecutableFinder();
         $executable = $ExecutableFinder->find(name: $name);
 
-        if (self::ALIASES[$name]) {
+        if (isset(self::ALIASES[$name])) {
             return $ExecutableFinder->find(name: self::ALIASES[$name], default: $executable);
         }
 

@@ -24,6 +24,7 @@ class ExecutableDiscoverTest extends TestCase
     {
         $ExecutableDiscover = new ExecutableDiscover();
         $result = $ExecutableDiscover->find('gzip');
+        $this->assertIsString($result);
         $this->assertStringEndsWith('gzip', $result);
     }
 
@@ -75,7 +76,7 @@ class ExecutableDiscoverTest extends TestCase
         $ExecutableFinder
             ->expects($this->any())
             ->method('find')
-            ->willReturnCallback(function (string $name, string $default = null): ?string {
+            ->willReturnCallback(function (string $name, ?string $default = null): ?string {
                 if (in_array($name, ['mariadb', 'mariadb-dump'])) {
                     return $default;
                 }
