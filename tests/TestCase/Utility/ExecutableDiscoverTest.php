@@ -7,6 +7,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\ExecutableDiscover;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
@@ -21,52 +22,74 @@ class ExecutableDiscoverTest extends TestCase
     #[Test]
     public function testFind(): void
     {
-        $BinaryDiscover = new ExecutableDiscover();
-        $result = $BinaryDiscover->find('gzip');
+        $ExecutableDiscover = new ExecutableDiscover();
+        $result = $ExecutableDiscover->find('gzip');
         $this->assertStringEndsWith('gzip', $result);
-
-        $result = $BinaryDiscover->find('mysqldump');
-        $this->assertStringEndsWith('mariadb-dump', $result);
     }
 
     /**
-     * Tests for `find()` method, with find `mariadb` and `mariadb-dump` executables unavailable (so `mysql` and
-     *  `mysql-dump` will be returned instead).
+     * Tests for `find()` method.
+     *
+     * In this case `mariadb` and `mariadb-dump` executables are available, so these will always be returned, even when
+     *  trying to find `mysql` and `mysql-dump`.
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\ExecutableDiscover::find()
      */
     #[Test]
-    public function testFindMariaDbAndMariaDbDumpNotAvailable(): void
+    #[TestWith(['mysql', '/usr/bin/mariadb'])]
+    #[TestWith(['mysql-dump', '/usr/bin/mariadb-dump'])]
+    public function testFindMariaDbAndMariaDbDumpAvailable(string $name, string $expectedExecutable): void
     {
-        /**
-         * This `ExecutableFinder` mock cannot find `mariadb` and `mariadb-dump` executables.
-         * It will always return `mysql` and `mysql-dump` executables instead.
-         */
         $ExecutableFinder = $this->createPartialMock(ExecutableFinder::class, ['find']);
         $ExecutableFinder
             ->expects($this->any())
             ->method('find')
-            ->willReturnCallback(function (string $name): ?string {
-                if (in_array($name, ['mariadb', 'mariadb-dump'])) {
-                    return null;
-                }
+            ->willReturnCallback(fn (string $name): string => '/usr/bin/' . $name);
 
-                $OriginalExecutableFinder = new ExecutableFinder();
-
-                return $OriginalExecutableFinder->find($name);
-            });
-
-        $BinaryDiscover = $this->createPartialMock(ExecutableDiscover::class, ['getExecutableFinder']);
-        $BinaryDiscover
-            ->expects($this->exactly(2))
+        $ExecutableDiscover = $this->createPartialMock(ExecutableDiscover::class, ['getExecutableFinder']);
+        $ExecutableDiscover
+            ->expects($this->once())
             ->method('getExecutableFinder')
             ->willReturn($ExecutableFinder);
 
-        $result = $BinaryDiscover->find('mysql');
-        $this->assertStringEndsWith('mysql', $result);
+        $result = $ExecutableDiscover->find($name);
+        $this->assertSame($expectedExecutable, $result);
+    }
 
-        $result = $BinaryDiscover->find('mysqldump');
-        $this->assertStringEndsWith('mysqldump', $result);
+    /**
+     * Tests for `find()` method.
+     *
+     * In this case `mariadb` and `mariadb-dump` executables are NOT available, so the executables of `mysql` and
+     *  `mysql-dump` will always be returned.
+     *
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\ExecutableDiscover::find()
+     */
+    #[Test]
+    #[TestWith(['mysql', '/usr/bin/mysql'])]
+    #[TestWith(['mysql-dump', '/usr/bin/mysql-dump'])]
+    public function testFindMariaDbAndMariaDbDumpNotAvailable(string $name, string $expectedExecutable): void
+    {
+        $ExecutableFinder = $this->createPartialMock(ExecutableFinder::class, ['find']);
+        $ExecutableFinder
+            ->expects($this->any())
+            ->method('find')
+            ->willReturnCallback(function (string $name, string $default = null): ?string {
+                if (in_array($name, ['mariadb', 'mariadb-dump'])) {
+                    return $default;
+                }
+
+                return '/usr/bin/' . $name;
+            });
+
+        $ExecutableDiscover = $this->createPartialMock(ExecutableDiscover::class, ['getExecutableFinder']);
+        $ExecutableDiscover
+            ->expects($this->once())
+            ->method('getExecutableFinder')
+            ->willReturn($ExecutableFinder);
+
+        $result = $ExecutableDiscover->find($name);
+        $this->assertSame($expectedExecutable, $result);
     }
 }

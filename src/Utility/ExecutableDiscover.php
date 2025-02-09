@@ -15,7 +15,19 @@ use Symfony\Component\Process\ExecutableFinder;
 class ExecutableDiscover
 {
     /**
-     * Internal method, returns an instance of `ExecutableFinder`.
+     * Array of aliases.
+     *
+     * When asked to find one of these executables, it will first try returning the alias executable.
+     *
+     * For example, if asked to find `mysql`, it will try to find `mariadb` first and then `mysql`.
+     */
+    protected const ALIASES = [
+        'mysql' => 'mariadb',
+        'mysql-dump' => 'mariadb-dump',
+    ];
+
+    /**
+     * Internal method. Returns an instance of `ExecutableFinder`.
      *
      * @return \Symfony\Component\Process\ExecutableFinder
      */
@@ -27,7 +39,7 @@ class ExecutableDiscover
     /**
      * Finds an executable by name.
      *
-     * @param string $name The executable name (without the extension)
+     * @param string $name The executable name
      * @return string|null
      */
     public function find(string $name): ?string
@@ -35,13 +47,8 @@ class ExecutableDiscover
         $ExecutableFinder = $this->getExecutableFinder();
         $executable = $ExecutableFinder->find(name: $name);
 
-        //Acts on some aliases
-        $aliases = [
-            'mariadb' => 'mysql',
-            'mariadb-dump' => 'mysqldump',
-        ];
-        if (in_array($name, $aliases)) {
-            return $ExecutableFinder->find(name: array_search($name, $aliases)) ?: $executable;
+        if (self::ALIASES[$name]) {
+            return $ExecutableFinder->find(name: self::ALIASES[$name], default: $executable);
         }
 
         return $executable;
