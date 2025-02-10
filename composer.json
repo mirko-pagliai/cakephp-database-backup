@@ -19,6 +19,7 @@
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^5.0",
+        "cakedc/cakephp-phpstan": "^3.2",
         "cakephp/migrations": "^4.0",
         "phpunit/phpunit": "^10.1.0 <=10.5.3",
         "phpstan/phpstan": "^1.10.38",

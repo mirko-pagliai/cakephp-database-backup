@@ -91,6 +91,7 @@ class BackupExportAndImportTest extends TestCase
         $this->assertNull($this->BackupExport->emailRecipient);
 
         $this->expectExceptionMessage('Undefined property: ' . BackupExport::class . '::$noExistingProperty');
+        // @phpstan-ignore property.notFound, expr.resultUnused
         $this->BackupExport->noExistingProperty;
     }
 
