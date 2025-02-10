@@ -1,11 +1,8 @@
 # 2.x branch
-## 2.14 branch
-### 2.14.0
-* added tests for php 8.4;
-* updated `psalm` to `6.x`.
-
 ## 2.13 branch
 ### 2.13.4
+* added tests for php 8.4;
+* updated `psalm` to `6.x`.
 * the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been
     removed and older versions are available as tags);
   * overall updated `README` file, updated links to CakePHP documentation. Some information has been moved from the
