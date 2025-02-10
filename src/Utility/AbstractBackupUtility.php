@@ -20,6 +20,7 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\AbstractDriver;
+use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Process\Process;
 
@@ -52,17 +53,17 @@ abstract class AbstractBackupUtility
     private AbstractDriver $Driver;
 
     /**
-     * Magic method for reading data from inaccessible (protected or private) or non-existing properties
+     * Magic method for reading data from inaccessible (protected or private).
+     *
      * @param string $name Property name
      * @return mixed
      * @since 2.12.0
-     * @throw \LogicException
+     * @throw \InvalidArgumentException
      */
     public function __get(string $name): mixed
     {
         if (!property_exists($this, $name)) {
-            $class = &$this;
-            throw new LogicException('Undefined property: ' . get_class($class) . '::$' . $name);
+            throw new InvalidArgumentException('Undefined property: ' . $this::class . '::$' . $name);
         }
 
         return $this->{$name};
