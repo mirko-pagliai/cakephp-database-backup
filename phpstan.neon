@@ -1,0 +1,22 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 8
+
+    paths:
+        - config
+        - src
+        - tests
+
+    bootstrapFiles:
+        - tests/bootstrap.php
+
+    ignoreErrors:
+            -
+                    identifier: missingType.generics
+
+    treatPhpDocTypesAsCertain: false
+
+    excludePaths:
+        -  tests/test_app/
