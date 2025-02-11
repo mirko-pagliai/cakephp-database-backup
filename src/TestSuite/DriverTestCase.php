@@ -58,7 +58,11 @@ abstract class DriverTestCase extends TestCase
         foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
             $filename = 'backup.' . $extension;
             $result = $this->Driver->getExportExecutable($filename);
-            $expected = sprintf(' | %s > %s', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
+            $expected = sprintf(
+                ' | %s > %s',
+                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($filename)
+            );
             $this->assertStringEndsWith($expected, $result);
         }
     }
@@ -75,7 +79,11 @@ abstract class DriverTestCase extends TestCase
         foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
             $filename = 'backup.' . $extension;
             $result = $this->Driver->getImportExecutable($filename);
-            $expected = sprintf('%s -dc %s | ', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
+            $expected = sprintf(
+                '%s -dc %s | ',
+                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($filename)
+            );
             $this->assertStringStartsWith($expected, $result);
         }
     }

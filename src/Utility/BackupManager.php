@@ -133,7 +133,9 @@ class BackupManager
             ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
             ->setTo($recipient)
             ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($filename), $server))
-            ->setAttachments([basename($filename) => ['file' => $filename, 'mimetype' => mime_content_type($filename)]]);
+            ->setAttachments([
+                basename($filename) => ['file' => $filename, 'mimetype' => mime_content_type($filename)],
+            ]);
     }
 
     /**

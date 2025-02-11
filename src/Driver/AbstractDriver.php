@@ -77,7 +77,9 @@ abstract class AbstractDriver implements EventListenerInterface
     {
         // @codeCoverageIgnoreStart
         if (!in_array($type, ['export', 'import'])) {
-            throw new LogicException(__d('database_backup', '`{0}` parameter should be `{1}` or `{2}`', '$type', 'export', 'import'));
+            throw new LogicException(
+                __d('database_backup', '`{0}` parameter should be `{1}` or `{2}`', '$type', 'export', 'import')
+            );
         }
         // @codeCoverageIgnoreEnd
         $driverName = strtolower($this->getDriverName());
@@ -125,7 +127,11 @@ abstract class AbstractDriver implements EventListenerInterface
         $exec = $this->getExecutable('import');
         $compression = self::getCompression($filename);
         if ($compression) {
-            return sprintf('%s -dc %s | ', escapeshellarg($this->getBinary($compression)), escapeshellarg($filename)) . $exec;
+            return sprintf(
+                '%s -dc %s | ',
+                escapeshellarg($this->getBinary($compression)),
+                escapeshellarg($filename)
+            ) . $exec;
         }
 
         return $exec . ' < ' . escapeshellarg($filename);
@@ -184,7 +190,11 @@ abstract class AbstractDriver implements EventListenerInterface
     {
         $binary = Configure::read('DatabaseBackup.binaries.' . $name);
         if (!$binary) {
-            throw new LogicException(__d('database_backup', 'Binary for `{0}` could not be found. You have to set its path manually', $name));
+            throw new LogicException(__d(
+                'database_backup',
+                'Binary for `{0}` could not be found. You have to set its path manually',
+                $name
+            ));
         }
 
         return $binary;

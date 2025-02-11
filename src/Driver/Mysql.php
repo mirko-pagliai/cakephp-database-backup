@@ -56,8 +56,16 @@ class Mysql extends AbstractDriver
     protected function writeAuthFile(string $content): bool
     {
         $content = str_replace(
-            ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
-            [(string)$this->getConfig('username'), (string)$this->getConfig('password'), (string)$this->getConfig('host')],
+            [
+                '{{USER}}',
+                '{{PASSWORD}}',
+                '{{HOST}}',
+            ],
+            [
+                (string)$this->getConfig('username'),
+                (string)$this->getConfig('password'),
+                (string)$this->getConfig('host'),
+            ],
             $content
         );
 

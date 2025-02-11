@@ -37,7 +37,9 @@ class Command extends BaseCommand
         $io->out(__d('database_backup', 'Driver: {0}', $this->getDriverName()));
 
         if ($args->getOption('timeout')) {
-            $io->verbose(__d('database_backup', 'Timeout for shell commands: {0} seconds', $args->getOption('timeout')));
+            $io->verbose(
+                __d('database_backup', 'Timeout for shell commands: {0} seconds', $args->getOption('timeout'))
+            );
         }
 
         $io->hr();

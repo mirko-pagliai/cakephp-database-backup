@@ -109,13 +109,19 @@ class BackupExport extends AbstractBackupUtility
 
         $filename = $this->getAbsolutePath($filename);
         if (!is_writable(dirname($filename))) {
-            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', dirname($filename)));
+            throw new LogicException(
+                __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))
+            );
         }
         if (file_exists($filename)) {
-            throw new LogicException(__d('database_backup', 'File `{0}` already exists', $filename));
+            throw new LogicException(
+                __d('database_backup', 'File `{0}` already exists', $filename)
+            );
         }
         if (!$this->getExtension($filename)) {
-            throw new LogicException(__d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION)));
+            throw new LogicException(
+                __d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION))
+            );
         }
 
         //Sets the compression
@@ -190,7 +196,9 @@ class BackupExport extends AbstractBackupUtility
         //Exports
         $Process = $this->getProcess($this->getDriver()->getExportExecutable($filename));
         if (!$Process->isSuccessful()) {
-            throw new LogicException(__d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())));
+            throw new LogicException(
+                __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput()))
+            );
         }
         (new Filesystem())->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 

@@ -62,7 +62,11 @@ class ExportCommand extends Command
                     'short' => 's',
                 ],
                 'timeout' => [
-                    'help' => __d('database_backup', 'Timeout for shell commands. Default value: {0} seconds', Configure::readOrFail('DatabaseBackup.processTimeout')),
+                    'help' => __d(
+                        'database_backup',
+                        'Timeout for shell commands. Default value: {0} seconds',
+                        Configure::readOrFail('DatabaseBackup.processTimeout')
+                    ),
                     'short' => 't',
                 ],
             ]);
@@ -109,17 +113,27 @@ class ExportCommand extends Command
 
             $file = $BackupExport->export();
             if (!$file) {
-                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
+                throw new StopException(
+                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport')
+                );
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
             //Sends via email and/or rotates
             $extraOptions = array_filter([$args->getOption('verbose') ? '--verbose' : '', $args->getOption('quiet') ? '--quiet' : '']);
             if ($args->getOption('send')) {
-                $this->executeCommand(SendCommand::class, array_merge([$file, (string)$args->getOption('send')], $extraOptions), $io);
+                $this->executeCommand(
+                    SendCommand::class,
+                    array_merge([$file, (string)$args->getOption('send')], $extraOptions),
+                    $io
+                );
             }
             if ($args->getOption('rotate')) {
-                $this->executeCommand(RotateCommand::class, array_merge([(string)$args->getOption('rotate')], $extraOptions), $io);
+                $this->executeCommand(
+                    RotateCommand::class,
+                    array_merge([(string)$args->getOption('rotate')], $extraOptions),
+                    $io
+                );
             }
         } catch (Exception $e) {
             $io->abort($e->getMessage());

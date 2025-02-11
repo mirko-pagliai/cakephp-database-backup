@@ -44,7 +44,11 @@ class ImportCommand extends Command
                 'required' => true,
             ])
             ->addOption('timeout', [
-                'help' => __d('database_backup', 'Timeout for shell commands. Default value: {0} seconds', Configure::readOrFail('DatabaseBackup.processTimeout')),
+                'help' => __d(
+                    'database_backup',
+                    'Timeout for shell commands. Default value: {0} seconds',
+                    Configure::readOrFail('DatabaseBackup.processTimeout')
+                ),
                 'short' => 't',
             ]);
     }
@@ -82,7 +86,9 @@ class ImportCommand extends Command
 
             $file = $BackupImport->import();
             if (!$file) {
-                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
+                throw new StopException(
+                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport')
+                );
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
         } catch (Exception $e) {
