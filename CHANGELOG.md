@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.4
+* fixed [issue #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for
+  `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
 * added tests for php 8.4;
 * all chainable methods of X and Y now have the typehint for returning self. Updated descriptions;
 * updated `psalm` to `6.x`.
