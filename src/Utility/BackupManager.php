@@ -56,7 +56,7 @@ class BackupManager
     /**
      * Deletes all backup files.
      *
-     * @return string[] List of deleted backup files
+     * @return array<string> List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
      */
