@@ -10,9 +10,6 @@
     <rule ref="Generic.Files.LineLength.TooLong">
         <severity>0</severity>
     </rule>
-    <rule ref="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDescriptionAndAnnotations">
-        <severity>0</severity>
-    </rule>
 
     <exclude-pattern>/coverage/</exclude-pattern>
     <exclude-pattern>/vendor</exclude-pattern>

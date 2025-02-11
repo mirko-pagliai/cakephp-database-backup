@@ -116,7 +116,8 @@ echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver 
 
 if (!function_exists('createBackup')) {
     /**
-     * Global function to create a backup file
+     * Global function to create a backup file.
+     *
      * @param string $filename Filename
      * @return string
      */
@@ -128,7 +129,8 @@ if (!function_exists('createBackup')) {
 
 if (!function_exists('createSomeBackups')) {
     /**
-     * Global function to create some backup files
+     * Global function to create some backup files.
+     *
      * @return string[]
      */
     function createSomeBackups(): array
