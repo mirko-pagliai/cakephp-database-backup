@@ -39,7 +39,11 @@ class Mysql extends AbstractDriver
      */
     protected function getAuthFilePath(): string
     {
-        return $this->auth ??= TMP . uniqid('auth');
+        if (empty($this->auth)) {
+            $this->auth = TMP . uniqid('auth');
+        }
+
+        return $this->auth;
     }
 
     /**
