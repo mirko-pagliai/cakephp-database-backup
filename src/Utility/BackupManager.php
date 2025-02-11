@@ -62,7 +62,7 @@ class BackupManager
      */
     public static function deleteAll(): array
     {
-        return array_map([__CLASS__, 'delete'], self::index()->extract('filename')->toList());
+        return array_map([self::class, 'delete'], self::index()->extract('filename')->toList());
     }
 
     /**
@@ -107,7 +107,7 @@ class BackupManager
             throw new LogicException(__d('database_backup', 'Invalid rotate value'));
         }
         $backupsToBeDeleted = self::index()->skip($rotate);
-        array_map([__CLASS__, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
+        array_map([self::class, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 
         return $backupsToBeDeleted->toList();
     }
