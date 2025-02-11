@@ -119,8 +119,13 @@ class ExportCommand extends Command
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
-            //Sends via email and/or rotates
-            $extraOptions = array_filter([$args->getOption('verbose') ? '--verbose' : '', $args->getOption('quiet') ? '--quiet' : '']);
+            //Sends via email and/or rotates. It keeps options `verbose` and `quiet`.
+            $extraOptions = [];
+            foreach (['verbose', 'quiet'] as $option) {
+                if ($args->getOption($option)) {
+                    $extraOptions[] = '--' . $option;
+                }
+            }
             if ($args->getOption('send')) {
                 $this->executeCommand(
                     SendCommand::class,
