@@ -39,11 +39,9 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
-        if (empty($this->Driver)) {
-            /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
-            $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
-            $this->Driver = new $DriverClass();
-        }
+        /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
+        $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
+        $this->Driver = new $DriverClass();
 
         $this->Driver->getEventManager()->on($this->Driver);
     }

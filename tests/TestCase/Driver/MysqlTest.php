@@ -43,9 +43,10 @@ class MysqlTest extends DriverTestCase
             $this->markTestSkipped('Skipping tests for mysql, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
         }
 
-        $this->Driver ??= $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
-
         parent::setUp();
+
+        $this->Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
+        $this->Driver->getEventManager()->on($this->Driver);
     }
 
     /**
