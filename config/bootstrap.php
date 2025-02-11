@@ -60,11 +60,8 @@ Configure::write(array_filter($defaults, fn (string $key): bool => !Configure::c
  * It then normally searches all other possible executables canonically.
  */
 $ExecutableFinder = new ExecutableFinder();
-foreach ([
-    'mariadb' => 'mysql',
-    'mariadb-dump' => 'mysqldump',
-] as $executable => $alias) {
-    if (!Configure::check('DatabaseBackup.binaries.'. $alias)) {
+foreach (['mariadb' => 'mysql', 'mariadb-dump' => 'mysqldump'] as $executable => $alias) {
+    if (!Configure::check('DatabaseBackup.binaries.' . $alias)) {
         Configure::write('DatabaseBackup.binaries.' . $alias, $ExecutableFinder->find($executable));
     }
 }
