@@ -1,16 +1,15 @@
 # 2.x branch
-## 2.14 branch
-### 2.14.0
-* added tests for php 8.4;
-* updated `psalm` to `6.x`.
-
 ## 2.13 branch
 ### 2.13.4
+* added tests for php 8.4;
+* updated `psalm` to `6.x`.
+* uses `cakedc/cakephp-phpstan`;
+* extensive revision of descriptions and tags of all classes and methods;
+* removed some errors related to phpcs, phpstan and psalm, previously silenced;
 * the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been
     removed and older versions are available as tags);
-  * overall updated `README` file, updated links to CakePHP documentation. Some information has been moved from the
-  `README` file to the (new) [Common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues)
-  wiki page.
+* overall updated `README` file, updated links to CakePHP documentation. Some information has been moved from the
+  `README` file to the (new) [Common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues) wiki page.
 
 ### 2.13.3
 * added `--reverse` option for the `IndexCommand` ([issue #96](https://github.com/mirko-pagliai/cakephp-database-backup/issues/96));

@@ -7,22 +7,7 @@
 
     <rule ref="./vendor/cakephp/cakephp-codesniffer/CakePHP/ruleset.xml"/>
 
-    <rule ref="CakePHP.Commenting.TypeHint.IncorrectFormat">
-        <severity>0</severity>
-    </rule>
-    <rule ref="CakePHP.Functions.ClosureDeclaration.SpaceAfterFunction">
-        <severity>0</severity>
-    </rule>
     <rule ref="Generic.Files.LineLength.TooLong">
-        <severity>0</severity>
-    </rule>
-    <rule ref="PSR12.ControlStructures.ControlStructureSpacing">
-        <severity>0</severity>
-    </rule>
-    <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaMagicConstant">
-        <severity>0</severity>
-    </rule>
-    <rule ref="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDescriptionAndAnnotations">
         <severity>0</severity>
     </rule>
 

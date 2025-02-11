@@ -54,7 +54,8 @@ class BackupExportAndImportTest extends TestCase
     ];
 
     /**
-     * Internal method to get all records from the database
+     * Internal method to get all records from the database.
+     *
      * @return non-empty-array<'Articles'|'Comments', mixed>
      */
     protected function getAllRecords(): array
@@ -91,11 +92,13 @@ class BackupExportAndImportTest extends TestCase
         $this->assertNull($this->BackupExport->emailRecipient);
 
         $this->expectExceptionMessage('Undefined property: ' . BackupExport::class . '::$noExistingProperty');
+        // @phpstan-ignore property.notFound, expr.resultUnused
         $this->BackupExport->noExistingProperty;
     }
 
     /**
-     * Test for `export()` and `import()` methods. It tests that the backup is properly exported and then imported
+     * Test for `export()` and `import()` methods. It tests that the backup is properly exported and then imported.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      * @uses \DatabaseBackup\Utility\BackupImport::import()

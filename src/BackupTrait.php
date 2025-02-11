@@ -22,12 +22,13 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * A trait that provides some methods used by all other classes
+ * A trait that provides some methods used by all other classes.
  */
 trait BackupTrait
 {
     /**
-     * Returns the absolute path for a backup file
+     * Returns the absolute path for a backup file.
+     *
      * @param string $path Relative or absolute path
      * @return string
      */
@@ -46,7 +47,8 @@ trait BackupTrait
     }
 
     /**
-     * Returns the compression type for a backup file
+     * Returns the compression type for a backup file.
+     *
      * @param string $path File path
      * @return string|null Compression type or `null`
      */
@@ -61,6 +63,7 @@ trait BackupTrait
      * Gets the `Connection` instance.
      *
      * You can pass the name of the connection. By default, the connection set in the configuration will be used.
+     *
      * @param string|null $name Connection name
      * @return \Cake\Datasource\ConnectionInterface
      */
@@ -70,7 +73,8 @@ trait BackupTrait
     }
 
     /**
-     * Gets the driver name, according to the connection
+     * Gets the driver name, according to the connection.
+     *
      * @return string Driver name
      * @since 2.9.2
      */
@@ -82,7 +86,8 @@ trait BackupTrait
     }
 
     /**
-     * Takes and gets the extension of a backup file
+     * Takes and gets the extension of a backup file.
+     *
      * @param string $path File path
      * @return string|null Extension or `null` for invalid extensions
      */
@@ -100,7 +105,8 @@ trait BackupTrait
     }
 
     /**
-     * Returns all valid compressions available
+     * Returns all valid compressions available.
+     *
      * @return array<string, string> An array with extensions as keys and compressions as values
      * @since 2.4.0
      */

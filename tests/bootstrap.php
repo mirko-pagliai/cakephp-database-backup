@@ -68,9 +68,9 @@ Configure::write('App', [
 ]);
 
 Cache::setConfig([
-    '_cake_core_' => [
+    '_cake_translations_' => [
         'engine' => 'File',
-        'prefix' => 'cake_core_',
+        'prefix' => 'cake_translations_',
         'serialize' => true,
     ],
 ]);
@@ -116,10 +116,10 @@ echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver 
 
 if (!function_exists('createBackup')) {
     /**
-     * Global function to create a backup file
+     * Global function to create a backup file.
+     *
      * @param string $filename Filename
      * @return string
-     * @throws \ReflectionException
      */
     function createBackup(string $filename = 'backup.sql'): string
     {
@@ -129,9 +129,9 @@ if (!function_exists('createBackup')) {
 
 if (!function_exists('createSomeBackups')) {
     /**
-     * Global function to create some backup files
+     * Global function to create some backup files.
+     *
      * @return string[]
-     * @throws \ReflectionException
      */
     function createSomeBackups(): array
     {

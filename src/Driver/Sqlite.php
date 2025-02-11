@@ -17,12 +17,13 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 /**
- * Sqlite driver to export/import database backups
+ * Sqlite driver to export/import database backups.
  */
 class Sqlite extends AbstractDriver
 {
     /**
-     * Called before import
+     * Called before import.
+     *
      * @return bool
      * @since 2.1.0
      */

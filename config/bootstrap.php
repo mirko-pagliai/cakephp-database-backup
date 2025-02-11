@@ -71,7 +71,8 @@ if (!is_dir($target) || !is_writeable($target)) {
 
 if (!function_exists('rtr')) {
     /**
-     * Returns a path relative to the root path
+     * Returns a path relative to the root path.
+     *
      * @param string $path Absolute path
      * @return string Relative path
      */

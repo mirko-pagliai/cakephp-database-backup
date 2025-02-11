@@ -29,7 +29,6 @@ class DeleteAllCommandTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\DeleteAllCommand::execute()
      */
     public function testExecute(): void
