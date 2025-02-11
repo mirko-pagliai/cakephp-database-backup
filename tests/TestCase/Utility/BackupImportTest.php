@@ -23,7 +23,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
- * BackupImportTest class
+ * BackupImportTest class.
  *
  * @uses \DatabaseBackup\Utility\BackupImport
  */
@@ -35,8 +35,7 @@ class BackupImportTest extends TestCase
     protected BackupImport $BackupImport;
 
     /**
-     * {@inheritDoc}
-     * @throws \ReflectionException
+     * @inheritDoc
      */
     protected function setUp(): void
     {
@@ -47,9 +46,9 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method. This tests also `$compression` property
+     * Test for `filename()` method. This tests also `$compression` property.
+     *
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupImport::filename()
      */
     public function testFilename(): void
@@ -71,7 +70,8 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method, with an invalid file extension
+     * Test for `filename()` method, with an invalid file extension.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupImport::filename()
      */
@@ -93,7 +93,6 @@ class BackupImportTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function testImport(): void
@@ -112,10 +111,10 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `import()` method. Export is stopped by the `Backup.beforeImport` event (implemented by driver)
+     * Test for `import()` method. Export is stopped by the `Backup.beforeImport` event (implemented by driver).
+     *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function testImportStoppedByBeforeExport(): void
@@ -129,7 +128,8 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `import()` method, on failure (error for `Process`)
+     * Test for `import()` method, on failure (error for `Process`).
+     *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @throws \ReflectionException
@@ -146,12 +146,12 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `import()` method, exceeding the timeout
+     * Test for `import()` method, exceeding the timeout.
+     *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
      * @test
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
      */
     public function testImportExceedingTimeout(): void
     {

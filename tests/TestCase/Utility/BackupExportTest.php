@@ -25,7 +25,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
- * BackupExportTest class
+ * BackupExportTest class.
  *
  * @uses \DatabaseBackup\Utility\BackupExport
  */
@@ -39,8 +39,7 @@ class BackupExportTest extends TestCase
     protected BackupExport $BackupExport;
 
     /**
-     * {@inheritDoc}
-     * @throws \ReflectionException
+     * @inheritDoc
      */
     protected function setUp(): void
     {
@@ -51,7 +50,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `compression()` method. This also tests for `$extension` property
+     * Test for `compression()` method. This also tests for `$extension` property.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::compression()
      */
@@ -67,7 +67,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method. This also tests for patterns and for the `$compression` property
+     * Test for `filename()` method. This also tests for patterns and for the `$compression` property.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
@@ -144,7 +145,6 @@ class BackupExportTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExport(): void
@@ -179,10 +179,10 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method, with a different chmod
+     * Test for `export()` method, with a different chmod.
+     *
      * @requires OS Linux
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportWithDifferentChmod(): void
@@ -196,10 +196,10 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method. Export is stopped by the `Backup.beforeExport` event (implemented by driver)
+     * Test for `export()` method. Export is stopped by the `Backup.beforeExport` event (implemented by driver).
+     *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportStoppedByBeforeExport(): void
@@ -213,7 +213,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method, on failure (error for `Process`)
+     * Test for `export()` method, on failure (error for `Process`).
+     *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @throws \ReflectionException
@@ -230,7 +231,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method, exceeding the timeout
+     * Test for `export()` method, exceeding the timeout.
+     *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()

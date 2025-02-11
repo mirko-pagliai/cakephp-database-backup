@@ -19,12 +19,13 @@ use Cake\I18n\I18n;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
- * I18nTest class
+ * I18nTest class.
  */
 class I18nTest extends TestCase
 {
     /**
-     * Tests I18n translations
+     * Tests I18n translations.
+     *
      * @test
      */
     public function testI18nConstant(): void

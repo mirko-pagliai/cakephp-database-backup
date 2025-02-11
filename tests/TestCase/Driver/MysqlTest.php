@@ -21,7 +21,7 @@ use DatabaseBackup\TestSuite\DriverTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * MysqlTest class
+ * MysqlTest class.
  *
  * @uses \DatabaseBackup\Driver\Mysql
  */
@@ -34,6 +34,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * {@inheritDoc}
+     *
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     protected function setUp(): void
@@ -42,14 +43,14 @@ class MysqlTest extends DriverTestCase
             $this->markTestSkipped('Skipping tests for mysql, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
         }
 
-        $this->Driver ??= $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
-
         parent::setUp();
+
+        $this->Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
+        $this->Driver->getEventManager()->on($this->Driver);
     }
 
     /**
      * @test
-     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::afterExport()
      */
     public function testAfterExport(): void
@@ -68,7 +69,6 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
-     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::afterImport()
      */
     public function testAfterImport(): void
@@ -125,7 +125,6 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
-     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::writeAuthFile()
      */
     public function testWriteAuthFile(): void

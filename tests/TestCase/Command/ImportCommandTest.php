@@ -39,7 +39,6 @@ class ImportCommandTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecute(): void
@@ -58,10 +57,10 @@ class ImportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method on stopped event
+     * Test for `execute()` method on stopped event.
+     *
      * @test
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
+     * @throws \PHPUnit\Framework\MockObject\Exception|\ReflectionException
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void
@@ -75,7 +74,8 @@ class ImportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `timeout` option
+     * Test for `execute()` method, with `timeout` option.
+     *
      * @test
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */

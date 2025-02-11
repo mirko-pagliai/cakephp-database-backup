@@ -26,12 +26,13 @@ use DatabaseBackup\Command\RotateCommand;
 use DatabaseBackup\Command\SendCommand;
 
 /**
- * Plugin class
+ * Plugin class.
  */
 class Plugin extends BasePlugin
 {
     /**
-     * Add console commands for the plugin
+     * Add console commands for the plugin.
+     *
      * @param \Cake\Console\CommandCollection $commands The command collection to update
      * @return \Cake\Console\CommandCollection
      */

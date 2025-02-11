@@ -19,7 +19,7 @@ use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
- * AbstractDriverTest
+ * AbstractDriverTest.
  *
  * @uses \DatabaseBackup\Driver\AbstractDriver
  */

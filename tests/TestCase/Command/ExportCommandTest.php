@@ -56,7 +56,8 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method on stopped event
+     * Test for `execute()` method on stopped event.
+     *
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -70,7 +71,8 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `compression` option
+     * Test for `execute()` method, with `compression` option.
+     *
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -83,7 +85,8 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `filename` option
+     * Test for `execute()` method, with `filename` option.
+     *
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -96,9 +99,9 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` option
+     * Test for `execute()` method, with `rotate` option.
+     *
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteRotateOption(): void
@@ -113,7 +116,8 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `send` option
+     * Test for `execute()` method, with `send` option.
+     *
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -127,7 +131,8 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `timeout` option
+     * Test for `execute()` method, with `timeout` option.
+     *
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */

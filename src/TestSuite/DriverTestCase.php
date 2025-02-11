@@ -33,25 +33,21 @@ abstract class DriverTestCase extends TestCase
     protected AbstractDriver $Driver;
 
     /**
-     * Called before every test method
-     * @return void
+     * @inheritDoc
      */
     protected function setUp(): void
     {
         parent::setUp();
 
-        if (empty($this->Driver)) {
-            /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
-            $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
-            $this->Driver = new $DriverClass();
-        }
+        /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
+        $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
+        $this->Driver = new $DriverClass();
 
         $this->Driver->getEventManager()->on($this->Driver);
     }
 
     /**
      * @return void
-     * @throws \ReflectionException|\ErrorException
      * @uses \DatabaseBackup\Driver\AbstractDriver::getExportExecutable()
      */
     public function testGetExportExecutable(): void
@@ -62,14 +58,17 @@ abstract class DriverTestCase extends TestCase
         foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
             $filename = 'backup.' . $extension;
             $result = $this->Driver->getExportExecutable($filename);
-            $expected = sprintf(' | %s > %s', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
+            $expected = sprintf(
+                ' | %s > %s',
+                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($filename)
+            );
             $this->assertStringEndsWith($expected, $result);
         }
     }
 
     /**
      * @return void
-     * @throws \ReflectionException|\ErrorException
      * @uses \DatabaseBackup\Driver\AbstractDriver::getImportExecutable()
      */
     public function testGetImportExecutable(): void
@@ -80,7 +79,11 @@ abstract class DriverTestCase extends TestCase
         foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
             $filename = 'backup.' . $extension;
             $result = $this->Driver->getImportExecutable($filename);
-            $expected = sprintf('%s -dc %s | ', escapeshellarg($this->Driver->getBinary($compression)), escapeshellarg($filename));
+            $expected = sprintf(
+                '%s -dc %s | ',
+                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($filename)
+            );
             $this->assertStringStartsWith($expected, $result);
         }
     }

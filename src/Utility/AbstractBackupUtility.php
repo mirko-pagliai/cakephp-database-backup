@@ -20,6 +20,7 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\AbstractDriver;
+use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Process\Process;
 
@@ -27,6 +28,7 @@ use Symfony\Component\Process\Process;
  * AbstractBackupUtility.
  *
  * Provides the code common to the `BackupExport` and `BackupImport` classes.
+ *
  * @property string $filename
  * @property int $timeout
  */
@@ -35,13 +37,11 @@ abstract class AbstractBackupUtility
     use BackupTrait;
 
     /**
-     * Filename where to export/import the database
      * @var string
      */
     protected string $filename;
 
     /**
-     * Timeout for shell commands
      * @var int
      */
     protected int $timeout;
@@ -52,38 +52,38 @@ abstract class AbstractBackupUtility
     private AbstractDriver $Driver;
 
     /**
-     * Magic method for reading data from inaccessible (protected or private) or non-existing properties
+     * Magic method for reading data from inaccessible (protected or private).
+     *
      * @param string $name Property name
      * @return mixed
      * @since 2.12.0
-     * @throw \LogicException
+     * @throw \InvalidArgumentException
      */
     public function __get(string $name): mixed
     {
         if (!property_exists($this, $name)) {
-            $class = &$this;
-            throw new LogicException('Undefined property: ' . get_class($class) . '::$' . $name);
+            throw new InvalidArgumentException('Undefined property: ' . $this::class . '::$' . $name);
         }
 
         return $this->{$name};
     }
 
     /**
-     * Sets the filename
+     * Sets the filename.
+     *
      * @param string $filename Filename. It can be an absolute path
-     * @return $this
-     * @noinspection PhpMissingReturnTypeInspection
+     * @return self
      */
-    abstract public function filename(string $filename);
+    abstract public function filename(string $filename): self;
 
     /**
-     * Sets the timeout for shell commands
+     * Sets the timeout for shell commands.
+     *
      * @param int $timeout Timeout in seconds
-     * @return $this
+     * @return self
      * @since 2.12.0
-     * @noinspection PhpMissingReturnTypeInspection
      */
-    public function timeout(int $timeout)
+    public function timeout(int $timeout): self
     {
         $this->timeout = $timeout;
 
@@ -91,10 +91,10 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Gets the driver instance
+     * Gets the driver instance.
+     *
      * @return \DatabaseBackup\Driver\AbstractDriver A driver instance
      * @throws \LogicException
-     * @throws \ReflectionException
      * @since 2.0.0
      */
     public function getDriver(): AbstractDriver
@@ -115,8 +115,10 @@ abstract class AbstractBackupUtility
 
     /**
      * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
+     *
      * @param string $command The command line to pass to the shell of the OS
      * @return \Symfony\Component\Process\Process
+     * @see https://symfony.com/doc/current/components/process.html
      * @since 2.8.7
      */
     protected function getProcess(string $command): Process

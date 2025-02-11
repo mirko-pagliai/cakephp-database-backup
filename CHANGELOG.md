@@ -1,8 +1,18 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.4
+* fixed [issue #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for
+  `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
+* added tests for php 8.4;
+* all chainable methods of X and Y now have the typehint for returning self. Updated descriptions;
+* updated `psalm` to `6.x`.
+* uses `cakedc/cakephp-phpstan`;
+* extensive revision of descriptions and tags of all classes and methods;
+* removed some errors related to phpcs, phpstan and psalm, previously silenced;
 * the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been
-    removed and older versions are available as tags).
+    removed and older versions are available as tags);
+* overall updated `README` file, updated links to CakePHP documentation. Some information has been moved from the
+  `README` file to the (new) [Common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues) wiki page.
 
 ### 2.13.3
 * added `--reverse` option for the `IndexCommand` ([issue #96](https://github.com/mirko-pagliai/cakephp-database-backup/issues/96));

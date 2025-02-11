@@ -23,7 +23,7 @@ use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
- * BackupTraitTest class
+ * BackupTraitTest class.
  *
  * @uses \DatabaseBackup\BackupTrait
  */
@@ -69,14 +69,16 @@ class BackupTraitTest extends TestCase
      */
     public function testGetCompression(): void
     {
-        foreach ([
-            'backup.sql' => null,
-            'backup.sql.bz2' => 'bzip2',
-            DS . 'backup.sql.bz2' => 'bzip2',
-            Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'bzip2',
-            'backup.sql.gz' => 'gzip',
-            'text.txt' => null,
-        ] as $filename => $expectedCompression) {
+        foreach (
+            [
+                'backup.sql' => null,
+                'backup.sql.bz2' => 'bzip2',
+                DS . 'backup.sql.bz2' => 'bzip2',
+                Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'bzip2',
+                'backup.sql.gz' => 'gzip',
+                'text.txt' => null,
+            ] as $filename => $expectedCompression
+        ) {
             $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
         }
     }
@@ -108,19 +110,21 @@ class BackupTraitTest extends TestCase
      */
     public function testGetExtension(): void
     {
-        foreach ([
-            'backup.sql' => 'sql',
-            'backup.sql.bz2' => 'sql.bz2',
-            DS . 'backup.sql.bz2' => 'sql.bz2',
-            Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'sql.bz2',
-            'backup.sql.gz' => 'sql.gz',
-            'backup.SQL' => 'sql',
-            'backup.SQL.BZ2' => 'sql.bz2',
-            'backup.SQL.GZ' => 'sql.gz',
-            'text.txt' => null,
-            'text' => null,
-            '.txt' => null,
-        ] as $filename => $expectedExtension) {
+        foreach (
+            [
+                'backup.sql' => 'sql',
+                'backup.sql.bz2' => 'sql.bz2',
+                DS . 'backup.sql.bz2' => 'sql.bz2',
+                Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'sql.bz2',
+                'backup.sql.gz' => 'sql.gz',
+                'backup.SQL' => 'sql',
+                'backup.SQL.BZ2' => 'sql.bz2',
+                'backup.SQL.GZ' => 'sql.gz',
+                'text.txt' => null,
+                'text' => null,
+                '.txt' => null,
+            ] as $filename => $expectedExtension
+        ) {
             $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
         }
     }

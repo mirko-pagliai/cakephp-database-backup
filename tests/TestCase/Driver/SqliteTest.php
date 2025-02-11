@@ -18,7 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
 /**
- * SqliteTest class
+ * SqliteTest class.
  *
  * @uses \DatabaseBackup\Driver\Sqlite
  */

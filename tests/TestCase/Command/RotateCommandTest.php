@@ -29,7 +29,6 @@ class RotateCommandTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\RotateCommand::execute()
      */
     public function testExecute(): void

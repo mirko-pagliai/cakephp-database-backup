@@ -23,7 +23,8 @@ use DatabaseBackup\Utility\BackupManager;
 use Exception;
 
 /**
- * Sends a backup file via email
+ * Command to send a backup file via email.
+ *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#send
  */
 class SendCommand extends Command
@@ -48,12 +49,12 @@ class SendCommand extends Command
     }
 
     /**
-     * Sends a backup file via email
+     * Sends a backup file via email.
+     *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
      * @throws \Cake\Console\Exception\StopException
-     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
@@ -61,7 +62,9 @@ class SendCommand extends Command
 
         try {
             BackupManager::send($args->getArgument('filename') ?: '', $args->getArgument('recipient') ?: '');
-            $io->success(__d('database_backup', 'Backup `{0}` was sent via mail', $args->getArgument('filename') ?: ''));
+            $io->success(
+                __d('database_backup', 'Backup `{0}` was sent via mail', $args->getArgument('filename') ?: '')
+            );
         } catch (Exception $e) {
             $io->error($e->getMessage());
             $this->abort();
