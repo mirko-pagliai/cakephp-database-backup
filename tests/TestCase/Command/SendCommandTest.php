@@ -19,7 +19,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
- * SendCommandTest class
+ * SendCommandTest class.
  *
  * @uses \DatabaseBackup\Command\SendCommand
  */

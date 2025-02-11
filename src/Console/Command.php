@@ -22,17 +22,14 @@ use Cake\Console\ConsoleIo;
 use DatabaseBackup\BackupTrait;
 
 /**
- * Base class for console commands
+ * Base class for console commands.
  */
 class Command extends BaseCommand
 {
     use BackupTrait;
 
     /**
-     * Implement this method with your command's logic
-     * @param \Cake\Console\Arguments $args The command arguments
-     * @param \Cake\Console\ConsoleIo $io The console io
-     * @return void
+     * @inheritDoc
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

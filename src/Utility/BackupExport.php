@@ -21,7 +21,8 @@ use LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Utility to export databases
+ * Utility to export databases.
+ *
  * @property ?string $compression
  * @property ?string $emailRecipient
  * @property string $extension
@@ -30,31 +31,26 @@ use Symfony\Component\Filesystem\Filesystem;
 class BackupExport extends AbstractBackupUtility
 {
     /**
-     * Compression type
      * @var string|null
      */
     protected ?string $compression = null;
 
     /**
-     * Default extension
      * @var string
      */
     private string $defaultExtension = 'sql';
 
     /**
-     * Recipient of the email, if you want to send the backup via mail
      * @var string|null
      */
     protected ?string $emailRecipient = null;
 
     /**
-     * Filename extension
      * @var string
      */
     protected string $extension;
 
     /**
-     * Rotate limit. This is the number of backups you want to keep. So, it will delete all backups that are older
      * @var int
      */
     protected int $rotate = 0;
@@ -66,6 +62,7 @@ class BackupExport extends AbstractBackupUtility
      *  - `bzip2`;
      *  - `gzip`;
      *  - `null` for no compression.
+     *
      * @param string|null $compression Compression type name
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
@@ -91,6 +88,7 @@ class BackupExport extends AbstractBackupUtility
      * Sets the filename.
      *
      * The compression type will be automatically set by the filename.
+     *
      * @param string $filename Filename. It can be an absolute path and may contain patterns
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
@@ -129,7 +127,8 @@ class BackupExport extends AbstractBackupUtility
     }
 
     /**
-     * Sets the number of backups you want to keep. So, it will delete all backups that are older
+     * Sets the number of backups you want to keep. So, it will delete all backups that are older.
+     *
      * @param int $rotate Number of backups you want to keep
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
@@ -143,7 +142,8 @@ class BackupExport extends AbstractBackupUtility
     }
 
     /**
-     * Sets the recipient's email address to send the backup file via mail
+     * Sets the recipient's email address to send the backup file via mail.
+     *
      * @param string|null $recipient Recipient's email address or `null` to disable
      * @return $this
      * @since 1.1.0
@@ -162,6 +162,7 @@ class BackupExport extends AbstractBackupUtility
      * When exporting, this method will trigger these events (implemented by the driver instance):
      *  - `Backup.beforeExport`: will be triggered before export;
      *  - `Backup.afterExport`: will be triggered after export.
+     *
      * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
      * @throws \LogicException
      * @throws \ReflectionException

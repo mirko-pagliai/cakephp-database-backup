@@ -18,7 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Driver;
 use DatabaseBackup\TestSuite\DriverTestCase;
 
 /**
- * PostgresTest class
+ * PostgresTest class.
  *
  * @uses \DatabaseBackup\Driver\Postgres
  */

@@ -20,7 +20,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 
 /**
- * AbstractBackupUtilityTest
+ * AbstractBackupUtilityTest.
  *
  * @uses \DatabaseBackup\Utility\AbstractBackupUtility
  */
@@ -28,7 +28,6 @@ class AbstractBackupUtilityTest extends TestCase
 {
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\AbstractBackupUtility::getDriver()
      */
     public function testGetDriver(): void

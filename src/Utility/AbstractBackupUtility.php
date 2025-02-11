@@ -28,6 +28,7 @@ use Symfony\Component\Process\Process;
  * AbstractBackupUtility.
  *
  * Provides the code common to the `BackupExport` and `BackupImport` classes.
+ *
  * @property string $filename
  * @property int $timeout
  */
@@ -36,13 +37,11 @@ abstract class AbstractBackupUtility
     use BackupTrait;
 
     /**
-     * Filename where to export/import the database
      * @var string
      */
     protected string $filename;
 
     /**
-     * Timeout for shell commands
      * @var int
      */
     protected int $timeout;
@@ -70,7 +69,8 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Sets the filename
+     * Sets the filename.
+     *
      * @param string $filename Filename. It can be an absolute path
      * @return $this
      * @noinspection PhpMissingReturnTypeInspection
@@ -78,7 +78,8 @@ abstract class AbstractBackupUtility
     abstract public function filename(string $filename);
 
     /**
-     * Sets the timeout for shell commands
+     * Sets the timeout for shell commands.
+     *
      * @param int $timeout Timeout in seconds
      * @return $this
      * @since 2.12.0
@@ -92,10 +93,10 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Gets the driver instance
+     * Gets the driver instance.
+     *
      * @return \DatabaseBackup\Driver\AbstractDriver A driver instance
      * @throws \LogicException
-     * @throws \ReflectionException
      * @since 2.0.0
      */
     public function getDriver(): AbstractDriver
@@ -116,8 +117,10 @@ abstract class AbstractBackupUtility
 
     /**
      * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
+     *
      * @param string $command The command line to pass to the shell of the OS
      * @return \Symfony\Component\Process\Process
+     * @see https://symfony.com/doc/current/components/process.html
      * @since 2.8.7
      */
     protected function getProcess(string $command): Process

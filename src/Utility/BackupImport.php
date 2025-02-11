@@ -24,7 +24,8 @@ use LogicException;
 class BackupImport extends AbstractBackupUtility
 {
     /**
-     * Sets the filename
+     * Sets the filename.
+     *
      * @param string $filename Filename. It can be an absolute path
      * @return $this
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
@@ -53,9 +54,9 @@ class BackupImport extends AbstractBackupUtility
      * When importing, this method will trigger these events (implemented by the driver instance):
      *  - `Backup.beforeImport`: will be triggered before import;
      *  - `Backup.afterImport`: will be triggered after import.
+     *
      * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
      * @throws \LogicException
-     * @throws \ReflectionException
      * @see \DatabaseBackup\Driver\AbstractDriver::afterImport()
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeImport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import

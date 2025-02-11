@@ -25,7 +25,7 @@ use InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * BackupManagerTest class
+ * BackupManagerTest class.
  *
  * @uses \DatabaseBackup\Utility\BackupManager
  */
@@ -56,7 +56,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::delete()
      */
     public function testDelete(): void
@@ -75,7 +74,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
      */
     public function testDeleteAll(): void
@@ -90,7 +88,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
     public function testIndex(): void
@@ -123,7 +120,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
     public function testRotate(): void
@@ -160,7 +156,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::send()
      */
     public function testSend(): void
@@ -181,7 +176,8 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `send()` method, with an invalid file
+     * Test for `send()` method, with an invalid file.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupManager::send()
      */

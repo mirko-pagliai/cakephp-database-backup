@@ -23,7 +23,7 @@ use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
- * BackupTraitTest class
+ * BackupTraitTest class.
  *
  * @uses \DatabaseBackup\BackupTrait
  */

@@ -23,7 +23,8 @@ use DatabaseBackup\BackupTrait;
 use LogicException;
 
 /**
- * Represents a driver containing all methods to export/import database backups according to the connection
+ * Represents a driver containing all methods to export/import database backups according to the connection.
+ *
  * @method \Cake\Event\EventManager getEventManager()
  */
 abstract class AbstractDriver implements EventListenerInterface
@@ -32,7 +33,7 @@ abstract class AbstractDriver implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
@@ -42,7 +43,8 @@ abstract class AbstractDriver implements EventListenerInterface
 
     /**
      * List of events this object is implementing. When the class is registered in an event manager, each individual
-     *  method will be associated with the respective event
+     *  method will be associated with the respective event.
+     *
      * @return array<string, string> Associative array or event key names pointing to the function that should be called
      *  in the object when the respective event is fired
      * @since 2.1.1
@@ -63,10 +65,10 @@ abstract class AbstractDriver implements EventListenerInterface
      *
      * These executables are not yet final, use instead `getExportExecutable()` and `getImportExecutable()` methods to
      *  have the final executables, including compression.
+     *
      * @param string $type Type or the request operation (`export` or `import`)
      * @return string
      * @throws \LogicException
-     * @throws \ReflectionException
      */
     private function getExecutable(string $type): string
     {
@@ -91,11 +93,11 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to export the database, with compression if requested
+     * Gets the executable command to export the database, with compression if requested.
+     *
      * @param string $filename Filename where you want to export the database
      * @return string
      * @throws \LogicException
-     * @throws \ReflectionException
      */
     public function getExportExecutable(string $filename): string
     {
@@ -109,11 +111,11 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to import the database, with compression if requested
+     * Gets the executable command to import the database, with compression if requested.
+     *
      * @param string $filename Filename from which you want to import the database
      * @return string
      * @throws \LogicException
-     * @throws \ReflectionException
      */
     public function getImportExecutable(string $filename): string
     {
@@ -127,7 +129,8 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Called after export
+     * Called after export.
+     *
      * @return void
      * @since 2.1.0
      */
@@ -136,7 +139,8 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Called after import
+     * Called after import.
+     *
      * @return void
      * @since 2.1.0
      */
@@ -145,7 +149,8 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Called before export
+     * Called before export.
+     *
      * @return bool Returns `false` to stop the export
      * @since 2.1.0
      */
@@ -155,7 +160,8 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Called before import
+     * Called before import.
+     *
      * @return bool Returns `false` to stop the import
      * @since 2.1.0
      */
@@ -165,7 +171,8 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Gets a binary path
+     * Gets a binary path.
+     *
      * @param string $name Binary name
      * @return string
      * @throws \LogicException
@@ -181,7 +188,8 @@ abstract class AbstractDriver implements EventListenerInterface
     }
 
     /**
-     * Gets a config value of the connection
+     * Gets a config value of the connection.
+     *
      * @param string $key Config key
      * @return mixed Config value or `null` if the key doesn't exist
      * @since 2.3.0

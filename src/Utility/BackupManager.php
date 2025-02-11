@@ -28,14 +28,15 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * Utility to manage database backups
+ * Utility to manage database backups.
  */
 class BackupManager
 {
     use BackupTrait;
 
     /**
-     * Deletes a backup file
+     * Deletes a backup file.
+     *
      * @param string $filename Backup filename you want to delete. The path can be relative to the backup directory
      * @return string Deleted backup file
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
@@ -53,7 +54,8 @@ class BackupManager
     }
 
     /**
-     * Deletes all backup files
+     * Deletes all backup files.
+     *
      * @return string[] List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
@@ -64,7 +66,8 @@ class BackupManager
     }
 
     /**
-     * Returns a list of database backups
+     * Returns a list of database backups.
+     *
      * @return \Cake\Collection\CollectionInterface Array of backups
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
@@ -92,6 +95,7 @@ class BackupManager
      * Rotates backups.
      *
      * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
+     *
      * @param int $rotate Number of backups that you want to keep
      * @return array<\Cake\ORM\Entity> Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
@@ -109,7 +113,8 @@ class BackupManager
     }
 
     /**
-     * Internal method to get an email instance with all options to send a backup file via email
+     * Internal method to get an email instance with all options to send a backup file via email.
+     *
      * @param string $backup Backup you want to send
      * @param string $recipient Recipient's email address
      * @return \Cake\Mailer\Mailer
@@ -132,7 +137,8 @@ class BackupManager
     }
 
     /**
-     * Sends a backup file via email
+     * Sends a backup file via email.
+     *
      * @param string $filename Backup filename you want to send via email. The path can be relative to the backup directory
      * @param string $recipient Recipient's email address
      * @return array{headers: string, message: string}

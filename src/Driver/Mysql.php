@@ -19,7 +19,7 @@ namespace DatabaseBackup\Driver;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Mysql driver to export/import database backups
+ * Mysql driver to export/import database backups.
  */
 class Mysql extends AbstractDriver
 {
@@ -33,6 +33,7 @@ class Mysql extends AbstractDriver
      * Internal method to get the auth file path.
      *
      * This method returns only the path that will be used and does not verify that the file already exists.
+     *
      * @return string
      * @since 2.11.0
      */
@@ -42,7 +43,8 @@ class Mysql extends AbstractDriver
     }
 
     /**
-     * Internal method to write an auth file
+     * Internal method to write an auth file.
+     *
      * @param string $content Content
      * @return bool
      * @since 2.3.0
@@ -62,7 +64,8 @@ class Mysql extends AbstractDriver
     }
 
     /**
-     * Called after export
+     * Called after export.
+     *
      * @return void
      * @since 2.1.0
      */
@@ -72,7 +75,8 @@ class Mysql extends AbstractDriver
     }
 
     /**
-     * Called after import
+     * Called after import.
+     *
      * @return void
      * @since 2.1.0
      */
@@ -89,6 +93,7 @@ class Mysql extends AbstractDriver
      * For security reasons, it's recommended to specify the password in a configuration file and not in the command (a
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
+     *
      * @return bool
      * @since 2.1.0
      */
@@ -108,6 +113,7 @@ class Mysql extends AbstractDriver
      * For security reasons, it's recommended to specify the password in a configuration file and not in the command (a
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
+     *
      * @return bool
      * @since 2.1.0
      */
@@ -120,7 +126,8 @@ class Mysql extends AbstractDriver
     }
 
     /**
-     * Deletes the temporary file with the database authentication data
+     * Deletes the temporary file with the database authentication data.
+     *
      * @return void
      * @since 2.1.0
      */

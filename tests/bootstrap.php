@@ -119,7 +119,6 @@ if (!function_exists('createBackup')) {
      * Global function to create a backup file
      * @param string $filename Filename
      * @return string
-     * @throws \ReflectionException
      */
     function createBackup(string $filename = 'backup.sql'): string
     {
@@ -131,7 +130,6 @@ if (!function_exists('createSomeBackups')) {
     /**
      * Global function to create some backup files
      * @return string[]
-     * @throws \ReflectionException
      */
     function createSomeBackups(): array
     {

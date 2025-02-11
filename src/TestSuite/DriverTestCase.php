@@ -33,8 +33,7 @@ abstract class DriverTestCase extends TestCase
     protected AbstractDriver $Driver;
 
     /**
-     * Called before every test method
-     * @return void
+     * @inheritDoc
      */
     protected function setUp(): void
     {
@@ -51,7 +50,6 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * @return void
-     * @throws \ReflectionException|\ErrorException
      * @uses \DatabaseBackup\Driver\AbstractDriver::getExportExecutable()
      */
     public function testGetExportExecutable(): void
@@ -69,7 +67,6 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * @return void
-     * @throws \ReflectionException|\ErrorException
      * @uses \DatabaseBackup\Driver\AbstractDriver::getImportExecutable()
      */
     public function testGetImportExecutable(): void
