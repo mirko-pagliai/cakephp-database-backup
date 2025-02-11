@@ -2,6 +2,7 @@
 ## 2.13 branch
 ### 2.13.4
 * added tests for php 8.4;
+* all chainable methods of X and Y now have the typehint for returning self. Updated descriptions;
 * updated `psalm` to `6.x`.
 * uses `cakedc/cakephp-phpstan`;
 * extensive revision of descriptions and tags of all classes and methods;
