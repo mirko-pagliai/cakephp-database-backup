@@ -80,13 +80,15 @@ class BackupManager
             //Sorts in descending order by last modified date
             ->sort(fn (SplFileInfo $a, SplFileInfo $b): bool => $a->getMTime() < $b->getMTime());
 
+        $Now = new DateTime();
+
         return (new Collection($Finder))
             ->map(fn (SplFileInfo $File): array => [
                 'filename' => $File->getFilename(),
                 'extension' => self::getExtension($File->getFilename()),
                 'compression' => self::getCompression($File->getFilename()),
                 'size' => $File->getSize(),
-                'datetime' => DateTime::createFromTimestamp($File->getMTime()),
+                'datetime' => DateTime::createFromTimestamp($File->getCTime(), $Now->getTimezone()),
             ])
             ->compile(false);
     }
