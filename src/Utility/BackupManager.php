@@ -19,7 +19,7 @@ namespace DatabaseBackup\Utility;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
-use Cake\I18n\FrozenTime;
+use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
 use DatabaseBackup\BackupTrait;
 use LogicException;
@@ -86,7 +86,7 @@ class BackupManager
                 'extension' => self::getExtension($File->getFilename()),
                 'compression' => self::getCompression($File->getFilename()),
                 'size' => $File->getSize(),
-                'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
+                'datetime' => DateTime::createFromTimestamp($File->getMTime()),
             ])
             ->compile(false);
     }

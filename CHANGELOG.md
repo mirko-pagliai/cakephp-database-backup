@@ -7,6 +7,7 @@
 * all chainable methods of X and Y now have the typehint for returning self. Updated descriptions;
 * updated `psalm` to `6.x`.
 * uses `cakedc/cakephp-phpstan`;
+* the old `FrozenTime` classes have been replaced with `DateTime` (which it was an alias for);
 * extensive revision of descriptions and tags of all classes and methods;
 * removed some errors related to phpcs, phpstan and psalm, previously silenced;
 * the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been

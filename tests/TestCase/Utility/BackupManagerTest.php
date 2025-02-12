@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use Cake\I18n\FrozenTime;
+use Cake\I18n\DateTime;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -114,7 +114,7 @@ class BackupManagerTest extends TestCase
         foreach ($files as $file) {
             $this->assertIsArray($file);
             $this->assertGreaterThan(0, $file['size']);
-            $this->assertInstanceOf(FrozenTime::class, $file['datetime']);
+            $this->assertInstanceOf(DateTime::class, $file['datetime']);
         }
     }
 
