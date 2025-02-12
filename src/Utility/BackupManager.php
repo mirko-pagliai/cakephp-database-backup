@@ -88,7 +88,7 @@ class BackupManager
                 'extension' => self::getExtension($File->getFilename()),
                 'compression' => self::getCompression($File->getFilename()),
                 'size' => $File->getSize(),
-                'datetime' => DateTime::createFromTimestamp($File->getCTime(), $Now->getTimezone()),
+                'datetime' => DateTime::createFromTimestamp($File->getMTime(), $Now->getTimezone()),
             ])
             ->compile(false);
     }
