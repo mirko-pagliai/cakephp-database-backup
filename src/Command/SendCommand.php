@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
-use Cake\Console\CommandFactoryInterface;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
@@ -31,16 +30,6 @@ use Exception;
  */
 class SendCommand extends Command
 {
-    public function __construct(?CommandFactoryInterface $factory = null)
-    {
-        parent::__construct($factory);
-
-        deprecationWarning(
-            '2.13.4',
-            'The `SendCommand` is deprecated. Will be removed in a future release'
-        );
-    }
-
     /**
      * @inheritDoc
      */
@@ -71,6 +60,11 @@ class SendCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
+
+        deprecationWarning(
+            '2.13.4',
+            'The `SendCommand` is deprecated. Will be removed in a future release'
+        );
 
         try {
             BackupManager::send($args->getArgument('filename') ?: '', $args->getArgument('recipient') ?: '');

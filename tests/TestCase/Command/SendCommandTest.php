@@ -27,18 +27,6 @@ class SendCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    /**
-     * Tests the class is deprecated
-     *
-     * @test
-     * @uses \DatabaseBackup\Command\SendCommand::__construct()
-     */
-    public function testConstructIsDeprecated(): void
-    {
-        $this->deprecated(function (): void {
-            $this->exec('database_backup.send -v' . ' ' . createBackup() . ' recipient@example.com');
-        });
-    }
 
     /**
      * @test
@@ -63,5 +51,16 @@ class SendCommandTest extends TestCase
         //With no existing file
         $this->exec('database_backup.send -v /noExistingDir/backup.sql');
         $this->assertExitError();
+    }
+
+    /**
+     * @test
+     * @uses \DatabaseBackup\Command\SendCommand::execute()
+     */
+    public function testExecuteIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->exec('database_backup.send -v' . ' ' . createBackup() . ' recipient@example.com');
+        });
     }
 }
