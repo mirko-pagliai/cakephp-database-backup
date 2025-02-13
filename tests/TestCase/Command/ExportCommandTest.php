@@ -23,6 +23,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * ExportCommandTest class
@@ -134,11 +135,10 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, the `send` option is deprecated
-     *
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[WithoutErrorHandler]
     public function testExecuteSendOptionIsDeprecated(): void
     {
         $this->deprecated(function (): void {

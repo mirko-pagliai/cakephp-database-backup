@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Core\Configure;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * SendCommandTest class.
@@ -56,6 +57,7 @@ class SendCommandTest extends TestCase
      * @test
      * @uses \DatabaseBackup\Command\SendCommand::execute()
      */
+    #[WithoutErrorHandler]
     public function testExecuteIsDeprecated(): void
     {
         $this->deprecated(function (): void {
