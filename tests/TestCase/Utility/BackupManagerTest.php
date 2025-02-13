@@ -176,6 +176,17 @@ class BackupManagerTest extends TestCase
     }
 
     /**
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::send()
+     */
+    public function testSendIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->BackupManager->send(createBackup(), 'recipient@example.com');
+        });
+    }
+
+    /**
      * Test for `send()` method, with an invalid file.
      *
      * @test
