@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * DeleteAllCommandTest class
@@ -55,6 +56,7 @@ class DeleteAllCommandTest extends TestCase
      * @test
      * @uses \DatabaseBackup\Command\DeleteAllCommand::execute()
      */
+    #[WithoutErrorHandler]
     public function testExecuteIsDeprecated(): void
     {
         $this->deprecated(function (): void {

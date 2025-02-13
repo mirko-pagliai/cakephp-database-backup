@@ -21,6 +21,7 @@ use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -134,11 +135,10 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Tests for `send()` method, is deprecated
-     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::send()
      */
+    #[WithoutErrorHandler]
     public function testSendIsDeprecated(): void
     {
         $this->deprecated(function (): void {
