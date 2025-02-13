@@ -37,7 +37,7 @@ $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 ```
 
 Then you have to load the plugin. For more information on how to load the plugin,
-please refer to the [Cookbook](https://book.cakephp.org/5/en/plugins.html#loading-a-plugin).
+please refer to the [CakePHP documentation](https://book.cakephp.org/5/en/plugins.html#loading-a-plugin).
 
 Simply, you can execute the shell command to enable the plugin:
 ```bash
@@ -75,7 +75,7 @@ The plugin uses some configuration parameters. See our wiki:
 
 If you want to send backup files by email, remember to set up your application
 correctly so that it can send emails. For more information on how to configure
-your application, see the [Cookbook](https://book.cakephp.org/5/en/core-libraries/email.html#configuring-transports).
+your application, see the [CakePHP documentation](https://book.cakephp.org/5/en/core-libraries/email.html#configuring-transports).
 
 ## How to use
 
