@@ -11,6 +11,7 @@
   removed in a later release. No replacement is provided.
 * setting the `DatabaseBackup.mailSender` value of the configuration is deprecated (bootstrap checks that the value
   has not been set by the user);
+* the `DeleteAllCommand` is deprecated. Will be removed in a future release;
 * added tests for php 8.4;
 * all chainable methods of `BackupExport` and `BackupImport` classes now have the typehint for returning self. Updated 
   descriptions;
