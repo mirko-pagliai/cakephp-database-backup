@@ -33,6 +33,8 @@ class SendCommandTest extends TestCase
      */
     public function testExecute(): void
     {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
         $file = createBackup();
         $this->exec('database_backup.send -v' . ' ' . $file . ' recipient@example.com');
         $this->assertExitSuccess();
@@ -48,5 +50,16 @@ class SendCommandTest extends TestCase
         //With no existing file
         $this->exec('database_backup.send -v /noExistingDir/backup.sql');
         $this->assertExitError();
+    }
+
+    /**
+     * @test
+     * @uses \DatabaseBackup\Command\SendCommand::execute()
+     */
+    public function testExecuteIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->exec('database_backup.send -v' . ' ' . createBackup() . ' recipient@example.com');
+        });
     }
 }

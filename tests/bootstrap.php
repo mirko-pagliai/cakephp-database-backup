@@ -94,7 +94,7 @@ ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 
 Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups' . DS);
-Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
 /**
  * For Xampp
  */

@@ -19,6 +19,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\Exception\StopException;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Console\TestSuite\StubConsoleOutput;
+use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -123,11 +124,26 @@ class ExportCommandTest extends TestCase
      */
     public function testExecuteSendOption(): void
     {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
         $this->exec($this->command . ' --send mymail@example.com');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` was sent via mail/');
         $this->assertErrorEmpty();
+    }
+
+    /**
+     * Test for `execute()` method, the `send` option is deprecated
+     *
+     * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    public function testExecuteSendOptionIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->exec($this->command . ' --send mymail@example.com');
+        });
     }
 
     /**

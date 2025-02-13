@@ -50,4 +50,15 @@ class DeleteAllCommandTest extends TestCase
         $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
     }
+
+    /**
+     * @test
+     * @uses \DatabaseBackup\Command\DeleteAllCommand::execute()
+     */
+    public function testExecuteIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->exec('database_backup.delete_all -v');
+        });
+    }
 }

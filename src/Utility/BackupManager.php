@@ -122,6 +122,7 @@ class BackupManager
      * @return \Cake\Mailer\Mailer
      * @since 1.1.0
      * @throws \LogicException
+     * @deprecated 2.13.4: `BackupManager::getEmailInstance()` method is deprecated. Will be removed in a future release
      */
     protected static function getEmailInstance(string $backup, string $recipient): Mailer
     {
@@ -148,9 +149,12 @@ class BackupManager
      * @return array{headers: string, message: string}
      * @throws \LogicException
      * @since 1.1.0
+     * @deprecated 2.13.4: the `BackupManager::send()` method is deprecated. Will be removed in a future release
      */
     public static function send(string $filename, string $recipient): array
     {
+        deprecationWarning('2.13.4', 'The `BackupManager::send()` method is deprecated. Will be removed in a future release');
+
         return self::getEmailInstance($filename, $recipient)->send();
     }
 }

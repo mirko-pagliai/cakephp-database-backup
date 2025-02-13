@@ -53,6 +53,11 @@ $defaults = [
 ];
 Configure::write(array_filter($defaults, fn (string $key): bool => !Configure::check($key), ARRAY_FILTER_USE_KEY));
 
+//@todo to be removed in 2.14.x
+if (Configure::check('DatabaseBackup.mailSender')) {
+    deprecationWarning('2.13.4', 'Setting the `DatabaseBackup.mailSender` value of the configuration is deprecated');
+}
+
 /**
  * It automatically discovers executables not already set by the user in the configuration.
  *
