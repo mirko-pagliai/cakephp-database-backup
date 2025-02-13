@@ -33,6 +33,8 @@ class SendCommandTest extends TestCase
      */
     public function testExecute(): void
     {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
         $file = createBackup();
         $this->exec('database_backup.send -v' . ' ' . $file . ' recipient@example.com');
         $this->assertExitSuccess();

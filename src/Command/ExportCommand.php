@@ -127,6 +127,11 @@ class ExportCommand extends Command
                 }
             }
             if ($args->getOption('send')) {
+                deprecationWarning(
+                    '2.13.4',
+                    'The `send` option for the `ExportCommand` is deprecated. Will be removed in a future release'
+                );
+
                 $this->executeCommand(
                     SendCommand::class,
                     array_merge([$file, (string)$args->getOption('send')], $extraOptions),

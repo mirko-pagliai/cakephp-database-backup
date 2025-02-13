@@ -166,6 +166,7 @@ class BackupExportTest extends TestCase
         $this->assertSame('backup.sql.bz2', basename($file));
 
         //Exports with `send()`
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
         $recipient = 'recipient@example.com';
         $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export() ?: '';
         $this->assertMailSentFrom(Configure::readOrFail('DatabaseBackup.mailSender'));

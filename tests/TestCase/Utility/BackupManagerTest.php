@@ -160,6 +160,8 @@ class BackupManagerTest extends TestCase
      */
     public function testSend(): void
     {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
         $file = createBackup();
         $recipient = 'recipient@example.com';
         $this->BackupManager->send($file, $recipient);
@@ -181,6 +183,8 @@ class BackupManagerTest extends TestCase
      */
     public function testSendIsDeprecated(): void
     {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
         $this->deprecated(function (): void {
             $this->BackupManager->send(createBackup(), 'recipient@example.com');
         });
