@@ -1,9 +1,16 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.4
+* fixed [bug #119](https://github.com/mirko-pagliai/cakephp-database-backup/issues/119): `BackupManager` ignored the 
+    timezone of backup files, and consequently also `IndexCommand`;
+* fixed [bug #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for
+  `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
 * added tests for php 8.4;
+* all chainable methods of `BackupExport` and `BackupImport` classes now have the typehint for returning self. Updated 
+  descriptions;
 * updated `psalm` to `6.x`.
 * uses `cakedc/cakephp-phpstan`;
+* the old `FrozenTime` classes have been replaced with `DateTime` (which it was an alias for);
 * extensive revision of descriptions and tags of all classes and methods;
 * removed some errors related to phpcs, phpstan and psalm, previously silenced;
 * the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been

@@ -64,12 +64,11 @@ class BackupExport extends AbstractBackupUtility
      *  - `null` for no compression.
      *
      * @param string|null $compression Compression type name
-     * @return $this
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
+     * @return self
      * @throws \LogicException
-     * @noinspection PhpMissingReturnTypeInspection
+     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      */
-    public function compression(?string $compression)
+    public function compression(?string $compression): self
     {
         $this->extension = $this->defaultExtension;
 
@@ -90,12 +89,11 @@ class BackupExport extends AbstractBackupUtility
      * The compression type will be automatically set by the filename.
      *
      * @param string $filename Filename. It can be an absolute path and may contain patterns
-     * @return $this
+     * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws \LogicException
-     * @noinspection PhpMissingReturnTypeInspection
      */
-    public function filename(string $filename)
+    public function filename(string $filename): self
     {
         $config = $this->getConnection()->config();
 
@@ -136,11 +134,10 @@ class BackupExport extends AbstractBackupUtility
      * Sets the number of backups you want to keep. So, it will delete all backups that are older.
      *
      * @param int $rotate Number of backups you want to keep
-     * @return $this
+     * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
-     * @noinspection PhpMissingReturnTypeInspection
      */
-    public function rotate(int $rotate)
+    public function rotate(int $rotate): self
     {
         $this->rotate = $rotate;
 
@@ -151,11 +148,10 @@ class BackupExport extends AbstractBackupUtility
      * Sets the recipient's email address to send the backup file via mail.
      *
      * @param string|null $recipient Recipient's email address or `null` to disable
-     * @return $this
+     * @return self
      * @since 1.1.0
-     * @noinspection PhpMissingReturnTypeInspection
      */
-    public function send(?string $recipient = null)
+    public function send(?string $recipient = null): self
     {
         $this->emailRecipient = $recipient;
 
@@ -171,7 +167,6 @@ class BackupExport extends AbstractBackupUtility
      *
      * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
      * @throws \LogicException
-     * @throws \ReflectionException
      * @see \DatabaseBackup\Driver\AbstractDriver::afterExport()
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
