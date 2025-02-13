@@ -8,7 +8,7 @@
 * all classes, methods and code related to sending backups via email are now deprecated. So, the `BackupManager::send()`
   method (and, consequently, also the internal `BackupManager::getEmailInstance()` method), the `BackupExport::send()`
   method, the `SendCommand` class and the `send` option for the `ExportCommand` are deprecated. All of these will be
-  removed in a later release. No replacement is provided.
+  removed in a later release. No replacement is provided;
 * setting the `DatabaseBackup.mailSender` value of the configuration is deprecated (bootstrap checks that the value
   has not been set by the user);
 * the `DeleteAllCommand` is deprecated. Will be removed in a future release;
