@@ -13,7 +13,8 @@
   has not been set by the user);
 * the `send` option for the `ExportCommand` is deprecated. Will be removed in a future release;
 * added tests for php 8.4;
-* all chainable methods of X and Y now have the typehint for returning self. Updated descriptions;
+* all chainable methods of `BackupExport` and `BackupImport` classes now have the typehint for returning self. Updated 
+  descriptions;
 * updated `psalm` to `6.x`.
 * uses `cakedc/cakephp-phpstan`;
 * the old `FrozenTime` classes have been replaced with `DateTime` (which it was an alias for);
