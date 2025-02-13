@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Event\EventList;
-use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -31,8 +30,6 @@ use Symfony\Component\Process\Process;
  */
 class BackupExportTest extends TestCase
 {
-    use EmailTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
@@ -121,20 +118,6 @@ class BackupExportTest extends TestCase
 
     /**
      * @test
-     * @uses \DatabaseBackup\Utility\BackupExport::send()
-     */
-    public function testSend(): void
-    {
-        $this->BackupExport->send();
-        $this->assertNull($this->BackupExport->emailRecipient);
-
-        $recipient = 'recipient@example.com';
-        $this->BackupExport->send($recipient);
-        $this->assertSame($recipient, $this->BackupExport->emailRecipient);
-    }
-
-    /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::timeout()
      */
     public function testTimeout(): void
@@ -164,14 +147,6 @@ class BackupExportTest extends TestCase
         $file = $this->BackupExport->filename('backup.sql.bz2')->export() ?: '';
         $this->assertFileExists($file);
         $this->assertSame('backup.sql.bz2', basename($file));
-
-        //Exports with `send()`
-        $recipient = 'recipient@example.com';
-        $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export() ?: '';
-        $this->assertMailSentFrom(Configure::readOrFail('DatabaseBackup.mailSender'));
-        $this->assertMailSentTo($recipient);
-        $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
-        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
 
         //With a file that already exists
         $this->expectExceptionMessage('File `' . $this->BackupExport->getAbsolutePath('backup.sql.bz2') . '` already exists');

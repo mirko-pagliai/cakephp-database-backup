@@ -1,10 +1,24 @@
 # 2.x branch
+## 2.14 branch
+### 2.14.0
+* all classes, methods and code related to sending backups via email had been deprecated, and now they have been
+  removed. So, the `BackupManager::send()` method (and, consequently, also the internal
+  `BackupManager::getEmailInstance()` method), the `BackupExport::send()` method, the `SendCommand` class and the
+  `send` option for the `ExportCommand` have been removed.
+
 ## 2.13 branch
 ### 2.13.4
 * fixed [bug #119](https://github.com/mirko-pagliai/cakephp-database-backup/issues/119): `BackupManager` ignored the 
     timezone of backup files, and consequently also `IndexCommand`;
 * fixed [bug #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for
   `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
+* all classes, methods and code related to sending backups via email are now deprecated. So, the `BackupManager::send()`
+  method (and, consequently, also the internal `BackupManager::getEmailInstance()` method), the `BackupExport::send()`
+  method, the `SendCommand` class and the `send` option for the `ExportCommand` are deprecated. All of these will be
+  removed in a later release. No replacement is provided.
+* setting the `DatabaseBackup.mailSender` value of the configuration is deprecated (bootstrap checks that the value
+  has not been set by the user);
+* the `DeleteAllCommand` is deprecated. Will be removed in a future release;
 * added tests for php 8.4;
 * all chainable methods of `BackupExport` and `BackupImport` classes now have the typehint for returning self. Updated 
   descriptions;

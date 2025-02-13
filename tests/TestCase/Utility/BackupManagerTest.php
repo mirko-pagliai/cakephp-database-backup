@@ -21,7 +21,6 @@ use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
-use InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -152,38 +151,5 @@ class BackupManagerTest extends TestCase
 
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupManager->rotate(-1);
-    }
-
-    /**
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupManager::send()
-     */
-    public function testSend(): void
-    {
-        $file = createBackup();
-        $recipient = 'recipient@example.com';
-        $this->BackupManager->send($file, $recipient);
-        $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
-        $this->assertMailSentTo($recipient);
-        $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
-        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
-
-        //With an invalid sender
-        $this->expectException(InvalidArgumentException::class);
-        unlink($file);
-        Configure::write('DatabaseBackup.mailSender', 'invalidSender');
-        $this->BackupManager->send(createBackup(), 'recipient@example.com');
-    }
-
-    /**
-     * Test for `send()` method, with an invalid file.
-     *
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupManager::send()
-     */
-    public function testSendWithInvalidFile(): void
-    {
-        $this->expectExceptionMessage('File or directory `' . Configure::readOrFail('DatabaseBackup.target') . 'noExistingFile` is not readable');
-        $this->BackupManager->send('noExistingFile', 'recipient@example.com');
     }
 }

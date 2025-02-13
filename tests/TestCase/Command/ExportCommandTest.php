@@ -116,21 +116,6 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `send` option.
-     *
-     * @test
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
-     */
-    public function testExecuteSendOption(): void
-    {
-        $this->exec($this->command . ' --send mymail@example.com');
-        $this->assertExitSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
-        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` was sent via mail/');
-        $this->assertErrorEmpty();
-    }
-
-    /**
      * Test for `execute()` method, with `timeout` option.
      *
      * @test

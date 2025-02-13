@@ -56,11 +56,6 @@ class ExportCommand extends Command
                         'will be deleted'),
                     'short' => 'r',
                 ],
-                'send' => [
-                    'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
-                        'to indicate the recipient\'s email address'),
-                    'short' => 's',
-                ],
                 'timeout' => [
                     'help' => __d(
                         'database_backup',
@@ -85,7 +80,7 @@ class ExportCommand extends Command
     /**
      * Exports a database backup.
      *
-     * This command uses `RotateCommand` and `SendCommand`.
+     * This command uses `RotateCommand`.
      *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
@@ -119,21 +114,15 @@ class ExportCommand extends Command
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
-            //Sends via email and/or rotates. It keeps options `verbose` and `quiet`.
-            $extraOptions = [];
-            foreach (['verbose', 'quiet'] as $option) {
-                if ($args->getOption($option)) {
-                    $extraOptions[] = '--' . $option;
-                }
-            }
-            if ($args->getOption('send')) {
-                $this->executeCommand(
-                    SendCommand::class,
-                    array_merge([$file, (string)$args->getOption('send')], $extraOptions),
-                    $io
-                );
-            }
+            //Rotates. It keeps options `verbose` and `quiet`.
             if ($args->getOption('rotate')) {
+                $extraOptions = [];
+                foreach (['verbose', 'quiet'] as $option) {
+                    if ($args->getOption($option)) {
+                        $extraOptions[] = '--' . $option;
+                    }
+                }
+
                 $this->executeCommand(
                     RotateCommand::class,
                     array_merge([(string)$args->getOption('rotate')], $extraOptions),

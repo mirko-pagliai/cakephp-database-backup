@@ -89,7 +89,7 @@ class BackupExportAndImportTest extends TestCase
      */
     public function testGetMagicMethod(): void
     {
-        $this->assertNull($this->BackupExport->emailRecipient);
+        $this->assertNull($this->BackupExport->compression);
 
         $this->expectExceptionMessage('Undefined property: ' . BackupExport::class . '::$noExistingProperty');
         // @phpstan-ignore property.notFound, expr.resultUnused

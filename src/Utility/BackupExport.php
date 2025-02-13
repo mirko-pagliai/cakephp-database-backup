@@ -24,7 +24,6 @@ use Symfony\Component\Filesystem\Filesystem;
  * Utility to export databases.
  *
  * @property ?string $compression
- * @property ?string $emailRecipient
  * @property string $extension
  * @property int $rotate
  */
@@ -39,11 +38,6 @@ class BackupExport extends AbstractBackupUtility
      * @var string
      */
     private string $defaultExtension = 'sql';
-
-    /**
-     * @var string|null
-     */
-    protected ?string $emailRecipient = null;
 
     /**
      * @var string
@@ -145,20 +139,6 @@ class BackupExport extends AbstractBackupUtility
     }
 
     /**
-     * Sets the recipient's email address to send the backup file via mail.
-     *
-     * @param string|null $recipient Recipient's email address or `null` to disable
-     * @return self
-     * @since 1.1.0
-     */
-    public function send(?string $recipient = null): self
-    {
-        $this->emailRecipient = $recipient;
-
-        return $this;
-    }
-
-    /**
      * Exports the database.
      *
      * When exporting, this method will trigger these events (implemented by the driver instance):
@@ -200,9 +180,6 @@ class BackupExport extends AbstractBackupUtility
         //Dispatches the `Backup.afterExport` event implemented by the driver
         $this->getDriver()->dispatchEvent('Backup.afterExport');
 
-        if ($this->emailRecipient) {
-            BackupManager::send($filename, $this->emailRecipient);
-        }
         if ($this->rotate) {
             BackupManager::rotate($this->rotate);
         }
