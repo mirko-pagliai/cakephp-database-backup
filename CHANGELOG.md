@@ -7,6 +7,8 @@
   `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
 * `BackupManager::send()` method is deprecated. Will be removed in a future release (consequently, the internal
   `BackupManager::getEmailInstance()` method is also deprecated);
+* setting the `DatabaseBackup.mailSender` value of the configuration is deprecated (bootstrap checks that the value
+  has not been set by the user);
 * added tests for php 8.4;
 * all chainable methods of X and Y now have the typehint for returning self. Updated descriptions;
 * updated `psalm` to `6.x`.
