@@ -7,6 +7,7 @@
   `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
 * `BackupManager::send()` method is deprecated. Will be removed in a future release (consequently, the internal
   `BackupManager::getEmailInstance()` method is also deprecated);
+* the `SendCommand` is deprecated. Will be removed in a future release;
 * setting the `DatabaseBackup.mailSender` value of the configuration is deprecated (bootstrap checks that the value
   has not been set by the user);
 * the `send` option for the `ExportCommand` is deprecated. Will be removed in a future release;

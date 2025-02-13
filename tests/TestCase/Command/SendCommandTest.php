@@ -28,6 +28,19 @@ class SendCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * Tests the class is deprecated
+     *
+     * @test
+     * @uses \DatabaseBackup\Command\SendCommand::__construct()
+     */
+    public function testConstructIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->exec('database_backup.send -v' . ' ' . createBackup() . ' recipient@example.com');
+        });
+    }
+
+    /**
      * @test
      * @uses \DatabaseBackup\Command\SendCommand::execute()
      */
