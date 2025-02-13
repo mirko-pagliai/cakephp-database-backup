@@ -150,7 +150,7 @@ class BackupExport extends AbstractBackupUtility
      * @param string|null $recipient Recipient's email address or `null` to disable
      * @return self
      * @since 1.1.0
-     * @deprecated 2.13.4 The `BackupExport::send()` method is deprecated. Will be removed in a future release
+     * @deprecated 2.13.4 the `BackupExport::send()` method is deprecated. Will be removed in a future release
      */
     public function send(?string $recipient = null): self
     {

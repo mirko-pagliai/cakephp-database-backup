@@ -5,7 +5,7 @@
     timezone of backup files, and consequently also `IndexCommand`;
 * fixed [bug #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for
   `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
-* `BackupManager::send()` method is deprecated. Will be removed in a future release (consequently, the internal
+* the `BackupManager::send()` method is deprecated. Will be removed in a future release (consequently, the internal
   `BackupManager::getEmailInstance()` method is also deprecated);
 * the `BackupExport::send()` method is deprecated. Will be removed in a future release;
 * the `SendCommand` is deprecated. Will be removed in a future release;
