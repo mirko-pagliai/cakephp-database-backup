@@ -19,7 +19,7 @@ namespace DatabaseBackup\Utility;
 use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
-use Cake\I18n\FrozenTime;
+use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
 use DatabaseBackup\BackupTrait;
 use LogicException;
@@ -28,14 +28,15 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * Utility to manage database backups
+ * Utility to manage database backups.
  */
 class BackupManager
 {
     use BackupTrait;
 
     /**
-     * Deletes a backup file
+     * Deletes a backup file.
+     *
      * @param string $filename Backup filename you want to delete. The path can be relative to the backup directory
      * @return string Deleted backup file
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
@@ -53,18 +54,20 @@ class BackupManager
     }
 
     /**
-     * Deletes all backup files
-     * @return string[] List of deleted backup files
+     * Deletes all backup files.
+     *
+     * @return array<string> List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
      */
     public static function deleteAll(): array
     {
-        return array_map([__CLASS__, 'delete'], self::index()->extract('filename')->toList());
+        return array_map([self::class, 'delete'], self::index()->extract('filename')->toList());
     }
 
     /**
-     * Returns a list of database backups
+     * Returns a list of database backups.
+     *
      * @return \Cake\Collection\CollectionInterface Array of backups
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
@@ -77,13 +80,15 @@ class BackupManager
             //Sorts in descending order by last modified date
             ->sort(fn (SplFileInfo $a, SplFileInfo $b): bool => $a->getMTime() < $b->getMTime());
 
+        $Now = new DateTime();
+
         return (new Collection($Finder))
             ->map(fn (SplFileInfo $File): array => [
                 'filename' => $File->getFilename(),
                 'extension' => self::getExtension($File->getFilename()),
                 'compression' => self::getCompression($File->getFilename()),
                 'size' => $File->getSize(),
-                'datetime' => FrozenTime::createFromTimestamp($File->getMTime()),
+                'datetime' => DateTime::createFromTimestamp($File->getMTime(), $Now->getTimezone()),
             ])
             ->compile(false);
     }
@@ -92,8 +97,9 @@ class BackupManager
      * Rotates backups.
      *
      * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
+     *
      * @param int $rotate Number of backups that you want to keep
-     * @return array<\Cake\ORM\Entity> Array of deleted files
+     * @return array<array{filename: string, extension: ?string, compression: ?string, size: false|int, datetime: \Cake\I18n\Date}> Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      * @throws \LogicException
      */
@@ -103,18 +109,20 @@ class BackupManager
             throw new LogicException(__d('database_backup', 'Invalid rotate value'));
         }
         $backupsToBeDeleted = self::index()->skip($rotate);
-        array_map([__CLASS__, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
+        array_map([self::class, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 
         return $backupsToBeDeleted->toList();
     }
 
     /**
-     * Internal method to get an email instance with all options to send a backup file via email
+     * Internal method to get an email instance with all options to send a backup file via email.
+     *
      * @param string $backup Backup you want to send
      * @param string $recipient Recipient's email address
      * @return \Cake\Mailer\Mailer
      * @since 1.1.0
      * @throws \LogicException
+     * @deprecated 2.13.4: `BackupManager::getEmailInstance()` method is deprecated. Will be removed in a future release
      */
     protected static function getEmailInstance(string $backup, string $recipient): Mailer
     {
@@ -128,19 +136,25 @@ class BackupManager
             ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
             ->setTo($recipient)
             ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($filename), $server))
-            ->setAttachments([basename($filename) => ['file' => $filename, 'mimetype' => mime_content_type($filename)]]);
+            ->setAttachments([
+                basename($filename) => ['file' => $filename, 'mimetype' => mime_content_type($filename)],
+            ]);
     }
 
     /**
-     * Sends a backup file via email
+     * Sends a backup file via email.
+     *
      * @param string $filename Backup filename you want to send via email. The path can be relative to the backup directory
      * @param string $recipient Recipient's email address
      * @return array{headers: string, message: string}
      * @throws \LogicException
      * @since 1.1.0
+     * @deprecated 2.13.4: the `BackupManager::send()` method is deprecated. Will be removed in a future release
      */
     public static function send(string $filename, string $recipient): array
     {
+        deprecationWarning('2.13.4', 'The `BackupManager::send()` method is deprecated. Will be removed in a future release');
+
         return self::getEmailInstance($filename, $recipient)->send();
     }
 }

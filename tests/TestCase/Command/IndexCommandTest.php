@@ -31,7 +31,6 @@ class IndexCommandTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Command\IndexCommand::execute()
      */
     public function testExecute(): void

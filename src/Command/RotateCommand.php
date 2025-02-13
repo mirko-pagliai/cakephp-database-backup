@@ -24,22 +24,24 @@ use DatabaseBackup\Utility\BackupManager;
 use Exception;
 
 /**
- * Rotates backups
+ * Command to rotate backups.
+ *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#rotate
  */
 class RotateCommand extends Command
 {
     /**
-     * Hook method for defining this command's option parser
-     * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
-     * @return \Cake\Console\ConsoleOptionParser
+     * @inheritDoc
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser
             ->setDescription(__d('database_backup', 'Rotates backups'))
             ->addArgument('keep', [
-                'help' => __d('database_backup', 'Number of backups you want to keep. So, it will delete all backups that are older'),
+                'help' => __d(
+                    'database_backup',
+                    'Number of backups you want to keep. So, it will delete all backups that are older'
+                ),
                 'required' => true,
             ]);
     }
@@ -48,11 +50,12 @@ class RotateCommand extends Command
      * Rotates backups.
      *
      * You have to indicate the number of backups you want to keep. So, it will
-     *  delete all backups that are older. By default, no backup will be deleted
+     *  delete all backups that are older. By default, no backup will be deleted.
+     *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @throws \Cake\Console\Exception\StopException|\ReflectionException
+     * @throws \Cake\Console\Exception\StopException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {

@@ -21,7 +21,7 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupManager;
 
 /**
- * TestCase class
+ * TestCase class.
  */
 abstract class TestCase extends BaseTestCase
 {

@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 /**
- * Postgres driver to export/import database backups
+ * Postgres driver to export/import database backups.
  */
 class Postgres extends AbstractDriver
 {

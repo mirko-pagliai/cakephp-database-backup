@@ -1,8 +1,30 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.4
+* fixed [bug #119](https://github.com/mirko-pagliai/cakephp-database-backup/issues/119): `BackupManager` ignored the 
+    timezone of backup files, and consequently also `IndexCommand`;
+* fixed [bug #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for
+  `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
+* all classes, methods and code related to sending backups via email are now deprecated. So, the `BackupManager::send()`
+  method (and, consequently, also the internal `BackupManager::getEmailInstance()` method), the `BackupExport::send()`
+  method, the `SendCommand` class and the `send` option for the `ExportCommand` are deprecated. All of these will be
+  removed in a later release. No replacement is provided.
+* setting the `DatabaseBackup.mailSender` value of the configuration is deprecated (bootstrap checks that the value
+  has not been set by the user);
+* the `DeleteAllCommand` is deprecated. Will be removed in a future release;
+* added tests for php 8.4;
+* all chainable methods of `BackupExport` and `BackupImport` classes now have the typehint for returning self. Updated 
+  descriptions;
+* updated `phpunit` to `^10.5.5 || ^11.1.3`;
+* updated `psalm` to `6.x`;
+* uses `cakedc/cakephp-phpstan`;
+* the old `FrozenTime` classes have been replaced with `DateTime` (which it was an alias for);
+* extensive revision of descriptions and tags of all classes and methods;
+* removed some errors related to phpcs, phpstan and psalm, previously silenced;
 * the `README` file has been updated for compatibility with older versions of CakePHP and PHP (branches have been
-    removed and older versions are available as tags).
+    removed and older versions are available as tags);
+* overall updated `README` file, updated links to CakePHP documentation. Some information has been moved from the
+  `README` file to the (new) [Common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues) wiki page.
 
 ### 2.13.3
 * added `--reverse` option for the `IndexCommand` ([issue #96](https://github.com/mirko-pagliai/cakephp-database-backup/issues/96));

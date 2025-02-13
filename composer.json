@@ -19,10 +19,11 @@
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^5.0",
+        "cakedc/cakephp-phpstan": "^3.2",
         "cakephp/migrations": "^4.0",
-        "phpunit/phpunit": "^10.1.0 <=10.5.3",
+        "phpunit/phpunit": "^10.5.5 || ^11.1.3",
         "phpstan/phpstan": "^1.10.38",
-        "vimeo/psalm": "^5.15.0"
+        "vimeo/psalm": "^5.15.0|~6.0"
     },
     "autoload": {
         "psr-4": {
@@ -47,15 +48,22 @@
         ],
         "cs-check": "phpcs --colors -p",
         "cs-fix": "phpcbf --colors -p",
-        "test": "rm -f -r /tmp/cake* && phpunit && driver_test=sqlite phpunit && driver_test=postgres phpunit --colors=always",
-        "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
         "phpstan": "phpstan analyse",
         "psalm": "psalm --php-version=8.2",
         "stan": [
             "@phpstan",
             "@psalm"
         ],
-        "update-lowest": "@composer update --prefer-lowest"
+        "update-lowest": "@composer update --prefer-lowest",
+        "test-all": [
+            "@test",
+            "@test-postgres",
+            "@test-sqlite"
+        ],
+        "test": "phpunit --colors=always",
+        "test-postgres": "driver_test=postgres phpunit --colors=always",
+        "test-sqlite": "driver_test=sqlite phpunit --colors=always",
+        "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage"
     },
     "config": {
         "allow-plugins": {

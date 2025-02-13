@@ -21,11 +21,12 @@ use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
- * BackupExportTest class
+ * BackupExportTest class.
  *
  * @uses \DatabaseBackup\Utility\BackupExport
  */
@@ -39,8 +40,7 @@ class BackupExportTest extends TestCase
     protected BackupExport $BackupExport;
 
     /**
-     * {@inheritDoc}
-     * @throws \ReflectionException
+     * @inheritDoc
      */
     protected function setUp(): void
     {
@@ -51,7 +51,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `compression()` method. This also tests for `$extension` property
+     * Test for `compression()` method. This also tests for `$extension` property.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::compression()
      */
@@ -67,7 +68,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method. This also tests for patterns and for the `$compression` property
+     * Test for `filename()` method. This also tests for patterns and for the `$compression` property.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
@@ -134,6 +136,18 @@ class BackupExportTest extends TestCase
 
     /**
      * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::send()
+     */
+    #[WithoutErrorHandler]
+    public function testSendIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->BackupExport->send();
+        });
+    }
+
+    /**
+     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::timeout()
      */
     public function testTimeout(): void
@@ -144,7 +158,6 @@ class BackupExportTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExport(): void
@@ -166,6 +179,7 @@ class BackupExportTest extends TestCase
         $this->assertSame('backup.sql.bz2', basename($file));
 
         //Exports with `send()`
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
         $recipient = 'recipient@example.com';
         $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export() ?: '';
         $this->assertMailSentFrom(Configure::readOrFail('DatabaseBackup.mailSender'));
@@ -179,10 +193,10 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method, with a different chmod
+     * Test for `export()` method, with a different chmod.
+     *
      * @requires OS Linux
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportWithDifferentChmod(): void
@@ -196,10 +210,10 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method. Export is stopped by the `Backup.beforeExport` event (implemented by driver)
+     * Test for `export()` method. Export is stopped by the `Backup.beforeExport` event (implemented by driver).
+     *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportStoppedByBeforeExport(): void
@@ -213,7 +227,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method, on failure (error for `Process`)
+     * Test for `export()` method, on failure (error for `Process`).
+     *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @throws \ReflectionException
@@ -230,7 +245,8 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method, exceeding the timeout
+     * Test for `export()` method, exceeding the timeout.
+     *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()

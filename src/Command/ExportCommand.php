@@ -26,15 +26,14 @@ use DatabaseBackup\Utility\BackupExport;
 use Exception;
 
 /**
- * Exports a database backup
+ * Command to export a database backup.
+ *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#export
  */
 class ExportCommand extends Command
 {
     /**
-     * Hook method for defining this command's option parser
-     * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
-     * @return \Cake\Console\ConsoleOptionParser
+     * @inheritDoc
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
@@ -63,14 +62,19 @@ class ExportCommand extends Command
                     'short' => 's',
                 ],
                 'timeout' => [
-                    'help' => __d('database_backup', 'Timeout for shell commands. Default value: {0} seconds', Configure::readOrFail('DatabaseBackup.processTimeout')),
+                    'help' => __d(
+                        'database_backup',
+                        'Timeout for shell commands. Default value: {0} seconds',
+                        Configure::readOrFail('DatabaseBackup.processTimeout')
+                    ),
                     'short' => 't',
                 ],
             ]);
     }
 
     /**
-     * Internal method to get a `BackupExport` instance
+     * Internal method to get a `BackupExport` instance.
+     *
      * @return \DatabaseBackup\Utility\BackupExport
      */
     protected function getBackupExport(): BackupExport
@@ -82,11 +86,11 @@ class ExportCommand extends Command
      * Exports a database backup.
      *
      * This command uses `RotateCommand` and `SendCommand`.
+     *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
      * @throws \Cake\Console\Exception\StopException
-     * @throws \ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
@@ -109,17 +113,37 @@ class ExportCommand extends Command
 
             $file = $BackupExport->export();
             if (!$file) {
-                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
+                throw new StopException(
+                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport')
+                );
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
-            //Sends via email and/or rotates
-            $extraOptions = array_filter([$args->getOption('verbose') ? '--verbose' : '', $args->getOption('quiet') ? '--quiet' : '']);
+            //Sends via email and/or rotates. It keeps options `verbose` and `quiet`.
+            $extraOptions = [];
+            foreach (['verbose', 'quiet'] as $option) {
+                if ($args->getOption($option)) {
+                    $extraOptions[] = '--' . $option;
+                }
+            }
             if ($args->getOption('send')) {
-                $this->executeCommand(SendCommand::class, array_merge([$file, (string)$args->getOption('send')], $extraOptions), $io);
+                deprecationWarning(
+                    '2.13.4',
+                    'The `send` option for the `ExportCommand` is deprecated. Will be removed in a future release'
+                );
+
+                $this->executeCommand(
+                    SendCommand::class,
+                    array_merge([$file, (string)$args->getOption('send')], $extraOptions),
+                    $io
+                );
             }
             if ($args->getOption('rotate')) {
-                $this->executeCommand(RotateCommand::class, array_merge([(string)$args->getOption('rotate')], $extraOptions), $io);
+                $this->executeCommand(
+                    RotateCommand::class,
+                    array_merge([(string)$args->getOption('rotate')], $extraOptions),
+                    $io
+                );
             }
         } catch (Exception $e) {
             $io->abort($e->getMessage());

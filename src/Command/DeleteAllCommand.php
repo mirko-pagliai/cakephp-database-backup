@@ -23,15 +23,15 @@ use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 
 /**
- * Deletes all backup files
+ * Command to delete all backup files.
+ *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#delete_all
+ * @deprecated 2.13.4' The `DeleteAllCommand` is deprecated. Will be removed in a future release
  */
 class DeleteAllCommand extends Command
 {
     /**
-     * Hook method for defining this command's option parser
-     * @param \Cake\Console\ConsoleOptionParser $parser The parser to be defined
-     * @return \Cake\Console\ConsoleOptionParser
+     * @inheritDoc
      */
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
@@ -39,15 +39,20 @@ class DeleteAllCommand extends Command
     }
 
     /**
-     * Deletes all backup files
+     * Deletes all backup files.
+     *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
-     * @throws \ErrorException|\ReflectionException
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
+
+        deprecationWarning(
+            '2.13.4',
+            'The `DeleteAllCommand` is deprecated. Will be removed in a future release'
+        );
 
         $files = BackupManager::deleteAll();
         if (!$files) {

@@ -1,5 +1,5 @@
 includes:
-    - phpstan-baseline.neon
+    - vendor/cakedc/cakephp-phpstan/extension.neon
 
 parameters:
     level: 8
@@ -14,7 +14,8 @@ parameters:
 
     ignoreErrors:
             -
-                    identifier: missingType.generics
+                message: '/^Cannot call method messages\(\) on Cake\\Console\\TestSuite\\StubConsoleOutput\|null\.$/'
+                path: tests/TestCase/Command
 
     treatPhpDocTypesAsCertain: false
 

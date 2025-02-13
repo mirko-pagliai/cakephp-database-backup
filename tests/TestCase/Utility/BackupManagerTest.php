@@ -16,16 +16,17 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use Cake\I18n\FrozenTime;
+use Cake\I18n\DateTime;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * BackupManagerTest class
+ * BackupManagerTest class.
  *
  * @uses \DatabaseBackup\Utility\BackupManager
  */
@@ -56,7 +57,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::delete()
      */
     public function testDelete(): void
@@ -75,7 +75,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
      */
     public function testDeleteAll(): void
@@ -90,7 +89,6 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
     public function testIndex(): void
@@ -117,13 +115,12 @@ class BackupManagerTest extends TestCase
         foreach ($files as $file) {
             $this->assertIsArray($file);
             $this->assertGreaterThan(0, $file['size']);
-            $this->assertInstanceOf(FrozenTime::class, $file['datetime']);
+            $this->assertInstanceOf(DateTime::class, $file['datetime']);
         }
     }
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
     public function testRotate(): void
@@ -160,11 +157,12 @@ class BackupManagerTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupManager::send()
      */
     public function testSend(): void
     {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
         $file = createBackup();
         $recipient = 'recipient@example.com';
         $this->BackupManager->send($file, $recipient);
@@ -181,7 +179,22 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * Test for `send()` method, with an invalid file
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::send()
+     */
+    #[WithoutErrorHandler]
+    public function testSendIsDeprecated(): void
+    {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
+        $this->deprecated(function (): void {
+            $this->BackupManager->send(createBackup(), 'recipient@example.com');
+        });
+    }
+
+    /**
+     * Test for `send()` method, with an invalid file.
+     *
      * @test
      * @uses \DatabaseBackup\Utility\BackupManager::send()
      */

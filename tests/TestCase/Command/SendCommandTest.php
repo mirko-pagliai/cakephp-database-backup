@@ -17,9 +17,10 @@ namespace DatabaseBackup\Test\TestCase\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Core\Configure;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
- * SendCommandTest class
+ * SendCommandTest class.
  *
  * @uses \DatabaseBackup\Command\SendCommand
  */
@@ -33,6 +34,8 @@ class SendCommandTest extends TestCase
      */
     public function testExecute(): void
     {
+        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
+
         $file = createBackup();
         $this->exec('database_backup.send -v' . ' ' . $file . ' recipient@example.com');
         $this->assertExitSuccess();
@@ -48,5 +51,17 @@ class SendCommandTest extends TestCase
         //With no existing file
         $this->exec('database_backup.send -v /noExistingDir/backup.sql');
         $this->assertExitError();
+    }
+
+    /**
+     * @test
+     * @uses \DatabaseBackup\Command\SendCommand::execute()
+     */
+    #[WithoutErrorHandler]
+    public function testExecuteIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->exec('database_backup.send -v' . ' ' . createBackup() . ' recipient@example.com');
+        });
     }
 }

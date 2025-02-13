@@ -22,17 +22,14 @@ use Cake\Console\ConsoleIo;
 use DatabaseBackup\BackupTrait;
 
 /**
- * Base class for console commands
+ * Base class for console commands.
  */
 class Command extends BaseCommand
 {
     use BackupTrait;
 
     /**
-     * Implement this method with your command's logic
-     * @param \Cake\Console\Arguments $args The command arguments
-     * @param \Cake\Console\ConsoleIo $io The console io
-     * @return void
+     * @inheritDoc
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
@@ -40,7 +37,9 @@ class Command extends BaseCommand
         $io->out(__d('database_backup', 'Driver: {0}', $this->getDriverName()));
 
         if ($args->getOption('timeout')) {
-            $io->verbose(__d('database_backup', 'Timeout for shell commands: {0} seconds', $args->getOption('timeout')));
+            $io->verbose(
+                __d('database_backup', 'Timeout for shell commands: {0} seconds', $args->getOption('timeout'))
+            );
         }
 
         $io->hr();
