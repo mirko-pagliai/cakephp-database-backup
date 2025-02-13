@@ -22,7 +22,8 @@
 * added tests for php 8.4;
 * all chainable methods of `BackupExport` and `BackupImport` classes now have the typehint for returning self. Updated 
   descriptions;
-* updated `psalm` to `6.x`.
+* updated `phpunit` to `^10.5.5 || ^11.1.3`;
+* updated `psalm` to `6.x`;
 * uses `cakedc/cakephp-phpstan`;
 * the old `FrozenTime` classes have been replaced with `DateTime` (which it was an alias for);
 * extensive revision of descriptions and tags of all classes and methods;
