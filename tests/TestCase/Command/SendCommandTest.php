@@ -27,7 +27,6 @@ class SendCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-
     /**
      * @test
      * @uses \DatabaseBackup\Command\SendCommand::execute()
