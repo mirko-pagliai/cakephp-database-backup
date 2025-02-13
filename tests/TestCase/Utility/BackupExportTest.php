@@ -134,6 +134,19 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests for `send()` method, is deprecated
+     *
+     * @test
+     * @uses \DatabaseBackup\Utility\BackupExport::send()
+     */
+    public function testSendIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->BackupExport->send();
+        });
+    }
+
+    /**
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::timeout()
      */
