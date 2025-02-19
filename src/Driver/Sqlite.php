@@ -29,21 +29,21 @@ class Sqlite extends AbstractDriver
      */
     public function beforeImport(): bool
     {
-        /** @var \Cake\Database\Connection $connection */
-        $connection = $this->getConnection();
-        /** @var \Cake\Database\Schema\Collection $schemaCollection */
-        $schemaCollection = $connection->getSchemaCollection();
+        /** @var \Cake\Database\Connection $Connection */
+        $Connection = $this->getConnection();
+        /** @var \Cake\Database\Schema\Collection $Schema */
+        $Schema = $Connection->getSchemaCollection();
 
         //Drops each table
-        foreach ($schemaCollection->listTables() as $table) {
+        foreach ($Schema->listTables() as $table) {
             /** @var \Cake\Database\Schema\TableSchema $TableSchema */
-            $TableSchema = $schemaCollection->describe($table);
-            array_map([$connection, 'execute'], $TableSchema->dropSql($connection));
+            $TableSchema = $Schema->describe($table);
+            array_map([$Connection, 'execute'], $TableSchema->dropSql($Connection));
         }
 
         //Needs disconnect and re-connect because the database schema has changed
-        $connection->getDriver()->disconnect();
-        $connection->getDriver()->connect();
+        $Connection->getDriver()->disconnect();
+        $Connection->getDriver()->connect();
 
         return true;
     }
