@@ -22,10 +22,7 @@ namespace DatabaseBackup\Driver;
 class Sqlite extends AbstractDriver
 {
     /**
-     * Called before import.
-     *
-     * @return bool
-     * @since 2.1.0
+     * @inheritDoc
      */
     public function beforeImport(): bool
     {
