@@ -21,8 +21,6 @@ use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\TestSuite\TestCase;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupTraitTest class.
