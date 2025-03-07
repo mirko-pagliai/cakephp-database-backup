@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.15 branch
+### 2.15.0
+* requires at least PHP 8.3.
+
 ## 2.14 branch
 ### 2.14.0
 * requires at least `symfony/finder` 7.1 and `symfony/process` 7.1.7;
