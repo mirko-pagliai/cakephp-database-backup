@@ -1,6 +1,10 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.5
+* added new `DatabaseBackup\Compression` enum, with some methods useful for the complete management of compressions;
+* the `BackupExport::compression()` method now accepts a `Compression` value as its `$compression` argument. String and
+  `null` values are still supported, but are now deprecated and will be removed in a future release. Additionally, if an
+  invalid string is now passed as an argument, a `InvalidArgumentException` exception is thrown;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;

@@ -17,13 +17,15 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
+use DatabaseBackup\Compression;
+use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Utility to export databases.
  *
- * @property ?string $compression
+ * @property \DatabaseBackup\Compression $compression
  * @property ?string $emailRecipient
  * @property string $extension
  * @property int $rotate
@@ -31,9 +33,9 @@ use Symfony\Component\Filesystem\Filesystem;
 class BackupExport extends AbstractBackupUtility
 {
     /**
-     * @var string|null
+     * @var \DatabaseBackup\Compression
      */
-    protected ?string $compression = null;
+    protected Compression $compression;
 
     /**
      * @var string|null
@@ -53,27 +55,38 @@ class BackupExport extends AbstractBackupUtility
     /**
      * Sets the compression.
      *
-     * Compression supported values are:
-     *  - `bzip2`;
-     *  - `gzip`;
-     *  - `null` for no compression.
-     *
-     * @param string|null $compression Compression type name
+     * @param \DatabaseBackup\Compression|string|null $Compression Compression type
      * @return self
-     * @throws \LogicException
+     * @throws \InvalidArgumentException With an invalid string argument.
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      */
-    public function compression(?string $compression): self
+    public function compression(Compression|string|null $Compression): self
     {
-        $this->extension = 'sql';
+        /**
+         * Backward compatibility if argument is string or `null`.
+         *
+         * @see https://stackoverflow.com/a/77859717/1480263
+         * @todo remove in a future release
+         */
+        if (!$Compression instanceof Compression) {
+            deprecationWarning(
+                '2.13.5',
+                'Passing `$Compression` argument as a string or `null` is deprecated. Will be removed in a future release'
+            );
 
-        if ($compression) {
-            $this->extension = (string)array_search($compression, $this->getValidCompressions());
-            if (!$this->extension) {
-                throw new LogicException(__d('database_backup', 'Invalid compression type'));
+            $constantName = Compression::class . '::' . ucfirst($Compression ?: 'none');
+            if (!defined($constantName)) {
+                throw new InvalidArgumentException(sprintf(
+                    'No valid `%s` value was found starting from `%s`',
+                    Compression::class,
+                    $Compression
+                ));
             }
+            $Compression = constant($constantName);
         }
-        $this->compression = $compression;
+
+        $this->compression = $Compression;
+        $this->extension = $Compression->value;
 
         return $this;
     }

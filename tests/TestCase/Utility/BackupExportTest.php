@@ -18,9 +18,13 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\Event\EventList;
 use Cake\TestSuite\EmailTrait;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -51,19 +55,50 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `compression()` method. This also tests for `$extension` property.
-     *
-     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::compression()
      */
-    public function testCompression(): void
+    #[Test]
+    #[TestWith([Compression::None])]
+    #[TestWith([Compression::Gzip])]
+    #[TestWith([Compression::Bzip2])]
+    public function testCompression(Compression $Compression): void
     {
-        $this->BackupExport->compression('bzip2');
-        $this->assertSame('bzip2', $this->BackupExport->compression);
-        $this->assertSame('sql.bz2', $this->BackupExport->extension);
+        $this->BackupExport->compression($Compression);
+        $this->assertSame($Compression, $this->BackupExport->compression);
+        $this->assertSame($Compression->value, $this->BackupExport->extension);
+    }
 
-        //With an invalid type
-        $this->expectExceptionMessage('Invalid compression type');
+    #[Test]
+    #[TestWith([Compression::None, null])]
+    #[TestWith([Compression::Gzip, 'gzip'])]
+    #[TestWith([Compression::Bzip2, 'bzip2'])]
+    public function testCompressionAsStringOrNull(Compression $ExpectedCompression, ?string $compressionAsStringOrNull): void
+    {
+        $this->BackupExport->compression($compressionAsStringOrNull);
+        $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
+        $this->assertSame($ExpectedCompression->value, $this->BackupExport->extension);
+    }
+
+    #[Test]
+    #[TestWith([null])]
+    #[TestWith(['gzip'])]
+    #[TestWith(['bzip2'])]
+    #[WithoutErrorHandler]
+    public function testCompressionAsStringOrNullIsDeprecated(?string $compressionAsStringOrNull): void
+    {
+        $this->deprecated(function () use ($compressionAsStringOrNull): void {
+            $this->BackupExport->compression($compressionAsStringOrNull);
+        });
+    }
+
+    /**
+     * @uses \DatabaseBackup\Utility\BackupExport::compression()
+     */
+    #[Test]
+    public function testCompressionWithInvalidCompressionAsString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found starting from `invalidType`');
         $this->BackupExport->compression('invalidType');
     }
 
@@ -77,14 +112,14 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename('backup.sql.bz2');
         $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->BackupExport->filename);
-        $this->assertSame('bzip2', $this->BackupExport->compression);
-        $this->assertSame('sql.bz2', $this->BackupExport->extension);
+        $this->assertSame(Compression::Bzip2, $this->BackupExport->compression);
+        $this->assertSame(Compression::Bzip2->value, $this->BackupExport->extension);
 
         //Compression is ignored, because there's a filename
         $this->BackupExport->compression('gzip')->filename('backup.sql.bz2');
         $this->assertSame('backup.sql.bz2', basename($this->BackupExport->filename));
-        $this->assertSame('bzip2', $this->BackupExport->compression);
-        $this->assertSame('sql.bz2', $this->BackupExport->extension);
+        $this->assertSame(Compression::Bzip2, $this->BackupExport->compression);
+        $this->assertSame(Compression::Bzip2->value, $this->BackupExport->extension);
 
         //Filename with `{$DATABASE}` pattern
         $this->BackupExport->filename('{$DATABASE}.sql');
@@ -222,7 +257,8 @@ class BackupExportTest extends TestCase
         $Driver->method('beforeExport')->willReturn(false);
         $Driver->getEventManager()->on($Driver);
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getDriver']);
-        $BackupExport->method('getDriver')->willReturn($Driver);
+        $BackupExport->method('getDriver')
+            ->willReturn($Driver);
         $this->assertFalse($BackupExport->export());
     }
 
@@ -231,7 +267,6 @@ class BackupExportTest extends TestCase
      *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     public function testExportOnFailure(): void
@@ -240,7 +275,8 @@ class BackupExportTest extends TestCase
         $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
-        $BackupExport->method('getProcess')->willReturn($Process);
+        $BackupExport->method('getProcess')
+            ->willReturn($Process);
         $BackupExport->export();
     }
 
@@ -251,7 +287,6 @@ class BackupExportTest extends TestCase
      * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
      */
     public function testExportExceedingTimeout(): void
     {
@@ -259,7 +294,8 @@ class BackupExportTest extends TestCase
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
-        $BackupExport->method('getProcess')->willThrowException($ProcessTimedOutException);
+        $BackupExport->method('getProcess')
+            ->willThrowException($ProcessTimedOutException);
         $BackupExport->export();
     }
 }
