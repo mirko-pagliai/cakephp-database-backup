@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\I18n\DateTime;
-use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -30,8 +29,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class BackupManagerTest extends TestCase
 {
-    use EmailTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
