@@ -104,6 +104,12 @@ trait BackupTrait
      */
     public static function getValidCompressions(): array
     {
-        return array_filter(DATABASE_BACKUP_EXTENSIONS);
+        $cases = Compression::cases();
+        array_shift($cases);
+
+        return array_map(
+            callback: 'lcfirst',
+            array: array_column(array: $cases, column_key: 'name', index_key: 'value')
+        );
     }
 }
