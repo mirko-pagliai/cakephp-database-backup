@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.13 branch
+### 2.13.5
+* updated for the latest version of psalm.
+
 ### 2.13.4
 * fixed [bug #119](https://github.com/mirko-pagliai/cakephp-database-backup/issues/119): `BackupManager` ignored the  timezone of backup files, and consequently also `IndexCommand`;
 * fixed [bug #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for `mariadb` and `mariadb-dump` executables, otherwise `mysql`

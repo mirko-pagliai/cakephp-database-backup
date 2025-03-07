@@ -6,7 +6,7 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     autoloader="tests/bootstrap.php"
     errorBaseline="psalm-baseline.xml"
-    findUnusedBaselineEntry="true"
+    ensureOverrideAttribute="false"
     findUnusedCode="false">
     <projectFiles>
         <directory name="src" />
