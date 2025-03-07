@@ -11,6 +11,7 @@
   property no longer exists;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
+* the `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
 * the `BackupExport::$defaultExtension` property no longer exists (by now it had become useless);
 * updated for the latest version of psalm.

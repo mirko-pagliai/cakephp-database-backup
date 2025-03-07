@@ -101,15 +101,22 @@ trait BackupTrait
      *
      * @return array<string, string> An array with extensions as keys and compressions as values
      * @since 2.4.0
+     * @deprecated 2.13.5 the `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release
      */
     public static function getValidCompressions(): array
     {
-        $cases = Compression::cases();
-        array_shift($cases);
-
-        return array_map(
-            callback: 'lcfirst',
-            array: array_column(array: $cases, column_key: 'name', index_key: 'value')
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release'
         );
+
+        return array_map(callback: 'lcfirst', array: array_column(
+            array: array_filter(
+                array: Compression::cases(),
+                callback: fn (Compression $Compression): bool => $Compression != Compression::None,
+            ),
+            column_key: 'name',
+            index_key: 'value'
+        ));
     }
 }
