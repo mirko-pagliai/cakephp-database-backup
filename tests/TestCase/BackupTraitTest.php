@@ -130,25 +130,4 @@ class BackupTraitTest extends TestCase
             $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
         }
     }
-
-    /**
-     * @uses \DatabaseBackup\BackupTrait::getValidCompressions()
-     */
-    #[Test]
-    public function testGetValidCompressions(): void
-    {
-        $this->assertNotEmpty($this->Trait->getValidCompressions());
-    }
-
-    /**
-     * @uses \DatabaseBackup\BackupTrait::getValidCompressions()
-     */
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testGetValidCompressionsIsDeprecated(): void
-    {
-        $this->deprecated(function (): void {
-            $this->Trait->getValidCompressions();
-        });
-    }
 }

@@ -95,28 +95,4 @@ trait BackupTrait
     {
         return Compression::tryFromFilename($path)?->value;
     }
-
-    /**
-     * Returns all valid compressions available.
-     *
-     * @return array<string, string> An array with extensions as keys and compressions as values
-     * @since 2.4.0
-     * @deprecated 2.13.5 the `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release
-     */
-    public static function getValidCompressions(): array
-    {
-        deprecationWarning(
-            '2.13.5',
-            'The `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release'
-        );
-
-        return array_map(callback: 'lcfirst', array: array_column(
-            array: array_filter(
-                array: Compression::cases(),
-                callback: fn (Compression $Compression): bool => $Compression != Compression::None,
-            ),
-            column_key: 'name',
-            index_key: 'value'
-        ));
-    }
 }
