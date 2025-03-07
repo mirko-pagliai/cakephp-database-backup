@@ -26,7 +26,7 @@ use Exception;
  * Command to send a backup file via email.
  *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#send
- * @deprecated 2.13.4' The `SendCommand` is deprecated. Will be removed in a future release
+ * @deprecated 2.13.4 The `SendCommand` is deprecated. Will be removed in a future release
  */
 class SendCommand extends Command
 {
