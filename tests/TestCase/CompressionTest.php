@@ -38,4 +38,17 @@ class CompressionTest extends TestCase
         $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `filename.txt`');
         Compression::fromFilename('filename.txt');
     }
+
+    /**
+     * @uses \DatabaseBackup\Compression::tryFromFilename()
+     */
+    #[Test]
+    #[TestWith([Compression::None, 'filename.sql'])]
+    #[TestWith([Compression::Gzip, 'filename.sql.gz'])]
+    #[TestWith([Compression::Bzip2, 'filename.sql.bz2'])]
+    #[TestWith([null, 'filename.txt'])]
+    public function testTryFromFilename(?Compression $ExpectedCompression, string $filename): void
+    {
+        $this->assertSame($ExpectedCompression, Compression::tryFromFilename($filename));
+    }
 }
