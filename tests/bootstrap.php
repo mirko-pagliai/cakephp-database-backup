@@ -67,8 +67,10 @@ Configure::write('App', [
     'paths' => ['plugins' => [APP . 'Plugin' . DS]],
 ]);
 
+/** @todo to be removed with CakePHP >= 5.1 */
+$translationsName = version_compare(Configure::version(), '5.1', '>=') ? '_cake_translations_' : '_cake_core_';
 Cache::setConfig([
-    '_cake_core_' => [
+    $translationsName => [
         'engine' => 'File',
         'prefix' => 'cake_core_',
         'serialize' => true,
