@@ -1,15 +1,15 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.5
-* the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand` class now uses the `BackupManager::rotate()` method to
-  continue supporting the `--rotate` option;
+* the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
+  class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
 * updated for the latest version of psalm.
 
 ### 2.13.4
 * fixed [bug #119](https://github.com/mirko-pagliai/cakephp-database-backup/issues/119): `BackupManager` ignored the  timezone of backup files, and consequently also `IndexCommand`;
-* fixed [bug #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for `mariadb` and `mariadb-dump` executables, otherwise `mysql`
-  and `mysqldump` executables;
+* fixed [bug #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111): for Mysql it first looks for
+  `mariadb` and `mariadb-dump` executables, otherwise `mysql` and `mysqldump` executables;
 * all classes, methods and code related to sending backups via email are now deprecated. So, the `BackupManager::send()`
   method (and, consequently, also the internal `BackupManager::getEmailInstance()` method), the `BackupExport::send()`
   method, the `SendCommand` class and the `send` option for the `ExportCommand` are deprecated. All of these will be

@@ -68,10 +68,10 @@ class ExportCommandTest extends TestCase
     {
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
-        $Command = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
-        $Command->method('getBackupExport')
+        $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
+        $ExportCommand->method('getBackupExport')
             ->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
-        $Command->run([], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+        $ExportCommand->run([], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**
