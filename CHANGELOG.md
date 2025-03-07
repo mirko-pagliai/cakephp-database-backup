@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.14 branch
 ### 2.14.0
+* passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
+  been removed (backwards compatibility removed);
 * `DeleteAllCommand` and `RotateCommand` classes had been deprecated and have been removed;
 * the `BackupTrait::getValidCompressions()` method had been deprecated and has been removed;
 * all classes, methods and code related to sending backups via email had been deprecated, and now they have been

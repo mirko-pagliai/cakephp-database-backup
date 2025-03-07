@@ -18,7 +18,6 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
-use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -43,36 +42,13 @@ class BackupExport extends AbstractBackupUtility
     /**
      * Sets the compression.
      *
-     * @param \DatabaseBackup\Compression|string|null $Compression Compression type
+     * @param \DatabaseBackup\Compression $Compression Compression type
      * @return self
      * @throws \InvalidArgumentException With an invalid string argument.
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      */
-    public function compression(Compression|string|null $Compression): self
+    public function compression(Compression $Compression): self
     {
-        /**
-         * Backward compatibility if argument is string or `null`.
-         *
-         * @see https://stackoverflow.com/a/77859717/1480263
-         * @todo remove in a future release
-         */
-        if (!$Compression instanceof Compression) {
-            deprecationWarning(
-                '2.13.5',
-                'Passing `$Compression` argument as a string or `null` is deprecated. Will be removed in a future release'
-            );
-
-            $constantName = Compression::class . '::' . ucfirst($Compression ?: 'none');
-            if (!defined($constantName)) {
-                throw new InvalidArgumentException(sprintf(
-                    'No valid `%s` value was found starting from `%s`',
-                    Compression::class,
-                    $Compression
-                ));
-            }
-            $Compression = constant($constantName);
-        }
-
         $this->compression = $Compression;
 
         return $this;
