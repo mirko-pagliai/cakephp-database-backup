@@ -27,6 +27,7 @@ use Exception;
  * Command to rotate backups.
  *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#rotate
+ * @deprecated 2.13.5 The `RotateCommand` is deprecated. Will be removed in a future release
  */
 class RotateCommand extends Command
 {
@@ -60,6 +61,11 @@ class RotateCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);
+
+        deprecationWarning(
+            '2.13.5',
+            'The `RotateCommand` is deprecated. Will be removed in a future release'
+        );
 
         try {
             //Gets deleted files

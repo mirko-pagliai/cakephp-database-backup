@@ -23,6 +23,7 @@ use Cake\Console\Exception\StopException;
 use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use Exception;
 
 /**
@@ -139,11 +140,17 @@ class ExportCommand extends Command
                 );
             }
             if ($args->getOption('rotate')) {
-                $this->executeCommand(
-                    RotateCommand::class,
-                    array_merge([(string)$args->getOption('rotate')], $extraOptions),
-                    $io
-                );
+                $files = BackupManager::rotate((int)$args->getOption('rotate'));
+
+                if ($files) {
+                    foreach ($files as $file) {
+                        $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['filename']));
+                    }
+
+                    $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
+                } else {
+                    $io->verbose(__d('database_backup', 'No backup has been deleted'));
+                }
             }
         } catch (Exception $e) {
             $io->abort($e->getMessage());

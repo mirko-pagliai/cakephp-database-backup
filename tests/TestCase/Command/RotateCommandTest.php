@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * RotateCommandTest class
@@ -54,5 +55,17 @@ class RotateCommandTest extends TestCase
         //With an invalid value
         $this->exec('database_backup.rotate -v string');
         $this->assertExitError();
+    }
+
+    /**
+     * @test
+     * @uses \DatabaseBackup\Command\RotateCommand::execute()
+     */
+    #[WithoutErrorHandler]
+    public function testExecuteIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->exec('database_backup.rotate -v 1');
+        });
     }
 }
