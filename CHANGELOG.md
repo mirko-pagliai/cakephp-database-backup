@@ -2,11 +2,11 @@
 ## 2.15 branch
 ### 2.15.0
 * requires at least PHP 8.3;
+* requires at least `symfony/finder` 7.1 and `symfony/process` 7.1.7;
 * the `#[Override]` attribute is widely and correctly used.
 
 ## 2.14 branch
 ### 2.14.0
-* requires at least `symfony/finder` 7.1 and `symfony/process` 7.1.7;
 * all classes, methods and code related to sending backups via email had been deprecated, and now they have been
   removed. So, the `BackupManager::send()` method (and, consequently, also the internal
   `BackupManager::getEmailInstance()` method), the `BackupExport::send()` method, the `SendCommand` class and the
