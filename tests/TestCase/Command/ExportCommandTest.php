@@ -19,9 +19,11 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\Exception\StopException;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Console\TestSuite\StubConsoleOutput;
+use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * ExportCommandTest class
@@ -59,6 +61,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method on stopped event.
      *
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void
@@ -66,7 +69,8 @@ class ExportCommandTest extends TestCase
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
         $Command = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
-        $Command->method('getBackupExport')->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
+        $Command->method('getBackupExport')
+            ->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
         $Command->run([], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
@@ -112,6 +116,21 @@ class ExportCommandTest extends TestCase
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename($files[0]) . '` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
+        $this->assertErrorEmpty();
+    }
+
+    /**
+     * Test for `execute()` method, with `rotate` option but no files to delete.
+     *
+     * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    public function testExecuteRotateOption2(): void
+    {
+        $this->exec($this->command . ' --rotate 3 -v');
+        $this->assertExitSuccess();
+        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
+        $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
     }
 
