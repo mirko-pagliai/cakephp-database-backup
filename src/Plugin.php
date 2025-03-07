@@ -21,7 +21,6 @@ use Cake\Core\BasePlugin;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\Command\IndexCommand;
-use DatabaseBackup\Command\RotateCommand;
 use Override;
 
 /**
@@ -41,7 +40,6 @@ class Plugin extends BasePlugin
         return $commands
             ->add('database_backup.export', ExportCommand::class)
             ->add('database_backup.import', ImportCommand::class)
-            ->add('database_backup.index', IndexCommand::class)
-            ->add('database_backup.rotate', RotateCommand::class);
+            ->add('database_backup.index', IndexCommand::class);
     }
 }

@@ -23,6 +23,7 @@ use Cake\Console\Exception\StopException;
 use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use Exception;
 use Override;
 
@@ -82,8 +83,6 @@ class ExportCommand extends Command
     /**
      * Exports a database backup.
      *
-     * This command uses `RotateCommand`.
-     *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
@@ -117,20 +116,19 @@ class ExportCommand extends Command
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
 
-            //Rotates. It keeps options `verbose` and `quiet`.
+            //Rotates
             if ($args->getOption('rotate')) {
-                $extraOptions = [];
-                foreach (['verbose', 'quiet'] as $option) {
-                    if ($args->getOption($option)) {
-                        $extraOptions[] = '--' . $option;
-                    }
-                }
+                $files = BackupManager::rotate((int)$args->getOption('rotate'));
 
-                $this->executeCommand(
-                    RotateCommand::class,
-                    array_merge([(string)$args->getOption('rotate')], $extraOptions),
-                    $io
-                );
+                if ($files) {
+                    foreach ($files as $file) {
+                        $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['filename']));
+                    }
+
+                    $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
+                } else {
+                    $io->verbose(__d('database_backup', 'No backup has been deleted'));
+                }
             }
         } catch (Exception $e) {
             $io->abort($e->getMessage());

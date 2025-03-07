@@ -59,15 +59,17 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method on stopped event.
      *
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void
     {
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
-        $Command = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
-        $Command->method('getBackupExport')->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
-        $Command->run([], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+        $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
+        $ExportCommand->method('getBackupExport')
+            ->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
+        $ExportCommand->run([], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**
@@ -112,6 +114,21 @@ class ExportCommandTest extends TestCase
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename($files[0]) . '` has been deleted');
         $this->assertOutputContains('<success>Deleted backup files: 1</success>');
+        $this->assertErrorEmpty();
+    }
+
+    /**
+     * Test for `execute()` method, with `rotate` option but no files to delete.
+     *
+     * @test
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    public function testExecuteRotateOption2(): void
+    {
+        $this->exec($this->command . ' --rotate 3 -v');
+        $this->assertExitSuccess();
+        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
+        $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
     }
 
