@@ -29,7 +29,7 @@ use Exception;
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#rotate
  * @deprecated 2.13.5 The `RotateCommand` is deprecated. Will be removed in a future release
  */
-class RotateCommand extends Command
+final class RotateCommand extends Command
 {
     /**
      * @inheritDoc

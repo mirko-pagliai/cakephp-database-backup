@@ -30,7 +30,7 @@ use Exception;
  *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#import
  */
-class ImportCommand extends Command
+final class ImportCommand extends Command
 {
     /**
      * @inheritDoc

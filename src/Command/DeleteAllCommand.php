@@ -28,7 +28,7 @@ use DatabaseBackup\Utility\BackupManager;
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#delete_all
  * @deprecated 2.13.4 The `DeleteAllCommand` is deprecated. Will be removed in a future release
  */
-class DeleteAllCommand extends Command
+final class DeleteAllCommand extends Command
 {
     /**
      * @inheritDoc

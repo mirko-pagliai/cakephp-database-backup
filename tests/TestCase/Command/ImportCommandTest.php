@@ -69,7 +69,8 @@ class ImportCommandTest extends TestCase
         $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
         $BackupImport = $this->createConfiguredMock(BackupImport::class, ['import' => false]);
         $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
-        $ImportCommand->method('getBackupImport')->willReturn($BackupImport);
+        $ImportCommand->method('getBackupImport')
+            ->willReturn($BackupImport);
         $ImportCommand->run(['--filename' => createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 

@@ -28,7 +28,7 @@ use DatabaseBackup\Utility\BackupManager;
  *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#index
  */
-class IndexCommand extends Command
+final class IndexCommand extends Command
 {
     /**
      * @inheritDoc
