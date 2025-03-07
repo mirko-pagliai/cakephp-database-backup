@@ -9,8 +9,6 @@
 
 ## 2.13 branch
 ### 2.13.5
-* all `Command` classes (including those that are deprecated and to be removed in a future release) are now `final`. 
-  `dg/bypass-finals` is used to ensure that the tests work;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
