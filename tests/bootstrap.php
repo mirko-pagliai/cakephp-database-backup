@@ -16,10 +16,7 @@ declare(strict_types=1);
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\Mailer\Mailer;
-use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\Fixture\SchemaLoader;
-use Cake\TestSuite\TestEmailTransport;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 
@@ -76,9 +73,6 @@ Cache::setConfig([
         'serialize' => true,
     ],
 ]);
-
-TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
-Mailer::setConfig('default', ['transport' => 'debug']);
 
 if (!getenv('db_dsn')) {
     putenv('db_dsn=mysql://travis@localhost/test');
