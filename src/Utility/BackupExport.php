@@ -25,7 +25,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Utility to export databases.
  *
- * @property ?string $compression
+ * @property \DatabaseBackup\Compression $compression
  * @property int $rotate
  */
 class BackupExport extends AbstractBackupUtility
