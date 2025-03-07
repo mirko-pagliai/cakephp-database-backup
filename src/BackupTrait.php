@@ -93,7 +93,7 @@ trait BackupTrait
      */
     public static function getExtension(string $path): ?string
     {
-        return Compression::tryFromFilename($path)->value;
+        return Compression::tryFromFilename($path)?->value;
     }
 
     /**
