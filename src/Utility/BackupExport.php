@@ -36,11 +36,6 @@ class BackupExport extends AbstractBackupUtility
     protected ?string $compression = null;
 
     /**
-     * @var string
-     */
-    private string $defaultExtension = 'sql';
-
-    /**
      * @var string|null
      */
     protected ?string $emailRecipient = null;
@@ -70,7 +65,7 @@ class BackupExport extends AbstractBackupUtility
      */
     public function compression(?string $compression): self
     {
-        $this->extension = $this->defaultExtension;
+        $this->extension = 'sql';
 
         if ($compression) {
             $this->extension = (string)array_search($compression, $this->getValidCompressions());
@@ -180,7 +175,7 @@ class BackupExport extends AbstractBackupUtility
     public function export(): string|false
     {
         if (empty($this->filename)) {
-            $this->extension ??= $this->defaultExtension;
+            $this->extension ??= 'sql';
             $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->extension);
         }
 
