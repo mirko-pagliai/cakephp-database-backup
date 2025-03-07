@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
+use DatabaseBackup\Compression;
 use LogicException;
 use Override;
 use Symfony\Component\Filesystem\Filesystem;
@@ -24,26 +25,15 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Utility to export databases.
  *
- * @property ?string $compression
- * @property string $extension
+ * @property \DatabaseBackup\Compression $compression
  * @property int $rotate
  */
 class BackupExport extends AbstractBackupUtility
 {
     /**
-     * @var string|null
+     * @var \DatabaseBackup\Compression
      */
-    protected ?string $compression = null;
-
-    /**
-     * @var string
-     */
-    private string $defaultExtension = 'sql';
-
-    /**
-     * @var string
-     */
-    protected string $extension;
+    protected Compression $compression = Compression::None;
 
     /**
      * @var int
@@ -53,27 +43,14 @@ class BackupExport extends AbstractBackupUtility
     /**
      * Sets the compression.
      *
-     * Compression supported values are:
-     *  - `bzip2`;
-     *  - `gzip`;
-     *  - `null` for no compression.
-     *
-     * @param string|null $compression Compression type name
+     * @param \DatabaseBackup\Compression $Compression Compression type
      * @return self
-     * @throws \LogicException
+     * @throws \InvalidArgumentException With an invalid string argument.
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      */
-    public function compression(?string $compression): self
+    public function compression(Compression $Compression): self
     {
-        $this->extension = $this->defaultExtension;
-
-        if ($compression) {
-            $this->extension = (string)array_search($compression, $this->getValidCompressions());
-            if (!$this->extension) {
-                throw new LogicException(__d('database_backup', 'Invalid compression type'));
-            }
-        }
-        $this->compression = $compression;
+        $this->compression = $Compression;
 
         return $this;
     }
@@ -87,6 +64,7 @@ class BackupExport extends AbstractBackupUtility
      * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws \LogicException
+     * @throws \ValueError With a filename that does not match any supported compression.
      */
     #[Override]
     public function filename(string $filename): self
@@ -112,14 +90,9 @@ class BackupExport extends AbstractBackupUtility
                 __d('database_backup', 'File `{0}` already exists', $filename)
             );
         }
-        if (!$this->getExtension($filename)) {
-            throw new LogicException(
-                __d('database_backup', 'Invalid `{0}` file extension', pathinfo($filename, PATHINFO_EXTENSION))
-            );
-        }
 
         //Sets the compression
-        $this->compression($this->getCompression($filename));
+        $this->compression = Compression::fromFilename($filename);
 
         $this->filename = $filename;
 
@@ -156,8 +129,7 @@ class BackupExport extends AbstractBackupUtility
     public function export(): string|false
     {
         if (empty($this->filename)) {
-            $this->extension ??= $this->defaultExtension;
-            $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->extension);
+            $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->compression->value);
         }
 
         //This allows the filename to be set again with a next call of this method

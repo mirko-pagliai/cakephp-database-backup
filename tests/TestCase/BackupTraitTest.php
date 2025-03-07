@@ -21,6 +21,8 @@ use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupTraitTest class.
@@ -127,14 +129,5 @@ class BackupTraitTest extends TestCase
         ) {
             $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
         }
-    }
-
-    /**
-     * @test
-     * @uses \DatabaseBackup\BackupTrait::getValidCompressions()
-     */
-    public function testGetValidCompressions(): void
-    {
-        $this->assertNotEmpty($this->Trait->getValidCompressions());
     }
 }

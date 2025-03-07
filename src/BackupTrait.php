@@ -54,9 +54,9 @@ trait BackupTrait
      */
     public static function getCompression(string $path): ?string
     {
-        $extension = self::getExtension($path);
+        $Compression = Compression::tryFromFilename($path);
 
-        return self::getValidCompressions()[$extension] ?? null;
+        return $Compression && $Compression !== Compression::None ? lcfirst($Compression->name) : null;
     }
 
     /**
@@ -93,25 +93,6 @@ trait BackupTrait
      */
     public static function getExtension(string $path): ?string
     {
-        $path = strtolower($path);
-
-        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            if (str_ends_with($path, '.' . $extension)) {
-                return $extension;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns all valid compressions available.
-     *
-     * @return array<string, string> An array with extensions as keys and compressions as values
-     * @since 2.4.0
-     */
-    public static function getValidCompressions(): array
-    {
-        return array_filter(DATABASE_BACKUP_EXTENSIONS);
+        return Compression::tryFromFilename($path)?->value;
     }
 }

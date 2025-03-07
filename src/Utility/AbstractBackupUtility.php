@@ -57,7 +57,7 @@ abstract class AbstractBackupUtility
      * @param string $name Property name
      * @return mixed
      * @since 2.12.0
-     * @throw \InvalidArgumentException
+     * @throw \InvalidArgumentException With an undefined property.
      */
     public function __get(string $name): mixed
     {
