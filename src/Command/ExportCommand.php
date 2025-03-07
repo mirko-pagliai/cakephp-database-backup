@@ -111,9 +111,7 @@ class ExportCommand extends Command
             if ($args->getOption('filename')) {
                 $BackupExport->filename((string)$args->getOption('filename'));
             } elseif ($args->getOption('compression')) {
-                $BackupExport->compression(
-                    Compression: constant(Compression::class . '::' . ucfirst((string)$args->getOption('compression')))
-                );
+                $BackupExport->compression(Compression::{ucfirst((string)$args->getOption('compression'))});
             }
             //Sets the timeout
             if ($args->getOption('timeout')) {
