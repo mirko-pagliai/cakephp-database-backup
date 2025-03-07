@@ -31,7 +31,7 @@ use Exception;
  *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#export
  */
-final class ExportCommand extends Command
+class ExportCommand extends Command
 {
     /**
      * @inheritDoc

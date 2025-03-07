@@ -17,7 +17,6 @@
 
     <extensions>
         <bootstrap class="Cake\TestSuite\Fixture\Extension\PHPUnitExtension"/>
-        <bootstrap class="DG\BypassFinals\PHPUnitExtension"/>
     </extensions>
 
     <!-- configure code coverage -->
