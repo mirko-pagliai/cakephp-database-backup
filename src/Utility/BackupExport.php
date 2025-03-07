@@ -42,11 +42,6 @@ class BackupExport extends AbstractBackupUtility
     protected ?string $emailRecipient = null;
 
     /**
-     * @var string
-     */
-    protected string $extension;
-
-    /**
      * @var int
      */
     protected int $rotate = 0;
