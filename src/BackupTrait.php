@@ -93,15 +93,7 @@ trait BackupTrait
      */
     public static function getExtension(string $path): ?string
     {
-        $path = strtolower($path);
-
-        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            if (str_ends_with($path, '.' . $extension)) {
-                return $extension;
-            }
-        }
-
-        return null;
+        return Compression::tryFromFilename($path)->value;
     }
 
     /**
