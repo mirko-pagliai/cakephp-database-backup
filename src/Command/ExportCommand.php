@@ -21,6 +21,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
 use Cake\Core\Configure;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -42,7 +43,13 @@ class ExportCommand extends Command
             ->setDescription(__d('database_backup', 'Exports a database backup'))
             ->addOptions([
                 'compression' => [
-                    'choices' => $this->getValidCompressions(),
+                    'choices' => array_map(callback: 'lcfirst', array: array_column(
+                        array: array_filter(
+                            array: Compression::cases(),
+                            callback: fn (Compression $Compression): bool => $Compression != Compression::None,
+                        ),
+                        column_key: 'name',
+                    )),
                     'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
                     'short' => 'c',
                 ],
