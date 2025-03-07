@@ -41,6 +41,8 @@ enum Compression: string
      */
     public static function tryFromFilename(string $filename): ?self
     {
+        $filename = strtolower($filename);
+
         foreach (self::cases() as $Compression) {
             if (str_ends_with(haystack: $filename, needle: '.' . $Compression->value)) {
                 return $Compression;
