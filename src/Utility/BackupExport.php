@@ -18,6 +18,7 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use LogicException;
+use Override;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -87,6 +88,7 @@ class BackupExport extends AbstractBackupUtility
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws \LogicException
      */
+    #[Override]
     public function filename(string $filename): self
     {
         $config = $this->getConnection()->config();

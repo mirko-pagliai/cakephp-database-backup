@@ -20,6 +20,7 @@ use Cake\Console\Arguments;
 use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use DatabaseBackup\BackupTrait;
+use Override;
 
 /**
  * Base class for console commands.
@@ -31,6 +32,7 @@ class Command extends BaseCommand
     /**
      * @inheritDoc
      */
+    #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         $io->out(__d('database_backup', 'Connection: {0}', $this->getConnection()->config()['name']));

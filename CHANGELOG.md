@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
-* requires at least PHP 8.3.
+* requires at least PHP 8.3;
+* the `#[Override]` attribute is widely and correctly used.
 
 ## 2.14 branch
 ### 2.14.0

@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use LogicException;
+use Override;
 
 /**
  * Utility to import databases
@@ -31,6 +32,7 @@ class BackupImport extends AbstractBackupUtility
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws \LogicException
      */
+    #[Override]
     public function filename(string $filename): self
     {
         $filename = $this->getAbsolutePath($filename);

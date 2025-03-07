@@ -19,6 +19,7 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
 use DatabaseBackup\Driver\AbstractDriver;
+use Override;
 
 /**
  * DriverTestCase class.
@@ -35,6 +36,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

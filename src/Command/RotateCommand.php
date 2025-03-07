@@ -22,6 +22,7 @@ use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 use Exception;
+use Override;
 
 /**
  * Command to rotate backups.
@@ -33,6 +34,7 @@ class RotateCommand extends Command
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser
@@ -57,6 +59,7 @@ class RotateCommand extends Command
      * @return void
      * @throws \Cake\Console\Exception\StopException
      */
+    #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);

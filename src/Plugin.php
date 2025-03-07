@@ -22,6 +22,7 @@ use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\Command\IndexCommand;
 use DatabaseBackup\Command\RotateCommand;
+use Override;
 
 /**
  * Plugin class.
@@ -34,6 +35,7 @@ class Plugin extends BasePlugin
      * @param \Cake\Console\CommandCollection $commands The command collection to update
      * @return \Cake\Console\CommandCollection
      */
+    #[Override]
     public function console(CommandCollection $commands): CommandCollection
     {
         return $commands

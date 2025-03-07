@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Driver;
 
+use Override;
+
 /**
  * Sqlite driver to export/import database backups.
  */
@@ -24,6 +26,7 @@ class Sqlite extends AbstractDriver
     /**
      * @inheritDoc
      */
+    #[Override]
     public function beforeImport(): bool
     {
         /** @var \Cake\Database\Connection $Connection */

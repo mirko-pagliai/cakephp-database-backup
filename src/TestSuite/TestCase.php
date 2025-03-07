@@ -19,6 +19,7 @@ namespace DatabaseBackup\TestSuite;
 use Cake\TestSuite\TestCase as BaseTestCase;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Utility\BackupManager;
+use Override;
 
 /**
  * TestCase class.
@@ -30,6 +31,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();

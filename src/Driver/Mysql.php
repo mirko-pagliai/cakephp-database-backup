@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Driver;
 
+use Override;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -81,6 +82,7 @@ class Mysql extends AbstractDriver
      * @return void
      * @since 2.1.0
      */
+    #[Override]
     public function afterExport(): void
     {
         $this->deleteAuthFile();
@@ -92,6 +94,7 @@ class Mysql extends AbstractDriver
      * @return void
      * @since 2.1.0
      */
+    #[Override]
     public function afterImport(): void
     {
         $this->deleteAuthFile();
@@ -109,6 +112,7 @@ class Mysql extends AbstractDriver
      * @return bool
      * @since 2.1.0
      */
+    #[Override]
     public function beforeExport(): bool
     {
         return $this->writeAuthFile('[mysqldump]' . PHP_EOL .
@@ -129,6 +133,7 @@ class Mysql extends AbstractDriver
      * @return bool
      * @since 2.1.0
      */
+    #[Override]
     public function beforeImport(): bool
     {
         return $this->writeAuthFile('[client]' . PHP_EOL .
