@@ -86,7 +86,7 @@ class ExportCommand extends Command
     /**
      * Exports a database backup.
      *
-     * This command uses `RotateCommand` and `SendCommand`.
+     * This command uses the `SendCommand`.
      *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
