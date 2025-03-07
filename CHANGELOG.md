@@ -8,6 +8,7 @@
 
 ## 2.13 branch
 ### 2.13.5
+* compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
 * updated for the latest version of psalm.
 
 ### 2.13.4
