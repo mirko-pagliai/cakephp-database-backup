@@ -107,8 +107,11 @@ class ExportCommand extends Command
         try {
             $BackupExport = $this->getBackupExport();
 
-            //Sets the output filename or the compression type. Regarding the `rotate` option, the
-            //`BackupShell::rotate()` method will be called at the end, instead of `BackupExport::rotate()`
+            /**
+             * Sets the output filename or the compression type.
+             *
+             * Regarding the `rotate` option, the `BackupManager::rotate()` method will be called at the end.
+             */
             if ($args->getOption('filename')) {
                 $BackupExport->filename((string)$args->getOption('filename'));
             } elseif ($args->getOption('compression')) {
