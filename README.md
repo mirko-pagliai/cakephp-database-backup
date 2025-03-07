@@ -71,7 +71,7 @@ no longer guaranteed, especially regarding old dependencies that may no longer b
 
 ## Configuration
 The plugin uses some configuration parameters. See our wiki:
-*   [Configuration](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration)
+* [Configuration](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration)
 
 If you want to send backup files by email, remember to set up your application
 correctly so that it can send emails. For more information on how to configure
@@ -85,6 +85,7 @@ See our wiki:
 * [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility)
 * [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility)
 * [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
+* [Send backups via email](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Send-backups-via-email)
 
 Before opening an issue, check this list of [common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues).
 
