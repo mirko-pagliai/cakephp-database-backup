@@ -27,7 +27,6 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @property \DatabaseBackup\Compression $compression
  * @property ?string $emailRecipient
- * @property string $extension
  * @property int $rotate
  */
 class BackupExport extends AbstractBackupUtility
