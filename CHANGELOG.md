@@ -9,9 +9,19 @@
 
 ## 2.13 branch
 ### 2.13.5
+* added new `DatabaseBackup\Compression` enum, with some methods useful for the complete management of compressions;
+* the `BackupExport::compression()` method now accepts a `Compression` value as its `$compression` argument. String and
+  `null` values are still supported, but are now deprecated and will be removed in a future release. Additionally, if an
+  invalid string is now passed as an argument, a `InvalidArgumentException` exception is thrown;
+* the `BackupExport` class no longer directly handles the backup extension, which is automatically deduced from the
+  value of `Compression`, now set by default to `Compression::None` (no compression) and which can always be changed
+  with the `compression()` and (indirectly) `filename()` methods. For this reason, the `BackupExport::$extension`
+  property no longer exists;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
+* the `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
+* the `BackupExport::$defaultExtension` property no longer exists (by now it had become useless);
 * updated for the latest version of psalm.
 
 ### 2.13.4

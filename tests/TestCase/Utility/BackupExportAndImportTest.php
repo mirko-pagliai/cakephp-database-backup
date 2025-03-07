@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\ORM\Table;
+use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
@@ -89,7 +90,7 @@ class BackupExportAndImportTest extends TestCase
      */
     public function testGetMagicMethod(): void
     {
-        $this->assertNull($this->BackupExport->compression);
+        $this->assertInstanceOf(Compression::class, $this->BackupExport->compression);
 
         $this->expectExceptionMessage('Undefined property: ' . BackupExport::class . '::$noExistingProperty');
         // @phpstan-ignore property.notFound, expr.resultUnused
