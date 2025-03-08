@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
@@ -31,6 +32,8 @@ use Symfony\Component\Process\Process;
  *
  * @property string $filename
  * @property int $timeout
+ * @method string getFilename()
+ * @method int getTimeOut()
  */
 abstract class AbstractBackupUtility
 {
@@ -52,15 +55,44 @@ abstract class AbstractBackupUtility
     private AbstractDriver $Driver;
 
     /**
+     * Magic `__call()` method.
+     *
+     * It provides all `getX()` methods to get properties.
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     * @since 2.13.5
+     * @throws \BadMethodCallException With a no existing property or method.
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        if (str_starts_with($name, 'get')) {
+            $property = lcfirst(substr($name, 3));
+            if (property_exists($this, $property)) {
+                return $this->{$property};
+            }
+        }
+
+        throw new BadMethodCallException('Method `' . $this::class . '::' . $name . '()` does not exist.');
+    }
+
+    /**
      * Magic method for reading data from inaccessible (protected or private).
      *
      * @param string $name Property name
      * @return mixed
      * @since 2.12.0
      * @throw \InvalidArgumentException With an undefined property.
+     * @deprecated 2.13.5 accessing properties via the `__get()` method is deprecated. Will be removed in a future release
      */
     public function __get(string $name): mixed
     {
+        deprecationWarning(
+            '2.13.5',
+            'Accessing properties via the `__get()` method is deprecated. Will be removed in a future release'
+        );
+
         if (!property_exists($this, $name)) {
             throw new InvalidArgumentException('Undefined property: ' . $this::class . '::$' . $name);
         }

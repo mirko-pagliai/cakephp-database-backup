@@ -2,6 +2,9 @@
 ## 2.13 branch
 ### 2.13.5
 * added new `DatabaseBackup\Compression` enum, with some methods useful for the complete management of compressions;
+* added `AbstractBackupUtility::__call()` magic method, that provides all `getX()` methods to get properties. So, from
+  now on, the `BackupExport` and `BackupImport` classes will have to access their properties via the `getX()` methods.
+  The `AbstractBackupUtility__get()` magic method is deprecated. Will be removed in a future release;
 * the `BackupExport::compression()` method now accepts a `Compression` value as its `$compression` argument. String and
   `null` values are still supported, but are now deprecated and will be removed in a future release. Additionally, if an
   invalid string is now passed as an argument, a `InvalidArgumentException` exception is thrown;
