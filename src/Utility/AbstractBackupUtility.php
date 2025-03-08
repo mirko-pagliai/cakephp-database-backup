@@ -33,7 +33,7 @@ use Symfony\Component\Process\Process;
  * @property string $filename
  * @property int $timeout
  * @method string getFilename()
- * @method int getTimeOut()
+ * @method int getTimeout()
  */
 abstract class AbstractBackupUtility
 {
@@ -47,7 +47,7 @@ abstract class AbstractBackupUtility
     /**
      * @var int
      */
-    protected int $timeout;
+    protected int $timeout = 0;
 
     /**
      * @var \DatabaseBackup\Driver\AbstractDriver
@@ -156,7 +156,7 @@ abstract class AbstractBackupUtility
     protected function getProcess(string $command): Process
     {
         $Process = Process::fromShellCommandline($command);
-        $Process->setTimeout($this->getTimeOut() ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
+        $Process->setTimeout($this->getTimeout() ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
         $Process->run();
 
         return $Process;

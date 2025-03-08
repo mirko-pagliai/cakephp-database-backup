@@ -88,7 +88,7 @@ class BackupImportTest extends TestCase
     public function testTimeout(): void
     {
         $this->BackupImport->timeout(120);
-        $this->assertSame(120, $this->BackupImport->getTimeOut());
+        $this->assertSame(120, $this->BackupImport->getTimeout());
     }
 
     /**
@@ -159,7 +159,8 @@ class BackupImportTest extends TestCase
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
-        $BackupImport->method('getProcess')->willThrowException($ProcessTimedOutException);
+        $BackupImport->method('getProcess')
+            ->willThrowException($ProcessTimedOutException);
         $BackupImport->filename(createBackup())->import();
     }
 }
