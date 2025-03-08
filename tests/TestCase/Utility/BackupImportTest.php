@@ -88,7 +88,7 @@ class BackupImportTest extends TestCase
     public function testTimeout(): void
     {
         $this->BackupImport->timeout(120);
-        $this->assertSame(120, $this->BackupImport->timeout);
+        $this->assertSame(120, $this->BackupImport->getTimeOut());
     }
 
     /**
