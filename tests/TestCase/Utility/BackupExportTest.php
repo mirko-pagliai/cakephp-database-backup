@@ -187,7 +187,7 @@ class BackupExportTest extends TestCase
     public function testTimeout(): void
     {
         $this->BackupExport->timeout(120);
-        $this->assertSame(120, $this->BackupExport->timeout);
+        $this->assertSame(120, $this->BackupExport->getTimeOut());
     }
 
     /**

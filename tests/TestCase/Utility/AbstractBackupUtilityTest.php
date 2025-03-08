@@ -70,6 +70,7 @@ class AbstractBackupUtilityTest extends TestCase
     }
 
     /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\AbstractBackupUtility::__get()
      */
     #[Test]
@@ -80,6 +81,7 @@ class AbstractBackupUtilityTest extends TestCase
         $Utility->timeout(3);
 
         $this->deprecated(function () use ($Utility): void {
+            // @phpstan-ignore-next-line
             $Utility->timeout;
         });
     }

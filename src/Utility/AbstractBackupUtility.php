@@ -60,12 +60,12 @@ abstract class AbstractBackupUtility
      * It provides all `getX()` methods to get properties.
      *
      * @param string $name
-     * @param array $arguments
+     * @param array<mixed> $arguments
      * @return mixed
      * @since 2.13.5
      * @throws \BadMethodCallException With a no existing property or method.
      */
-    public function __call(string $name, array $arguments): mixed
+    public function __call(string $name, array $arguments = []): mixed
     {
         if (str_starts_with($name, 'get')) {
             $property = lcfirst(substr($name, 3));
@@ -156,7 +156,7 @@ abstract class AbstractBackupUtility
     protected function getProcess(string $command): Process
     {
         $Process = Process::fromShellCommandline($command);
-        $Process->setTimeout($this->timeout ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
+        $Process->setTimeout($this->getTimeOut() ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
         $Process->run();
 
         return $Process;
