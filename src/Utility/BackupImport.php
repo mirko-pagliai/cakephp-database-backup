@@ -31,6 +31,7 @@ class BackupImport extends AbstractBackupUtility
      * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws \LogicException
+     * @throws \ValueError With a filename that does not match any supported compression.
      */
     public function filename(string $filename): self
     {
@@ -40,9 +41,6 @@ class BackupImport extends AbstractBackupUtility
         }
 
         Compression::fromFilename($filename);
-//        if (!$this->getExtension($filename)) {
-//            throw new LogicException(__d('database_backup', 'Invalid file extension'));
-//        }
 
         $this->filename = $filename;
 
