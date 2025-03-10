@@ -71,7 +71,7 @@ class IndexCommand extends Command
 
         $rows = $backups
             ->map(fn (array $backup): array => array_merge($backup, [
-               'compression' => match($backup['compression']) {
+               'compression' => match ($backup['compression']) {
                     Compression::None => '',
                     default => lcfirst($backup['compression']->name)
                },
