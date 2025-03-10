@@ -32,7 +32,7 @@ class Mysql extends AbstractDriver
     /**
      * Internal method to get a `Filesystem` instance.
      *
-     * @return Filesystem
+     * @return \Symfony\Component\Filesystem\Filesystem
      */
     protected function getFilesystem(): Filesystem
     {

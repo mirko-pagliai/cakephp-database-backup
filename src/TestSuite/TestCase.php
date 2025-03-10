@@ -49,7 +49,7 @@ abstract class TestCase extends CakeTestCase
     public function createBackup(string $filename = 'backup.sql', bool $fakeBackup = false): string
     {
         if ($fakeBackup) {
-            $filename = TMP . 'backups'. DS . $filename;
+            $filename = TMP . 'backups' . DS . $filename;
             file_put_contents($filename, '');
 
             return $filename;
@@ -61,7 +61,7 @@ abstract class TestCase extends CakeTestCase
     /**
      * Creates some backup files for tests.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function createSomeBackups(?int $timestamp = null): array
     {
