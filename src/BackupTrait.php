@@ -51,9 +51,15 @@ trait BackupTrait
      *
      * @param string $path File path
      * @return string|null Compression type or `null`
+     * @deprecated 2.13.5 the `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release
      */
     public static function getCompression(string $path): ?string
     {
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release'
+        );
+
         $Compression = Compression::tryFromFilename($path);
 
         return $Compression && $Compression !== Compression::None ? lcfirst($Compression->name) : null;

@@ -70,20 +70,28 @@ class BackupTraitTest extends TestCase
      * @test
      * @uses \DatabaseBackup\BackupTrait::getCompression()
      */
-    public function testGetCompression(): void
+    #[Test]
+    #[TestWith([null, 'backup.sql'])]
+    #[TestWith(['bzip2', 'backup.sql.bz2'])]
+    #[TestWith(['bzip2', DS . 'backup.sql.bz2'])]
+    #[TestWith(['bzip2', TMP . 'backup.sql.bz2'])]
+    #[TestWith(['gzip', 'backup.sql.gz'])]
+    #[TestWith([null, 'text.txt'])]
+    public function testGetCompression(?string $expectedCompression, string $filename): void
     {
-        foreach (
-            [
-                'backup.sql' => null,
-                'backup.sql.bz2' => 'bzip2',
-                DS . 'backup.sql.bz2' => 'bzip2',
-                Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'bzip2',
-                'backup.sql.gz' => 'gzip',
-                'text.txt' => null,
-            ] as $filename => $expectedCompression
-        ) {
-            $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
-        }
+        $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getCompression()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetCompressionIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getCompression('backup.sql');
+        });
     }
 
     /**
