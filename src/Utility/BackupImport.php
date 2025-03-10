@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use DatabaseBackup\Compression;
 use LogicException;
 
 /**
@@ -38,9 +39,10 @@ class BackupImport extends AbstractBackupUtility
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }
 
-        if (!$this->getExtension($filename)) {
-            throw new LogicException(__d('database_backup', 'Invalid file extension'));
-        }
+        Compression::fromFilename($filename);
+//        if (!$this->getExtension($filename)) {
+//            throw new LogicException(__d('database_backup', 'Invalid file extension'));
+//        }
 
         $this->filename = $filename;
 
