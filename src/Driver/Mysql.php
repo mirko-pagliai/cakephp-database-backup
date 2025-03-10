@@ -30,49 +30,13 @@ class Mysql extends AbstractDriver
     private string $auth;
 
     /**
-     * Internal method to get the auth file path.
+     * Internal method to get a `Filesystem` instance.
      *
-     * This method returns only the path that will be used and does not verify that the file already exists.
-     *
-     * @return string
-     * @since 2.11.0
+     * @return Filesystem
      */
-    protected function getAuthFilePath(): string
+    protected function getFilesystem(): Filesystem
     {
-        if (empty($this->auth)) {
-            $this->auth = TMP . uniqid('auth');
-        }
-
-        return $this->auth;
-    }
-
-    /**
-     * Internal method to write an auth file.
-     *
-     * @param string $content Content
-     * @return bool
-     * @since 2.3.0
-     */
-    protected function writeAuthFile(string $content): bool
-    {
-        $content = str_replace(
-            [
-                '{{USER}}',
-                '{{PASSWORD}}',
-                '{{HOST}}',
-            ],
-            [
-                (string)$this->getConfig('username'),
-                (string)$this->getConfig('password'),
-                (string)$this->getConfig('host'),
-            ],
-            $content
-        );
-
-        $Filesystem = new Filesystem();
-        $Filesystem->dumpFile($this->getAuthFilePath(), $content);
-
-        return $Filesystem->exists($this->getAuthFilePath());
+        return new Filesystem();
     }
 
     /**
@@ -138,6 +102,52 @@ class Mysql extends AbstractDriver
     }
 
     /**
+     * Internal method to get the auth file path.
+     *
+     * This method returns only the path that will be used and does not verify that the file already exists.
+     *
+     * @return string
+     * @since 2.11.0
+     */
+    protected function getAuthFilePath(): string
+    {
+        if (empty($this->auth)) {
+            $this->auth = TMP . uniqid('auth');
+        }
+
+        return $this->auth;
+    }
+
+    /**
+     * Internal method to write an auth file.
+     *
+     * @param string $content Content
+     * @return bool
+     * @since 2.3.0
+     */
+    protected function writeAuthFile(string $content): bool
+    {
+        $content = str_replace(
+            [
+                '{{USER}}',
+                '{{PASSWORD}}',
+                '{{HOST}}',
+            ],
+            [
+                (string)$this->getConfig('username'),
+                (string)$this->getConfig('password'),
+                (string)$this->getConfig('host'),
+            ],
+            $content
+        );
+
+        $Filesystem = $this->getFilesystem();
+        $Filesystem->dumpFile($this->getAuthFilePath(), $content);
+
+        return $Filesystem->exists($this->getAuthFilePath());
+    }
+
+    /**
      * Deletes the temporary file with the database authentication data.
      *
      * @return void
@@ -145,7 +155,8 @@ class Mysql extends AbstractDriver
      */
     protected function deleteAuthFile(): void
     {
-        (new Filesystem())->remove($this->getAuthFilePath());
+        $this->getFilesystem()->remove($this->getAuthFilePath());
+
         unset($this->auth);
     }
 }
