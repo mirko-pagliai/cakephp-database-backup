@@ -23,6 +23,7 @@ use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
+use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -98,15 +99,15 @@ class BackupManager
      *
      * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
      *
-     * @param int $rotate Number of backups that you want to keep
+     * @param positive-int $rotate Number of backups that you want to keep
      * @return array<array{filename: string, extension: ?string, compression: ?string, size: false|int, datetime: \Cake\I18n\Date}> Array of deleted files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
-     * @throws \LogicException
+     * @throws \InvalidArgumentException With an Invalid rotate value
      */
     public static function rotate(int $rotate): array
     {
-        if (!($rotate >= 1)) {
-            throw new LogicException(__d('database_backup', 'Invalid rotate value'));
+        if ($rotate < 1) {
+            throw new InvalidArgumentException(__d('database_backup', 'Invalid rotate value'));
         }
         $backupsToBeDeleted = self::index()->skip($rotate);
         array_map([self::class, 'delete'], $backupsToBeDeleted->extract('filename')->toList());

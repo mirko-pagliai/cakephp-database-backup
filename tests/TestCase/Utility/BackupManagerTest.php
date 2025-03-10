@@ -148,6 +148,7 @@ class BackupManagerTest extends TestCase
         $this->assertCount(1, $diff);
         $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
 
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupManager->rotate(-1);
     }
