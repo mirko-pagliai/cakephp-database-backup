@@ -20,7 +20,7 @@
   no longer checks its extension). This will throw a `ValueError` exception for invalid files;
 * added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
 * the `BackupManager::rotate()` method throws an `InvalidArgumentException` (and no longer `LogicException`) for an
-  invalid `$rotate` value;
+  invalid `$rotate` value. The method description has been corrected;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.
