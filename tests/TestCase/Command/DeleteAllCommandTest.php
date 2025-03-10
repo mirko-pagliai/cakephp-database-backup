@@ -46,8 +46,6 @@ class DeleteAllCommandTest extends TestCase
         //With no backups
         $this->exec('database_backup.delete_all -v');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
     }

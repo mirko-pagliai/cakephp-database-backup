@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\TestSuite\EmailTrait;
+use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -101,15 +102,11 @@ class BackupManagerTest extends TestCase
 
         //Checks compressions
         $compressions = $files->extract('compression')->toList();
-        $this->assertSame(['bzip2', 'gzip', null], $compressions);
+        $this->assertSame([Compression::Bzip2, Compression::Gzip, Compression::None], $compressions);
 
         //Checks filenames
         $filenames = $files->extract('filename')->toList();
         $this->assertSame(array_reverse(array_map('basename', $createdFiles)), $filenames);
-
-        //Checks extensions
-        $extensions = $files->extract('extension')->toList();
-        $this->assertSame(['sql.bz2', 'sql.gz', 'sql'], $extensions);
 
         //Checks for properties of each backup object
         foreach ($files as $file) {
@@ -138,7 +135,7 @@ class BackupManagerTest extends TestCase
         //Now there are two files. Only uncompressed file was deleted
         $filesAfterRotate = $this->BackupManager->index();
         $this->assertCount(2, $filesAfterRotate);
-        $this->assertSame(['bzip2', 'gzip'], $filesAfterRotate->extract('compression')->toList());
+        $this->assertSame([Compression::Bzip2, Compression::Gzip], $filesAfterRotate->extract('compression')->toList());
 
         //Gets the difference
         $diff = array_udiff(

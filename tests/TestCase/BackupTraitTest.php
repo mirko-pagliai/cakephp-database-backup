@@ -21,6 +21,9 @@ use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupTraitTest class.
@@ -67,20 +70,28 @@ class BackupTraitTest extends TestCase
      * @test
      * @uses \DatabaseBackup\BackupTrait::getCompression()
      */
-    public function testGetCompression(): void
+    #[Test]
+    #[TestWith([null, 'backup.sql'])]
+    #[TestWith(['bzip2', 'backup.sql.bz2'])]
+    #[TestWith(['bzip2', DS . 'backup.sql.bz2'])]
+    #[TestWith(['bzip2', TMP . 'backup.sql.bz2'])]
+    #[TestWith(['gzip', 'backup.sql.gz'])]
+    #[TestWith([null, 'text.txt'])]
+    public function testGetCompression(?string $expectedCompression, string $filename): void
     {
-        foreach (
-            [
-                'backup.sql' => null,
-                'backup.sql.bz2' => 'bzip2',
-                DS . 'backup.sql.bz2' => 'bzip2',
-                Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'bzip2',
-                'backup.sql.gz' => 'gzip',
-                'text.txt' => null,
-            ] as $filename => $expectedCompression
-        ) {
-            $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
-        }
+        $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getCompression()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetCompressionIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getCompression('backup.sql');
+        });
     }
 
     /**
@@ -108,33 +119,53 @@ class BackupTraitTest extends TestCase
      * @test
      * @uses \DatabaseBackup\BackupTrait::getExtension()
      */
-    public function testGetExtension(): void
+    #[Test]
+    #[TestWith(['sql', 'backup.sql'])]
+    #[TestWith(['sql.bz2', 'backup.sql.bz2'])]
+    #[TestWith(['sql.bz2', DS . 'backup.sql.bz2'])]
+    #[TestWith(['sql.bz2', TMP . 'backup.sql.bz2'])]
+    #[TestWith(['sql.gz', 'backup.sql.gz'])]
+    #[TestWith(['sql', 'backup.SQL'])]
+    #[TestWith(['sql.bz2', 'backup.SQL.BZ2'])]
+    #[TestWith(['sql.gz', 'backup.SQL.GZ'])]
+    #[TestWith([null, 'text.txt'])]
+    #[TestWith([null, 'text'])]
+    #[TestWith([null, '.txt'])]
+    public function testGetExtension(?string $expectedExtension, string $filename): void
     {
-        foreach (
-            [
-                'backup.sql' => 'sql',
-                'backup.sql.bz2' => 'sql.bz2',
-                DS . 'backup.sql.bz2' => 'sql.bz2',
-                Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'sql.bz2',
-                'backup.sql.gz' => 'sql.gz',
-                'backup.SQL' => 'sql',
-                'backup.SQL.BZ2' => 'sql.bz2',
-                'backup.SQL.GZ' => 'sql.gz',
-                'text.txt' => null,
-                'text' => null,
-                '.txt' => null,
-            ] as $filename => $expectedExtension
-        ) {
-            $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
-        }
+        $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
     }
 
     /**
-     * @test
+     * @uses \DatabaseBackup\BackupTrait::getExtension()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetExtensionIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getExtension('backup.sql');
+        });
+    }
+
+    /**
      * @uses \DatabaseBackup\BackupTrait::getValidCompressions()
      */
+    #[Test]
     public function testGetValidCompressions(): void
     {
         $this->assertNotEmpty($this->Trait->getValidCompressions());
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getValidCompressions()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetValidCompressionsIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getValidCompressions();
+        });
     }
 }

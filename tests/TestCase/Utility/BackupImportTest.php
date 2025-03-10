@@ -16,11 +16,13 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Event\EventList;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use ValueError;
 
 /**
  * BackupImportTest class.
@@ -77,8 +79,11 @@ class BackupImportTest extends TestCase
      */
     public function testFilenameWithInvalidFileExtension(): void
     {
-        $this->expectExceptionMessage('Invalid file extension');
-        $this->BackupImport->filename(tempnam(TMP, 'invalidFile'));
+        $filename = tempnam(TMP, 'invalidFile');
+
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . $filename . '`');
+        $this->BackupImport->filename($filename);
     }
 
     /**

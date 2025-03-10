@@ -51,12 +51,18 @@ trait BackupTrait
      *
      * @param string $path File path
      * @return string|null Compression type or `null`
+     * @deprecated 2.13.5 the `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release
      */
     public static function getCompression(string $path): ?string
     {
-        $extension = self::getExtension($path);
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release'
+        );
 
-        return self::getValidCompressions()[$extension] ?? null;
+        $Compression = Compression::tryFromFilename($path);
+
+        return $Compression && $Compression !== Compression::None ? lcfirst($Compression->name) : null;
     }
 
     /**
@@ -90,18 +96,16 @@ trait BackupTrait
      *
      * @param string $path File path
      * @return string|null Extension or `null` for invalid extensions
+     * @deprecated 2.13.5 the `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release
      */
     public static function getExtension(string $path): ?string
     {
-        $path = strtolower($path);
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release'
+        );
 
-        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            if (str_ends_with($path, '.' . $extension)) {
-                return $extension;
-            }
-        }
-
-        return null;
+        return Compression::tryFromFilename($path)?->value;
     }
 
     /**
@@ -109,9 +113,22 @@ trait BackupTrait
      *
      * @return array<string, string> An array with extensions as keys and compressions as values
      * @since 2.4.0
+     * @deprecated 2.13.5 the `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release
      */
     public static function getValidCompressions(): array
     {
-        return array_filter(DATABASE_BACKUP_EXTENSIONS);
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release'
+        );
+
+        return array_map(callback: 'lcfirst', array: array_column(
+            array: array_filter(
+                array: Compression::cases(),
+                callback: fn (Compression $Compression): bool => $Compression != Compression::None,
+            ),
+            column_key: 'name',
+            index_key: 'value'
+        ));
     }
 }

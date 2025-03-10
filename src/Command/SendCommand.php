@@ -16,9 +16,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
+use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 use Exception;
 
@@ -28,7 +28,7 @@ use Exception;
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#send
  * @deprecated 2.13.4 The `SendCommand` is deprecated. Will be removed in a future release
  */
-class SendCommand extends Command
+class SendCommand extends BaseCommand
 {
     /**
      * @inheritDoc
@@ -59,8 +59,6 @@ class SendCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        parent::execute($args, $io);
-
         deprecationWarning(
             '2.13.4',
             'The `SendCommand` is deprecated. Will be removed in a future release'

@@ -22,6 +22,7 @@ use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
 use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Compression;
 use LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -68,7 +69,7 @@ class BackupManager
     /**
      * Returns a list of database backups.
      *
-     * @return \Cake\Collection\CollectionInterface Array of backups
+     * @return \Cake\Collection\CollectionInterface A `Collection` of backups
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
@@ -80,15 +81,14 @@ class BackupManager
             //Sorts in descending order by last modified date
             ->sort(fn (SplFileInfo $a, SplFileInfo $b): bool => $a->getMTime() < $b->getMTime());
 
-        $Now = new DateTime();
+        $DateTimeZone = DateTime::now()->getTimezone();
 
         return (new Collection($Finder))
             ->map(fn (SplFileInfo $File): array => [
                 'filename' => $File->getFilename(),
-                'extension' => self::getExtension($File->getFilename()),
-                'compression' => self::getCompression($File->getFilename()),
+                'compression' => Compression::fromFilename($File->getFilename()),
                 'size' => $File->getSize(),
-                'datetime' => DateTime::createFromTimestamp($File->getMTime(), $Now->getTimezone()),
+                'datetime' => DateTime::createFromTimestamp($File->getMTime(), $DateTimeZone),
             ])
             ->compile(false);
     }

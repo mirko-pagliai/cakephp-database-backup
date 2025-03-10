@@ -1,9 +1,30 @@
 # 2.x branch
 ## 2.13 branch
 ### 2.13.5
+* added new `DatabaseBackup\Compression` enum, with some methods useful for the complete management of compressions;
+* the `BackupExport::compression()` method now accepts a `Compression` value as its `$compression` argument. String and
+  `null` values are still supported, but are now deprecated and will be removed in a future release. Additionally, if an
+  invalid string is now passed as an argument, a `InvalidArgumentException` exception is thrown;
+* the `BackupManager::index()` also returns a `Compression` value for compressions (and no longer a string or `null`),
+  while it no longer returns the extension (useless at this point). The `IndexCommand` instead still carries the
+  compression as a string (it couldn't be otherwise), while it also no longer reports the extension (also useless in
+  this case);
+* the `BackupExport` class no longer directly handles the backup extension, which is automatically deduced from the
+  value of `Compression`, now set by default to `Compression::None` (no compression) and which can always be changed
+  with the `compression()` and (indirectly) `filename()` methods. For this reason, the `BackupExport::$extension`
+  property no longer exists;
+* except for `ExportCommand` and `ImportCommand`, all other `Command` classes (including deprecated ones) now directly
+  extend `Cake\Console\BaseCommand`. This means that they will no longer display connection information by default, but
+  that makes sense since those classes only work on the filesystem;
+* the `BackupImport::filename()` method uses `Compression` to check the validity of the file you want to import (so it
+  no longer checks its extension). This will throw a `ValueError` exception for invalid files;
+* added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
+* `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.
+  They will be removed in a future release;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
+* the `BackupExport::$defaultExtension` property no longer exists (by now it had become useless);
 * updated for the latest version of psalm.
 
 ### 2.13.4

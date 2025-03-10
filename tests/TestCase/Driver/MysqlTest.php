@@ -51,6 +51,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::afterExport()
      */
     public function testAfterExport(): void
@@ -61,7 +62,8 @@ class MysqlTest extends DriverTestCase
         $this->assertFileExists($expectedAuthFile);
 
         $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
-        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
+        $Driver->method('getAuthFilePath')
+            ->willReturn($expectedAuthFile);
         $Driver->getEventManager()->on($Driver);
         $Driver->dispatchEvent('Backup.afterExport');
         $this->assertFileDoesNotExist($expectedAuthFile);
@@ -69,6 +71,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::afterImport()
      */
     public function testAfterImport(): void
@@ -80,7 +83,8 @@ class MysqlTest extends DriverTestCase
 
         $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
         $Driver->getEventManager()->on($Driver);
-        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
+        $Driver->method('getAuthFilePath')
+            ->willReturn($expectedAuthFile);
         $Driver->dispatchEvent('Backup.afterImport');
         $this->assertFileDoesNotExist($expectedAuthFile);
     }
@@ -125,6 +129,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Driver\Mysql::writeAuthFile()
      */
     public function testWriteAuthFile(): void
@@ -133,7 +138,8 @@ class MysqlTest extends DriverTestCase
         $this->assertFileDoesNotExist($expectedAuthFile);
 
         $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
-        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
+        $Driver->method('getAuthFilePath')
+            ->willReturn($expectedAuthFile);
         $Driver->getEventManager()->on($Driver);
 
         //Dispatches an event that calls and returns `writeAuthFile()`
