@@ -24,7 +24,7 @@ use DatabaseBackup\BackupTrait;
 /**
  * Base class for console commands.
  */
-class Command extends BaseCommand
+abstract class Command extends BaseCommand
 {
     use BackupTrait;
 
