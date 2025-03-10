@@ -39,8 +39,6 @@ class SendCommandTest extends TestCase
         $file = createBackup();
         $this->exec('database_backup.send -v' . ' ' . $file . ' recipient@example.com');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('<success>Backup `' . $file . '` was sent via mail</success>');
 
         //With no sender configuration

@@ -17,11 +17,11 @@ declare(strict_types=1);
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
+use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\I18n\Number;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 
 /**
@@ -29,7 +29,7 @@ use DatabaseBackup\Utility\BackupManager;
  *
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#index
  */
-class IndexCommand extends Command
+class IndexCommand extends BaseCommand
 {
     /**
      * @inheritDoc
@@ -53,8 +53,6 @@ class IndexCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        parent::execute($args, $io);
-
         $backups = BackupManager::index();
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
 

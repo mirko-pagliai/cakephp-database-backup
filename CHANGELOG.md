@@ -13,6 +13,9 @@
   value of `Compression`, now set by default to `Compression::None` (no compression) and which can always be changed
   with the `compression()` and (indirectly) `filename()` methods. For this reason, the `BackupExport::$extension`
   property no longer exists;
+* except for `ExportCommand` and `ImportCommand`, all other `Command` classes (including deprecated ones) now directly
+  extend `Cake\Console\BaseCommand`. This means that they will no longer display connection information by default, but
+  that makes sense since those classes only work on the filesystem;
 * the `BackupImport::filename()` method uses `Compression` to check the validity of the file you want to import (so it
   no longer checks its extension). This will throw a `ValueError` exception for invalid files;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
