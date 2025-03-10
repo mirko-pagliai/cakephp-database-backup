@@ -22,6 +22,7 @@ use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
 use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Compression;
 use LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -85,8 +86,7 @@ class BackupManager
         return (new Collection($Finder))
             ->map(fn (SplFileInfo $File): array => [
                 'filename' => $File->getFilename(),
-                'extension' => self::getExtension($File->getFilename()),
-                'compression' => self::getCompression($File->getFilename()),
+                'compression' => Compression::fromFilename($File->getFilename()),
                 'size' => $File->getSize(),
                 'datetime' => DateTime::createFromTimestamp($File->getMTime(), $Now->getTimezone()),
             ])

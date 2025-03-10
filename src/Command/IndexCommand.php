@@ -20,6 +20,7 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\I18n\Number;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 
@@ -63,7 +64,6 @@ class IndexCommand extends Command
 
         $headers = [
             __d('database_backup', 'Filename'),
-            __d('database_backup', 'Extension'),
             __d('database_backup', 'Compression'),
             __d('database_backup', 'Size'),
             __d('database_backup', 'Datetime'),
@@ -71,7 +71,10 @@ class IndexCommand extends Command
 
         $rows = $backups
             ->map(fn (array $backup): array => array_merge($backup, [
-               'compression' => $backup['compression'] ?: '',
+               'compression' => match($backup['compression']) {
+                    Compression::None => '',
+                    default => lcfirst($backup['compression']->name)
+               },
                'datetime' => $backup['datetime']->nice(),
                'size' => Number::toReadableSize($backup['size']),
             ]))

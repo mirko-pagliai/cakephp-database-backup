@@ -45,7 +45,6 @@ class IndexCommandTest extends TestCase
          */
         $expectedHeaders = [
             '<info>Filename</info>',
-            '<info>Extension</info>',
             '<info>Compression</info>',
             '<info>Size</info>',
             '<info>Datetime</info>',
@@ -56,7 +55,6 @@ class IndexCommandTest extends TestCase
         $expectedRows = array_reverse(array_map(fn (string $filename): array => [
             '',
             basename($filename),
-            $this->getExtension($filename),
             $this->getCompression($filename) ?: '',
             Number::toReadableSize(filesize($filename) ?: 0),
             DateTime::createFromTimestamp(filemtime($filename) ?: 0)->nice(),
