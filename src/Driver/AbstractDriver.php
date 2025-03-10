@@ -20,6 +20,7 @@ use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Compression;
 use LogicException;
 
 /**
@@ -103,13 +104,15 @@ abstract class AbstractDriver implements EventListenerInterface
      * @param string $filename Filename where you want to export the database
      * @return string
      * @throws \LogicException
+     * @throws \ValueError With a filename that does not match any supported compression.
      */
     public function getExportExecutable(string $filename): string
     {
         $exec = $this->getExecutable('export');
-        $compression = self::getCompression($filename);
-        if ($compression) {
-            $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
+
+        $Compression = Compression::fromFilename($filename);
+        if ($Compression !== Compression::None) {
+            $exec .= ' | ' . escapeshellarg($this->getBinary(lcfirst($Compression->name)));
         }
 
         return $exec . ' > ' . escapeshellarg($filename);
@@ -125,11 +128,12 @@ abstract class AbstractDriver implements EventListenerInterface
     public function getImportExecutable(string $filename): string
     {
         $exec = $this->getExecutable('import');
-        $compression = self::getCompression($filename);
-        if ($compression) {
+
+        $Compression = Compression::fromFilename($filename);
+        if ($Compression !== Compression::None) {
             return sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->getBinary($compression)),
+                escapeshellarg($this->getBinary(lcfirst($Compression->name))),
                 escapeshellarg($filename)
             ) . $exec;
         }
