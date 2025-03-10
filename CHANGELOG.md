@@ -18,6 +18,7 @@
   that makes sense since those classes only work on the filesystem;
 * the `BackupImport::filename()` method uses `Compression` to check the validity of the file you want to import (so it
   no longer checks its extension). This will throw a `ValueError` exception for invalid files;
+* added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.

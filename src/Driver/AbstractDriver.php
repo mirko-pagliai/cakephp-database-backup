@@ -21,6 +21,7 @@ use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
+use DatabaseBackup\OperationType;
 use LogicException;
 
 /**
@@ -70,22 +71,14 @@ abstract class AbstractDriver implements EventListenerInterface
      * These executables are not yet final, use instead `getExportExecutable()` and `getImportExecutable()` methods to
      *  have the final executables, including compression.
      *
-     * @param string $type Type or the request operation (`export` or `import`)
+     * @param \DatabaseBackup\OperationType $OperationType
      * @return string
-     * @throws \LogicException
      */
-    private function getExecutable(string $type): string
+    private function getExecutable(OperationType $OperationType): string
     {
-        // @codeCoverageIgnoreStart
-        if (!in_array($type, ['export', 'import'])) {
-            throw new LogicException(
-                __d('database_backup', '`{0}` parameter should be `{1}` or `{2}`', '$type', 'export', 'import')
-            );
-        }
-        // @codeCoverageIgnoreEnd
         $driverName = strtolower($this->getDriverName());
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$type])),
+            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
@@ -93,7 +86,7 @@ abstract class AbstractDriver implements EventListenerInterface
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
         /** @var string $exec */
-        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $type);
+        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $OperationType->value);
 
         return str_replace(array_keys($replacements), $replacements, $exec);
     }
@@ -108,7 +101,7 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     public function getExportExecutable(string $filename): string
     {
-        $exec = $this->getExecutable('export');
+        $exec = $this->getExecutable(OperationType::Export);
 
         $Compression = Compression::fromFilename($filename);
         if ($Compression !== Compression::None) {
@@ -127,7 +120,7 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     public function getImportExecutable(string $filename): string
     {
-        $exec = $this->getExecutable('import');
+        $exec = $this->getExecutable(OperationType::Import);
 
         $Compression = Compression::fromFilename($filename);
         if ($Compression !== Compression::None) {
