@@ -142,14 +142,15 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::rotate()
      */
+    #[Test]
     public function testRotate(): void
     {
         $this->BackupExport->rotate(10);
         $this->assertSame(10, $this->BackupExport->rotate);
 
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid rotate value');
         $this->BackupExport->rotate(-1)->export();
     }

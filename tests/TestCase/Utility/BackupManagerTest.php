@@ -23,6 +23,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -177,9 +178,9 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupManager::send()
      */
+    #[Test]
     #[WithoutErrorHandler]
     public function testSendIsDeprecated(): void
     {
