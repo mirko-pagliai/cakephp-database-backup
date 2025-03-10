@@ -43,10 +43,18 @@ abstract class TestCase extends CakeTestCase
      * Creates a backup file for tests.
      *
      * @param string $filename
+     * @param bool $fakeBackup With `true`, it will create a fake file (i.e. with empty content).
      * @return string
      */
-    public function createBackup(string $filename = 'backup.sql'): string
+    public function createBackup(string $filename = 'backup.sql', bool $fakeBackup = false): string
     {
+        if ($fakeBackup) {
+            $filename = TMP . 'backups'. DS . $filename;
+            file_put_contents($filename, '');
+
+            return $filename;
+        }
+
         return (new BackupExport())->filename($filename)->export() ?: '';
     }
 
