@@ -60,7 +60,6 @@ class ImportCommandTest extends TestCase
      * Test for `execute()` method on stopped event.
      *
      * @test
-     * @throws \PHPUnit\Framework\MockObject\Exception|\ReflectionException
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void
