@@ -22,6 +22,7 @@ use Cake\Console\TestSuite\StubConsoleOutput;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use PHPUnit\Framework\MockObject\Exception;
 
 /**
  * ImportCommandTest class
@@ -60,7 +61,7 @@ class ImportCommandTest extends TestCase
      * Test for `execute()` method on stopped event.
      *
      * @test
-     * @throws \PHPUnit\Framework\MockObject\Exception|\ReflectionException
+     * @throws Exception
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void

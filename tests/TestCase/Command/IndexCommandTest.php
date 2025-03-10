@@ -74,7 +74,7 @@ class IndexCommandTest extends TestCase
         );
         $this->assertSame($expectedRows, $rows);
 
-        $this->_out = $this->_err = null;
+        $this->cleanupConsoleTrait();
 
         //With `reverse` option
         $this->exec('database_backup.index -v --reverse');
