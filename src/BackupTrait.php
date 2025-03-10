@@ -90,9 +90,15 @@ trait BackupTrait
      *
      * @param string $path File path
      * @return string|null Extension or `null` for invalid extensions
+     * @deprecated 2.13.5 the `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release
      */
     public static function getExtension(string $path): ?string
     {
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release'
+        );
+
         return Compression::tryFromFilename($path)?->value;
     }
 
