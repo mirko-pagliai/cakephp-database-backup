@@ -20,7 +20,6 @@ use Cake\I18n\DateTime;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
@@ -37,11 +36,6 @@ class BackupManagerTest extends TestCase
     use EmailTrait;
 
     /**
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
-    protected BackupExport $BackupExport;
-
-    /**
      * @var \DatabaseBackup\Utility\BackupManager
      */
     protected BackupManager $BackupManager;
@@ -53,7 +47,6 @@ class BackupManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport ??= new BackupExport();
         $this->BackupManager ??= new BackupManager();
     }
 
@@ -63,13 +56,13 @@ class BackupManagerTest extends TestCase
      */
     public function testDelete(): void
     {
-        $filename = $this->BackupExport->export() ?: '';
+        $filename = createBackup();
         $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete($filename));
         $this->assertFileDoesNotExist($filename);
 
         //With a relative path
-        $filename = $this->BackupExport->export() ?: '';
+        $filename = createBackup();
         $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
         $this->assertFileDoesNotExist($filename);
