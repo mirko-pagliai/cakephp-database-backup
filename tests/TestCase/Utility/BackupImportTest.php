@@ -56,13 +56,13 @@ class BackupImportTest extends TestCase
     public function testFilename(): void
     {
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            $result = createBackup('backup.' . $extension);
+            $result = $this->createBackup('backup.' . $extension);
             $this->BackupImport->filename($result);
             $this->assertSame($result, $this->BackupImport->filename);
         }
 
         //With a relative path
-        $result = createBackup('backup_' . time() . '.sql');
+        $result = $this->createBackup('backup_' . time() . '.sql');
         $this->BackupImport->filename(basename($result));
         $this->assertSame($result, $this->BackupImport->filename);
 
@@ -103,7 +103,7 @@ class BackupImportTest extends TestCase
     public function testImport(): void
     {
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            $expectedFilename = createBackup('backup.' . $extension);
+            $expectedFilename = $this->createBackup('backup.' . $extension);
             $result = $this->BackupImport->filename($expectedFilename)->import() ?: '';
             $this->assertStringEndsWith('backup.' . $extension, $result);
             $this->assertSame($expectedFilename, $result);
@@ -125,11 +125,14 @@ class BackupImportTest extends TestCase
     public function testImportStoppedByBeforeExport(): void
     {
         $Driver = $this->createPartialMock(Sqlite::class, ['beforeImport']);
-        $Driver->method('beforeImport')->willReturn(false);
+        $Driver->method('beforeImport')
+            ->willReturn(false);
         $Driver->getEventManager()->on($Driver);
+
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getDriver']);
         $BackupImport->method('getDriver')->willReturn($Driver);
-        $this->assertFalse($BackupImport->filename(createBackup())->import());
+
+        $this->assertFalse($BackupImport->filename($this->createBackup())->import());
     }
 
     /**
@@ -143,11 +146,17 @@ class BackupImportTest extends TestCase
     public function testImportOnFailure(): void
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
-        $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
+
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
+
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
-        $BackupImport->method('getProcess')->willReturn($Process);
-        $BackupImport->filename(createBackup())->import();
+        $BackupImport->method('getProcess')
+            ->willReturn($Process);
+
+        $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
+
+        $BackupImport->filename($this->createBackup())
+            ->import();
     }
 
     /**
@@ -160,11 +169,15 @@ class BackupImportTest extends TestCase
      */
     public function testImportExceedingTimeout(): void
     {
+        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
+        $BackupImport->method('getProcess')
+            ->willThrowException($ProcessTimedOutException);
+
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
-        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
-        $BackupImport->method('getProcess')->willThrowException($ProcessTimedOutException);
-        $BackupImport->filename(createBackup())->import();
+        $BackupImport->filename($this->createBackup())
+            ->import();
     }
 }

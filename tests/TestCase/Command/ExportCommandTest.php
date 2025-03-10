@@ -110,7 +110,7 @@ class ExportCommandTest extends TestCase
      */
     public function testExecuteRotateOption(): void
     {
-        $files = createSomeBackups();
+        $files = $this->createSomeBackups();
         $this->exec($this->command . ' --rotate 3 -v');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
@@ -125,7 +125,7 @@ class ExportCommandTest extends TestCase
      * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
-    public function testExecuteRotateOption2(): void
+    public function testExecuteRotateOptionWithNoFileToDelete(): void
     {
         $this->exec($this->command . ' --rotate 3 -v');
         $this->assertExitSuccess();

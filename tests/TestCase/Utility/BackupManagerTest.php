@@ -56,13 +56,13 @@ class BackupManagerTest extends TestCase
      */
     public function testDelete(): void
     {
-        $filename = createBackup();
+        $filename = $this->createBackup();
         $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete($filename));
         $this->assertFileDoesNotExist($filename);
 
         //With a relative path
-        $filename = createBackup();
+        $filename = $this->createBackup();
         $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
         $this->assertFileDoesNotExist($filename);
@@ -74,7 +74,7 @@ class BackupManagerTest extends TestCase
      */
     public function testDeleteAll(): void
     {
-        $createdFiles = createSomeBackups();
+        $createdFiles = $this->createSomeBackups();
         $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
         $this->assertEmpty($this->BackupManager->index()->toList());
 
@@ -91,7 +91,7 @@ class BackupManagerTest extends TestCase
         //Creates a text file. This file should be ignored
         (new Filesystem())->dumpFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
-        $createdFiles = createSomeBackups();
+        $createdFiles = $this->createSomeBackups();
         $files = $this->BackupManager->index();
 
         //Checks compressions
@@ -118,7 +118,7 @@ class BackupManagerTest extends TestCase
     {
         $this->assertSame([], BackupManager::rotate(1));
 
-        createSomeBackups();
+        $this->createSomeBackups();
 
         $initialFiles = $this->BackupManager->index();
 
@@ -155,7 +155,7 @@ class BackupManagerTest extends TestCase
     {
         Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
-        $file = createBackup();
+        $file = $this->createBackup();
         $recipient = 'recipient@example.com';
         $this->BackupManager->send($file, $recipient);
         $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
@@ -167,7 +167,7 @@ class BackupManagerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         unlink($file);
         Configure::write('DatabaseBackup.mailSender', 'invalidSender');
-        $this->BackupManager->send(createBackup(), 'recipient@example.com');
+        $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
     }
 
     /**
@@ -180,7 +180,7 @@ class BackupManagerTest extends TestCase
         Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
         $this->deprecated(function (): void {
-            $this->BackupManager->send(createBackup(), 'recipient@example.com');
+            $this->BackupManager->send($this->createBackup(), 'recipient@example.com');
         });
     }
 

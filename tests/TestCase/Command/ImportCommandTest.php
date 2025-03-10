@@ -43,7 +43,7 @@ class ImportCommandTest extends TestCase
      */
     public function testExecute(): void
     {
-        $backup = createBackup();
+        $backup = $this->createBackup();
         $this->exec($this->command . ' ' . $backup);
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
@@ -70,7 +70,7 @@ class ImportCommandTest extends TestCase
         $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
         $ImportCommand->method('getBackupImport')
             ->willReturn($BackupImport);
-        $ImportCommand->run(['--filename' => createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+        $ImportCommand->run(['--filename' => $this->createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**
@@ -81,7 +81,7 @@ class ImportCommandTest extends TestCase
      */
     public function testExecuteTimeoutOption(): void
     {
-        $this->exec($this->command . ' --timeout 10 ' . createBackup());
+        $this->exec($this->command . ' --timeout 10 ' . $this->createBackup());
         $this->assertExitSuccess();
         $this->assertOutputContains('Timeout for shell commands: 10 seconds');
         $this->assertErrorEmpty();
