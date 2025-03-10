@@ -7,6 +7,8 @@ use ValueError;
 
 /**
  * Compression.
+ *
+ * @since 2.13.5
  */
 enum Compression: string
 {
