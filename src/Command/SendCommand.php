@@ -19,7 +19,6 @@ use Cake\Console\Arguments;
 use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 use Exception;
 
