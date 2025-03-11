@@ -21,6 +21,8 @@ use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\TestSuite\TestCase;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
@@ -55,15 +57,45 @@ class BackupTraitTest extends TestCase
         $this->Trait ??= new BackupTraitAsClass();
     }
 
+    public static function getAbsolutePathProvider(): Generator
+    {
+        yield [
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+            'file.txt',
+        ];
+
+        yield [
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+        ];
+
+        yield [
+            TMP . 'tmp_file',
+            TMP . 'tmp_file',
+        ];
+    }
+
     /**
-     * @test
      * @uses \DatabaseBackup\BackupTrait::getAbsolutePath()
      */
-    public function testGetAbsolutePath(): void
+    #[Test]
+    #[DataProvider('getAbsolutePathProvider')]
+    public function testGetAbsolutePath(string $expectedAbsolutePath, string $path): void
     {
-        $expected = Configure::readOrFail('DatabaseBackup.target') . 'file.txt';
-        $this->assertSame($expected, $this->Trait->getAbsolutePath('file.txt'));
-        $this->assertSame($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . 'file.txt'));
+        $result = $this->Trait->getAbsolutePath($path);
+        $this->assertSame($expectedAbsolutePath, $result);
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getAbsolutePath()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetAbsolutePathIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getAbsolutePath(TMP . 'tmp_file');
+        });
     }
 
     /**
@@ -112,7 +144,7 @@ class BackupTraitTest extends TestCase
         $this->assertSame('fake', $connection->config()['name']);
 
         $this->expectException(MissingDatasourceConfigException::class);
-        $this->getConnection('noExisting');
+        $this->Trait->getConnection('noExisting');
     }
 
     /**

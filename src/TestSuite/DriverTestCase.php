@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
+use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
 
@@ -28,6 +29,8 @@ use DatabaseBackup\Driver\AbstractDriver;
  */
 abstract class DriverTestCase extends TestCase
 {
+    use BackupTrait;
+
     /**
      * @var \DatabaseBackup\Driver\AbstractDriver
      */

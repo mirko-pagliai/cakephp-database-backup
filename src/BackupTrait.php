@@ -30,12 +30,14 @@ trait BackupTrait
      *
      * @param string $path Relative or absolute path
      * @return string
+     * @deprecated 2.13.5 the `BackupTrait::getAbsolutePath()` method is deprecated. Will be removed in a future release
      */
     public static function getAbsolutePath(string $path): string
     {
-        if (Path::isAbsolute($path)) {
-            return $path;
-        }
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getAbsolutePath()` method is deprecated. Will be removed in a future release'
+        );
 
         return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }

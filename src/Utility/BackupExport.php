@@ -107,7 +107,7 @@ class BackupExport extends AbstractBackupUtility
             time(),
         ], $filename);
 
-        $filename = $this->getAbsolutePath($filename);
+        $filename = $this->makeAbsoluteFilename($filename);
         if (!is_writable(dirname($filename))) {
             throw new LogicException(
                 __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))

@@ -35,7 +35,7 @@ class BackupImport extends AbstractBackupUtility
      */
     public function filename(string $filename): self
     {
-        $filename = $this->getAbsolutePath($filename);
+        $filename = $this->makeAbsoluteFilename($filename);
         if (!is_readable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }

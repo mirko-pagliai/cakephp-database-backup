@@ -23,6 +23,9 @@
 * the global test functions `createBackup()` and `createSomeBackups()` are now methods of the `TestCase` class (as they
   should be). The `createBackup()` method now has the `$fakeBackup` argument (`false` by default), which allows you to
   create a fake backup file (i.e. an empty file) Added tests;
+* added new `AbstractBackupUtility::makeAbsoluteFilename()` method. Since the `BackupTrait::getAbsolutePath()` method is
+  now deprecated (see below), it provides the `BackupExport` and `BackupImport` classes (the only ones that really need
+  it) with a method to construct absolute paths;
 * added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
 * the `AbstractDriver::getBinary()` method can now accept a `Compression` value as an argument (in addition to a
   string). Invalid values will now throw an `InvalidArgumentException` (rather than a `LogicException`);
@@ -34,8 +37,8 @@
 * the `DATABASE_BACKUP_EXTENSIONS` constant no longer exists, as it is no longer needed due to the `Compression` enum;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
-* `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.
-  They will be removed in a future release;
+* `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by
+  `BackupTrait` are deprecated. They will be removed in a future release;
 * the `delete()` and `deleteAll()` methods provided by `BackupManager` are deprecated. They will be removed in a future
   release. The few methods that need to delete files (e.g. rotation methods) implement the necessary code themselves;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;

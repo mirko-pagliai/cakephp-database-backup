@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\ORM\Table;
+use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -31,6 +32,8 @@ use DatabaseBackup\Utility\BackupImport;
  */
 class BackupExportAndImportTest extends TestCase
 {
+    use BackupTrait;
+
     /**
      * @var \Cake\ORM\Table
      */
@@ -109,7 +112,7 @@ class BackupExportAndImportTest extends TestCase
         $BackupImport = new BackupImport();
 
         foreach (Compression::cases() as $Compression) {
-            $expectedFilename = $this->getAbsolutePath(uniqid('example_') . '.' . $Compression->value);
+            $expectedFilename = TMP . 'backups' . DS . 'backup_' . uniqid('example_') . '.' . $Compression->value;
 
             //Initial records. 3 articles and 6 comments
             $initial = $this->getAllRecords();
