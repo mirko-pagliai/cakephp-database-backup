@@ -19,6 +19,8 @@ namespace DatabaseBackup\Console;
 use Cake\Console\Arguments;
 use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
+use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
 
 /**
@@ -33,8 +35,10 @@ abstract class Command extends BaseCommand
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        $io->out(__d('database_backup', 'Connection: {0}', $this->getConnection()->config()['name']));
-        $io->out(__d('database_backup', 'Driver: {0}', $this->getDriverName()));
+        $Connection = ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+
+        $io->out(__d('database_backup', 'Connection: {0}', $Connection->config()['name']));
+        $io->out(__d('database_backup', 'Driver: {0}', $Connection->config()['driver']));
 
         if ($args->getOption('timeout')) {
             $io->verbose(

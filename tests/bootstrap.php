@@ -114,7 +114,7 @@ $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
 
 $Connection = ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
 echo sprintf(
-    'Running tests for database `%s` with `\%s` driver',
+    'Running tests for database `%s` with `%s` driver',
     $Connection->config()['name'],
     $Connection->config()['driver']
 ) . PHP_EOL . PHP_EOL;
