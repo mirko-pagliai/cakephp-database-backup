@@ -61,7 +61,7 @@ class BackupTraitTest extends TestCase
     {
         yield [
             Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-            'file.txt'
+            'file.txt',
         ];
 
         yield [

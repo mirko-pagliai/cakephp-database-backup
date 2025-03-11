@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\TestSuite\TestCase as CakeTestCase;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
