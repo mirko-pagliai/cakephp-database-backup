@@ -20,7 +20,6 @@ use Cake\Mailer\Mailer;
 use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use Cake\TestSuite\TestEmailTransport;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 
 date_default_timezone_set('UTC');
@@ -115,38 +114,3 @@ $loader = new SchemaLoader();
 $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
 
 echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver ' . PHP_EOL;
-
-if (!function_exists('createBackup')) {
-    /**
-     * Global function to create a backup file.
-     *
-     * @param string $filename Filename
-     * @return string
-     */
-    function createBackup(string $filename = 'backup.sql'): string
-    {
-        return (new BackupExport())->filename($filename)->export() ?: '';
-    }
-}
-
-if (!function_exists('createSomeBackups')) {
-    /**
-     * Global function to create some backup files.
-     *
-     * @return string[]
-     */
-    function createSomeBackups(): array
-    {
-        $files = [];
-        $timestamp = time();
-
-        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            $timestamp--;
-            $file = createBackup('backup_test_' . $timestamp . '.' . $extension);
-            touch($file, $timestamp);
-            $files[] = $file;
-        }
-
-        return array_reverse($files);
-    }
-}

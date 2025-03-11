@@ -16,14 +16,16 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\TestSuite;
 
-use Cake\TestSuite\TestCase as BaseTestCase;
+use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Compression;
+use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 
 /**
  * TestCase class.
  */
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends CakeTestCase
 {
     use BackupTrait;
 
@@ -35,5 +37,44 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
 
         BackupManager::deleteAll();
+    }
+
+    /**
+     * Creates a backup file for tests.
+     *
+     * @param string $filename
+     * @param bool $fakeBackup With `true`, it will create a fake file (i.e. with empty content).
+     * @return string
+     */
+    public function createBackup(string $filename = 'backup.sql', bool $fakeBackup = false): string
+    {
+        if ($fakeBackup) {
+            $filename = TMP . 'backups' . DS . $filename;
+            file_put_contents($filename, '');
+
+            return $filename;
+        }
+
+        return (new BackupExport())->filename($filename)->export() ?: '';
+    }
+
+    /**
+     * Creates some backup files for tests.
+     *
+     * @return array<string>
+     */
+    public function createSomeBackups(?int $timestamp = null): array
+    {
+        $files = [];
+        $timestamp = $timestamp ?: time();
+
+        foreach (array_reverse(Compression::cases()) as $Compression) {
+            $timestamp--;
+            $file = $this->createBackup(filename: 'backup_test_' . $timestamp . '.' . $Compression->value, fakeBackup: true);
+            touch($file, $timestamp);
+            $files[] = $file;
+        }
+
+        return array_reverse($files);
     }
 }

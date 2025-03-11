@@ -36,7 +36,7 @@ class IndexCommandTest extends TestCase
      */
     public function testExecute(): void
     {
-        $backups = createSomeBackups();
+        $backups = $this->createSomeBackups();
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');

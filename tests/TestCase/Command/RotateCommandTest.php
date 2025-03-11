@@ -40,7 +40,7 @@ class RotateCommandTest extends TestCase
         $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
 
-        $expectedFiles = createSomeBackups();
+        $expectedFiles = $this->createSomeBackups();
         array_pop($expectedFiles);
         $this->exec('database_backup.rotate -v 1');
         $this->assertExitSuccess();

@@ -34,7 +34,7 @@ class DeleteAllCommandTest extends TestCase
      */
     public function testExecute(): void
     {
-        $files = createSomeBackups();
+        $files = $this->createSomeBackups();
         $this->exec('database_backup.delete_all -v');
         $this->assertExitSuccess();
         foreach ($files as $file) {

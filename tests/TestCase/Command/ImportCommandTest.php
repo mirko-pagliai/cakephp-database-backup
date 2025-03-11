@@ -43,7 +43,7 @@ class ImportCommandTest extends TestCase
      */
     public function testExecute(): void
     {
-        $backup = createBackup();
+        $backup = $this->createBackup();
         $this->exec($this->command . ' ' . $backup);
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
@@ -60,17 +60,19 @@ class ImportCommandTest extends TestCase
      * Test for `execute()` method on stopped event.
      *
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void
     {
-        $this->expectException(StopException::class);
-        $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
         $BackupImport = $this->createConfiguredMock(BackupImport::class, ['import' => false]);
         $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
         $ImportCommand->method('getBackupImport')
             ->willReturn($BackupImport);
-        $ImportCommand->run(['--filename' => createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+
+        $this->expectException(StopException::class);
+        $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
+        $ImportCommand->run(['--filename' => $this->createBackup(fakeBackup: true)], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**
@@ -81,7 +83,7 @@ class ImportCommandTest extends TestCase
      */
     public function testExecuteTimeoutOption(): void
     {
-        $this->exec($this->command . ' --timeout 10 ' . createBackup());
+        $this->exec($this->command . ' --timeout 10 ' . $this->createBackup());
         $this->assertExitSuccess();
         $this->assertOutputContains('Timeout for shell commands: 10 seconds');
         $this->assertErrorEmpty();
