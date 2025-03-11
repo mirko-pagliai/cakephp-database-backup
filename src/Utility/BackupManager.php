@@ -50,7 +50,7 @@ class BackupManager
         if (!is_writable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', $filename));
         }
-        (new Filesystem())->remove($filename);
+        unlink($filename);
 
         return $filename;
     }
@@ -64,7 +64,10 @@ class BackupManager
      */
     public static function deleteAll(): array
     {
-        return array_map([self::class, 'delete'], self::index()->extract('path')->toList());
+        return self::index()
+            ->extract('path')
+            ->each(fn (string $path) => unlink($path))
+            ->toList();
     }
 
     /**
@@ -115,9 +118,7 @@ class BackupManager
 
         return self::index()
             ->skip($keep)
-            ->each(function (array $file): void {
-                unlink($file['path']);
-            })
+            ->each(fn (array $file) => unlink($file['path']))
             ->toList();
     }
 
