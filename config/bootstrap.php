@@ -31,13 +31,6 @@ if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
     ]);
 }
 
-/**
- * Valid extensions. Names as keys and compressions as values
- */
-if (!defined('DATABASE_BACKUP_EXTENSIONS')) {
-    define('DATABASE_BACKUP_EXTENSIONS', ['sql.bz2' => 'bzip2', 'sql.gz' => 'gzip', 'sql' => false]);
-}
-
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,
