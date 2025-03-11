@@ -76,7 +76,7 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     private function getExecutable(OperationType $OperationType): string
     {
-        $driverName = lcfirst(substr(strrchr($this::class, "\\"), 1));
+        $driverName = lcfirst(substr(strrchr($this::class, '\\') ?: '', 1));
 
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
