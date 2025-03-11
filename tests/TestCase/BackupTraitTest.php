@@ -20,10 +20,8 @@ use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use Generator;
-use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -31,8 +29,9 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupTraitTest class.
+ *
+ * @uses \DatabaseBackup\BackupTrait
  */
-#[CoversTrait(BackupTrait::class)]
 class BackupTraitTest extends TestCase
 {
     /**
