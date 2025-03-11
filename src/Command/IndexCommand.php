@@ -69,7 +69,7 @@ class IndexCommand extends BaseCommand
 
         $rows = $backups
             ->map(fn (array $backup): array => [
-                'basename' => $backup['filename'],
+                'basename' => $backup['basename'],
                 'compression' => match ($backup['compression']) {
                     Compression::None => '',
                     default => lcfirst($backup['compression']->name)
