@@ -99,20 +99,23 @@ class BackupManager
      *
      * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
      *
-     * @param int $rotate Number of backups that you want to keep
+     * @param int $keep Number of backups that you want to keep
      * @return array<array{filename: string, compression: ?string, size: false|int, datetime: \Cake\I18n\DateTime}> Array of deleted files
+     * @throws \InvalidArgumentException With an Invalid rotate value.
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
-     * @throws \InvalidArgumentException With an Invalid rotate value
      */
-    public static function rotate(int $rotate): array
+    public static function rotate(int $keep): array
     {
-        if ($rotate < 1) {
-            throw new InvalidArgumentException(__d('database_backup', 'Invalid rotate value'));
+        if ($keep < 1) {
+            throw new InvalidArgumentException(__d('database_backup', 'Invalid `$keep` value'));
         }
-        $backupsToBeDeleted = self::index()->skip($rotate);
-        array_map([self::class, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 
-        return $backupsToBeDeleted->toList();
+        return self::index()
+            ->skip($keep)
+            ->each(function (array $file): void {
+                unlink(self::getAbsolutePath($file['filename']));
+            })
+            ->toList();
     }
 
     /**

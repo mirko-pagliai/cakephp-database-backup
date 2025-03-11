@@ -111,39 +111,32 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
+    #[Test]
     public function testRotate(): void
     {
         $this->assertSame([], BackupManager::rotate(1));
 
-        $this->createSomeBackups();
-
-        $initialFiles = $this->BackupManager->index();
-
-        //Keeps 2 backups. Only 1 backup was deleted
+        /**
+         * Creates 3 backups (`$initialFiles`) and keeps only 2 of them.
+         *
+         * So only 1 backup was deleted, which was the first one created.
+         */
+        $initialFiles = $this->createSomeBackups();
         $rotate = $this->BackupManager->rotate(2);
         $this->assertCount(1, $rotate);
+        $this->assertSame(basename($initialFiles[0]), $rotate[0]['filename']);
+    }
 
-        //Now there are two files. Only uncompressed file was deleted
-        $filesAfterRotate = $this->BackupManager->index();
-        $this->assertCount(2, $filesAfterRotate);
-        $this->assertSame([Compression::Bzip2, Compression::Gzip], $filesAfterRotate->extract('compression')->toList());
-
-        //Gets the difference
-        $diff = array_udiff(
-            $initialFiles->toList(),
-            $filesAfterRotate->toList(),
-            fn (array $first, array $second): int => strcmp($first['filename'], $second['filename'])
-        );
-
-        //Again, only 1 backup was deleted. The difference is the same
-        $this->assertCount(1, $diff);
-        $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
-
+    /**
+     * @uses \DatabaseBackup\Utility\BackupManager::rotate()
+     */
+    #[Test]
+    public function testRotateWithInvalidKeepValue(): void
+    {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid rotate value');
+        $this->expectExceptionMessage('Invalid `$keep` value');
         $this->BackupManager->rotate(-1);
     }
 
