@@ -18,7 +18,6 @@ namespace DatabaseBackup;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -34,13 +33,8 @@ trait BackupTrait
      */
     public static function getAbsolutePath(string $path): string
     {
-        $Filesystem = new Filesystem();
-        if ($Filesystem->isAbsolutePath($path)) {
+        if (Path::isAbsolute($path)) {
             return $path;
-        }
-
-        if (is_readable(Path::makeAbsolute($path, ROOT))) {
-            return Path::makeAbsolute($path, ROOT);
         }
 
         return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));

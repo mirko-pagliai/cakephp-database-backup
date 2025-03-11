@@ -24,6 +24,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Command to import a database backup.
@@ -74,10 +75,23 @@ class ImportCommand extends Command
     {
         parent::execute($args, $io);
 
-        try {
-            $BackupImport = $this->getBackupImport();
+        $filename = (string)$args->getArgument('filename');
 
-            $BackupImport->filename((string)$args->getArgument('filename'));
+        /**
+         * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
+         *
+         * For example:
+         * ```
+         * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
+         * ```
+         */
+        if (Path::isRelative($filename) && is_readable(Path::makeAbsolute($filename, ROOT))) {
+            $filename = Path::makeAbsolute($filename, ROOT);
+        }
+
+        try {
+            $BackupImport = $this->getBackupImport()
+                ->filename($filename);
 
             //Sets the timeout
             if ($args->getOption('timeout')) {
