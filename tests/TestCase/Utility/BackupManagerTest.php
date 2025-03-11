@@ -24,7 +24,6 @@ use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * BackupManagerTest class.
@@ -83,28 +82,25 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
+    #[Test]
     public function testIndex(): void
     {
         //Creates a text file. This file should be ignored
-        (new Filesystem())->dumpFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
+        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
-        $createdFiles = $this->createSomeBackups();
+        $createdFiles = array_reverse($this->createSomeBackups());
         $files = $this->BackupManager->index();
+        array_map('unlink', $createdFiles);
+        $this->assertCount(3, $files);
 
-        //Checks compressions
-        $compressions = $files->extract('compression')->toList();
-        $this->assertSame([Compression::Bzip2, Compression::Gzip, Compression::None], $compressions);
-
-        //Checks filenames
-        $filenames = $files->extract('filename')->toList();
-        $this->assertSame(array_reverse(array_map('basename', $createdFiles)), $filenames);
-
-        //Checks for properties of each backup object
-        foreach ($files as $file) {
-            $this->assertIsArray($file);
+        foreach ($files as $k => $file) {
+            $this->assertSame(['filename', 'basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
+            $this->assertSame(basename($createdFiles[$k]), $file['filename']);
+            $this->assertSame(basename($createdFiles[$k]), $file['basename']);
+            $this->assertSame($createdFiles[$k], $file['path']);
+            $this->assertInstanceOf(Compression::class, $file['compression']);
             $this->assertIsInt($file['size']);
             $this->assertInstanceOf(DateTime::class, $file['datetime']);
         }

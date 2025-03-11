@@ -86,7 +86,10 @@ class BackupManager
 
         return (new Collection($Finder))
             ->map(fn (SplFileInfo $File): array => [
+                /** @todo remove `filename` in version 2.14.0 */
                 'filename' => $File->getFilename(),
+                'basename' => $File->getBasename(),
+                'path' => $File->getPathname(),
                 'compression' => Compression::fromFilename($File->getFilename()),
                 'size' => $File->getSize(),
                 'datetime' => DateTime::createFromTimestamp($File->getMTime(), $DateTimeZone),
