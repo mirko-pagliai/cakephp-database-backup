@@ -23,6 +23,9 @@
 * the global test functions `createBackup()` and `createSomeBackups()` are now methods of the `TestCase` class (as they
   should be). The `createBackup()` method now has the `$fakeBackup` argument (`false` by default), which allows you to
   create a fake backup file (i.e. an empty file) Added tests;
+* added new `AbstractBackupUtility::makeAbsoluteFilename()` method. Since the `BackupTrait::getAbsolutePath()` method is
+  now deprecated (see below), it provides the `BackupExport` and `BackupImport` classes (the only ones that really need
+  it) with a method to construct absolute paths;
 * added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
 * the `AbstractDriver::getBinary()` method can now accept a `Compression` value as an argument (in addition to a
   string). Invalid values will now throw an `InvalidArgumentException` (rather than a `LogicException`);

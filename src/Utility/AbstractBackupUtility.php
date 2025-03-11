@@ -22,6 +22,7 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Driver\AbstractDriver;
 use InvalidArgumentException;
 use LogicException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Process;
 
 /**
@@ -66,6 +67,18 @@ abstract class AbstractBackupUtility
         }
 
         return $this->{$name};
+    }
+
+    /**
+     * Makes the absolute path for a filename.
+     *
+     * @param string $filename
+     * @return string
+     * @since 2.13.5
+     */
+    public function makeAbsoluteFilename(string $filename): string
+    {
+        return Path::makeAbsolute($filename, Configure::readOrFail('DatabaseBackup.target'));
     }
 
     /**
