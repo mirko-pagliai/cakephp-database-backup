@@ -122,7 +122,7 @@ class BackupManagerTest extends TestCase
         $initialFiles = $this->createSomeBackups();
         $rotate = $this->BackupManager->rotate(2);
         $this->assertCount(1, $rotate);
-        $this->assertSame(basename($initialFiles[0]), $rotate[0]['filename']);
+        $this->assertSame($initialFiles[0], $rotate[0]['path']);
     }
 
     /**
