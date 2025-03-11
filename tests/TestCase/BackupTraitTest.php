@@ -133,7 +133,7 @@ class BackupTraitTest extends TestCase
         $this->assertSame('fake', $connection->config()['name']);
 
         $this->expectException(MissingDatasourceConfigException::class);
-        $this->getConnection('noExisting');
+        $this->Trait->getConnection('noExisting');
     }
 
     /**

@@ -27,8 +27,6 @@ use DatabaseBackup\Utility\BackupManager;
  */
 abstract class TestCase extends CakeTestCase
 {
-    use BackupTrait;
-
     /**
      * @inheritDoc
      */
