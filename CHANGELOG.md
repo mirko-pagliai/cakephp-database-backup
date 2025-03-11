@@ -36,6 +36,8 @@
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.
   They will be removed in a future release;
+* the `delete()` and `deleteAll()` methods provided by `BackupManager` are deprecated. They will be removed in a future
+  release. The few methods that need to delete files (e.g. rotation methods) implement the necessary code themselves;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
 * the `BackupExport::$defaultExtension` property no longer exists (by now it had become useless);
 * updated for the latest version of psalm.

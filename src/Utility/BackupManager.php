@@ -25,7 +25,6 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use InvalidArgumentException;
 use LogicException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -43,9 +42,12 @@ class BackupManager
      * @return string Deleted backup file
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws \LogicException
+     * @deprecated 2.13.5: `BackupManager::delete()` method is deprecated. Will be removed in a future release
      */
     public static function delete(string $filename): string
     {
+        deprecationWarning('2.13.5', 'The `BackupManager::delete()` method is deprecated. Will be removed in a future release');
+
         $filename = self::getAbsolutePath($filename);
         if (!is_writable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', $filename));
@@ -61,9 +63,12 @@ class BackupManager
      * @return array<string> List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
+     * @deprecated 2.13.5: `BackupManager::deleteAll()` method is deprecated. Will be removed in a future release
      */
     public static function deleteAll(): array
     {
+        deprecationWarning('2.13.5', 'The `BackupManager::deleteAll()` method is deprecated. Will be removed in a future release');
+
         return self::index()
             ->extract('path')
             ->each(fn (string $path) => unlink($path))

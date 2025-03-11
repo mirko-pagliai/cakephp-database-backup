@@ -50,35 +50,66 @@ class BackupManagerTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupManager::delete()
      */
+    #[Test]
     public function testDelete(): void
     {
         $filename = $this->createBackup(fakeBackup: true);
-        $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete($filename));
         $this->assertFileDoesNotExist($filename);
 
         //With a relative path
         $filename = $this->createBackup(fakeBackup: true);
-        $this->assertFileExists($filename);
         $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
         $this->assertFileDoesNotExist($filename);
     }
 
     /**
-     * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::delete()
+     */
+    #[Test]
+    public function testDeleteWithNoExistingFile(): void
+    {
+        $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` is not writable');
+        $this->BackupManager->delete('noExistingFile');
+    }
+
+    /**
+     * @uses \DatabaseBackup\Utility\BackupManager::delete()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testDeleteIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->BackupManager->delete($this->createBackup(fakeBackup: true));
+        });
+    }
+
+    /**
      * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
      */
+    #[Test]
     public function testDeleteAll(): void
     {
         $createdFiles = $this->createSomeBackups();
         $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
-        $this->assertTrue($this->BackupManager->index()->isEmpty());
+        foreach ($createdFiles as $file) {
+            $this->assertFileDoesNotExist($file);
+        }
+    }
 
-        $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` is not writable');
-        $this->BackupManager->delete('noExistingFile');
+    /**
+     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testDeleteAllIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->BackupManager->deleteAll();
+        });
     }
 
     /**
