@@ -20,7 +20,6 @@ use Cake\Mailer\Mailer;
 use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use Cake\TestSuite\TestEmailTransport;
-use DatabaseBackup\Utility\BackupManager;
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
@@ -113,4 +112,9 @@ $loader = new SchemaLoader();
 /** @uses tests/schema.php */
 $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
 
-echo 'Running tests for `' . (new BackupManager())->getDriverName() . '` driver ' . PHP_EOL;
+$Connection = ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+echo sprintf(
+    'Running tests for database `%s` with `\%s` driver',
+    $Connection->config()['name'],
+    $Connection->config()['driver']
+) . PHP_EOL . PHP_EOL;
