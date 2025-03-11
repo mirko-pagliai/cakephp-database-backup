@@ -109,7 +109,7 @@ class BackupExportAndImportTest extends TestCase
         $BackupImport = new BackupImport();
 
         foreach (Compression::cases() as $Compression) {
-            $expectedFilename = $this->getAbsolutePath(uniqid('example_') . '.' . $Compression->value);
+            $expectedFilename = TMP . 'backups' . DS . 'backup_' . uniqid('example_') . '.' . $Compression->value;
 
             //Initial records. 3 articles and 6 comments
             $initial = $this->getAllRecords();
