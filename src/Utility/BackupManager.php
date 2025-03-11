@@ -70,7 +70,7 @@ class BackupManager
     /**
      * Returns a list of database backups.
      *
-     * @return \Cake\Collection\CollectionInterface<array<array{filename: string, basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>>
+     * @return \Cake\Collection\CollectionInterface
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
