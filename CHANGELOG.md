@@ -34,8 +34,8 @@
 * the `DATABASE_BACKUP_EXTENSIONS` constant no longer exists, as it is no longer needed due to the `Compression` enum;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
-* `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.
-  They will be removed in a future release;
+* `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by
+  `BackupTrait` are deprecated. They will be removed in a future release;
 * the `delete()` and `deleteAll()` methods provided by `BackupManager` are deprecated. They will be removed in a future
   release. The few methods that need to delete files (e.g. rotation methods) implement the necessary code themselves;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;

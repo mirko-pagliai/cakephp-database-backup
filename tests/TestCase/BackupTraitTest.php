@@ -76,7 +76,6 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\BackupTrait::getAbsolutePath()
      */
     #[Test]
@@ -85,6 +84,18 @@ class BackupTraitTest extends TestCase
     {
         $result = $this->Trait->getAbsolutePath($path);
         $this->assertSame($expectedAbsolutePath, $result);
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getAbsolutePath()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetAbsolutePathIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getAbsolutePath(TMP . 'tmp_file');
+        });
     }
 
     /**
