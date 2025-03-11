@@ -42,14 +42,6 @@ class BackupTraitTest extends TestCase
     /**
      * @inheritDoc
      */
-    public array $fixtures = [
-        'core.Articles',
-        'core.Comments',
-    ];
-
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -127,22 +119,29 @@ class BackupTraitTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\BackupTrait::getConnection()
      */
-    public function testGetConnection(): void
+    #[Test]
+    #[TestWith([''])]
+    #[TestWith(['test'])]
+    #[TestWith(['fake'])]
+    public function testGetConnection(string $connectionName): void
     {
-        foreach ([null, Configure::read('DatabaseBackup.connection')] as $name) {
-            $connection = $this->Trait->getConnection($name);
-            $this->assertInstanceof(Connection::class, $connection);
-            $this->assertSame('test', $connection->config()['name']);
+        if ($connectionName == 'fake') {
+            ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
         }
 
-        ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
-        $connection = $this->Trait->getConnection('fake');
-        $this->assertInstanceof(Connection::class, $connection);
-        $this->assertSame('fake', $connection->config()['name']);
+        $Connection = $this->Trait->getConnection($connectionName);
+        $this->assertInstanceof(Connection::class, $Connection);
+        $this->assertSame($connectionName ?: Configure::read('DatabaseBackup.connection'), $Connection->configName());
+    }
 
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getConnection()
+     */
+    #[Test]
+    public function testGetConnectionWithNoExistingConnection(): void
+    {
         $this->expectException(MissingDatasourceConfigException::class);
         $this->Trait->getConnection('noExisting');
     }

@@ -66,10 +66,10 @@ trait BackupTrait
      *
      * You can pass the name of the connection. By default, the connection set in the configuration will be used.
      *
-     * @param string|null $name Connection name
+     * @param string $name Connection name
      * @return \Cake\Datasource\ConnectionInterface
      */
-    public static function getConnection(?string $name = null): ConnectionInterface
+    public static function getConnection(string $name = ''): ConnectionInterface
     {
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
