@@ -70,7 +70,7 @@ abstract class TestCase extends CakeTestCase
 
         foreach (array_reverse(Compression::cases()) as $Compression) {
             $timestamp--;
-            $file = $this->createBackup('backup_test_' . $timestamp . '.' . $Compression->value);
+            $file = $this->createBackup(filename: 'backup_test_' . $timestamp . '.' . $Compression->value, fakeBackup: true);
             touch($file, $timestamp);
             $files[] = $file;
         }
