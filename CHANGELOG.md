@@ -28,11 +28,16 @@
   string). Invalid values will now throw an `InvalidArgumentException` (rather than a `LogicException`);
 * the `BackupManager::rotate()` method throws an `InvalidArgumentException` (and no longer `LogicException`) for an
   invalid `$rotate` value. The method description has been corrected;
+* the code, introduced in version `2.13.3`, that allows paths relative to `ROOT`, has been moved from
+  `BackupTrait::getAbsolutePath()` method to `ImportCommand::execute()`, since it is the only one that takes advantage
+  of it;
 * the `DATABASE_BACKUP_EXTENSIONS` constant no longer exists, as it is no longer needed due to the `Compression` enum;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.
   They will be removed in a future release;
+* the `delete()` and `deleteAll()` methods provided by `BackupManager` are deprecated. They will be removed in a future
+  release. The few methods that need to delete files (e.g. rotation methods) implement the necessary code themselves;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
 * the `BackupExport::$defaultExtension` property no longer exists (by now it had become useless);
 * updated for the latest version of psalm.
