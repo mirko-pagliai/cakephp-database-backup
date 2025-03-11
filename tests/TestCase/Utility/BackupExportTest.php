@@ -151,7 +151,7 @@ class BackupExportTest extends TestCase
         $this->assertSame(10, $this->BackupExport->rotate);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid rotate value');
+        $this->expectExceptionMessage('Invalid `$keep` value');
         $this->BackupExport->rotate(-1)->export();
     }
 

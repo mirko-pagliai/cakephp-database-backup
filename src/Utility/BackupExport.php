@@ -130,13 +130,13 @@ class BackupExport extends AbstractBackupUtility
     /**
      * Sets the number of backups you want to keep. So, it will delete all backups that are older.
      *
-     * @param int $rotate Number of backups you want to keep
+     * @param int $keep Number of backups you want to keep
      * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
      */
-    public function rotate(int $rotate): self
+    public function rotate(int $keep): self
     {
-        $this->rotate = $rotate;
+        $this->rotate = $keep;
 
         return $this;
     }
