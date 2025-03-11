@@ -64,7 +64,7 @@ abstract class DriverTestCase extends TestCase
             $result = $this->Driver->getExportExecutable($filename);
             $expected = sprintf(
                 ' | %s > %s',
-                escapeshellarg($this->Driver->getBinary(lcfirst($Compression->name))),
+                escapeshellarg($this->Driver->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringEndsWith($expected, $result);
@@ -90,7 +90,7 @@ abstract class DriverTestCase extends TestCase
             $result = $this->Driver->getImportExecutable($filename);
             $expected = sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->Driver->getBinary(lcfirst($Compression->name))),
+                escapeshellarg($this->Driver->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringStartsWith($expected, $result);

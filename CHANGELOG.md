@@ -22,8 +22,11 @@
   should be). The `createBackup()` method now has the `$fakeBackup` argument (`false` by default), which allows you to
   create a fake backup file (i.e. an empty file) Added tests;
 * added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
+* the `AbstractDriver::getBinary()` method can now accept a `Compression` value as an argument (in addition to a
+  string). Invalid values will now throw an `InvalidArgumentException` (rather than a `LogicException`);
 * the `BackupManager::rotate()` method throws an `InvalidArgumentException` (and no longer `LogicException`) for an
   invalid `$rotate` value. The method description has been corrected;
+* the `DATABASE_BACKUP_EXTENSIONS` constant no longer exists, as it is no longer needed due to the `Compression` enum;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by `BackupTrait` are deprecated.
