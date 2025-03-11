@@ -76,7 +76,8 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     private function getExecutable(OperationType $OperationType): string
     {
-        $driverName = strtolower($this->getDriverName());
+        $driverName = lcfirst(substr(strrchr($this::class, "\\"), 1));
+
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
