@@ -54,7 +54,7 @@ class AbstractDriverTest extends TestCase
     public function testGetBinaryNoExistingBinary(string $expectedBinaryName, string|Compression $binaryName): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Binary for `'. $expectedBinaryName . '` could not be found. You have to set its path manually');
+        $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
         $this->createPartialMock(AbstractDriver::class, [])
             ->getBinary($binaryName);
     }

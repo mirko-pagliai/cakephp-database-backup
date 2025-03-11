@@ -179,11 +179,11 @@ abstract class AbstractDriver implements EventListenerInterface
     /**
      * Gets a binary path.
      *
-     * @param string|\DatabaseBackup\Compression $binaryName Binary name
+     * @param \DatabaseBackup\Compression|string $binaryName Binary name
      * @return string
      * @throws \LogicException
      */
-    public function getBinary(string|Compression $binaryName): string
+    public function getBinary(Compression|string $binaryName): string
     {
         if ($binaryName instanceof Compression) {
             $binaryName = lcfirst($binaryName->name);
