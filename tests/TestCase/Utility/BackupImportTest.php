@@ -56,13 +56,13 @@ class BackupImportTest extends TestCase
     public function testFilename(): void
     {
         foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            $result = $this->createBackup('backup.' . $extension);
+            $result = $this->createBackup(filename: 'backup.' . $extension, fakeBackup: true);
             $this->BackupImport->filename($result);
             $this->assertSame($result, $this->BackupImport->filename);
         }
 
         //With a relative path
-        $result = $this->createBackup('backup_' . time() . '.sql');
+        $result = $this->createBackup(filename: 'backup_' . time() . '.sql', fakeBackup: true);
         $this->BackupImport->filename(basename($result));
         $this->assertSame($result, $this->BackupImport->filename);
 
@@ -132,7 +132,8 @@ class BackupImportTest extends TestCase
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getDriver']);
         $BackupImport->method('getDriver')->willReturn($Driver);
 
-        $this->assertFalse($BackupImport->filename($this->createBackup())->import());
+        $this->assertFalse($BackupImport->filename($this->createBackup(fakeBackup: true))
+            ->import());
     }
 
     /**
@@ -155,7 +156,7 @@ class BackupImportTest extends TestCase
 
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
 
-        $BackupImport->filename($this->createBackup())
+        $BackupImport->filename($this->createBackup(fakeBackup: true))
             ->import();
     }
 
@@ -177,7 +178,7 @@ class BackupImportTest extends TestCase
 
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
-        $BackupImport->filename($this->createBackup())
+        $BackupImport->filename($this->createBackup(fakeBackup: true))
             ->import();
     }
 }
