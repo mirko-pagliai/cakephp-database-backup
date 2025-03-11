@@ -60,17 +60,19 @@ class ImportCommandTest extends TestCase
      * Test for `execute()` method on stopped event.
      *
      * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     public function testExecuteOnStoppedEvent(): void
     {
-        $this->expectException(StopException::class);
-        $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
         $BackupImport = $this->createConfiguredMock(BackupImport::class, ['import' => false]);
         $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
         $ImportCommand->method('getBackupImport')
             ->willReturn($BackupImport);
-        $ImportCommand->run(['--filename' => $this->createBackup()], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
+
+        $this->expectException(StopException::class);
+        $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
+        $ImportCommand->run(['--filename' => $this->createBackup(fakeBackup: true)], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
     }
 
     /**
