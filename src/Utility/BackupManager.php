@@ -21,10 +21,10 @@ use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use InvalidArgumentException;
 use LogicException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -33,8 +33,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class BackupManager
 {
-    use BackupTrait;
-
     /**
      * Deletes a backup file.
      *
@@ -48,7 +46,7 @@ class BackupManager
     {
         deprecationWarning('2.13.5', 'The `BackupManager::delete()` method is deprecated. Will be removed in a future release');
 
-        $filename = self::getAbsolutePath($filename);
+        $filename = Path::makeAbsolute($filename, Configure::readOrFail('DatabaseBackup.target'));
         if (!is_writable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', $filename));
         }
@@ -139,7 +137,7 @@ class BackupManager
      */
     protected static function getEmailInstance(string $backup, string $recipient): Mailer
     {
-        $filename = self::getAbsolutePath($backup);
+        $filename = Path::makeAbsolute($backup, Configure::readOrFail('DatabaseBackup.target'));
         if (!is_readable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }
