@@ -33,10 +33,6 @@ trait BackupTrait
      */
     public static function getAbsolutePath(string $path): string
     {
-        if (Path::isAbsolute($path)) {
-            return $path;
-        }
-
         return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }
 
