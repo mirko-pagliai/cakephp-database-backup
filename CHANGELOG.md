@@ -19,7 +19,8 @@
 * the `BackupImport::filename()` method uses `Compression` to check the validity of the file you want to import (so it
   no longer checks its extension). This will throw a `ValueError` exception for invalid files;
 * the global test functions `createBackup()` and `createSomeBackups()` are now methods of the `TestCase` class (as they
-  should be). Added tests;
+  should be). The `createBackup()` method now has the `$fakeBackup` argument (`false` by default), which allows you to
+  create a fake backup file (i.e. an empty file) Added tests;
 * added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
 * the `BackupManager::rotate()` method throws an `InvalidArgumentException` (and no longer `LogicException`) for an
   invalid `$rotate` value. The method description has been corrected;

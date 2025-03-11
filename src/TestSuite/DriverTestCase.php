@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
 
 /**
@@ -52,13 +53,18 @@ abstract class DriverTestCase extends TestCase
     {
         $this->assertNotEmpty($this->Driver->getExportExecutable('backup.sql'));
 
+        $cases = array_filter(
+            array: Compression::cases(),
+            callback: fn (Compression $Compression): bool => $Compression !== Compression::None
+        );
+
         //Gzip and Bzip2 compressions
-        foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
-            $filename = 'backup.' . $extension;
+        foreach ($cases as $Compression) {
+            $filename = 'backup.' . $Compression->value;
             $result = $this->Driver->getExportExecutable($filename);
             $expected = sprintf(
                 ' | %s > %s',
-                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($this->Driver->getBinary(lcfirst($Compression->name))),
                 escapeshellarg($filename)
             );
             $this->assertStringEndsWith($expected, $result);
@@ -73,13 +79,18 @@ abstract class DriverTestCase extends TestCase
     {
         $this->assertNotEmpty($this->Driver->getImportExecutable('backup.sql'));
 
+        $cases = array_filter(
+            array: Compression::cases(),
+            callback: fn (Compression $Compression): bool => $Compression !== Compression::None
+        );
+
         //Gzip and Bzip2 compressions
-        foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
-            $filename = 'backup.' . $extension;
+        foreach ($cases as $Compression) {
+            $filename = 'backup.' . $Compression->value;
             $result = $this->Driver->getImportExecutable($filename);
             $expected = sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($this->Driver->getBinary(lcfirst($Compression->name))),
                 escapeshellarg($filename)
             );
             $this->assertStringStartsWith($expected, $result);
