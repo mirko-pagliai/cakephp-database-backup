@@ -32,6 +32,7 @@ use InvalidArgumentException;
 abstract class AbstractDriver implements EventListenerInterface
 {
     use BackupTrait;
+
     /**
      * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Driver\AbstractDriver>
      */
