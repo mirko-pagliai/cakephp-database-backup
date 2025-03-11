@@ -68,14 +68,15 @@ class IndexCommand extends BaseCommand
         ];
 
         $rows = $backups
-            ->map(fn (array $backup): array => array_merge($backup, [
-               'compression' => match ($backup['compression']) {
+            ->map(fn (array $backup): array => [
+                'basename' => $backup['filename'],
+                'compression' => match ($backup['compression']) {
                     Compression::None => '',
                     default => lcfirst($backup['compression']->name)
-               },
-               'datetime' => $backup['datetime']->nice(),
-               'size' => Number::toReadableSize($backup['size']),
-            ]))
+                },
+                'size' => Number::toReadableSize($backup['size']),
+                'datetime' => $backup['datetime']->nice(),
+            ])
             ->toList();
 
         if ($args->getOption('reverse')) {

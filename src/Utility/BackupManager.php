@@ -64,7 +64,7 @@ class BackupManager
      */
     public static function deleteAll(): array
     {
-        return array_map([self::class, 'delete'], self::index()->extract('filename')->toList());
+        return array_map([self::class, 'delete'], self::index()->extract('path')->toList());
     }
 
     /**
@@ -116,7 +116,7 @@ class BackupManager
         return self::index()
             ->skip($keep)
             ->each(function (array $file): void {
-                unlink(self::getAbsolutePath($file['filename']));
+                unlink($file['path']);
             })
             ->toList();
     }
