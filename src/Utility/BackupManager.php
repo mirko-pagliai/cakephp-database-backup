@@ -64,13 +64,13 @@ class BackupManager
      */
     public static function deleteAll(): array
     {
-        return array_map([self::class, 'delete'], self::index()->extract('filename')->toList());
+        return array_map([self::class, 'delete'], self::index()->extract('path')->toList());
     }
 
     /**
      * Returns a list of database backups.
      *
-     * @return \Cake\Collection\CollectionInterface A `Collection` of backups
+     * @return \Cake\Collection\CollectionInterface
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
@@ -86,7 +86,10 @@ class BackupManager
 
         return (new Collection($Finder))
             ->map(fn (SplFileInfo $File): array => [
+                /** @todo remove `filename` in version 2.14.0 */
                 'filename' => $File->getFilename(),
+                'basename' => $File->getBasename(),
+                'path' => $File->getPathname(),
                 'compression' => Compression::fromFilename($File->getFilename()),
                 'size' => $File->getSize(),
                 'datetime' => DateTime::createFromTimestamp($File->getMTime(), $DateTimeZone),
@@ -100,7 +103,7 @@ class BackupManager
      * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
      *
      * @param int $keep Number of backups that you want to keep
-     * @return array<array{filename: string, compression: ?string, size: false|int, datetime: \Cake\I18n\DateTime}> Array of deleted files
+     * @return array<array{filename: string, basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
      * @throws \InvalidArgumentException With an Invalid rotate value.
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      */
@@ -113,7 +116,7 @@ class BackupManager
         return self::index()
             ->skip($keep)
             ->each(function (array $file): void {
-                unlink(self::getAbsolutePath($file['filename']));
+                unlink($file['path']);
             })
             ->toList();
     }

@@ -76,7 +76,7 @@ class RotateCommand extends BaseCommand
             }
 
             foreach ($files as $file) {
-                $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['filename']));
+                $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['basename']));
             }
 
             $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));

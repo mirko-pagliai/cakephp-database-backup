@@ -5,10 +5,12 @@
 * the `BackupExport::compression()` method now accepts a `Compression` value as its `$compression` argument. String and
   `null` values are still supported, but are now deprecated and will be removed in a future release. Additionally, if an
   invalid string is now passed as an argument, a `InvalidArgumentException` exception is thrown;
-* the `BackupManager::index()` also returns a `Compression` value for compressions (and no longer a string or `null`),
-  while it no longer returns the extension (useless at this point). The `IndexCommand` instead still carries the
-  compression as a string (it couldn't be otherwise), while it also no longer reports the extension (also useless in
-  this case);
+* the `BackupManager::index()` method now returns, in the array for each file, a `Compression` enum value for the 
+  `compression` key (rather than a string or `null`), the absolute path for the `path` key, and the basename for the
+  `basename` key. The `filename` key is still returned, but will be removed in version 2.14.0 (`basename` is more
+  efficient). The `extension` key has already been removed, as it is now useless. The `IndexCommand` instead still
+  carries the compression as a string (it couldn't be otherwise), while it also no longer reports the extension (also
+  useless in this case);
 * the `BackupExport` class no longer directly handles the backup extension, which is automatically deduced from the
   value of `Compression`, now set by default to `Compression::None` (no compression) and which can always be changed
   with the `compression()` and (indirectly) `filename()` methods. For this reason, the `BackupExport::$extension`
