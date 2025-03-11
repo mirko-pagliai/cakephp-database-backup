@@ -22,7 +22,7 @@ use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
-use LogicException;
+use InvalidArgumentException;
 
 /**
  * Represents a driver containing all methods to export/import database backups according to the connection.
@@ -105,7 +105,7 @@ abstract class AbstractDriver implements EventListenerInterface
 
         $Compression = Compression::fromFilename($filename);
         if ($Compression !== Compression::None) {
-            $exec .= ' | ' . escapeshellarg($this->getBinary(lcfirst($Compression->name)));
+            $exec .= ' | ' . escapeshellarg($this->getBinary($Compression));
         }
 
         return $exec . ' > ' . escapeshellarg($filename);
@@ -126,7 +126,7 @@ abstract class AbstractDriver implements EventListenerInterface
         if ($Compression !== Compression::None) {
             return sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->getBinary(lcfirst($Compression->name))),
+                escapeshellarg($this->getBinary($Compression)),
                 escapeshellarg($filename)
             ) . $exec;
         }
@@ -179,18 +179,22 @@ abstract class AbstractDriver implements EventListenerInterface
     /**
      * Gets a binary path.
      *
-     * @param string $name Binary name
+     * @param string|\DatabaseBackup\Compression $binaryName Binary name
      * @return string
      * @throws \LogicException
      */
-    public function getBinary(string $name): string
+    public function getBinary(string|Compression $binaryName): string
     {
-        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
+        if ($binaryName instanceof Compression) {
+            $binaryName = lcfirst($binaryName->name);
+        }
+
+        $binary = Configure::read('DatabaseBackup.binaries.' . $binaryName);
         if (!$binary) {
-            throw new LogicException(__d(
+            throw new InvalidArgumentException(__d(
                 'database_backup',
                 'Binary for `{0}` could not be found. You have to set its path manually',
-                $name
+                $binaryName
             ));
         }
 
