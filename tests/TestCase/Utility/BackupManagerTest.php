@@ -75,7 +75,7 @@ class BackupManagerTest extends TestCase
     {
         $createdFiles = $this->createSomeBackups();
         $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
-        $this->assertEmpty($this->BackupManager->index()->toList());
+        $this->assertTrue($this->BackupManager->index()->isEmpty());
 
         $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` is not writable');
         $this->BackupManager->delete('noExistingFile');

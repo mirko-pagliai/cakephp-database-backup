@@ -37,9 +37,8 @@ abstract class TestCase extends CakeTestCase
         parent::tearDown();
 
         BackupManager::index()
-            ->each(function (array $backup): void {
-                unlink($backup['path']);
-            });
+            ->extract('path')
+            ->each(fn (string $path) => unlink($path));
     }
 
     /**
