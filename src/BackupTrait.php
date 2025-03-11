@@ -88,7 +88,7 @@ trait BackupTrait
     {
         $className = get_class($this->getConnection()->getDriver());
 
-        return substr($className, strrpos($className, '\\') + 1);
+        return substr(strrchr($className, "\\"), 1);
     }
 
     /**
