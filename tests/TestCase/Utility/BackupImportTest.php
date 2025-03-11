@@ -55,8 +55,8 @@ class BackupImportTest extends TestCase
      */
     public function testFilename(): void
     {
-        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            $result = $this->createBackup(filename: 'backup.' . $extension, fakeBackup: true);
+        foreach (Compression::cases() as $Compression) {
+            $result = $this->createBackup(filename: 'backup.' . $Compression->value, fakeBackup: true);
             $this->BackupImport->filename($result);
             $this->assertSame($result, $this->BackupImport->filename);
         }
@@ -102,10 +102,10 @@ class BackupImportTest extends TestCase
      */
     public function testImport(): void
     {
-        foreach (array_keys(DATABASE_BACKUP_EXTENSIONS) as $extension) {
-            $expectedFilename = $this->createBackup('backup.' . $extension);
+        foreach (Compression::cases() as $Compression) {
+            $expectedFilename = $this->createBackup('backup.' . $Compression->value);
             $result = $this->BackupImport->filename($expectedFilename)->import() ?: '';
-            $this->assertStringEndsWith('backup.' . $extension, $result);
+            $this->assertStringEndsWith('backup.' . $Compression->value, $result);
             $this->assertSame($expectedFilename, $result);
             $this->assertEventFired('Backup.beforeImport', $this->BackupImport->getDriver()->getEventManager());
             $this->assertEventFired('Backup.afterImport', $this->BackupImport->getDriver()->getEventManager());
