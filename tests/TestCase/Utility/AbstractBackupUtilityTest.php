@@ -15,12 +15,16 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use BadMethodCallException;
 use Cake\Core\Configure;
 use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
+use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * AbstractBackupUtilityTest.
