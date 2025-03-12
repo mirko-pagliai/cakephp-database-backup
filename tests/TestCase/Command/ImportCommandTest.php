@@ -22,12 +22,14 @@ use Cake\Console\TestSuite\StubConsoleOutput;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * ImportCommandTest class
- *
- * @uses \DatabaseBackup\Command\ImportCommand
+ * ImportCommandTest class.
  */
+#[CoversClass(ImportCommand::class)]
 class ImportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
@@ -38,31 +40,64 @@ class ImportCommandTest extends TestCase
     protected string $command = 'database_backup.import -v';
 
     /**
-     * @test
+     * @uses \DatabaseBackup\Command\ImportCommand::makeAbsoluteFilename()
+     */
+    #[Test]
+    #[TestWith(['file.sql', 'file.sql'])]
+    #[TestWith([TMP . 'backups' . DS . 'file.sql', TMP . 'backups' . DS . 'file.sql'])]
+    #[TestWith([ROOT . 'version', 'version'])]
+    public function testMakeAbsoluteFilename(string $expectedFilename, string $filename): void
+    {
+        $ImportCommand = new ImportCommand();
+        $result = $ImportCommand->makeAbsoluteFilename($filename);
+        $this->assertSame($expectedFilename, $result);
+    }
+
+    /**
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
+    #[Test]
     public function testExecute(): void
     {
         $backup = $this->createBackup();
+
         $this->exec($this->command . ' ' . $backup);
         $this->assertExitSuccess();
         $this->assertOutputContains('Connection: test');
         $this->assertOutputRegExp('/Driver: Cake\\\\Database\\\\Driver\\\\\w+/');
         $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
         $this->assertErrorEmpty();
-
-        //With a no existing file
-        $this->exec($this->command . ' /noExistingDir/backup.sql');
-        $this->assertExitError();
     }
 
     /**
-     * Test for `execute()` method on stopped event.
-     *
-     * @test
+     * @uses \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    #[Test]
+    public function testExecuteNoExistingFile(): void
+    {
+        $filename = '/noExistingDir/backup.sql';
+        $this->exec($this->command . ' ' . $filename);
+        $this->assertExitError();
+        $this->assertErrorContains('File or directory `' . $filename . '` is not readable');
+    }
+
+    /**
+     * @uses \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    #[Test]
+    public function testExecuteTimeoutOption(): void
+    {
+        $this->exec($this->command . ' --timeout 10 ' . $this->createBackup());
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Timeout for shell commands: 10 seconds');
+        $this->assertErrorEmpty();
+    }
+
+    /**
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
+    #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
         $BackupImport = $this->createConfiguredMock(BackupImport::class, ['import' => false]);
@@ -72,20 +107,9 @@ class ImportCommandTest extends TestCase
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
-        $ImportCommand->run(['--filename' => $this->createBackup(fakeBackup: true)], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
-    }
-
-    /**
-     * Test for `execute()` method, with `timeout` option.
-     *
-     * @test
-     * @uses \DatabaseBackup\Command\ImportCommand::execute()
-     */
-    public function testExecuteTimeoutOption(): void
-    {
-        $this->exec($this->command . ' --timeout 10 ' . $this->createBackup());
-        $this->assertExitSuccess();
-        $this->assertOutputContains('Timeout for shell commands: 10 seconds');
-        $this->assertErrorEmpty();
+        $ImportCommand->run(
+            ['--filename' => $this->createBackup(fakeBackup: true)],
+            new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
+        );
     }
 }
