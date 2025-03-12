@@ -8,8 +8,9 @@
 * passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
   been removed (backwards compatibility removed);
 * the `BackupManager::index` methods no longer returns, in the array for each file, the `filename` key;
-* the `BackupExport::filename()` method now throws an `IOException` exception (rather than a `LogicException`) if the
-  target (directory) is not writable or if the filename already exists;
+* the `BackupExport::filename()` and `BackupImport::filename()` methods now throw an `IOException` exception (rather
+  than a `LogicException`) if the target (directory) is not writable/the filename already exists/the filename is not
+  readable;
 * the `BackupExport::export()` and `BackupImport::import()` methods now throw a `RuntimeException` exception (rather
   than a `LogicException`) when export/import fails;
 * the `TestCase::createSomeBackups()` method has been improved;

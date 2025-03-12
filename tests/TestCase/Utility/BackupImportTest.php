@@ -21,6 +21,7 @@ use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -45,59 +46,52 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupImport ??= new BackupImport();
+        $this->BackupImport = new BackupImport();
         $this->BackupImport->getDriver()->getEventManager()->setEventList(new EventList());
     }
 
     /**
-     * Test for `filename()` method. This tests also `$compression` property.
-     *
-     * @test
      * @uses \DatabaseBackup\Utility\BackupImport::filename()
      */
-    public function testFilename(): void
+    #[Test]
+    #[TestWith([TMP . 'backups/backup.sql', 'backup.sql'])]
+    #[TestWith([TMP . 'backups/backup.sql.gz', 'backup.sql.gz'])]
+    #[TestWith([TMP . 'backups/backup.sql.bz2', 'backup.sql.bz2'])]
+    #[TestWith([TMP . 'backups/backup.sql.bz2', TMP . 'backups/backup.sql.bz2'])]
+    public function testFilename(string $expectedFilename, string $filename): void
     {
-        foreach (Compression::cases() as $Compression) {
-            $result = $this->createBackup(filename: 'backup.' . $Compression->value, fakeBackup: true);
-            $this->BackupImport->filename($result);
-            $this->assertSame($result, $this->BackupImport->getFilename());
-        }
-
-        //With a relative path
-        $result = $this->createBackup(filename: 'backup_' . time() . '.sql', fakeBackup: true);
-        $this->BackupImport->filename(basename($result));
-        $this->assertSame($result, $this->BackupImport->getFilename());
-
-        //With an invalid directory
-        $this->expectExceptionMessage('File or directory `' . TMP . 'noExistingDir' . DS . 'backup.sql` is not readable');
-        $this->BackupImport->filename(TMP . 'noExistingDir' . DS . 'backup.sql');
+        $filename = $this->createBackup(filename: $filename, fakeBackup: true);
+        $this->BackupImport->filename($filename);
+        $result = $this->BackupImport->getFilename();
+        $this->assertSame($expectedFilename, $result);
     }
 
     /**
-     * Test for `filename()` method, with an invalid file extension.
+     * Test for `filename()` method, with a no readable file.
      *
-     * @test
      * @uses \DatabaseBackup\Utility\BackupImport::filename()
      */
-    public function testFilenameWithInvalidFileExtension(): void
+    #[Test]
+    public function testFilenameNoReadableFile(): void
     {
-        $filename = tempnam(TMP, 'invalidFile');
-
-        $this->expectException(ValueError::class);
-        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . $filename . '`');
+        $filename = TMP . 'noExistingDir/backup.sql';
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('File or directory `' . $filename . '` is not readable');
         $this->BackupImport->filename($filename);
     }
 
     /**
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupImport::timeout()
+     * Test for `filename()` method, with an invalid filename.
+     *
+     * @uses \DatabaseBackup\Utility\BackupImport::filename()
      */
-    public function testTimeout(): void
+    #[Test]
+    public function testFilenameWithInvalidFilename(): void
     {
-        $this->assertSame(0, $this->BackupImport->getTimeout());
-
-        $this->BackupImport->timeout(120);
-        $this->assertSame(120, $this->BackupImport->getTimeout());
+        $filename = tempnam(TMP, 'invalidFile');
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . $filename . '`');
+        $this->BackupImport->filename($filename);
     }
 
     /**

@@ -67,17 +67,17 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method.
-     *
      * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
     #[Test]
+    #[TestWith(['backup.sql'])]
+    #[TestWith(['backup.sql.gz'])]
     #[TestWith(['backup.sql.bz2'])]
     #[TestWith([TMP . 'backups/backup.sql.bz2'])]
     public function testFilename(string $filename): void
     {
         $expectedFilename = Configure::read('DatabaseBackup.target') . basename($filename);
-        $expectedCompression = Compression::Bzip2;
+        $expectedCompression = Compression::fromFilename($filename);
 
         $this->BackupExport->filename($filename);
         $this->assertSame($expectedFilename, $this->BackupExport->getFilename());

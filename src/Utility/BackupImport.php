@@ -19,6 +19,7 @@ namespace DatabaseBackup\Utility;
 use DatabaseBackup\Compression;
 use LogicException;
 use RuntimeException;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Utility to import databases.
@@ -31,14 +32,16 @@ class BackupImport extends AbstractBackupUtility
      * @param string $filename Filename. It can be an absolute path
      * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
-     * @throws \LogicException
+     * @throws \Symfony\Component\Filesystem\Exception\IOException If the filename is not readable
      * @throws \ValueError With a filename that does not match any supported compression.
      */
     public function filename(string $filename): self
     {
         $filename = $this->makeAbsoluteFilename($filename);
         if (!is_readable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
+            throw new IOException(
+                __d('database_backup', 'File or directory `{0}` is not readable', $filename)
+            );
         }
 
         Compression::fromFilename($filename);
