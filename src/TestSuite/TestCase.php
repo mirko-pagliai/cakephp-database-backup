@@ -68,7 +68,7 @@ abstract class TestCase extends CakeTestCase
 
         return array_map(
             callback: function (Compression $Compression) use (&$timestamp): string {
-                $timestamp--;
+                $timestamp = $timestamp - 60;
                 $file = $this->createBackup(filename: 'backup_test_' . $timestamp . '.' . $Compression->value, fakeBackup: true);
                 touch($file, $timestamp);
 

@@ -48,8 +48,7 @@ class ImportCommandTest extends TestCase
     #[TestWith([ROOT . 'version', 'version'])]
     public function testMakeAbsoluteFilename(string $expectedFilename, string $filename): void
     {
-        $ImportCommand = new ImportCommand();
-        $result = $ImportCommand->makeAbsoluteFilename($filename);
+        $result = ImportCommand::makeAbsoluteFilename($filename);
         $this->assertSame($expectedFilename, $result);
     }
 
@@ -82,7 +81,7 @@ class ImportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `timeout` option.
+     * Test for `execute()` method, with `--timeout` option.
      *
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */

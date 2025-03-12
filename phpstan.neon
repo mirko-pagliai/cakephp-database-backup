@@ -12,11 +12,6 @@ parameters:
     bootstrapFiles:
         - tests/bootstrap.php
 
-    ignoreErrors:
-            -
-                message: '/^Cannot call method messages\(\) on Cake\\Console\\TestSuite\\StubConsoleOutput\|null\.$/'
-                path: tests/TestCase/Command
-
     treatPhpDocTypesAsCertain: false
 
     excludePaths:

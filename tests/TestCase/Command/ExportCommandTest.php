@@ -53,7 +53,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `compression` option.
+     * Test for `execute()` method, with `--compression` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -67,7 +67,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `filename` option.
+     * Test for `execute()` method, with `--filename` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -81,7 +81,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` option.
+     * Test for `execute()` method, with `--rotate` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -99,7 +99,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` option but no files to delete.
+     * Test for `execute()` method, with `--rotate` option, but no files to rotate.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -114,7 +114,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `timeout` option.
+     * Test for `execute()` method, with `--timeout` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
