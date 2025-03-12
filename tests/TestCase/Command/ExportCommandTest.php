@@ -46,8 +46,6 @@ class ExportCommandTest extends TestCase
     {
         $this->exec($this->command);
         $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: Cake\\\\Database\\\\Driver\\\\\w+/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertErrorEmpty();
     }

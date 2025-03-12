@@ -20,6 +20,7 @@ use Cake\Console\Arguments;
 use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Symfony\Component\Filesystem\Path;
 
@@ -28,6 +29,16 @@ use Symfony\Component\Filesystem\Path;
  */
 abstract class Command extends BaseCommand
 {
+    /**
+     * Gets the `Connection`.
+     *
+     * @return \Cake\Datasource\ConnectionInterface
+     */
+    public function getConnection(): ConnectionInterface
+    {
+        return ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+    }
+
     /**
      * Makes the relative path for a filename (relative to `ROOT`).
      *
@@ -45,10 +56,8 @@ abstract class Command extends BaseCommand
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        $Connection = ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
-
-        $io->out(__d('database_backup', 'Connection: {0}', $Connection->config()['name']));
-        $io->out(__d('database_backup', 'Driver: {0}', $Connection->config()['driver']));
+        $io->out(__d('database_backup', 'Connection: {0}', $this->getConnection()->config()['name']));
+        $io->out(__d('database_backup', 'Driver: {0}', $this->getConnection()->config()['driver']));
 
         if ($args->getOption('timeout')) {
             $io->verbose(
