@@ -5,7 +5,10 @@
   been removed (backwards compatibility removed);
 * `DeleteAllCommand`, `RotateCommand` and `SendCommand` classes had been deprecated and have been removed;
 * `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by 
-  `BackupTrait` had been deprecated and has been removed.
+  `BackupTrait` had been deprecated and has been removed;
+* all classes, methods and code related to sending backups via email had been deprecated, and now they have been
+  removed. So, the `BackupManager::send()` method (and, consequently, the internal `BackupManager::getEmailInstance()`
+  method), the `BackupExport::send()` method and the `send` option for the `ExportCommand` have been removed.
 
 ## 2.13 branch
 ### 2.13.5

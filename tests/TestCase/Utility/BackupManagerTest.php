@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\I18n\DateTime;
-use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupManager;
@@ -32,8 +31,6 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
  */
 class BackupManagerTest extends TestCase
 {
-    use EmailTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupManager
      */
@@ -166,54 +163,5 @@ class BackupManagerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `$keep` value');
         $this->BackupManager->rotate(-1);
-    }
-
-    /**
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupManager::send()
-     */
-    public function testSend(): void
-    {
-        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
-
-        $file = $this->createBackup(fakeBackup: true);
-        $recipient = 'recipient@example.com';
-        $this->BackupManager->send($file, $recipient);
-        $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
-        $this->assertMailSentTo($recipient);
-        $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
-        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
-
-        //With an invalid sender
-        $this->expectException(InvalidArgumentException::class);
-        unlink($file);
-        Configure::write('DatabaseBackup.mailSender', 'invalidSender');
-        $this->BackupManager->send($this->createBackup(fakeBackup: true), 'recipient@example.com');
-    }
-
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::send()
-     */
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testSendIsDeprecated(): void
-    {
-        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
-
-        $this->deprecated(function (): void {
-            $this->BackupManager->send($this->createBackup(fakeBackup: true), 'recipient@example.com');
-        });
-    }
-
-    /**
-     * Test for `send()` method, with an invalid file.
-     *
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupManager::send()
-     */
-    public function testSendWithInvalidFile(): void
-    {
-        $this->expectExceptionMessage('File or directory `' . Configure::readOrFail('DatabaseBackup.target') . 'noExistingFile` is not readable');
-        $this->BackupManager->send('noExistingFile', 'recipient@example.com');
     }
 }

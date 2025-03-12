@@ -20,7 +20,6 @@ use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\DateTime;
-use Cake\Mailer\Mailer;
 use DatabaseBackup\Compression;
 use InvalidArgumentException;
 use LogicException;
@@ -123,49 +122,5 @@ class BackupManager
             ->skip($keep)
             ->each(fn (array $file) => unlink($file['path']))
             ->toList();
-    }
-
-    /**
-     * Internal method to get an email instance with all options to send a backup file via email.
-     *
-     * @param string $backup Backup you want to send
-     * @param string $recipient Recipient's email address
-     * @return \Cake\Mailer\Mailer
-     * @since 1.1.0
-     * @throws \LogicException
-     * @deprecated 2.13.4: `BackupManager::getEmailInstance()` method is deprecated. Will be removed in a future release
-     */
-    protected static function getEmailInstance(string $backup, string $recipient): Mailer
-    {
-        $filename = Path::makeAbsolute($backup, Configure::readOrFail('DatabaseBackup.target'));
-        if (!is_readable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
-        }
-        $server = env('SERVER_NAME', 'localhost');
-
-        return (new Mailer())
-            ->setFrom(Configure::readOrFail('DatabaseBackup.mailSender'))
-            ->setTo($recipient)
-            ->setSubject(__d('database_backup', 'Database backup {0} from {1}', basename($filename), $server))
-            ->setAttachments([
-                basename($filename) => ['file' => $filename, 'mimetype' => mime_content_type($filename)],
-            ]);
-    }
-
-    /**
-     * Sends a backup file via email.
-     *
-     * @param string $filename Backup filename you want to send via email. The path can be relative to the backup directory
-     * @param string $recipient Recipient's email address
-     * @return array{headers: string, message: string}
-     * @throws \LogicException
-     * @since 1.1.0
-     * @deprecated 2.13.4: the `BackupManager::send()` method is deprecated. Will be removed in a future release
-     */
-    public static function send(string $filename, string $recipient): array
-    {
-        deprecationWarning('2.13.4', 'The `BackupManager::send()` method is deprecated. Will be removed in a future release');
-
-        return self::getEmailInstance($filename, $recipient)->send();
     }
 }

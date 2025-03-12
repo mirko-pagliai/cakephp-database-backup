@@ -124,32 +124,6 @@ class BackupExportTest extends TestCase
 
     /**
      * @test
-     * @uses \DatabaseBackup\Utility\BackupExport::send()
-     */
-    public function testSend(): void
-    {
-        $this->BackupExport->send();
-        $this->assertNull($this->BackupExport->emailRecipient);
-
-        $recipient = 'recipient@example.com';
-        $this->BackupExport->send($recipient);
-        $this->assertSame($recipient, $this->BackupExport->emailRecipient);
-    }
-
-    /**
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupExport::send()
-     */
-    #[WithoutErrorHandler]
-    public function testSendIsDeprecated(): void
-    {
-        $this->deprecated(function (): void {
-            $this->BackupExport->send();
-        });
-    }
-
-    /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::timeout()
      */
     public function testTimeout(): void
@@ -179,15 +153,6 @@ class BackupExportTest extends TestCase
         $file = $this->BackupExport->filename('backup.sql.bz2')->export() ?: '';
         $this->assertFileExists($file);
         $this->assertSame('backup.sql.bz2', basename($file));
-
-        //Exports with `send()`
-        Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
-        $recipient = 'recipient@example.com';
-        $file = $this->BackupExport->filename('exportWithSend.sql')->send($recipient)->export() ?: '';
-        $this->assertMailSentFrom(Configure::readOrFail('DatabaseBackup.mailSender'));
-        $this->assertMailSentTo($recipient);
-        $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
-        $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
     }
 
     /**

@@ -16,10 +16,7 @@ declare(strict_types=1);
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\Mailer\Mailer;
-use Cake\Mailer\TransportFactory;
 use Cake\TestSuite\Fixture\SchemaLoader;
-use Cake\TestSuite\TestEmailTransport;
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
@@ -74,9 +71,6 @@ Cache::setConfig([
         'serialize' => true,
     ],
 ]);
-
-TransportFactory::setConfig('debug', ['className' => TestEmailTransport::class]);
-Mailer::setConfig('default', ['transport' => 'debug']);
 
 if (!getenv('db_dsn')) {
     putenv('db_dsn=mysql://travis@localhost/test');

@@ -26,7 +26,6 @@ use Symfony\Component\Filesystem\Filesystem;
  * Utility to export databases.
  *
  * @property \DatabaseBackup\Compression $compression
- * @property ?string $emailRecipient
  * @property int $rotate
  */
 class BackupExport extends AbstractBackupUtility
@@ -35,11 +34,6 @@ class BackupExport extends AbstractBackupUtility
      * @var \DatabaseBackup\Compression
      */
     protected Compression $compression = Compression::None;
-
-    /**
-     * @var string|null
-     */
-    protected ?string $emailRecipient = null;
 
     /**
      * @var int
@@ -116,26 +110,6 @@ class BackupExport extends AbstractBackupUtility
     }
 
     /**
-     * Sets the recipient's email address to send the backup file via mail.
-     *
-     * @param string|null $recipient Recipient's email address or `null` to disable
-     * @return self
-     * @since 1.1.0
-     * @deprecated 2.13.4 the `BackupExport::send()` method is deprecated. Will be removed in a future release
-     */
-    public function send(?string $recipient = null): self
-    {
-        deprecationWarning(
-            '2.13.4',
-            'The `BackupExport::send()` method is deprecated. Will be removed in a future release'
-        );
-
-        $this->emailRecipient = $recipient;
-
-        return $this;
-    }
-
-    /**
      * Exports the database.
      *
      * When exporting, this method will trigger these events (implemented by the driver instance):
@@ -176,9 +150,6 @@ class BackupExport extends AbstractBackupUtility
         //Dispatches the `Backup.afterExport` event implemented by the driver
         $this->getDriver()->dispatchEvent('Backup.afterExport');
 
-        if ($this->emailRecipient) {
-            BackupManager::send($filename, $this->emailRecipient);
-        }
         if ($this->rotate) {
             BackupManager::rotate($this->rotate);
         }
