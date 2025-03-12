@@ -85,9 +85,15 @@ if (!function_exists('rtr')) {
      *
      * @param string $path Absolute path
      * @return string Relative path
+     * @deprecated 2.13.5 The `rtr()` global function is deprecated. Will be removed in a future release
      */
     function rtr(string $path): string
     {
+        deprecationWarning(
+            '2.13.5',
+            'The `rtr()` global function is deprecated. Will be removed in a future release'
+        );
+
         if (!str_starts_with($path, ROOT)) {
             return $path;
         }

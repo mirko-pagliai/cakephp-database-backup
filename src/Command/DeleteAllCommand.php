@@ -21,6 +21,7 @@ use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use DatabaseBackup\Utility\BackupManager;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Command to delete all backup files.
@@ -52,17 +53,19 @@ class DeleteAllCommand extends BaseCommand
             'The `DeleteAllCommand` is deprecated. Will be removed in a future release'
         );
 
-        $files = BackupManager::deleteAll();
-        if (!$files) {
+        $deletedFiles = BackupManager::deleteAll();
+        if (!$deletedFiles) {
             $io->verbose(__d('database_backup', 'No backup has been deleted'));
 
             return;
         }
 
-        foreach ($files as $file) {
-            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', rtr($file)));
+        foreach ($deletedFiles as $filename) {
+            $filename = Path::isBasePath(ROOT, $filename) ? Path::makeRelative($filename, ROOT) : $filename;
+
+            $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $filename));
         }
 
-        $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
+        $io->success(__d('database_backup', 'Deleted backup files: {0}', count($deletedFiles)));
     }
 }
