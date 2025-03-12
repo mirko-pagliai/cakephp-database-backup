@@ -97,13 +97,11 @@ class BackupExport extends AbstractBackupUtility
      */
     public function filename(string $filename): self
     {
-        $config = $this->getConnection()->config();
-
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
-            pathinfo($config['database'], PATHINFO_FILENAME),
+            pathinfo($this->getDriver()->getConfig('database'), PATHINFO_FILENAME),
             date('YmdHis'),
-            str_replace(['127.0.0.1', '::1'], 'localhost', $config['host'] ?? 'localhost'),
+            str_replace(['127.0.0.1', '::1'], 'localhost', $this->getDriver()->getConfig('host') ?? 'localhost'),
             time(),
         ], $filename);
 

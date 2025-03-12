@@ -210,7 +210,7 @@ abstract class AbstractDriver implements EventListenerInterface
      * @return mixed Config value or `null` if the key doesn't exist
      * @since 2.3.0
      */
-    protected function getConfig(string $key): mixed
+    public function getConfig(string $key): mixed
     {
         return $this->getConnection()->config()[$key] ?? null;
     }
