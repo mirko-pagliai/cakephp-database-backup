@@ -22,14 +22,14 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupManagerTest class.
- *
- * @uses \DatabaseBackup\Utility\BackupManager
  */
+#[CoversClass(BackupManager::class)]
 class BackupManagerTest extends TestCase
 {
     use EmailTrait;
