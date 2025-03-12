@@ -53,7 +53,7 @@ class IndexCommandTest extends TestCase
         $headers = preg_split(pattern: '/\s*\|\s*/', subject: $this->_out->messages()[2], flags: PREG_SPLIT_NO_EMPTY);
         $this->assertSame($expectedHeaders, $headers);
 
-        $expectedRows = array_reverse(array_map(
+        $expectedRows = array_map(
             callback: function (string $filename): array {
                 $Compression = Compression::fromFilename($filename);
 
@@ -67,7 +67,7 @@ class IndexCommandTest extends TestCase
                 ];
             },
             array: $backups
-        ));
+        );
         $rows = array_map(
             callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row) ?: [],
             array: array_slice($this->_out->messages(), 4, 3)

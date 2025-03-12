@@ -64,16 +64,17 @@ abstract class TestCase extends CakeTestCase
      */
     public function createSomeBackups(?int $timestamp = null): array
     {
-        $files = [];
         $timestamp = $timestamp ?: time();
 
-        foreach (array_reverse(Compression::cases()) as $Compression) {
-            $timestamp--;
-            $file = $this->createBackup(filename: 'backup_test_' . $timestamp . '.' . $Compression->value, fakeBackup: true);
-            touch($file, $timestamp);
-            $files[] = $file;
-        }
+        return array_map(
+            callback: function (Compression $Compression) use (&$timestamp): string {
+                $timestamp--;
+                $file = $this->createBackup(filename: 'backup_test_' . $timestamp . '.' . $Compression->value, fakeBackup: true);
+                touch($file, $timestamp);
 
-        return array_reverse($files);
+                return $file;
+            },
+            array: Compression::cases()
+        );
     }
 }

@@ -92,7 +92,7 @@ class BackupManagerTest extends TestCase
     public function testDeleteAll(): void
     {
         $createdFiles = $this->createSomeBackups();
-        $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
+        $this->assertSame($createdFiles, $this->BackupManager->deleteAll());
         foreach ($createdFiles as $file) {
             $this->assertFileDoesNotExist($file);
         }
@@ -119,7 +119,7 @@ class BackupManagerTest extends TestCase
         //Creates a text file. This file should be ignored
         file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
-        $createdFiles = array_reverse($this->createSomeBackups());
+        $createdFiles = $this->createSomeBackups();
         $files = $this->BackupManager->index();
         array_map('unlink', $createdFiles);
         $this->assertCount(3, $files);
@@ -145,12 +145,12 @@ class BackupManagerTest extends TestCase
         /**
          * Creates 3 backups (`$initialFiles`) and keeps only 2 of them.
          *
-         * So only 1 backup was deleted, which was the first one created.
+         * So only 1 backup was deleted, which was the last one created.
          */
         $initialFiles = $this->createSomeBackups();
         $rotate = $this->BackupManager->rotate(2);
         $this->assertCount(1, $rotate);
-        $this->assertSame($initialFiles[0], $rotate[0]['path']);
+        $this->assertSame($initialFiles[2], $rotate[0]['path']);
     }
 
     /**

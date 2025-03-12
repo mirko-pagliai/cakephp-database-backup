@@ -47,9 +47,9 @@ class TestCaseTest extends CakeTestCase
     {
         $timestamp = time();
         $expectedFiles = [
-            'backup_test_' . ($timestamp - 3) . '.sql',
+            'backup_test_' . ($timestamp - 1) . '.sql',
             'backup_test_' . ($timestamp - 2) . '.sql.gz',
-            'backup_test_' . ($timestamp - 1) . '.sql.bz2',
+            'backup_test_' . ($timestamp - 3) . '.sql.bz2',
         ];
 
         $TestCase = $this->getMockBuilder(TestCase::class)
