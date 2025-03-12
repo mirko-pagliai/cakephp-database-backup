@@ -31,7 +31,7 @@ class MysqlTest extends DriverTestCase
     /**
      * Internal method to get a mock of `Mysql`.
      *
-     * @param array $methods Methods you want to mock
+     * @param array<string> $methods Methods you want to mock
      * @return \DatabaseBackup\Driver\Mysql&\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMysqlMock(array $methods = []): Mysql
