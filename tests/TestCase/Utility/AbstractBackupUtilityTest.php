@@ -15,13 +15,17 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use BadMethodCallException;
 use Cake\Core\Configure;
 use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
+use DatabaseBackup\Utility\BackupExport;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * AbstractBackupUtilityTest.
@@ -30,6 +34,50 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class AbstractBackupUtilityTest extends TestCase
 {
+    /**
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::__call()
+     */
+    #[Test]
+    public function testMagicCallMethod(): void
+    {
+        $Utility = new BackupExport();
+        $this->assertIsInt($Utility->getRotate());
+    }
+
+    /**
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::__call()
+     */
+    #[Test]
+    #[TestWith(['getNoExistingProperty'])]
+    #[TestWith(['noExistingMethod'])]
+    public function testMagicCallMethodWithNoExistingMethod(string $noExistingMethod): void
+    {
+        $Utility = $this->getMockBuilder(AbstractBackupUtility::class)
+            ->onlyMethods(['filename'])
+            ->getMock();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method `' . $Utility::class . '::' . $noExistingMethod . '()` does not exist.');
+        $Utility->{$noExistingMethod}();
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::__get()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testMagicGetMethodIsDeprecated(): void
+    {
+        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
+        $Utility->timeout(3);
+
+        $this->deprecated(function () use ($Utility): void {
+            // @phpstan-ignore property.protected, expr.resultUnused
+            $Utility->timeout;
+        });
+    }
+
     public static function makeAbsoluteFilenameProvider(): Generator
     {
         yield [

@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
@@ -30,8 +31,8 @@ use Symfony\Component\Process\Process;
  *
  * Provides the code common to the `BackupExport` and `BackupImport` classes.
  *
- * @property string $filename
- * @property int $timeout
+ * @method string getFilename()
+ * @method int getTimeout()
  */
 abstract class AbstractBackupUtility
 {
@@ -45,12 +46,35 @@ abstract class AbstractBackupUtility
     /**
      * @var int
      */
-    protected int $timeout;
+    protected int $timeout = 0;
 
     /**
      * @var \DatabaseBackup\Driver\AbstractDriver
      */
     private AbstractDriver $Driver;
+
+    /**
+     * Magic `__call()` method.
+     *
+     * It provides all `getX()` methods to get properties.
+     *
+     * @param string $name
+     * @param array<mixed> $arguments
+     * @return mixed
+     * @since 2.14.0
+     * @throws \BadMethodCallException With a no existing property or method.
+     */
+    public function __call(string $name, array $arguments = []): mixed
+    {
+        if (str_starts_with($name, 'get')) {
+            $property = lcfirst(substr($name, 3));
+            if (property_exists($this, $property)) {
+                return $this->{$property};
+            }
+        }
+
+        throw new BadMethodCallException('Method `' . $this::class . '::' . $name . '()` does not exist.');
+    }
 
     /**
      * Magic method for reading data from inaccessible (protected or private).
@@ -59,9 +83,15 @@ abstract class AbstractBackupUtility
      * @return mixed
      * @since 2.12.0
      * @throw \InvalidArgumentException With an undefined property.
+     * @deprecated 2.14.0 accessing properties via the `__get()` method is deprecated. Will be removed in a future release
      */
     public function __get(string $name): mixed
     {
+        deprecationWarning(
+            '2.14.0',
+            'Accessing properties via the `__get()` method is deprecated. Will be removed in a future release'
+        );
+
         if (!property_exists($this, $name)) {
             throw new InvalidArgumentException('Undefined property: ' . $this::class . '::$' . $name);
         }
@@ -137,7 +167,7 @@ abstract class AbstractBackupUtility
     protected function getProcess(string $command): Process
     {
         $Process = Process::fromShellCommandline($command);
-        $Process->setTimeout($this->timeout ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
+        $Process->setTimeout($this->getTimeout() ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
         $Process->run();
 
         return $Process;

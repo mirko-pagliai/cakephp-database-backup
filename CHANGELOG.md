@@ -1,10 +1,15 @@
 # 2.x branch
 ## 2.14 branch
 ### 2.14.0
+* added new magic `AbstractBackupUtility::__call()` method. This allows `BackupExport` and `BackupImport` to access the
+  property via the magic methods `getX()` (be careful not to confuse the `getCompression()` method, which now returns
+  the `$compression` property of `BackupExport`, with the old method provided by `BackupTrait`, which had been
+  deprecated and has now been removed);
 * passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
   been removed (backwards compatibility removed);
 * the `BackupManager::index` methods no longer returns, in the array for each file, the `filename` key;
 * the `TestCase::createSomeBackups()` method has been improved;
+* the `AbstractBackupUtility::__get()` method is deprecated and will be removed in a future release;
 * `DeleteAllCommand`, `RotateCommand` and `SendCommand` classes had been deprecated and have been removed;
 * `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by 
   `BackupTrait` had been deprecated and has been removed;

@@ -58,13 +58,13 @@ class BackupImportTest extends TestCase
         foreach (Compression::cases() as $Compression) {
             $result = $this->createBackup(filename: 'backup.' . $Compression->value, fakeBackup: true);
             $this->BackupImport->filename($result);
-            $this->assertSame($result, $this->BackupImport->filename);
+            $this->assertSame($result, $this->BackupImport->getFilename());
         }
 
         //With a relative path
         $result = $this->createBackup(filename: 'backup_' . time() . '.sql', fakeBackup: true);
         $this->BackupImport->filename(basename($result));
-        $this->assertSame($result, $this->BackupImport->filename);
+        $this->assertSame($result, $this->BackupImport->getFilename());
 
         //With an invalid directory
         $this->expectExceptionMessage('File or directory `' . TMP . 'noExistingDir' . DS . 'backup.sql` is not readable');
@@ -92,8 +92,10 @@ class BackupImportTest extends TestCase
      */
     public function testTimeout(): void
     {
+        $this->assertSame(0, $this->BackupImport->getTimeout());
+
         $this->BackupImport->timeout(120);
-        $this->assertSame(120, $this->BackupImport->timeout);
+        $this->assertSame(120, $this->BackupImport->getTimeout());
     }
 
     /**
@@ -129,11 +131,12 @@ class BackupImportTest extends TestCase
             ->willReturn(false);
         $Driver->getEventManager()->on($Driver);
 
-        $BackupImport = $this->createPartialMock(BackupImport::class, ['getDriver']);
-        $BackupImport->method('getDriver')->willReturn($Driver);
+        $BackupImport = $this->createConfiguredMock(BackupImport::class, ['getDriver' => $Driver]);
 
-        $this->assertFalse($BackupImport->filename($this->createBackup(fakeBackup: true))
-            ->import());
+        $result = $BackupImport
+            ->filename($this->createBackup(fakeBackup: true))
+            ->import();
+        $this->assertFalse($result);
     }
 
     /**
@@ -141,7 +144,6 @@ class BackupImportTest extends TestCase
      *
      * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws \ReflectionException
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     public function testImportOnFailure(): void
@@ -178,7 +180,8 @@ class BackupImportTest extends TestCase
 
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
-        $BackupImport->filename($this->createBackup(fakeBackup: true))
+        $BackupImport
+            ->filename($this->createBackup(fakeBackup: true))
             ->import();
     }
 }

@@ -21,6 +21,7 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * BackupExportAndImportTest class.
@@ -88,11 +89,12 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\AbstractBackupUtility::__get()
      */
+    #[Test]
     public function testGetMagicMethod(): void
     {
+        // @phpstan-ignore property.protected
         $this->assertIsInt($this->BackupExport->rotate);
 
         $this->expectExceptionMessage('Undefined property: ' . BackupExport::class . '::$noExistingProperty');

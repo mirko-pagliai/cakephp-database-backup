@@ -20,7 +20,7 @@ use DatabaseBackup\Compression;
 use LogicException;
 
 /**
- * Utility to import databases
+ * Utility to import databases.
  */
 class BackupImport extends AbstractBackupUtility
 {

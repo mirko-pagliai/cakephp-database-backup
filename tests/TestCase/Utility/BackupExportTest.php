@@ -64,7 +64,7 @@ class BackupExportTest extends TestCase
     public function testCompression(Compression $Compression): void
     {
         $this->BackupExport->compression($Compression);
-        $this->assertSame($Compression, $this->BackupExport->compression);
+        $this->assertSame($Compression, $this->BackupExport->getCompression());
     }
 
     /**
@@ -76,29 +76,29 @@ class BackupExportTest extends TestCase
     public function testFilename(): void
     {
         $this->BackupExport->filename('backup.sql.bz2');
-        $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->BackupExport->filename);
-        $this->assertSame(Compression::Bzip2, $this->BackupExport->compression);
+        $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->BackupExport->getFilename());
+        $this->assertSame(Compression::Bzip2, $this->BackupExport->getCompression());
 
         //Compression is ignored, because there's a filename
         $this->BackupExport->compression(Compression::Gzip)->filename('backup.sql.bz2');
-        $this->assertSame('backup.sql.bz2', basename($this->BackupExport->filename));
-        $this->assertSame(Compression::Bzip2, $this->BackupExport->compression);
+        $this->assertSame('backup.sql.bz2', basename($this->BackupExport->getFilename()));
+        $this->assertSame(Compression::Bzip2, $this->BackupExport->getCompression());
 
         //Filename with `{$DATABASE}` pattern
         $this->BackupExport->filename('{$DATABASE}.sql');
-        $this->assertSame('test.sql', basename($this->BackupExport->filename));
+        $this->assertSame('test.sql', basename($this->BackupExport->getFilename()));
 
         //Filename with `{$DATETIME}` pattern
         $this->BackupExport->filename('{$DATETIME}.sql');
-        $this->assertMatchesRegularExpression('/^\d{14}\.sql$/', basename($this->BackupExport->filename));
+        $this->assertMatchesRegularExpression('/^\d{14}\.sql$/', basename($this->BackupExport->getFilename()));
 
         //Filename with `{$HOSTNAME}` pattern
         $this->BackupExport->filename('{$HOSTNAME}.sql');
-        $this->assertSame('localhost.sql', basename($this->BackupExport->filename));
+        $this->assertSame('localhost.sql', basename($this->BackupExport->getFilename()));
 
         //Filename with `{$TIMESTAMP}` pattern
         $this->BackupExport->filename('{$TIMESTAMP}.sql');
-        $this->assertMatchesRegularExpression('/^\d{10}\.sql$/', basename($this->BackupExport->filename));
+        $this->assertMatchesRegularExpression('/^\d{10}\.sql$/', basename($this->BackupExport->getFilename()));
 
         //With invalid extension
         $filename = TMP . 'backup.txt';
@@ -114,7 +114,7 @@ class BackupExportTest extends TestCase
     public function testRotate(): void
     {
         $this->BackupExport->rotate(10);
-        $this->assertSame(10, $this->BackupExport->rotate);
+        $this->assertSame(10, $this->BackupExport->getRotate());
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `$keep` value');
@@ -128,7 +128,7 @@ class BackupExportTest extends TestCase
     public function testTimeout(): void
     {
         $this->BackupExport->timeout(120);
-        $this->assertSame(120, $this->BackupExport->timeout);
+        $this->assertSame(120, $this->BackupExport->getTimeout());
     }
 
     /**

@@ -24,8 +24,8 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Utility to export databases.
  *
- * @property \DatabaseBackup\Compression $compression
- * @property int $rotate
+ * @method \DatabaseBackup\Compression getCompression()
+ * @method int getRotate()
  */
 class BackupExport extends AbstractBackupUtility
 {
@@ -149,8 +149,8 @@ class BackupExport extends AbstractBackupUtility
         //Dispatches the `Backup.afterExport` event implemented by the driver
         $this->getDriver()->dispatchEvent('Backup.afterExport');
 
-        if ($this->rotate) {
-            BackupManager::rotate($this->rotate);
+        if ($this->getRotate()) {
+            BackupManager::rotate($this->getRotate());
         }
 
         return $filename;
