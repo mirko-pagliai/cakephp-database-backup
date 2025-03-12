@@ -24,6 +24,7 @@ use DatabaseBackup\Utility\BackupExport;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use ValueError;
@@ -65,39 +66,89 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method. This also tests for patterns and for the `$compression` property.
+     * Test for `filename()` method.
      *
-     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
-    public function testFilename(): void
+    #[Test]
+    #[TestWith(['backup.sql.bz2'])]
+    #[TestWith([TMP . 'backups/backup.sql.bz2'])]
+    public function testFilename(string $filename): void
     {
-        $this->BackupExport->filename('backup.sql.bz2');
-        $this->assertSame(Configure::read('DatabaseBackup.target') . 'backup.sql.bz2', $this->BackupExport->getFilename());
-        $this->assertSame(Compression::Bzip2, $this->BackupExport->getCompression());
+        $expectedFilename = Configure::read('DatabaseBackup.target') . basename($filename);
+        $expectedCompression = Compression::Bzip2;
 
-        //Compression is ignored, because there's a filename
-        $this->BackupExport->compression(Compression::Gzip)->filename('backup.sql.bz2');
-        $this->assertSame('backup.sql.bz2', basename($this->BackupExport->getFilename()));
-        $this->assertSame(Compression::Bzip2, $this->BackupExport->getCompression());
+        $this->BackupExport->filename($filename);
+        $this->assertSame($expectedFilename, $this->BackupExport->getFilename());
+        $this->assertSame($expectedCompression, $this->BackupExport->getCompression());
 
-        //Filename with `{$DATABASE}` pattern
-        $this->BackupExport->filename('{$DATABASE}.sql');
-        $this->assertSame('test.sql', basename($this->BackupExport->getFilename()));
+        /**
+         * The compression set by the `compression()` method is however overridden by the `filename()` method.
+         *
+         * So the result is the same as the previous one.
+         */
+        $this->BackupExport
+            ->compression(Compression::Gzip)
+            ->filename($filename);
+        $this->assertSame($expectedFilename, $this->BackupExport->getFilename());
+        $this->assertSame($expectedCompression, $this->BackupExport->getCompression());
+    }
 
-        //Filename with `{$DATETIME}` pattern
-        $this->BackupExport->filename('{$DATETIME}.sql');
-        $this->assertMatchesRegularExpression('/^\d{14}\.sql$/', basename($this->BackupExport->getFilename()));
+    /**
+     * Test for `filename()` method, with a no writable target.
+     *
+     * @uses \DatabaseBackup\Utility\BackupExport::filename()
+     */
+    #[Test]
+    public function testFilenameWithNoWritableTarget(): void
+    {
+        $filename = '/noExistingDir/backup.sql';
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage('File or directory `' . dirname($filename) . '` is not writable');
+        $this->BackupExport->filename($filename);
+    }
 
-        //Filename with `{$HOSTNAME}` pattern
-        $this->BackupExport->filename('{$HOSTNAME}.sql');
-        $this->assertSame('localhost.sql', basename($this->BackupExport->getFilename()));
+    /**
+     * Test for `filename()` method, with file already exist.
+     *
+     * @uses \DatabaseBackup\Utility\BackupExport::filename()
+     */
+    #[Test]
+    public function testFilenameWithFileAlreadyExists(): void
+    {
+        $filename = $this->createBackup();
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage('File `' . $filename . '` already exists');
+        $this->BackupExport->filename($filename);
+    }
 
-        //Filename with `{$TIMESTAMP}` pattern
-        $this->BackupExport->filename('{$TIMESTAMP}.sql');
-        $this->assertMatchesRegularExpression('/^\d{10}\.sql$/', basename($this->BackupExport->getFilename()));
+    /**
+     * Test for `filename()` method, with patterns on the filename (`{$DATABASE}`, `{$DATETIME}` and so on...).
+     *
+     * @uses \DatabaseBackup\Utility\BackupExport::filename()
+     */
+    #[Test]
+    #[TestWith(['test.sql', '{$DATABASE}.sql'])]
+    #[TestWith(['/^\d{14}\.sql$/', '{$DATETIME}.sql'])]
+    #[TestWith(['localhost.sql', '{$HOSTNAME}.sql'])]
+    #[TestWith(['/^\d{10}\.sql$/', '{$TIMESTAMP}.sql'])]
+    public function testFilenameWithPatterns(string $expectedFilename, string $filenameWithPattern): void
+    {
+        $this->BackupExport->filename($filenameWithPattern);
+        $result = $this->BackupExport->getFilename();
 
-        //With invalid extension
+        $assertMethod = str_starts_with($expectedFilename, '/') ? 'assertMatchesRegularExpression' : 'assertSame';
+        $this->{$assertMethod}($expectedFilename, basename($result));
+    }
+
+    /**
+     * Test for `filename()` method, with an invalid filename.
+     *
+     * @uses \DatabaseBackup\Utility\BackupExport::filename()
+     */
+    #[Test]
+    public function testFilenameInvalidFilename(): void
+    {
         $filename = TMP . 'backup.txt';
         $this->expectException(ValueError::class);
         $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . $filename . '`');
@@ -149,19 +200,6 @@ class BackupExportTest extends TestCase
         $file = $this->BackupExport->filename('backup.sql.bz2')->export() ?: '';
         $this->assertFileExists($file);
         $this->assertSame('backup.sql.bz2', basename($file));
-    }
-
-    /**
-     * Test for `export()` method, with target file already exist.
-     *
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
-     */
-    #[Test]
-    public function testExportTargetFileAlreadyExists(): void
-    {
-        $filename = $this->createBackup();
-        $this->expectExceptionMessage('File `' . $filename . '` already exists');
-        $this->BackupExport->filename($filename)->export();
     }
 
     /**

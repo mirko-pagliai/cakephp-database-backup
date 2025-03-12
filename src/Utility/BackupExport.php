@@ -19,6 +19,7 @@ namespace DatabaseBackup\Utility;
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
 use LogicException;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -61,7 +62,7 @@ class BackupExport extends AbstractBackupUtility
      * @param string $filename Filename. It can be an absolute path and may contain patterns
      * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
-     * @throws \LogicException
+     * @throws \Symfony\Component\Filesystem\Exception\IOException If the target (directory) is not writable or if the filename already exists.
      * @throws \ValueError With a filename that does not match any supported compression.
      */
     public function filename(string $filename): self
@@ -76,12 +77,12 @@ class BackupExport extends AbstractBackupUtility
 
         $filename = $this->makeAbsoluteFilename($filename);
         if (!is_writable(dirname($filename))) {
-            throw new LogicException(
+            throw new IOException(
                 __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))
             );
         }
         if (file_exists($filename)) {
-            throw new LogicException(
+            throw new IOException(
                 __d('database_backup', 'File `{0}` already exists', $filename)
             );
         }
