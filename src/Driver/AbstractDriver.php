@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Driver;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionInterface;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
@@ -39,10 +40,19 @@ abstract class AbstractDriver implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * Constructor.
+     * @var \Cake\Datasource\ConnectionInterface
      */
-    public function __construct()
+    protected ConnectionInterface $Connection;
+
+    /**
+     * Constructor.
+     *
+     * @param \Cake\Datasource\ConnectionInterface $Connection
+     */
+    public function __construct(ConnectionInterface $Connection)
     {
+        $this->Connection = $Connection;
+
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
@@ -212,6 +222,6 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     public function getConfig(string $key): mixed
     {
-        return $this->getConnection()->config()[$key] ?? null;
+        return $this->Connection->config()[$key] ?? null;
     }
 }

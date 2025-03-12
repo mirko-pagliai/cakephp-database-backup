@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
@@ -45,7 +46,7 @@ abstract class DriverTestCase extends TestCase
 
         /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
         $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
-        $this->Driver = new $DriverClass();
+        $this->Driver = new $DriverClass(ConnectionManager::get('test'));
     }
 
     /**

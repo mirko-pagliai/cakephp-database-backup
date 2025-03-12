@@ -1,5 +1,10 @@
 # 2.x branch
 ## 2.13 branch
+### 2.13.6
+* now all `Driver` classes (through the `AbstractDriver` class) have `$Connection` as their constructor argument, and
+  therefore as their property. This argument is automatically passed by the `AbstractBackupUtility::getDriver()` method
+  (which was already happening previously, but without any consequences).
+
 ### 2.13.5
 * added new `DatabaseBackup\Compression` enum, with some methods useful for the complete management of compressions;
 * the `BackupExport::compression()` method now accepts a `Compression` value as its `$compression` argument. String and

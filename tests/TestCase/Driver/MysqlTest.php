@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Driver;
 
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -46,6 +47,7 @@ class MysqlTest extends DriverTestCase
     public function testAfterExport(): void
     {
         $Driver = $this->getMockBuilder(Mysql::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['deleteAuthFile'])
             ->getMock();
 
@@ -62,6 +64,7 @@ class MysqlTest extends DriverTestCase
     public function testAfterImport(): void
     {
         $Driver = $this->getMockBuilder(Mysql::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['deleteAuthFile'])
             ->getMock();
 
@@ -78,6 +81,7 @@ class MysqlTest extends DriverTestCase
     public function testBeforeExport(): void
     {
         $Driver = $this->getMockBuilder(Mysql::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['writeAuthFile'])
             ->getMock();
 
@@ -98,6 +102,7 @@ class MysqlTest extends DriverTestCase
     public function testBeforeImport(): void
     {
         $Driver = $this->getMockBuilder(Mysql::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['writeAuthFile'])
             ->getMock();
 
@@ -127,6 +132,7 @@ class MysqlTest extends DriverTestCase
             ->with($expectedAuthFile);
 
         $Driver = $this->getMockBuilder(Mysql::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['getFilesystem', 'getAuthFilePath'])
             ->getMock();
 
