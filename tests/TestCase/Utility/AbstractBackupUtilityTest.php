@@ -15,13 +15,12 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
-use BadMethodCallException;
+use Cake\Core\Configure;
 use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\TestWith;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * AbstractBackupUtilityTest.
@@ -84,6 +83,37 @@ class AbstractBackupUtilityTest extends TestCase
             // @phpstan-ignore-next-line
             $Utility->timeout;
         });
+    }
+
+    public static function makeAbsoluteFilenameProvider(): Generator
+    {
+        yield [
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+            'file.txt',
+        ];
+
+        yield [
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+        ];
+
+        yield [
+            TMP . 'tmp_file',
+            TMP . 'tmp_file',
+        ];
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::makeAbsoluteFilename()
+     */
+    #[Test]
+    #[DataProvider('makeAbsoluteFilenameProvider')]
+    public function testMakeAbsoluteFilename(string $expectedAbsolutePath, string $path): void
+    {
+        $result = $this->createPartialMock(AbstractBackupUtility::class, ['filename'])
+            ->makeAbsoluteFilename($path);
+        $this->assertSame($expectedAbsolutePath, $result);
     }
 
     /**

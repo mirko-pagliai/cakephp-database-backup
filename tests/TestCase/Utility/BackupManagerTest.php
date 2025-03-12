@@ -18,12 +18,12 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\TestSuite\EmailTrait;
+use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * BackupManagerTest class.
@@ -33,11 +33,6 @@ use Symfony\Component\Filesystem\Filesystem;
 class BackupManagerTest extends TestCase
 {
     use EmailTrait;
-
-    /**
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
-    protected BackupExport $BackupExport;
 
     /**
      * @var \DatabaseBackup\Utility\BackupManager
@@ -51,107 +46,125 @@ class BackupManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport ??= new BackupExport();
         $this->BackupManager ??= new BackupManager();
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupManager::delete()
      */
+    #[Test]
     public function testDelete(): void
     {
-        $filename = $this->BackupExport->export() ?: '';
-        $this->assertFileExists($filename);
+        $filename = $this->createBackup(fakeBackup: true);
         $this->assertSame($filename, $this->BackupManager->delete($filename));
         $this->assertFileDoesNotExist($filename);
 
         //With a relative path
-        $filename = $this->BackupExport->export() ?: '';
-        $this->assertFileExists($filename);
+        $filename = $this->createBackup(fakeBackup: true);
         $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
         $this->assertFileDoesNotExist($filename);
     }
 
     /**
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
+     * @uses \DatabaseBackup\Utility\BackupManager::delete()
      */
-    public function testDeleteAll(): void
+    #[Test]
+    public function testDeleteWithNoExistingFile(): void
     {
-        $createdFiles = createSomeBackups();
-        $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
-        $this->assertEmpty($this->BackupManager->index()->toList());
-
-        $this->expectExceptionMessage('File or directory `' . $this->getAbsolutePath('noExistingFile') . '` is not writable');
-        $this->BackupManager->delete('noExistingFile');
+        $filename = TMP . 'noExistingFile';
+        $this->expectExceptionMessage('File or directory `' . $filename . '` is not writable');
+        $this->BackupManager->delete($filename);
     }
 
     /**
-     * @test
+     * @uses \DatabaseBackup\Utility\BackupManager::delete()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testDeleteIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->BackupManager->delete($this->createBackup(fakeBackup: true));
+        });
+    }
+
+    /**
+     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
+     */
+    #[Test]
+    public function testDeleteAll(): void
+    {
+        $createdFiles = $this->createSomeBackups();
+        $this->assertSame(array_reverse($createdFiles), $this->BackupManager->deleteAll());
+        foreach ($createdFiles as $file) {
+            $this->assertFileDoesNotExist($file);
+        }
+    }
+
+    /**
+     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testDeleteAllIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->BackupManager->deleteAll();
+        });
+    }
+
+    /**
      * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
+    #[Test]
     public function testIndex(): void
     {
         //Creates a text file. This file should be ignored
-        (new Filesystem())->dumpFile(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
+        file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
-        $createdFiles = createSomeBackups();
+        $createdFiles = array_reverse($this->createSomeBackups());
         $files = $this->BackupManager->index();
+        array_map('unlink', $createdFiles);
+        $this->assertCount(3, $files);
 
-        //Checks compressions
-        $compressions = $files->extract('compression')->toList();
-        $this->assertSame(['bzip2', 'gzip', null], $compressions);
-
-        //Checks filenames
-        $filenames = $files->extract('filename')->toList();
-        $this->assertSame(array_reverse(array_map('basename', $createdFiles)), $filenames);
-
-        //Checks extensions
-        $extensions = $files->extract('extension')->toList();
-        $this->assertSame(['sql.bz2', 'sql.gz', 'sql'], $extensions);
-
-        //Checks for properties of each backup object
-        foreach ($files as $file) {
-            $this->assertIsArray($file);
-            $this->assertGreaterThan(0, $file['size']);
+        foreach ($files as $k => $file) {
+            $this->assertSame(['filename', 'basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
+            $this->assertSame(basename($createdFiles[$k]), $file['filename']);
+            $this->assertSame(basename($createdFiles[$k]), $file['basename']);
+            $this->assertSame($createdFiles[$k], $file['path']);
+            $this->assertInstanceOf(Compression::class, $file['compression']);
+            $this->assertIsInt($file['size']);
             $this->assertInstanceOf(DateTime::class, $file['datetime']);
         }
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupManager::rotate()
      */
+    #[Test]
     public function testRotate(): void
     {
         $this->assertSame([], BackupManager::rotate(1));
 
-        createSomeBackups();
-
-        $initialFiles = $this->BackupManager->index();
-
-        //Keeps 2 backups. Only 1 backup was deleted
+        /**
+         * Creates 3 backups (`$initialFiles`) and keeps only 2 of them.
+         *
+         * So only 1 backup was deleted, which was the first one created.
+         */
+        $initialFiles = $this->createSomeBackups();
         $rotate = $this->BackupManager->rotate(2);
         $this->assertCount(1, $rotate);
+        $this->assertSame($initialFiles[0], $rotate[0]['path']);
+    }
 
-        //Now there are two files. Only uncompressed file was deleted
-        $filesAfterRotate = $this->BackupManager->index();
-        $this->assertCount(2, $filesAfterRotate);
-        $this->assertSame(['bzip2', 'gzip'], $filesAfterRotate->extract('compression')->toList());
-
-        //Gets the difference
-        $diff = array_udiff(
-            $initialFiles->toList(),
-            $filesAfterRotate->toList(),
-            fn (array $first, array $second): int => strcmp($first['filename'], $second['filename'])
-        );
-
-        //Again, only 1 backup was deleted. The difference is the same
-        $this->assertCount(1, $diff);
-        $this->assertEquals(collection($diff)->first(), collection($rotate)->first());
-
-        $this->expectExceptionMessage('Invalid rotate value');
+    /**
+     * @uses \DatabaseBackup\Utility\BackupManager::rotate()
+     */
+    #[Test]
+    public function testRotateWithInvalidKeepValue(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid `$keep` value');
         $this->BackupManager->rotate(-1);
     }
 
@@ -163,7 +176,7 @@ class BackupManagerTest extends TestCase
     {
         Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
-        $file = createBackup();
+        $file = $this->createBackup(fakeBackup: true);
         $recipient = 'recipient@example.com';
         $this->BackupManager->send($file, $recipient);
         $this->assertMailSentFrom(Configure::read('DatabaseBackup.mailSender'));
@@ -175,20 +188,20 @@ class BackupManagerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         unlink($file);
         Configure::write('DatabaseBackup.mailSender', 'invalidSender');
-        $this->BackupManager->send(createBackup(), 'recipient@example.com');
+        $this->BackupManager->send($this->createBackup(fakeBackup: true), 'recipient@example.com');
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupManager::send()
      */
+    #[Test]
     #[WithoutErrorHandler]
     public function testSendIsDeprecated(): void
     {
         Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
         $this->deprecated(function (): void {
-            $this->BackupManager->send(createBackup(), 'recipient@example.com');
+            $this->BackupManager->send($this->createBackup(fakeBackup: true), 'recipient@example.com');
         });
     }
 

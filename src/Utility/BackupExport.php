@@ -97,17 +97,15 @@ class BackupExport extends AbstractBackupUtility
      */
     public function filename(string $filename): self
     {
-        $config = $this->getConnection()->config();
-
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
-            pathinfo($config['database'], PATHINFO_FILENAME),
+            pathinfo($this->getDriver()->getConfig('database'), PATHINFO_FILENAME),
             date('YmdHis'),
-            str_replace(['127.0.0.1', '::1'], 'localhost', $config['host'] ?? 'localhost'),
+            str_replace(['127.0.0.1', '::1'], 'localhost', $this->getDriver()->getConfig('host') ?? 'localhost'),
             time(),
         ], $filename);
 
-        $filename = $this->getAbsolutePath($filename);
+        $filename = $this->makeAbsoluteFilename($filename);
         if (!is_writable(dirname($filename))) {
             throw new LogicException(
                 __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))
@@ -130,13 +128,13 @@ class BackupExport extends AbstractBackupUtility
     /**
      * Sets the number of backups you want to keep. So, it will delete all backups that are older.
      *
-     * @param int $rotate Number of backups you want to keep
+     * @param int $keep Number of backups you want to keep
      * @return self
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
      */
-    public function rotate(int $rotate): self
+    public function rotate(int $keep): self
     {
-        $this->rotate = $rotate;
+        $this->rotate = $keep;
 
         return $this;
     }

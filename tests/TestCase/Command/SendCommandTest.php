@@ -36,11 +36,9 @@ class SendCommandTest extends TestCase
     {
         Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
 
-        $file = createBackup();
+        $file = $this->createBackup(fakeBackup: true);
         $this->exec('database_backup.send -v' . ' ' . $file . ' recipient@example.com');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('<success>Backup `' . $file . '` was sent via mail</success>');
 
         //With no sender configuration
@@ -61,7 +59,7 @@ class SendCommandTest extends TestCase
     public function testExecuteIsDeprecated(): void
     {
         $this->deprecated(function (): void {
-            $this->exec('database_backup.send -v' . ' ' . createBackup() . ' recipient@example.com');
+            $this->exec('database_backup.send -v' . ' ' . $this->createBackup(fakeBackup: true) . ' recipient@example.com');
         });
     }
 }

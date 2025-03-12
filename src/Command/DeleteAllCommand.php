@@ -17,9 +17,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
+use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 
 /**
@@ -28,7 +28,7 @@ use DatabaseBackup\Utility\BackupManager;
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#delete_all
  * @deprecated 2.13.4 The `DeleteAllCommand` is deprecated. Will be removed in a future release
  */
-class DeleteAllCommand extends Command
+class DeleteAllCommand extends BaseCommand
 {
     /**
      * @inheritDoc
@@ -47,8 +47,6 @@ class DeleteAllCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        parent::execute($args, $io);
-
         deprecationWarning(
             '2.13.4',
             'The `DeleteAllCommand` is deprecated. Will be removed in a future release'

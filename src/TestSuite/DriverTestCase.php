@@ -18,6 +18,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
+use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
 
 /**
@@ -27,6 +29,8 @@ use DatabaseBackup\Driver\AbstractDriver;
  */
 abstract class DriverTestCase extends TestCase
 {
+    use BackupTrait;
+
     /**
      * @var \DatabaseBackup\Driver\AbstractDriver
      */
@@ -42,8 +46,6 @@ abstract class DriverTestCase extends TestCase
         /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
         $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
         $this->Driver = new $DriverClass();
-
-        $this->Driver->getEventManager()->on($this->Driver);
     }
 
     /**
@@ -54,13 +56,18 @@ abstract class DriverTestCase extends TestCase
     {
         $this->assertNotEmpty($this->Driver->getExportExecutable('backup.sql'));
 
+        $cases = array_filter(
+            array: Compression::cases(),
+            callback: fn (Compression $Compression): bool => $Compression !== Compression::None
+        );
+
         //Gzip and Bzip2 compressions
-        foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
-            $filename = 'backup.' . $extension;
+        foreach ($cases as $Compression) {
+            $filename = 'backup.' . $Compression->value;
             $result = $this->Driver->getExportExecutable($filename);
             $expected = sprintf(
                 ' | %s > %s',
-                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($this->Driver->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringEndsWith($expected, $result);
@@ -75,13 +82,18 @@ abstract class DriverTestCase extends TestCase
     {
         $this->assertNotEmpty($this->Driver->getImportExecutable('backup.sql'));
 
+        $cases = array_filter(
+            array: Compression::cases(),
+            callback: fn (Compression $Compression): bool => $Compression !== Compression::None
+        );
+
         //Gzip and Bzip2 compressions
-        foreach (array_flip(array_filter(DATABASE_BACKUP_EXTENSIONS)) as $compression => $extension) {
-            $filename = 'backup.' . $extension;
+        foreach ($cases as $Compression) {
+            $filename = 'backup.' . $Compression->value;
             $result = $this->Driver->getImportExecutable($filename);
             $expected = sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->Driver->getBinary($compression)),
+                escapeshellarg($this->Driver->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringStartsWith($expected, $result);

@@ -142,15 +142,16 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::rotate()
      */
+    #[Test]
     public function testRotate(): void
     {
         $this->BackupExport->rotate(10);
         $this->assertSame(10, $this->BackupExport->rotate);
 
-        $this->expectExceptionMessage('Invalid rotate value');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid `$keep` value');
         $this->BackupExport->rotate(-1)->export();
     }
 
@@ -220,10 +221,19 @@ class BackupExportTest extends TestCase
         $this->assertMailSentTo($recipient);
         $this->assertMailSentWith('Database backup ' . basename($file) . ' from localhost', 'subject');
         $this->assertMailContainsAttachment(basename($file), compact('file') + ['mimetype' => mime_content_type($file)]);
+    }
 
-        //With a file that already exists
-        $this->expectExceptionMessage('File `' . $this->BackupExport->getAbsolutePath('backup.sql.bz2') . '` already exists');
-        $this->BackupExport->filename('backup.sql.bz2')->export();
+    /**
+     * Test for `export()` method, with target file already exist.
+     *
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
+     */
+    #[Test]
+    public function testExportTargetFileAlreadyExists(): void
+    {
+        $filename = $this->createBackup();
+        $this->expectExceptionMessage('File `' . $filename . '` already exists');
+        $this->BackupExport->filename($filename)->export();
     }
 
     /**

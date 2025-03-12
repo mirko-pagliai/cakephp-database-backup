@@ -37,12 +37,10 @@ class RotateCommandTest extends TestCase
         //With no backups
         $this->exec('database_backup.rotate -v 1');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
 
-        $expectedFiles = createSomeBackups();
+        $expectedFiles = $this->createSomeBackups();
         array_pop($expectedFiles);
         $this->exec('database_backup.rotate -v 1');
         $this->assertExitSuccess();

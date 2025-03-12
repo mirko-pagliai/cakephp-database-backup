@@ -18,7 +18,6 @@ namespace DatabaseBackup;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -31,17 +30,14 @@ trait BackupTrait
      *
      * @param string $path Relative or absolute path
      * @return string
+     * @deprecated 2.13.5 the `BackupTrait::getAbsolutePath()` method is deprecated. Will be removed in a future release
      */
     public static function getAbsolutePath(string $path): string
     {
-        $Filesystem = new Filesystem();
-        if ($Filesystem->isAbsolutePath($path)) {
-            return $path;
-        }
-
-        if (is_readable(Path::makeAbsolute($path, ROOT))) {
-            return Path::makeAbsolute($path, ROOT);
-        }
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getAbsolutePath()` method is deprecated. Will be removed in a future release'
+        );
 
         return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }
@@ -51,9 +47,15 @@ trait BackupTrait
      *
      * @param string $path File path
      * @return string|null Compression type or `null`
+     * @deprecated 2.13.5 the `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release
      */
     public static function getCompression(string $path): ?string
     {
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release'
+        );
+
         $Compression = Compression::tryFromFilename($path);
 
         return $Compression && $Compression !== Compression::None ? lcfirst($Compression->name) : null;
@@ -64,10 +66,10 @@ trait BackupTrait
      *
      * You can pass the name of the connection. By default, the connection set in the configuration will be used.
      *
-     * @param string|null $name Connection name
+     * @param string $name Connection name
      * @return \Cake\Datasource\ConnectionInterface
      */
-    public static function getConnection(?string $name = null): ConnectionInterface
+    public static function getConnection(string $name = ''): ConnectionInterface
     {
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
@@ -82,7 +84,7 @@ trait BackupTrait
     {
         $className = get_class($this->getConnection()->getDriver());
 
-        return substr($className, strrpos($className, '\\') + 1);
+        return substr(strrchr($className, '\\') ?: '', 1);
     }
 
     /**
@@ -90,9 +92,15 @@ trait BackupTrait
      *
      * @param string $path File path
      * @return string|null Extension or `null` for invalid extensions
+     * @deprecated 2.13.5 the `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release
      */
     public static function getExtension(string $path): ?string
     {
+        deprecationWarning(
+            '2.13.5',
+            'The `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release'
+        );
+
         return Compression::tryFromFilename($path)?->value;
     }
 

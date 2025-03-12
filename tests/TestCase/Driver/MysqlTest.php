@@ -15,27 +15,20 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Driver;
 
-use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\Driver\Mysql;
 use DatabaseBackup\TestSuite\DriverTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * MysqlTest class.
- *
- * @uses \DatabaseBackup\Driver\Mysql
  */
+#[CoversClass(Mysql::class)]
 class MysqlTest extends DriverTestCase
 {
     /**
-     * @var \DatabaseBackup\Driver\Mysql&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected AbstractDriver $Driver;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @inheritDoc
      */
     protected function setUp(): void
     {
@@ -44,105 +37,108 @@ class MysqlTest extends DriverTestCase
         }
 
         parent::setUp();
-
-        $this->Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath', 'writeAuthFile']);
-        $this->Driver->getEventManager()->on($this->Driver);
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Driver\Mysql::afterExport()
      */
+    #[Test]
     public function testAfterExport(): void
     {
-        $expectedAuthFile = tempnam(TMP, 'tmp');
-        $Filesystem = new Filesystem();
-        $Filesystem->dumpFile($expectedAuthFile, '');
-        $this->assertFileExists($expectedAuthFile);
+        $Driver = $this->getMockBuilder(Mysql::class)
+            ->onlyMethods(['deleteAuthFile'])
+            ->getMock();
 
-        $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
-        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
-        $Driver->getEventManager()->on($Driver);
+        $Driver->expects($this->once())
+            ->method('deleteAuthFile');
+
         $Driver->dispatchEvent('Backup.afterExport');
-        $this->assertFileDoesNotExist($expectedAuthFile);
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Driver\Mysql::afterImport()
      */
+    #[Test]
     public function testAfterImport(): void
     {
-        $expectedAuthFile = tempnam(TMP, 'tmp');
-        $Filesystem = new Filesystem();
-        $Filesystem->dumpFile($expectedAuthFile, '');
-        $this->assertFileExists($expectedAuthFile);
+        $Driver = $this->getMockBuilder(Mysql::class)
+            ->onlyMethods(['deleteAuthFile'])
+            ->getMock();
 
-        $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
-        $Driver->getEventManager()->on($Driver);
-        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
+        $Driver->expects($this->once())
+            ->method('deleteAuthFile');
+
         $Driver->dispatchEvent('Backup.afterImport');
-        $this->assertFileDoesNotExist($expectedAuthFile);
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Driver\Mysql::beforeExport()
      */
+    #[Test]
     public function testBeforeExport(): void
     {
-        $expectedContent = '[mysqldump]' . PHP_EOL .
-            'user={{USER}}' . PHP_EOL .
-            'password="{{PASSWORD}}"' . PHP_EOL .
-            'host={{HOST}}';
+        $Driver = $this->getMockBuilder(Mysql::class)
+            ->onlyMethods(['writeAuthFile'])
+            ->getMock();
 
-        $this->Driver->expects($this->once())
+        $Driver->expects($this->once())
             ->method('writeAuthFile')
-            ->with($this->equalTo($expectedContent))
-            ->willReturn(true);
+            ->with('[mysqldump]' . PHP_EOL .
+                'user={{USER}}' . PHP_EOL .
+                'password="{{PASSWORD}}"' . PHP_EOL .
+                'host={{HOST}}');
 
-        $this->assertTrue($this->Driver->dispatchEvent('Backup.beforeExport')->getResult());
+        $Driver->dispatchEvent('Backup.beforeExport');
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Driver\Mysql::beforeImport()
      */
+    #[Test]
     public function testBeforeImport(): void
     {
-        $expectedContent = '[client]' . PHP_EOL .
-            'user={{USER}}' . PHP_EOL .
-            'password="{{PASSWORD}}"' . PHP_EOL .
-            'host={{HOST}}';
+        $Driver = $this->getMockBuilder(Mysql::class)
+            ->onlyMethods(['writeAuthFile'])
+            ->getMock();
 
-        $this->Driver->expects($this->once())
+        $Driver->expects($this->once())
             ->method('writeAuthFile')
-            ->with($this->equalTo($expectedContent))
-            ->willReturn(true);
+            ->with('[client]' . PHP_EOL .
+                'user={{USER}}' . PHP_EOL .
+                'password="{{PASSWORD}}"' . PHP_EOL .
+                'host={{HOST}}');
 
-        $this->assertTrue($this->Driver->dispatchEvent('Backup.beforeImport')->getResult());
+        $Driver->dispatchEvent('Backup.beforeImport');
     }
 
     /**
-     * @test
-     * @uses \DatabaseBackup\Driver\Mysql::writeAuthFile()
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Driver\Mysql::deleteAuthFile()
      */
-    public function testWriteAuthFile(): void
+    #[Test]
+    public function testDeleteAuthFile(): void
     {
-        $expectedAuthFile = TMP . 'auth' . uniqid();
-        $this->assertFileDoesNotExist($expectedAuthFile);
+        $expectedAuthFile = TMP . 'myAuthFile';
 
-        $Driver = $this->createPartialMock(Mysql::class, ['getAuthFilePath']);
-        $Driver->method('getAuthFilePath')->willReturn($expectedAuthFile);
-        $Driver->getEventManager()->on($Driver);
+        $Filesystem = $this->createPartialMock(Filesystem::class, ['remove']);
 
-        //Dispatches an event that calls and returns `writeAuthFile()`
-        $this->assertTrue($Driver->dispatchEvent('Backup.beforeExport')->getResult());
-        $this->assertFileExists($expectedAuthFile);
-        $config = $Driver->getConnection()->config();
-        $this->assertSame('[mysqldump]' . PHP_EOL .
-            'user=' . $config['username'] . PHP_EOL .
-            'password="' . ($config['password'] ?? '') . '"' . PHP_EOL .
-            'host=' . $config['host'], file_get_contents($expectedAuthFile));
+        $Filesystem->expects($this->once())
+            ->method('remove')
+            ->with($expectedAuthFile);
+
+        $Driver = $this->getMockBuilder(Mysql::class)
+            ->onlyMethods(['getFilesystem', 'getAuthFilePath'])
+            ->getMock();
+
+        $Driver->method('getFilesystem')
+            ->willReturn($Filesystem);
+
+        $Driver->method('getAuthFilePath')
+            ->willReturn($expectedAuthFile);
+
+        //Dispatches an event (any) that we are sure will call and return the `deleteAuthFile()` method.
+        $result = $Driver->dispatchEvent('Backup.afterExport');
+
+        $this->assertNull($result->getResult());
     }
 }

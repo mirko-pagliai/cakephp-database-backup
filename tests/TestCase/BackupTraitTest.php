@@ -21,7 +21,10 @@ use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use DatabaseBackup\TestSuite\TestCase;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
@@ -39,14 +42,6 @@ class BackupTraitTest extends TestCase
     /**
      * @inheritDoc
      */
-    public array $fixtures = [
-        'core.Articles',
-        'core.Comments',
-    ];
-
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,81 +49,134 @@ class BackupTraitTest extends TestCase
         $this->Trait ??= new BackupTraitAsClass();
     }
 
+    public static function getAbsolutePathProvider(): Generator
+    {
+        yield [
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+            'file.txt',
+        ];
+
+        yield [
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+        ];
+
+        yield [
+            TMP . 'tmp_file',
+            TMP . 'tmp_file',
+        ];
+    }
+
     /**
-     * @test
      * @uses \DatabaseBackup\BackupTrait::getAbsolutePath()
      */
-    public function testGetAbsolutePath(): void
+    #[Test]
+    #[DataProvider('getAbsolutePathProvider')]
+    public function testGetAbsolutePath(string $expectedAbsolutePath, string $path): void
     {
-        $expected = Configure::readOrFail('DatabaseBackup.target') . 'file.txt';
-        $this->assertSame($expected, $this->Trait->getAbsolutePath('file.txt'));
-        $this->assertSame($expected, $this->Trait->getAbsolutePath(Configure::read('DatabaseBackup.target') . 'file.txt'));
+        $result = $this->Trait->getAbsolutePath($path);
+        $this->assertSame($expectedAbsolutePath, $result);
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getAbsolutePath()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetAbsolutePathIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getAbsolutePath(TMP . 'tmp_file');
+        });
     }
 
     /**
      * @test
      * @uses \DatabaseBackup\BackupTrait::getCompression()
      */
-    public function testGetCompression(): void
+    #[Test]
+    #[TestWith([null, 'backup.sql'])]
+    #[TestWith(['bzip2', 'backup.sql.bz2'])]
+    #[TestWith(['bzip2', DS . 'backup.sql.bz2'])]
+    #[TestWith(['bzip2', TMP . 'backup.sql.bz2'])]
+    #[TestWith(['gzip', 'backup.sql.gz'])]
+    #[TestWith([null, 'text.txt'])]
+    public function testGetCompression(?string $expectedCompression, string $filename): void
     {
-        foreach (
-            [
-                'backup.sql' => null,
-                'backup.sql.bz2' => 'bzip2',
-                DS . 'backup.sql.bz2' => 'bzip2',
-                Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'bzip2',
-                'backup.sql.gz' => 'gzip',
-                'text.txt' => null,
-            ] as $filename => $expectedCompression
-        ) {
-            $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
-        }
+        $this->assertSame($expectedCompression, $this->Trait->getCompression($filename));
     }
 
     /**
-     * @test
+     * @uses \DatabaseBackup\BackupTrait::getCompression()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetCompressionIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getCompression('backup.sql');
+        });
+    }
+
+    /**
      * @uses \DatabaseBackup\BackupTrait::getConnection()
      */
-    public function testGetConnection(): void
+    #[Test]
+    #[TestWith([''])]
+    #[TestWith(['test'])]
+    #[TestWith(['fake'])]
+    public function testGetConnection(string $connectionName): void
     {
-        foreach ([null, Configure::read('DatabaseBackup.connection')] as $name) {
-            $connection = $this->Trait->getConnection($name);
-            $this->assertInstanceof(Connection::class, $connection);
-            $this->assertSame('test', $connection->config()['name']);
+        if ($connectionName == 'fake') {
+            ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
         }
 
-        ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
-        $connection = $this->Trait->getConnection('fake');
-        $this->assertInstanceof(Connection::class, $connection);
-        $this->assertSame('fake', $connection->config()['name']);
+        $Connection = $this->Trait->getConnection($connectionName);
+        $this->assertInstanceof(Connection::class, $Connection);
+        $this->assertSame($connectionName ?: Configure::read('DatabaseBackup.connection'), $Connection->configName());
+    }
 
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getConnection()
+     */
+    #[Test]
+    public function testGetConnectionWithNoExistingConnection(): void
+    {
         $this->expectException(MissingDatasourceConfigException::class);
-        $this->getConnection('noExisting');
+        $this->Trait->getConnection('noExisting');
     }
 
     /**
      * @test
      * @uses \DatabaseBackup\BackupTrait::getExtension()
      */
-    public function testGetExtension(): void
+    #[Test]
+    #[TestWith(['sql', 'backup.sql'])]
+    #[TestWith(['sql.bz2', 'backup.sql.bz2'])]
+    #[TestWith(['sql.bz2', DS . 'backup.sql.bz2'])]
+    #[TestWith(['sql.bz2', TMP . 'backup.sql.bz2'])]
+    #[TestWith(['sql.gz', 'backup.sql.gz'])]
+    #[TestWith(['sql', 'backup.SQL'])]
+    #[TestWith(['sql.bz2', 'backup.SQL.BZ2'])]
+    #[TestWith(['sql.gz', 'backup.SQL.GZ'])]
+    #[TestWith([null, 'text.txt'])]
+    #[TestWith([null, 'text'])]
+    #[TestWith([null, '.txt'])]
+    public function testGetExtension(?string $expectedExtension, string $filename): void
     {
-        foreach (
-            [
-                'backup.sql' => 'sql',
-                'backup.sql.bz2' => 'sql.bz2',
-                DS . 'backup.sql.bz2' => 'sql.bz2',
-                Configure::read('DatabaseBackup.target') . 'backup.sql.bz2' => 'sql.bz2',
-                'backup.sql.gz' => 'sql.gz',
-                'backup.SQL' => 'sql',
-                'backup.SQL.BZ2' => 'sql.bz2',
-                'backup.SQL.GZ' => 'sql.gz',
-                'text.txt' => null,
-                'text' => null,
-                '.txt' => null,
-            ] as $filename => $expectedExtension
-        ) {
-            $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
-        }
+        $this->assertSame($expectedExtension, $this->Trait->getExtension($filename));
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getExtension()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetExtensionIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->Trait->getExtension('backup.sql');
+        });
     }
 
     /**

@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\I18n\DateTime;
 use Cake\I18n\Number;
+use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 
 /**
@@ -35,7 +36,7 @@ class IndexCommandTest extends TestCase
      */
     public function testExecute(): void
     {
-        $backups = createSomeBackups();
+        $backups = $this->createSomeBackups();
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
@@ -45,30 +46,35 @@ class IndexCommandTest extends TestCase
          */
         $expectedHeaders = [
             '<info>Filename</info>',
-            '<info>Extension</info>',
             '<info>Compression</info>',
             '<info>Size</info>',
             '<info>Datetime</info>',
         ];
-        $headers = preg_split(pattern: '/\s*\|\s*/', subject: $this->_out->messages()[7], flags: PREG_SPLIT_NO_EMPTY);
+        $headers = preg_split(pattern: '/\s*\|\s*/', subject: $this->_out->messages()[2], flags: PREG_SPLIT_NO_EMPTY);
         $this->assertSame($expectedHeaders, $headers);
 
-        $expectedRows = array_reverse(array_map(fn (string $filename): array => [
-            '',
-            basename($filename),
-            $this->getExtension($filename),
-            $this->getCompression($filename) ?: '',
-            Number::toReadableSize(filesize($filename) ?: 0),
-            DateTime::createFromTimestamp(filemtime($filename) ?: 0)->nice(),
-            '',
-        ], $backups));
+        $expectedRows = array_reverse(array_map(
+            callback: function (string $filename): array {
+                $Compression = Compression::fromFilename($filename);
+
+                return [
+                    '',
+                    basename($filename),
+                    $Compression !== Compression::None ? lcfirst($Compression->name) : '',
+                    Number::toReadableSize(filesize($filename) ?: 0),
+                    DateTime::createFromTimestamp(filemtime($filename) ?: 0)->nice(),
+                    '',
+                ];
+            },
+            array: $backups
+        ));
         $rows = array_map(
             callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row) ?: [],
-            array: array_slice($this->_out->messages(), 9, 3)
+            array: array_slice($this->_out->messages(), 4, 3)
         );
         $this->assertSame($expectedRows, $rows);
 
-        $this->_out = $this->_err = null;
+        $this->cleanupConsoleTrait();
 
         //With `reverse` option
         $this->exec('database_backup.index -v --reverse');
@@ -76,7 +82,7 @@ class IndexCommandTest extends TestCase
         $this->assertOutputContains('Backup files found: 3');
         $rows = array_map(
             callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row) ?: [],
-            array: array_slice($this->_out->messages(), 9, 3)
+            array: array_slice($this->_out->messages(), 4, 3)
         );
         $this->assertSame(array_reverse($expectedRows), $rows);
     }
@@ -90,8 +96,6 @@ class IndexCommandTest extends TestCase
         //With no backups
         $this->exec('database_backup.index -v');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: (Mysql|Postgres|Sqlite)/');
         $this->assertOutputContains('Backup files found: 0');
         $this->assertErrorEmpty();
     }

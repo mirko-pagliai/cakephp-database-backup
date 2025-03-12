@@ -20,7 +20,9 @@ use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\BackupTrait;
-use LogicException;
+use DatabaseBackup\Compression;
+use DatabaseBackup\OperationType;
+use InvalidArgumentException;
 
 /**
  * Represents a driver containing all methods to export/import database backups according to the connection.
@@ -30,6 +32,7 @@ use LogicException;
 abstract class AbstractDriver implements EventListenerInterface
 {
     use BackupTrait;
+
     /**
      * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Driver\AbstractDriver>
      */
@@ -69,22 +72,15 @@ abstract class AbstractDriver implements EventListenerInterface
      * These executables are not yet final, use instead `getExportExecutable()` and `getImportExecutable()` methods to
      *  have the final executables, including compression.
      *
-     * @param string $type Type or the request operation (`export` or `import`)
+     * @param \DatabaseBackup\OperationType $OperationType
      * @return string
-     * @throws \LogicException
      */
-    private function getExecutable(string $type): string
+    private function getExecutable(OperationType $OperationType): string
     {
-        // @codeCoverageIgnoreStart
-        if (!in_array($type, ['export', 'import'])) {
-            throw new LogicException(
-                __d('database_backup', '`{0}` parameter should be `{1}` or `{2}`', '$type', 'export', 'import')
-            );
-        }
-        // @codeCoverageIgnoreEnd
-        $driverName = strtolower($this->getDriverName());
+        $driverName = lcfirst(substr(strrchr($this::class, '\\') ?: '', 1));
+
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$type])),
+            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
@@ -92,7 +88,7 @@ abstract class AbstractDriver implements EventListenerInterface
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
         /** @var string $exec */
-        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $type);
+        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $OperationType->value);
 
         return str_replace(array_keys($replacements), $replacements, $exec);
     }
@@ -103,13 +99,15 @@ abstract class AbstractDriver implements EventListenerInterface
      * @param string $filename Filename where you want to export the database
      * @return string
      * @throws \LogicException
+     * @throws \ValueError With a filename that does not match any supported compression.
      */
     public function getExportExecutable(string $filename): string
     {
-        $exec = $this->getExecutable('export');
-        $compression = self::getCompression($filename);
-        if ($compression) {
-            $exec .= ' | ' . escapeshellarg($this->getBinary($compression));
+        $exec = $this->getExecutable(OperationType::Export);
+
+        $Compression = Compression::fromFilename($filename);
+        if ($Compression !== Compression::None) {
+            $exec .= ' | ' . escapeshellarg($this->getBinary($Compression));
         }
 
         return $exec . ' > ' . escapeshellarg($filename);
@@ -124,12 +122,13 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     public function getImportExecutable(string $filename): string
     {
-        $exec = $this->getExecutable('import');
-        $compression = self::getCompression($filename);
-        if ($compression) {
+        $exec = $this->getExecutable(OperationType::Import);
+
+        $Compression = Compression::fromFilename($filename);
+        if ($Compression !== Compression::None) {
             return sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->getBinary($compression)),
+                escapeshellarg($this->getBinary($Compression)),
                 escapeshellarg($filename)
             ) . $exec;
         }
@@ -182,18 +181,22 @@ abstract class AbstractDriver implements EventListenerInterface
     /**
      * Gets a binary path.
      *
-     * @param string $name Binary name
+     * @param \DatabaseBackup\Compression|string $binaryName Binary name
      * @return string
      * @throws \LogicException
      */
-    public function getBinary(string $name): string
+    public function getBinary(Compression|string $binaryName): string
     {
-        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
+        if ($binaryName instanceof Compression) {
+            $binaryName = lcfirst($binaryName->name);
+        }
+
+        $binary = Configure::read('DatabaseBackup.binaries.' . $binaryName);
         if (!$binary) {
-            throw new LogicException(__d(
+            throw new InvalidArgumentException(__d(
                 'database_backup',
                 'Binary for `{0}` could not be found. You have to set its path manually',
-                $name
+                $binaryName
             ));
         }
 
@@ -207,7 +210,7 @@ abstract class AbstractDriver implements EventListenerInterface
      * @return mixed Config value or `null` if the key doesn't exist
      * @since 2.3.0
      */
-    protected function getConfig(string $key): mixed
+    public function getConfig(string $key): mixed
     {
         return $this->getConnection()->config()[$key] ?? null;
     }

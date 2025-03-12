@@ -17,9 +17,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Command;
 
 use Cake\Console\Arguments;
+use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupManager;
 use Exception;
 
@@ -29,7 +29,7 @@ use Exception;
  * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#rotate
  * @deprecated 2.13.5 The `RotateCommand` is deprecated. Will be removed in a future release
  */
-class RotateCommand extends Command
+class RotateCommand extends BaseCommand
 {
     /**
      * @inheritDoc
@@ -60,8 +60,6 @@ class RotateCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        parent::execute($args, $io);
-
         deprecationWarning(
             '2.13.5',
             'The `RotateCommand` is deprecated. Will be removed in a future release'
@@ -78,7 +76,7 @@ class RotateCommand extends Command
             }
 
             foreach ($files as $file) {
-                $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['filename']));
+                $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['basename']));
             }
 
             $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));

@@ -21,9 +21,10 @@ use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
-use DatabaseBackup\BackupTrait;
+use DatabaseBackup\Compression;
+use InvalidArgumentException;
 use LogicException;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -32,8 +33,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class BackupManager
 {
-    use BackupTrait;
-
     /**
      * Deletes a backup file.
      *
@@ -41,14 +40,17 @@ class BackupManager
      * @return string Deleted backup file
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
      * @throws \LogicException
+     * @deprecated 2.13.5: `BackupManager::delete()` method is deprecated. Will be removed in a future release
      */
     public static function delete(string $filename): string
     {
-        $filename = self::getAbsolutePath($filename);
+        deprecationWarning('2.13.5', 'The `BackupManager::delete()` method is deprecated. Will be removed in a future release');
+
+        $filename = Path::makeAbsolute($filename, Configure::readOrFail('DatabaseBackup.target'));
         if (!is_writable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', $filename));
         }
-        (new Filesystem())->remove($filename);
+        unlink($filename);
 
         return $filename;
     }
@@ -59,16 +61,22 @@ class BackupManager
      * @return array<string> List of deleted backup files
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
      * @since 1.0.1
+     * @deprecated 2.13.5: `BackupManager::deleteAll()` method is deprecated. Will be removed in a future release
      */
     public static function deleteAll(): array
     {
-        return array_map([self::class, 'delete'], self::index()->extract('filename')->toList());
+        deprecationWarning('2.13.5', 'The `BackupManager::deleteAll()` method is deprecated. Will be removed in a future release');
+
+        return self::index()
+            ->extract('path')
+            ->each(fn (string $path) => unlink($path))
+            ->toList();
     }
 
     /**
      * Returns a list of database backups.
      *
-     * @return \Cake\Collection\CollectionInterface Array of backups
+     * @return \Cake\Collection\CollectionInterface
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
@@ -80,15 +88,17 @@ class BackupManager
             //Sorts in descending order by last modified date
             ->sort(fn (SplFileInfo $a, SplFileInfo $b): bool => $a->getMTime() < $b->getMTime());
 
-        $Now = new DateTime();
+        $DateTimeZone = DateTime::now()->getTimezone();
 
         return (new Collection($Finder))
             ->map(fn (SplFileInfo $File): array => [
+                /** @todo remove `filename` in version 2.14.0 */
                 'filename' => $File->getFilename(),
-                'extension' => self::getExtension($File->getFilename()),
-                'compression' => self::getCompression($File->getFilename()),
+                'basename' => $File->getBasename(),
+                'path' => $File->getPathname(),
+                'compression' => Compression::fromFilename($File->getFilename()),
                 'size' => $File->getSize(),
-                'datetime' => DateTime::createFromTimestamp($File->getMTime(), $Now->getTimezone()),
+                'datetime' => DateTime::createFromTimestamp($File->getMTime(), $DateTimeZone),
             ])
             ->compile(false);
     }
@@ -98,20 +108,21 @@ class BackupManager
      *
      * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
      *
-     * @param int $rotate Number of backups that you want to keep
-     * @return array<array{filename: string, extension: ?string, compression: ?string, size: false|int, datetime: \Cake\I18n\Date}> Array of deleted files
+     * @param int $keep Number of backups that you want to keep
+     * @return array<array{filename: string, basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
+     * @throws \InvalidArgumentException With an Invalid rotate value.
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
-     * @throws \LogicException
      */
-    public static function rotate(int $rotate): array
+    public static function rotate(int $keep): array
     {
-        if (!($rotate >= 1)) {
-            throw new LogicException(__d('database_backup', 'Invalid rotate value'));
+        if ($keep < 1) {
+            throw new InvalidArgumentException(__d('database_backup', 'Invalid `$keep` value'));
         }
-        $backupsToBeDeleted = self::index()->skip($rotate);
-        array_map([self::class, 'delete'], $backupsToBeDeleted->extract('filename')->toList());
 
-        return $backupsToBeDeleted->toList();
+        return self::index()
+            ->skip($keep)
+            ->each(fn (array $file) => unlink($file['path']))
+            ->toList();
     }
 
     /**
@@ -126,7 +137,7 @@ class BackupManager
      */
     protected static function getEmailInstance(string $backup, string $recipient): Mailer
     {
-        $filename = self::getAbsolutePath($backup);
+        $filename = Path::makeAbsolute($backup, Configure::readOrFail('DatabaseBackup.target'));
         if (!is_readable($filename)) {
             throw new LogicException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }

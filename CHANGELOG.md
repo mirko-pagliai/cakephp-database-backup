@@ -8,13 +8,42 @@
 * the `BackupExport::compression()` method now accepts a `Compression` value as its `$compression` argument. String and
   `null` values are still supported, but are now deprecated and will be removed in a future release. Additionally, if an
   invalid string is now passed as an argument, a `InvalidArgumentException` exception is thrown;
+* the `BackupManager::index()` method now returns, in the array for each file, a `Compression` enum value for the 
+  `compression` key (rather than a string or `null`), the absolute path for the `path` key, and the basename for the
+  `basename` key. The `filename` key is still returned, but will be removed in version 2.14.0 (`basename` is more
+  efficient). The `extension` key has already been removed, as it is now useless. The `IndexCommand` instead still
+  carries the compression as a string (it couldn't be otherwise), while it also no longer reports the extension (also
+  useless in this case);
 * the `BackupExport` class no longer directly handles the backup extension, which is automatically deduced from the
   value of `Compression`, now set by default to `Compression::None` (no compression) and which can always be changed
   with the `compression()` and (indirectly) `filename()` methods. For this reason, the `BackupExport::$extension`
   property no longer exists;
+* except for `ExportCommand` and `ImportCommand`, all other `Command` classes (including deprecated ones) now directly
+  extend `Cake\Console\BaseCommand`. This means that they will no longer display connection information by default, but
+  that makes sense since those classes only work on the filesystem;
+* the `BackupImport::filename()` method uses `Compression` to check the validity of the file you want to import (so it
+  no longer checks its extension). This will throw a `ValueError` exception for invalid files;
+* the global test functions `createBackup()` and `createSomeBackups()` are now methods of the `TestCase` class (as they
+  should be). The `createBackup()` method now has the `$fakeBackup` argument (`false` by default), which allows you to
+  create a fake backup file (i.e. an empty file) Added tests;
+* added new `AbstractBackupUtility::makeAbsoluteFilename()` method. Since the `BackupTrait::getAbsolutePath()` method is
+  now deprecated (see below), it provides the `BackupExport` and `BackupImport` classes (the only ones that really need
+  it) with a method to construct absolute paths;
+* added `OperationType` enum, which is used by the `AbstractDriver::getExecutable()` private method;
+* the `AbstractDriver::getBinary()` method can now accept a `Compression` value as an argument (in addition to a
+  string). Invalid values will now throw an `InvalidArgumentException` (rather than a `LogicException`);
+* the `BackupManager::rotate()` method throws an `InvalidArgumentException` (and no longer `LogicException`) for an
+  invalid `$rotate` value. The method description has been corrected;
+* the code, introduced in version `2.13.3`, that allows paths relative to `ROOT`, has been moved from
+  `BackupTrait::getAbsolutePath()` method to `ImportCommand::execute()`, since it is the only one that takes advantage
+  of it;
+* the `DATABASE_BACKUP_EXTENSIONS` constant no longer exists, as it is no longer needed due to the `Compression` enum;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
-* the `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release;
+* `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by
+  `BackupTrait` are deprecated. They will be removed in a future release;
+* the `delete()` and `deleteAll()` methods provided by `BackupManager` are deprecated. They will be removed in a future
+  release. The few methods that need to delete files (e.g. rotation methods) implement the necessary code themselves;
 * compatibility with the transition from `_cake_core_` to `_cake_translations_` expected in CakePHP 5.1;
 * the `BackupExport::$defaultExtension` property no longer exists (by now it had become useless);
 * updated for the latest version of psalm.
