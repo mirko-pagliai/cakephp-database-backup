@@ -10,6 +10,8 @@
 * the `BackupManager::index` methods no longer returns, in the array for each file, the `filename` key;
 * the `BackupExport::filename()` method now throws an `IOException` exception (rather than a `LogicException`) if the
   target (directory) is not writable or if the filename already exists;
+* the `BackupExport::export()` and `BackupImport::import()` methods now throw a `RuntimeException` exception (rather
+  than a `LogicException`) when export/import fails;
 * the `TestCase::createSomeBackups()` method has been improved;
 * the `AbstractBackupUtility::__get()` method is deprecated and will be removed in a future release;
 * `DeleteAllCommand`, `RotateCommand` and `SendCommand` classes had been deprecated and have been removed;

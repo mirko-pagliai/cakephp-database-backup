@@ -18,6 +18,7 @@ namespace DatabaseBackup\Utility;
 
 use DatabaseBackup\Compression;
 use LogicException;
+use RuntimeException;
 
 /**
  * Utility to import databases.
@@ -56,6 +57,7 @@ class BackupImport extends AbstractBackupUtility
      *
      * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
      * @throws \LogicException
+     * @throws \RuntimeException When import fails
      * @see \DatabaseBackup\Driver\AbstractDriver::afterImport()
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeImport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
@@ -67,7 +69,7 @@ class BackupImport extends AbstractBackupUtility
         }
 
         //This allows the filename to be set again with a next call of this method
-        $filename = $this->filename;
+        $filename = $this->getFilename();
         unset($this->filename);
 
         //Dispatches the `Backup.beforeImport` event implemented by the driver
@@ -79,7 +81,7 @@ class BackupImport extends AbstractBackupUtility
         //Imports
         $Process = $this->getProcess($this->getDriver()->getImportExecutable($filename));
         if (!$Process->isSuccessful()) {
-            throw new LogicException(
+            throw new RuntimeException(
                 __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput()))
             );
         }

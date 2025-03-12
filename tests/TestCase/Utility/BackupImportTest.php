@@ -20,6 +20,8 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use ValueError;
@@ -142,34 +144,32 @@ class BackupImportTest extends TestCase
     /**
      * Test for `import()` method, on failure (error for `Process`).
      *
-     * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
+    #[Test]
     public function testImportOnFailure(): void
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
-
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
 
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
         $BackupImport->method('getProcess')
             ->willReturn($Process);
 
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
-
-        $BackupImport->filename($this->createBackup(fakeBackup: true))
-            ->import();
+        $BackupImport->filename($this->createBackup(fakeBackup: true))->import();
     }
 
     /**
      * Test for `import()` method, exceeding the timeout.
      *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
-     * @test
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
+    #[Test]
     public function testImportExceedingTimeout(): void
     {
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
