@@ -18,6 +18,8 @@
 * except for `ExportCommand` and `ImportCommand`, all other `Command` classes (including deprecated ones) now directly
   extend `Cake\Console\BaseCommand`. This means that they will no longer display connection information by default, but
   that makes sense since those classes only work on the filesystem;
+* added new `Command::makeRelativeFilename()` method. This will replace the global `rtr()` function, since only
+  `Command` classes really need it;
 * the `BackupImport::filename()` method uses `Compression` to check the validity of the file you want to import (so it
   no longer checks its extension). This will throw a `ValueError` exception for invalid files;
 * the global test functions `createBackup()` and `createSomeBackups()` are now methods of the `TestCase` class (as they

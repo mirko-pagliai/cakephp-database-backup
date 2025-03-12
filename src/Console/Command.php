@@ -22,6 +22,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Base class for console commands.
@@ -29,6 +30,18 @@ use DatabaseBackup\BackupTrait;
 abstract class Command extends BaseCommand
 {
     use BackupTrait;
+
+    /**
+     * Makes the relative path for a filename (relative to `ROOT`).
+     *
+     * @param string $filename
+     * @return string
+     * @since 2.13.5
+     */
+    public function makeRelativeFilename(string $filename): string
+    {
+        return Path::isBasePath(ROOT, $filename) ? Path::makeRelative($filename, ROOT) : $filename;
+    }
 
     /**
      * @inheritDoc

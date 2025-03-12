@@ -122,13 +122,13 @@ class ExportCommand extends Command
                 $BackupExport->timeout((int)$args->getOption('timeout'));
             }
 
-            $file = $BackupExport->export();
-            if (!$file) {
+            $filename = $BackupExport->export();
+            if (!$filename) {
                 throw new StopException(
                     __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport')
                 );
             }
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativeFilename($filename)));
 
             //Sends via email and/or rotates. It keeps options `verbose` and `quiet`.
             $extraOptions = [];
@@ -145,19 +145,19 @@ class ExportCommand extends Command
 
                 $this->executeCommand(
                     SendCommand::class,
-                    array_merge([$file, (string)$args->getOption('send')], $extraOptions),
+                    array_merge([$filename, (string)$args->getOption('send')], $extraOptions),
                     $io
                 );
             }
             if ($args->getOption('rotate')) {
-                $files = BackupManager::rotate((int)$args->getOption('rotate'));
+                $rotatedFiles = BackupManager::rotate((int)$args->getOption('rotate'));
 
-                if ($files) {
-                    foreach ($files as $file) {
+                if ($rotatedFiles) {
+                    foreach ($rotatedFiles as $file) {
                         $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['basename']));
                     }
 
-                    $io->success(__d('database_backup', 'Deleted backup files: {0}', count($files)));
+                    $io->success(__d('database_backup', 'Deleted backup files: {0}', count($rotatedFiles)));
                 } else {
                     $io->verbose(__d('database_backup', 'No backup has been deleted'));
                 }

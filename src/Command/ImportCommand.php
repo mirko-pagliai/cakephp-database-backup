@@ -107,13 +107,13 @@ class ImportCommand extends Command
                 $BackupImport->timeout((int)$args->getOption('timeout'));
             }
 
-            $file = $BackupImport->import();
-            if (!$file) {
+            $filename = $BackupImport->import();
+            if (!$filename) {
                 throw new StopException(
                     __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport')
                 );
             }
-            $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativeFilename($filename)));
         } catch (Exception $e) {
             $io->abort($e->getMessage());
         }
