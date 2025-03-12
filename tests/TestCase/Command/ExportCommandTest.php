@@ -23,13 +23,14 @@ use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
- * ExportCommandTest class
- *
- * @uses \DatabaseBackup\Command\ExportCommand
+ * ExportCommandTest class.
  */
+#[CoversClass(ExportCommand::class)]
 class ExportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
@@ -40,9 +41,9 @@ class ExportCommandTest extends TestCase
     protected string $command = 'database_backup.export -v';
 
     /**
-     * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[Test]
     public function testExecute(): void
     {
         $this->exec($this->command);
@@ -51,35 +52,14 @@ class ExportCommandTest extends TestCase
         $this->assertOutputRegExp('/Driver: Cake\\\\Database\\\\Driver\\\\\w+/');
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertErrorEmpty();
-
-        //With an invalid option value
-        $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
-        $this->assertExitError();
     }
 
     /**
-     * Test for `execute()` method on stopped event.
+     * Test for `execute()` method, with `--compression` option.
      *
-     * @test
-     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
-    public function testExecuteOnStoppedEvent(): void
-    {
-        $this->expectException(StopException::class);
-        $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
-        $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
-        $ExportCommand->method('getBackupExport')
-            ->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
-        $ExportCommand->run([], new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()));
-    }
-
-    /**
-     * Test for `execute()` method, with `compression` option.
-     *
-     * @test
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
-     */
+    #[Test]
     public function testExecuteCompressionOption(): void
     {
         $this->exec($this->command . ' --compression bzip2');
@@ -89,11 +69,11 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `filename` option.
+     * Test for `execute()` method, with `--filename` option.
      *
-     * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[Test]
     public function testExecuteFilenameOption(): void
     {
         $this->exec($this->command . ' --filename backup.sql');
@@ -103,15 +83,15 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` option.
+     * Test for `execute()` method, with `--rotate` option.
      *
-     * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[Test]
     public function testExecuteRotateOption(): void
     {
         $files = $this->createSomeBackups();
-        $this->exec($this->command . ' --rotate 3 -v');
+        $this->exec($this->command . ' --rotate 3');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename($files[0]) . '` has been deleted');
@@ -120,14 +100,14 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` option but no files to delete.
+     * Test for `execute()` method, with `--rotate` option, but no files to rotate.
      *
-     * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[Test]
     public function testExecuteRotateOptionWithNoFileToDelete(): void
     {
-        $this->exec($this->command . ' --rotate 3 -v');
+        $this->exec($this->command . ' --rotate 3');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('No backup has been deleted');
@@ -135,11 +115,11 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `send` option.
+     * Test for `execute()` method, with `--send` option.
      *
-     * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[Test]
     public function testExecuteSendOption(): void
     {
         Configure::write('DatabaseBackup.mailSender', 'sender@example.com');
@@ -152,9 +132,9 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[Test]
     #[WithoutErrorHandler]
     public function testExecuteSendOptionIsDeprecated(): void
     {
@@ -164,16 +144,47 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `timeout` option.
+     * Test for `execute()` method, with `--timeout` option.
      *
-     * @test
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
+    #[Test]
     public function testExecuteTimeoutOption(): void
     {
         $this->exec($this->command . ' --timeout 10');
         $this->assertExitSuccess();
         $this->assertOutputContains('Timeout for shell commands: 10 seconds');
         $this->assertErrorEmpty();
+    }
+
+    /**
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    #[Test]
+    public function testExecuteNotWritableTarget(): void
+    {
+        $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
+        $this->assertExitError();
+        $this->assertErrorContains('File or directory `/noExistingDir` is not writable');
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    #[Test]
+    public function testExecuteOnStoppedEvent(): void
+    {
+        $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
+        $ExportCommand
+            ->method('getBackupExport')
+            ->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
+
+        $this->expectException(StopException::class);
+        $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
+        $ExportCommand->run(
+            [],
+            new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
+        );
     }
 }

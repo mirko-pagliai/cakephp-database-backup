@@ -15,13 +15,14 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Driver;
 
+use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\DriverTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * SqliteTest class.
- *
- * @uses \DatabaseBackup\Driver\Sqlite
  */
+#[CoversClass(Sqlite::class)]
 class SqliteTest extends DriverTestCase
 {
     /**

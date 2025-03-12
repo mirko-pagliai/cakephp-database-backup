@@ -68,7 +68,7 @@ abstract class TestCase extends CakeTestCase
         $timestamp = $timestamp ?: time();
 
         foreach (array_reverse(Compression::cases()) as $Compression) {
-            $timestamp--;
+            $timestamp = $timestamp - 60;
             $file = $this->createBackup(filename: 'backup_test_' . $timestamp . '.' . $Compression->value, fakeBackup: true);
             touch($file, $timestamp);
             $files[] = $file;

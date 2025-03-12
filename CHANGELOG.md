@@ -18,6 +18,8 @@
 * except for `ExportCommand` and `ImportCommand`, all other `Command` classes (including deprecated ones) now directly
   extend `Cake\Console\BaseCommand`. This means that they will no longer display connection information by default, but
   that makes sense since those classes only work on the filesystem;
+* added new `Command::makeRelativeFilename()` method. This will replace the global `rtr()` function, since only
+  `Command` classes really need it;
 * the `BackupImport::filename()` method uses `Compression` to check the validity of the file you want to import (so it
   no longer checks its extension). This will throw a `ValueError` exception for invalid files;
 * the global test functions `createBackup()` and `createSomeBackups()` are now methods of the `TestCase` class (as they
@@ -35,6 +37,7 @@
   `BackupTrait::getAbsolutePath()` method to `ImportCommand::execute()`, since it is the only one that takes advantage
   of it;
 * the `DATABASE_BACKUP_EXTENSIONS` constant no longer exists, as it is no longer needed due to the `Compression` enum;
+* the `rtr()` global function is deprecated and will be removed in a future release;
 * the `RotateCommand` class is deprecated and will be removed in a later release. For this reason, the `ExportCommand`
   class now uses the `BackupManager::rotate()` method to continue supporting the `--rotate` option;
 * `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by

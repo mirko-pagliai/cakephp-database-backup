@@ -65,6 +65,29 @@ class ImportCommand extends Command
     }
 
     /**
+     * Makes the absolute path for a filename.
+     *
+     * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
+     *
+     * For example:
+     * ```
+     * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
+     * ```
+     *
+     * @param string $filename
+     * @return string
+     * @since 2.13.5
+     */
+    public static function makeAbsoluteFilename(string $filename): string
+    {
+        if (Path::isRelative($filename) && is_readable(Path::makeAbsolute($filename, ROOT))) {
+            $filename = Path::makeAbsolute($filename, ROOT);
+        }
+
+        return $filename;
+    }
+
+    /**
      * Imports a database backup.
      *
      * @param \Cake\Console\Arguments $args The command arguments
@@ -75,36 +98,22 @@ class ImportCommand extends Command
     {
         parent::execute($args, $io);
 
-        $filename = (string)$args->getArgument('filename');
-
-        /**
-         * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
-         *
-         * For example:
-         * ```
-         * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
-         * ```
-         */
-        if (Path::isRelative($filename) && is_readable(Path::makeAbsolute($filename, ROOT))) {
-            $filename = Path::makeAbsolute($filename, ROOT);
-        }
-
         try {
             $BackupImport = $this->getBackupImport()
-                ->filename($filename);
+                ->filename($this->makeAbsoluteFilename((string)$args->getArgument('filename')));
 
             //Sets the timeout
             if ($args->getOption('timeout')) {
                 $BackupImport->timeout((int)$args->getOption('timeout'));
             }
 
-            $file = $BackupImport->import();
-            if (!$file) {
+            $filename = $BackupImport->import();
+            if (!$filename) {
                 throw new StopException(
                     __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport')
                 );
             }
-            $io->success(__d('database_backup', 'Backup `{0}` has been imported', rtr($file)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativeFilename($filename)));
         } catch (Exception $e) {
             $io->abort($e->getMessage());
         }
