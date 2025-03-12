@@ -20,6 +20,7 @@ use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * TestCase class.
@@ -48,7 +49,9 @@ abstract class TestCase extends CakeTestCase
     public function createBackup(string $filename = 'backup.sql', bool $fakeBackup = false): string
     {
         if ($fakeBackup) {
-            $filename = TMP . 'backups' . DS . $filename;
+            if (Path::isRelative($filename)) {
+                $filename = TMP . 'backups' . DS . $filename;
+            }
             file_put_contents($filename, '');
 
             return $filename;
