@@ -15,11 +15,11 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase;
 
-use App\BackupTraitAsClass;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
+use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -31,21 +31,6 @@ use PHPUnit\Framework\Attributes\TestWith;
  */
 class BackupTraitTest extends TestCase
 {
-    /**
-     * @var \App\BackupTraitAsClass
-     */
-    protected BackupTraitAsClass $Trait;
-
-    /**
-     * @inheritDoc
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->Trait ??= new BackupTraitAsClass();
-    }
-
     /**
      * @uses \DatabaseBackup\BackupTrait::getConnection()
      */
@@ -59,7 +44,10 @@ class BackupTraitTest extends TestCase
             ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
         }
 
-        $Connection = $this->Trait->getConnection($connectionName);
+        $Trait = new class {
+            use BackupTrait;
+        };
+        $Connection = $Trait->getConnection($connectionName);
         $this->assertInstanceof(Connection::class, $Connection);
         $this->assertSame($connectionName ?: Configure::read('DatabaseBackup.connection'), $Connection->configName());
     }
@@ -70,7 +58,11 @@ class BackupTraitTest extends TestCase
     #[Test]
     public function testGetConnectionWithNoExistingConnection(): void
     {
+        $Trait = new class {
+            use BackupTrait;
+        };
+
         $this->expectException(MissingDatasourceConfigException::class);
-        $this->Trait->getConnection('noExisting');
+        $Trait->getConnection('noExisting');
     }
 }
