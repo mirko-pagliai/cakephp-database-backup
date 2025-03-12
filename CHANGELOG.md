@@ -9,7 +9,8 @@
   `BackupTrait` had been deprecated and has been removed;
 * all classes, methods and code related to sending backups via email had been deprecated, and now they have been
   removed. So, the `BackupManager::send()` method (and, consequently, the internal `BackupManager::getEmailInstance()`
-  method), the `BackupExport::send()` method and the `send` option for the `ExportCommand` have been removed.
+  method), the `BackupExport::send()` method and the `send` option for the `ExportCommand` have been removed;
+* the `rtr()` global function had been deprecated and has been removed.
 
 ## 2.13 branch
 ### 2.13.5

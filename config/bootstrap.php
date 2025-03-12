@@ -73,26 +73,3 @@ if (!file_exists($target)) {
 if (!is_dir($target) || !is_writeable($target)) {
     trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target), E_USER_ERROR);
 }
-
-if (!function_exists('rtr')) {
-    /**
-     * Returns a path relative to the root path.
-     *
-     * @param string $path Absolute path
-     * @return string Relative path
-     * @deprecated 2.13.5 The `rtr()` global function is deprecated. Will be removed in a future release
-     */
-    function rtr(string $path): string
-    {
-        deprecationWarning(
-            '2.13.5',
-            'The `rtr()` global function is deprecated. Will be removed in a future release'
-        );
-
-        if (!str_starts_with($path, ROOT)) {
-            return $path;
-        }
-
-        return rtrim(substr($path, strlen(ROOT)), DS);
-    }
-}
