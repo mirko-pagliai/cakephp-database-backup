@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Event\EventList;
-use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
@@ -36,8 +35,6 @@ use ValueError;
  */
 class BackupExportTest extends TestCase
 {
-    use EmailTrait;
-
     /**
      * @var \DatabaseBackup\Utility\BackupExport
      */
