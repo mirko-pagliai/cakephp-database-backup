@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use Cake\Datasource\ConnectionManager;
 use Cake\ORM\Table;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
@@ -78,10 +79,11 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport ??= new BackupExport();
+        $this->BackupExport = new BackupExport();
 
         /** @var \Cake\Database\Connection $connection */
-        $connection = $this->getConnection('test');
+        $connection = ConnectionManager::get('test');
+
         foreach (['Articles', 'Comments'] as $name) {
             $this->{$name} ??= $this->fetchTable($name, compact('connection'));
         }
