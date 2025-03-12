@@ -18,7 +18,6 @@ namespace DatabaseBackup\Utility;
 
 use BadMethodCallException;
 use DatabaseBackup\Compression;
-use LogicException;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 

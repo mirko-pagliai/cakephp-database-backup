@@ -19,9 +19,9 @@ use BadMethodCallException;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
-use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
@@ -31,9 +31,8 @@ use ValueError;
 
 /**
  * BackupImportTest class.
- *
- * @uses \DatabaseBackup\Utility\BackupImport
  */
+#[CoversClass(BackupImport::class)]
 class BackupImportTest extends TestCase
 {
     /**
@@ -49,7 +48,6 @@ class BackupImportTest extends TestCase
         parent::setUp();
 
         $this->BackupImport = new BackupImport();
-        $this->BackupImport->getDriver()->getEventManager()->setEventList(new EventList());
     }
 
     /**
