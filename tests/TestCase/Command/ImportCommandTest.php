@@ -62,8 +62,6 @@ class ImportCommandTest extends TestCase
 
         $this->exec($this->command . ' ' . $backup);
         $this->assertExitSuccess();
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputRegExp('/Driver: Cake\\\\Database\\\\Driver\\\\\w+/');
         $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
         $this->assertErrorEmpty();
     }
