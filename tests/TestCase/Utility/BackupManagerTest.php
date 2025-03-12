@@ -23,7 +23,6 @@ use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupManagerTest class.
@@ -44,70 +43,6 @@ class BackupManagerTest extends TestCase
         parent::setUp();
 
         $this->BackupManager ??= new BackupManager();
-    }
-
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::delete()
-     */
-    #[Test]
-    public function testDelete(): void
-    {
-        $filename = $this->createBackup(fakeBackup: true);
-        $this->assertSame($filename, $this->BackupManager->delete($filename));
-        $this->assertFileDoesNotExist($filename);
-
-        //With a relative path
-        $filename = $this->createBackup(fakeBackup: true);
-        $this->assertSame($filename, $this->BackupManager->delete(basename($filename)));
-        $this->assertFileDoesNotExist($filename);
-    }
-
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::delete()
-     */
-    #[Test]
-    public function testDeleteWithNoExistingFile(): void
-    {
-        $filename = TMP . 'noExistingFile';
-        $this->expectExceptionMessage('File or directory `' . $filename . '` is not writable');
-        $this->BackupManager->delete($filename);
-    }
-
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::delete()
-     */
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testDeleteIsDeprecated(): void
-    {
-        $this->deprecated(function (): void {
-            $this->BackupManager->delete($this->createBackup(fakeBackup: true));
-        });
-    }
-
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
-     */
-    #[Test]
-    public function testDeleteAll(): void
-    {
-        $createdFiles = $this->createSomeBackups();
-        $this->assertSame($createdFiles, $this->BackupManager->deleteAll());
-        foreach ($createdFiles as $file) {
-            $this->assertFileDoesNotExist($file);
-        }
-    }
-
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::deleteAll()
-     */
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testDeleteAllIsDeprecated(): void
-    {
-        $this->deprecated(function (): void {
-            $this->BackupManager->deleteAll();
-        });
     }
 
     /**

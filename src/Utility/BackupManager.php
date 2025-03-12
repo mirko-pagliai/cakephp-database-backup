@@ -22,8 +22,6 @@ use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use DatabaseBackup\Compression;
 use InvalidArgumentException;
-use LogicException;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -32,46 +30,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class BackupManager
 {
-    /**
-     * Deletes a backup file.
-     *
-     * @param string $filename Backup filename you want to delete. The path can be relative to the backup directory
-     * @return string Deleted backup file
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#delete
-     * @throws \LogicException
-     * @deprecated 2.13.5: `BackupManager::delete()` method is deprecated. Will be removed in a future release
-     */
-    public static function delete(string $filename): string
-    {
-        deprecationWarning('2.13.5', 'The `BackupManager::delete()` method is deprecated. Will be removed in a future release');
-
-        $filename = Path::makeAbsolute($filename, Configure::readOrFail('DatabaseBackup.target'));
-        if (!is_writable($filename)) {
-            throw new LogicException(__d('database_backup', 'File or directory `{0}` is not writable', $filename));
-        }
-        unlink($filename);
-
-        return $filename;
-    }
-
-    /**
-     * Deletes all backup files.
-     *
-     * @return array<string> List of deleted backup files
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#deleteAll
-     * @since 1.0.1
-     * @deprecated 2.13.5: `BackupManager::deleteAll()` method is deprecated. Will be removed in a future release
-     */
-    public static function deleteAll(): array
-    {
-        deprecationWarning('2.13.5', 'The `BackupManager::deleteAll()` method is deprecated. Will be removed in a future release');
-
-        return self::index()
-            ->extract('path')
-            ->each(fn (string $path) => unlink($path))
-            ->toList();
-    }
-
     /**
      * Returns a list of database backups.
      *

@@ -11,6 +11,7 @@
 * all classes, methods and code related to sending backups via email had been deprecated, and now they have been
   removed. So, the `BackupManager::send()` method (and, consequently, the internal `BackupManager::getEmailInstance()`
   method), the `BackupExport::send()` method and the `send` option for the `ExportCommand` have been removed;
+* the `delete()` and `deleteAll()` methods provided by `BackupManager` had been deprecated and have been removed;
 * the `rtr()` global function had been deprecated and has been removed.
 
 ## 2.13 branch
