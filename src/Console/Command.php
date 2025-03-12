@@ -21,7 +21,6 @@ use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\BackupTrait;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -29,8 +28,6 @@ use Symfony\Component\Filesystem\Path;
  */
 abstract class Command extends BaseCommand
 {
-    use BackupTrait;
-
     /**
      * Makes the relative path for a filename (relative to `ROOT`).
      *

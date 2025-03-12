@@ -18,7 +18,6 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
-use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 
