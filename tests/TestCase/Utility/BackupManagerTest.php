@@ -31,21 +31,6 @@ use PHPUnit\Framework\Attributes\Test;
 class BackupManagerTest extends TestCase
 {
     /**
-     * @var \DatabaseBackup\Utility\BackupManager
-     */
-    protected BackupManager $BackupManager;
-
-    /**
-     * @inheritDoc
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->BackupManager ??= new BackupManager();
-    }
-
-    /**
      * @uses \DatabaseBackup\Utility\BackupManager::index()
      */
     #[Test]
@@ -55,7 +40,7 @@ class BackupManagerTest extends TestCase
         file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
         $createdFiles = $this->createSomeBackups();
-        $files = $this->BackupManager->index();
+        $files = BackupManager::index();
         array_map('unlink', $createdFiles);
         $this->assertCount(3, $files);
 
@@ -83,7 +68,7 @@ class BackupManagerTest extends TestCase
          * So only 1 backup was deleted, which was the last one created.
          */
         $initialFiles = $this->createSomeBackups();
-        $rotate = $this->BackupManager->rotate(2);
+        $rotate = BackupManager::rotate(2);
         $this->assertCount(1, $rotate);
         $this->assertSame($initialFiles[2], $rotate[0]['path']);
     }
@@ -96,6 +81,6 @@ class BackupManagerTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `$keep` value');
-        $this->BackupManager->rotate(-1);
+        BackupManager::rotate(-1);
     }
 }
