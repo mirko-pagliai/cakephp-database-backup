@@ -20,6 +20,7 @@ use Cake\I18n\DateTime;
 use Cake\I18n\Number;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * IndexCommandTest class
@@ -31,70 +32,109 @@ class IndexCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
-     * @test
+     * @var string
+     */
+    protected string $command = 'database_backup.index -v';
+
+    /**
      * @uses \DatabaseBackup\Command\IndexCommand::execute()
      */
+    #[Test]
     public function testExecute(): void
     {
-        $backups = $this->createSomeBackups();
-        $this->exec('database_backup.index -v');
+        $files = array_reverse($this->createSomeBackups());
+
+        $this->exec($this->command);
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
 
-        /**
-         * Extracts and checks only the lines containing headers and data about backup file
-         */
-        $expectedHeaders = [
+        //Checks for headers
+        $this->assertOutputContainsRow([
             '<info>Filename</info>',
             '<info>Compression</info>',
             '<info>Size</info>',
             '<info>Datetime</info>',
-        ];
-        $headers = preg_split(pattern: '/\s*\|\s*/', subject: $this->_out->messages()[2], flags: PREG_SPLIT_NO_EMPTY);
-        $this->assertSame($expectedHeaders, $headers);
+        ]);
 
-        $expectedRows = array_reverse(array_map(
-            callback: function (string $filename): array {
-                $Compression = Compression::fromFilename($filename);
+        //Checks the row of every file that has been created
+        foreach ($files as $file) {
+            $Compression = Compression::fromFilename($file);
+            $row = [
+                basename($file),
+                $Compression == Compression::None ? '' : lcfirst($Compression->name),
+                Number::toReadableSize(filesize($file) ?: 0),
+                DateTime::createFromTimestamp(filemtime($file) ?: 0)->nice(),
+            ];
 
-                return [
-                    '',
-                    basename($filename),
-                    $Compression !== Compression::None ? lcfirst($Compression->name) : '',
-                    Number::toReadableSize(filesize($filename) ?: 0),
-                    DateTime::createFromTimestamp(filemtime($filename) ?: 0)->nice(),
-                    '',
-                ];
-            },
-            array: $backups
-        ));
-        $rows = array_map(
-            callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row) ?: [],
-            array: array_slice($this->_out->messages(), 4, 3)
-        );
-        $this->assertSame($expectedRows, $rows);
+            $this->assertOutputContainsRow($row);
+        }
 
-        $this->cleanupConsoleTrait();
-
-        //With `reverse` option
-        $this->exec('database_backup.index -v --reverse');
-        $this->assertExitSuccess();
-        $this->assertOutputContains('Backup files found: 3');
-        $rows = array_map(
-            callback: fn (string $row): array => preg_split(pattern: '/\s*\|\s*/', subject: $row) ?: [],
-            array: array_slice($this->_out->messages(), 4, 3)
-        );
-        $this->assertSame(array_reverse($expectedRows), $rows);
+        /**
+         * `$matches[1]` will be an array with the basename extracted from the output.
+         *
+         * Example:
+         * ```
+         * [
+         *    'backup_test_1741792112.sql',
+         *    'backup_test_1741792172.sql.gz',
+         *    'backup_test_1741792232.sql.bz2',
+         * ]
+         * ```
+         *
+         * So we should expect this array to match the basename of the files we initially created.
+         *
+         * @var \Cake\Console\TestSuite\StubConsoleOutput $out
+         */
+        $out = $this->_out;
+        preg_match_all('/\s+(backup_test_\d+\.sql(?:\.(?:gz|bz2))?)\s+/', implode('', $out->messages()), $matches);
+        $this->assertSame(array_map(callback: 'basename', array: $files), $matches[1]);
     }
 
     /**
+     * Test for `execute()` method, with `--reverse` option.
+     *
      * @test
      * @uses \DatabaseBackup\Command\IndexCommand::execute()
      */
+    #[Test]
+    public function testExecuteWithReverseOption(): void
+    {
+        $files = $this->createSomeBackups();
+
+        $this->exec($this->command . ' --reverse');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Backup files found: 3');
+
+        /**
+         * `$matches[1]` will be an array with the basename extracted from the output.
+         *
+         * Example:
+         * ```
+         * [
+         *    'backup_test_1741792112.sql',
+         *    'backup_test_1741792172.sql.gz',
+         *    'backup_test_1741792232.sql.bz2',
+         * ]
+         * ```
+         *
+         * So we should expect this array to match the basename of the files we initially created.
+         *
+         * @var \Cake\Console\TestSuite\StubConsoleOutput $out
+         */
+        $out = $this->_out;
+        preg_match_all('/\s+(backup_test_\d+\.sql(?:\.(?:gz|bz2))?)\s+/', implode('', $out->messages()), $matches);
+        $this->assertSame(array_map(callback: 'basename', array: $files), $matches[1]);
+    }
+
+    /**
+     * Test for `execute()` method, with no backup files.
+     *
+     * @uses \DatabaseBackup\Command\IndexCommand::execute()
+     */
+    #[Test]
     public function testExecuteWithNoFiles(): void
     {
-        //With no backups
-        $this->exec('database_backup.index -v');
+        $this->exec($this->command);
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 0');
         $this->assertErrorEmpty();

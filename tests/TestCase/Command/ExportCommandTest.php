@@ -55,7 +55,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `compression` option.
+     * Test for `execute()` method, with `--compression` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -69,7 +69,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `filename` option.
+     * Test for `execute()` method, with `--filename` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -83,7 +83,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` option.
+     * Test for `execute()` method, with `--rotate` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -91,7 +91,6 @@ class ExportCommandTest extends TestCase
     public function testExecuteRotateOption(): void
     {
         $files = $this->createSomeBackups();
-
         $this->exec($this->command . ' --rotate 3');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
@@ -101,7 +100,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `rotate` option but no files to delete.
+     * Test for `execute()` method, with `--rotate` option, but no files to rotate.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -116,7 +115,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `send` option.
+     * Test for `execute()` method, with `--send` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
@@ -145,7 +144,7 @@ class ExportCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with `timeout` option.
+     * Test for `execute()` method, with `--timeout` option.
      *
      * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
