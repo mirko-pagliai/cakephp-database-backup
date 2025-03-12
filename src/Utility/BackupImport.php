@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use BadMethodCallException;
 use DatabaseBackup\Compression;
 use LogicException;
 use RuntimeException;
@@ -59,7 +60,7 @@ class BackupImport extends AbstractBackupUtility
      *  - `Backup.afterImport`: will be triggered after import.
      *
      * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
-     * @throws \LogicException
+     * @throws \BadMethodCallException When the filename has not been set
      * @throws \RuntimeException When import fails
      * @see \DatabaseBackup\Driver\AbstractDriver::afterImport()
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeImport()
@@ -68,7 +69,7 @@ class BackupImport extends AbstractBackupUtility
     public function import(): string|false
     {
         if (empty($this->filename)) {
-            throw new LogicException(__d('database_backup', 'You must first set the filename'));
+            throw new BadMethodCallException(__d('database_backup', 'You must first set the filename'));
         }
 
         //This allows the filename to be set again with a next call of this method

@@ -13,6 +13,8 @@
   readable;
 * the `BackupExport::export()` and `BackupImport::import()` methods now throw a `RuntimeException` exception (rather
   than a `LogicException`) when export/import fails;
+* the `BackupImport::import()` methods now throws a `BadMethodCallException` exception (rather than a `LogicException`)
+  when the filename has not been set;
 * the `TestCase::createSomeBackups()` method has been improved;
 * the `AbstractBackupUtility::__get()` method is deprecated and will be removed in a future release;
 * `DeleteAllCommand`, `RotateCommand` and `SendCommand` classes had been deprecated and have been removed;

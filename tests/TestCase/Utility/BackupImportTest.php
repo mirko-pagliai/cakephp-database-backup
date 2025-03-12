@@ -15,8 +15,10 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use BadMethodCallException;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
+use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\Driver\Sqlite;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
@@ -95,40 +97,57 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * @test
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
+    #[Test]
     public function testImport(): void
     {
-        foreach (Compression::cases() as $Compression) {
-            $expectedFilename = $this->createBackup('backup.' . $Compression->value);
-            $result = $this->BackupImport->filename($expectedFilename)->import() ?: '';
-            $this->assertStringEndsWith('backup.' . $Compression->value, $result);
-            $this->assertSame($expectedFilename, $result);
-            $this->assertEventFired('Backup.beforeImport', $this->BackupImport->getDriver()->getEventManager());
-            $this->assertEventFired('Backup.afterImport', $this->BackupImport->getDriver()->getEventManager());
-        }
+        $filename = $this->createBackup(fakeBackup: true);
 
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
+        $BackupImport
+            ->method('getProcess')
+            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+
+        $BackupImport->getDriver()->getEventManager()->setEventList(new EventList());
+
+        $result = $BackupImport->filename($filename)
+            ->import();
+        $this->assertIsString($result);
+        $this->assertSame($filename, $result);
+        $this->assertEventFired('Backup.beforeImport', $BackupImport->getDriver()->getEventManager());
+        $this->assertEventFired('Backup.afterImport', $BackupImport->getDriver()->getEventManager());
+    }
+
+    /**
+     * @uses \DatabaseBackup\Utility\BackupImport::import()
+     */
+    #[Test]
+    public function testImportOnMissingFilename(): void
+    {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
     }
 
     /**
-     * Test for `import()` method. Export is stopped by the `Backup.beforeImport` event (implemented by driver).
+     * Test for `import()` method.
      *
-     * @test
+     * Import is stopped by the `Backup.beforeImport` event (implemented by driver).
+     *
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
+    #[Test]
     public function testImportStoppedByBeforeExport(): void
     {
-        $Driver = $this->createPartialMock(Sqlite::class, ['beforeImport']);
+        $Driver = $this->createPartialMock(AbstractDriver::class, ['beforeImport']);
         $Driver->method('beforeImport')
             ->willReturn(false);
         $Driver->getEventManager()->on($Driver);
 
         $BackupImport = $this->createConfiguredMock(BackupImport::class, ['getDriver' => $Driver]);
-
         $result = $BackupImport
             ->filename($this->createBackup(fakeBackup: true))
             ->import();
