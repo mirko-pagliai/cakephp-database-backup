@@ -18,7 +18,7 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
-use LogicException;
+use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -39,6 +39,17 @@ class BackupExport extends AbstractBackupUtility
      * @var int
      */
     protected int $rotate = 0;
+
+    /**
+     * Internal method to get a `Filesystem` instance.
+     *
+     * @return \Symfony\Component\Filesystem\Filesystem
+     * @since 2.14.0
+     */
+    protected function getFilesystem(): Filesystem
+    {
+        return new Filesystem();
+    }
 
     /**
      * Sets the compression.
@@ -117,7 +128,7 @@ class BackupExport extends AbstractBackupUtility
      *  - `Backup.afterExport`: will be triggered after export.
      *
      * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
-     * @throws \LogicException
+     * @throws \RuntimeException When export fails
      * @see \DatabaseBackup\Driver\AbstractDriver::afterExport()
      * @see \DatabaseBackup\Driver\AbstractDriver::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
@@ -125,11 +136,11 @@ class BackupExport extends AbstractBackupUtility
     public function export(): string|false
     {
         if (empty($this->filename)) {
-            $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->compression->value);
+            $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->getCompression()->value);
         }
 
         //This allows the filename to be set again with a next call of this method
-        $filename = $this->filename;
+        $filename = $this->getFilename();
         unset($this->filename);
 
         //Dispatches the `Backup.beforeExport` event implemented by the driver
@@ -141,11 +152,12 @@ class BackupExport extends AbstractBackupUtility
         //Exports
         $Process = $this->getProcess($this->getDriver()->getExportExecutable($filename));
         if (!$Process->isSuccessful()) {
-            throw new LogicException(
+            throw new RuntimeException(
                 __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput()))
             );
         }
-        (new Filesystem())->chmod($filename, Configure::read('DatabaseBackup.chmod'));
+
+        $this->getFilesystem()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
         //Dispatches the `Backup.afterExport` event implemented by the driver
         $this->getDriver()->dispatchEvent('Backup.afterExport');

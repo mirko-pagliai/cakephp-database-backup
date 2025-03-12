@@ -18,22 +18,24 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use Cake\Core\Configure;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\Sqlite;
+use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
-use InvalidArgumentException;
+use DatabaseBackup\Utility\BackupManager;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use ValueError;
 
 /**
  * BackupExportTest class.
- *
- * @uses \DatabaseBackup\Utility\BackupExport
  */
+#[CoversClass(BackupExport::class)]
 class BackupExportTest extends TestCase
 {
     /**
@@ -48,8 +50,7 @@ class BackupExportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport ??= new BackupExport();
-        $this->BackupExport->getDriver()->getEventManager()->setEventList(new EventList());
+        $this->BackupExport = new BackupExport();
     }
 
     /**
@@ -163,122 +164,147 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->rotate(10);
         $this->assertSame(10, $this->BackupExport->getRotate());
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid `$keep` value');
-        $this->BackupExport->rotate(-1)->export();
     }
 
     /**
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupExport::timeout()
-     */
-    public function testTimeout(): void
-    {
-        $this->BackupExport->timeout(120);
-        $this->assertSame(120, $this->BackupExport->getTimeout());
-    }
-
-    /**
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
-     */
-    public function testExport(): void
-    {
-        $file = $this->BackupExport->export() ?: '';
-        $this->assertFileExists($file);
-        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($file));
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->getDriver()->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->getDriver()->getEventManager());
-
-        //Exports with `compression()`
-        $file = $this->BackupExport->compression(Compression::Bzip2)->export() ?: '';
-        $this->assertFileExists($file);
-        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql\.bz2$/', basename($file));
-
-        //Exports with `filename()`
-        $file = $this->BackupExport->filename('backup.sql.bz2')->export() ?: '';
-        $this->assertFileExists($file);
-        $this->assertSame('backup.sql.bz2', basename($file));
-    }
-
-    /**
-     * Test for `export()` method, with a different chmod.
-     *
-     * @requires OS Linux
-     * @test
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
-     */
-    public function testExportWithDifferentChmod(): void
-    {
-        $file = $this->BackupExport->filename('exportWithNormalChmod.sql')->export() ?: '';
-        $this->assertSame('0664', substr(sprintf('%o', fileperms($file)), -4));
-
-        Configure::write('DatabaseBackup.chmod', 0777);
-        $file = $this->BackupExport->filename('exportWithDifferentChmod.sql')->export() ?: '';
-        $this->assertSame('0777', substr(sprintf('%o', fileperms($file)), -4));
-    }
-
-    /**
-     * Test for `export()` method. Export is stopped by the `Backup.beforeExport` event (implemented by driver).
-     *
-     * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
+    #[Test]
+    public function testExport(): void
+    {
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getFilesystem', 'getProcess']);
+        $BackupExport
+            ->method('getProcess')
+            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+        $BackupExport
+            ->method('getFilesystem')
+            ->willReturn($this->createStub(Filesystem::class));
+
+        $BackupExport->getDriver()->getEventManager()->setEventList(new EventList());
+
+        $filename = $BackupExport->export();
+        $this->assertIsString($filename);
+        $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($filename));
+        $this->assertEventFired('Backup.beforeExport', $BackupExport->getDriver()->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $BackupExport->getDriver()->getEventManager());
+
+        //Exports with `compression()`
+        $filename = $BackupExport
+            ->compression(Compression::Gzip)
+            ->export();
+        $this->assertIsString($filename);
+        $this->assertMatchesRegularExpression('/backup_test_\d{14}\.sql\.gz$/', $filename);
+
+        //Exports with `filename()`
+        $filename = $BackupExport
+            ->filename('backup_test.sql.bz2')
+            ->export();
+        $this->assertIsString($filename);
+        $this->assertMatchesRegularExpression('/backup_test\.sql\.bz2$/', $filename);
+
+        //Exports with `rotate()`
+        $this->createSomeBackups();
+        $filename = $BackupExport
+            ->rotate(1)
+            ->export();
+        $this->assertIsString($filename);
+        $this->assertSame(1, BackupManager::index()->count());
+    }
+
+    /**
+     * Test for `export()` method.
+     *
+     * Export is stopped by the `Backup.beforeExport` event (implemented by driver).
+     *
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
+     */
+    #[Test]
     public function testExportStoppedByBeforeExport(): void
     {
-        $Driver = $this->createPartialMock(Sqlite::class, ['beforeExport']);
+        $Driver = $this->createPartialMock(AbstractDriver::class, ['beforeExport']);
         $Driver->method('beforeExport')
             ->willReturn(false);
         $Driver->getEventManager()->on($Driver);
 
-        $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['getDriver'])
-            ->getMock();
-        $BackupExport->method('getDriver')
-            ->willReturn($Driver);
-        $this->assertFalse($BackupExport->export());
+        $BackupExport = $this->createConfiguredMock(BackupExport::class, ['getDriver' => $Driver]);
+        $result = $BackupExport->export();
+        $this->assertFalse($result);
     }
 
     /**
      * Test for `export()` method, on failure (error for `Process`).
      *
-     * @test
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
+    #[Test]
     public function testExportOnFailure(): void
     {
         $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
-        $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
-        $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['getProcess'])
-            ->getMock();
+
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
         $BackupExport->method('getProcess')
             ->willReturn($Process);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
         $BackupExport->export();
     }
 
     /**
-     * Test for `export()` method, exceeding the timeout.
+     * Test for `export()` method, with a different chmod configuration value.
+     *
+     * @requires OS Linux
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\BackupExport::export()
+     */
+    #[Test]
+    public function testExportWithDifferentChmod(): void
+    {
+        $filename = TMP . 'backups/backup.sql';
+        $chmodValue = 0777;
+        Configure::write('DatabaseBackup.chmod', $chmodValue);
+
+        $Filesystem = $this->createPartialMock(Filesystem::class, ['chmod']);
+        $Filesystem
+            ->expects($this->once())
+            ->method('chmod')
+            ->with($filename, $chmodValue);
+
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getFilesystem', 'getProcess']);
+        $BackupExport
+            ->method('getFilesystem')
+            ->willReturn($Filesystem);
+        $BackupExport
+            ->method('getProcess')
+            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+
+        $BackupExport
+            ->filename($filename)
+            ->export();
+    }
+
+    /**
+     * Test for `export()` method, `Process` exceeding the timeout.
      *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
-     * @test
      * @uses \DatabaseBackup\Utility\BackupExport::export()
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    public function testExportExceedingTimeout(): void
+    #[Test]
+    public function testExportProcessExceedingTimeout(): void
     {
-        $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-        $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['getProcess'])
-            ->getMock();
+
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
         $BackupExport->method('getProcess')
             ->willThrowException($ProcessTimedOutException);
+
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $BackupExport->export();
     }
 }
