@@ -68,39 +68,6 @@ class BackupExportTest extends TestCase
         $this->assertSame($Compression, $this->BackupExport->compression);
     }
 
-    #[Test]
-    #[TestWith([Compression::None, null])]
-    #[TestWith([Compression::Gzip, 'gzip'])]
-    #[TestWith([Compression::Bzip2, 'bzip2'])]
-    public function testCompressionAsStringOrNull(Compression $ExpectedCompression, ?string $compressionAsStringOrNull): void
-    {
-        $this->BackupExport->compression($compressionAsStringOrNull);
-        $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
-    }
-
-    #[Test]
-    #[TestWith([null])]
-    #[TestWith(['gzip'])]
-    #[TestWith(['bzip2'])]
-    #[WithoutErrorHandler]
-    public function testCompressionAsStringOrNullIsDeprecated(?string $compressionAsStringOrNull): void
-    {
-        $this->deprecated(function () use ($compressionAsStringOrNull): void {
-            $this->BackupExport->compression($compressionAsStringOrNull);
-        });
-    }
-
-    /**
-     * @uses \DatabaseBackup\Utility\BackupExport::compression()
-     */
-    #[Test]
-    public function testCompressionWithInvalidCompressionAsString(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found starting from `invalidType`');
-        $this->BackupExport->compression('invalidType');
-    }
-
     /**
      * Test for `filename()` method. This also tests for patterns and for the `$compression` property.
      *
@@ -114,7 +81,7 @@ class BackupExportTest extends TestCase
         $this->assertSame(Compression::Bzip2, $this->BackupExport->compression);
 
         //Compression is ignored, because there's a filename
-        $this->BackupExport->compression('gzip')->filename('backup.sql.bz2');
+        $this->BackupExport->compression(Compression::Gzip)->filename('backup.sql.bz2');
         $this->assertSame('backup.sql.bz2', basename($this->BackupExport->filename));
         $this->assertSame(Compression::Bzip2, $this->BackupExport->compression);
 
@@ -204,7 +171,7 @@ class BackupExportTest extends TestCase
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->getDriver()->getEventManager());
 
         //Exports with `compression()`
-        $file = $this->BackupExport->compression('bzip2')->export() ?: '';
+        $file = $this->BackupExport->compression(Compression::Bzip2)->export() ?: '';
         $this->assertFileExists($file);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql\.bz2$/', basename($file));
 

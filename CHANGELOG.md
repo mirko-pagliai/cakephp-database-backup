@@ -1,4 +1,9 @@
 # 2.x branch
+## 2.14 branch
+### 2.14.0
+* passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
+  been removed (backwards compatibility removed).
+
 ## 2.13 branch
 ### 2.13.5
 * added new `DatabaseBackup\Compression` enum, with some methods useful for the complete management of compressions;
