@@ -16,10 +16,11 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use Cake\TestSuite\EmailTrait;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\Sqlite;
+use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use InvalidArgumentException;
@@ -262,9 +263,15 @@ class BackupExportTest extends TestCase
      */
     public function testExportStoppedByBeforeExport(): void
     {
-        $Driver = $this->createPartialMock(Sqlite::class, ['beforeExport']);
-        $Driver->method('beforeExport')
+        $Driver = $this->getMockBuilder(AbstractDriver::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
+            ->onlyMethods(['beforeExport'])
+            ->getMock();
+
+        $Driver->expects($this->once())
+            ->method('beforeExport')
             ->willReturn(false);
+
         $Driver->getEventManager()->on($Driver);
 
         $BackupExport = $this->getMockBuilder(BackupExport::class)
