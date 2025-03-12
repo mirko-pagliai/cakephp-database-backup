@@ -82,6 +82,8 @@ class ImportCommandTest extends TestCase
     }
 
     /**
+     * Test for `execute()` method, with `timeout` option.
+     *
      * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     #[Test]
@@ -100,10 +102,10 @@ class ImportCommandTest extends TestCase
     #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
-        $BackupImport = $this->createConfiguredMock(BackupImport::class, ['import' => false]);
         $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
-        $ImportCommand->method('getBackupImport')
-            ->willReturn($BackupImport);
+        $ImportCommand
+            ->method('getBackupImport')
+            ->willReturn($this->createConfiguredMock(BackupImport::class, ['import' => false]));
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
