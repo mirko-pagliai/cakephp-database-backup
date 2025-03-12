@@ -19,14 +19,14 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * AbstractDriverTest.
- *
- * @uses \DatabaseBackup\Driver\AbstractDriver
  */
+#[CoversClass(AbstractDriver::class)]
 class AbstractDriverTest extends TestCase
 {
     /**

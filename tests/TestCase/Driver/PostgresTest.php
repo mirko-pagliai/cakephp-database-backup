@@ -15,13 +15,14 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Driver;
 
+use DatabaseBackup\Driver\Postgres;
 use DatabaseBackup\TestSuite\DriverTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * PostgresTest class.
- *
- * @uses \DatabaseBackup\Driver\Postgres
  */
+#[CoversClass(Postgres::class)]
 class PostgresTest extends DriverTestCase
 {
     /**
