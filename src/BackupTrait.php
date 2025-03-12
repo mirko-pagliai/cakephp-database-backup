@@ -18,49 +18,12 @@ namespace DatabaseBackup;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use Symfony\Component\Filesystem\Path;
 
 /**
  * A trait that provides some methods used by all other classes.
  */
 trait BackupTrait
 {
-    /**
-     * Returns the absolute path for a backup file.
-     *
-     * @param string $path Relative or absolute path
-     * @return string
-     * @deprecated 2.13.5 the `BackupTrait::getAbsolutePath()` method is deprecated. Will be removed in a future release
-     */
-    public static function getAbsolutePath(string $path): string
-    {
-        deprecationWarning(
-            '2.13.5',
-            'The `BackupTrait::getAbsolutePath()` method is deprecated. Will be removed in a future release'
-        );
-
-        return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
-    }
-
-    /**
-     * Returns the compression type for a backup file.
-     *
-     * @param string $path File path
-     * @return string|null Compression type or `null`
-     * @deprecated 2.13.5 the `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release
-     */
-    public static function getCompression(string $path): ?string
-    {
-        deprecationWarning(
-            '2.13.5',
-            'The `BackupTrait::getCompression()` method is deprecated. Will be removed in a future release'
-        );
-
-        $Compression = Compression::tryFromFilename($path);
-
-        return $Compression && $Compression !== Compression::None ? lcfirst($Compression->name) : null;
-    }
-
     /**
      * Gets the `Connection` instance.
      *
@@ -85,46 +48,5 @@ trait BackupTrait
         $className = get_class($this->getConnection()->getDriver());
 
         return substr(strrchr($className, '\\') ?: '', 1);
-    }
-
-    /**
-     * Takes and gets the extension of a backup file.
-     *
-     * @param string $path File path
-     * @return string|null Extension or `null` for invalid extensions
-     * @deprecated 2.13.5 the `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release
-     */
-    public static function getExtension(string $path): ?string
-    {
-        deprecationWarning(
-            '2.13.5',
-            'The `BackupTrait::getExtension()` method is deprecated. Will be removed in a future release'
-        );
-
-        return Compression::tryFromFilename($path)?->value;
-    }
-
-    /**
-     * Returns all valid compressions available.
-     *
-     * @return array<string, string> An array with extensions as keys and compressions as values
-     * @since 2.4.0
-     * @deprecated 2.13.5 the `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release
-     */
-    public static function getValidCompressions(): array
-    {
-        deprecationWarning(
-            '2.13.5',
-            'The `BackupTrait::getValidCompressions()` method is deprecated. Will be removed in a future release'
-        );
-
-        return array_map(callback: 'lcfirst', array: array_column(
-            array: array_filter(
-                array: Compression::cases(),
-                callback: fn (Compression $Compression): bool => $Compression != Compression::None,
-            ),
-            column_key: 'name',
-            index_key: 'value'
-        ));
     }
 }
