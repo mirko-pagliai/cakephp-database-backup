@@ -136,25 +136,6 @@ class ExportCommand extends Command
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativeFilename($filename)));
 
-            //Sends via email and/or rotates. It keeps options `verbose` and `quiet`.
-            $extraOptions = [];
-            foreach (['verbose', 'quiet'] as $option) {
-                if ($args->getOption($option)) {
-                    $extraOptions[] = '--' . $option;
-                }
-            }
-            if ($args->getOption('send')) {
-                deprecationWarning(
-                    '2.13.4',
-                    'The `send` option for the `ExportCommand` is deprecated. Will be removed in a future release'
-                );
-
-                $this->executeCommand(
-                    SendCommand::class,
-                    array_merge([$filename, (string)$args->getOption('send')], $extraOptions),
-                    $io
-                );
-            }
             if ($args->getOption('rotate')) {
                 $rotatedFiles = BackupManager::rotate((int)$args->getOption('rotate'));
 
