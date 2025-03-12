@@ -3,6 +3,7 @@
 ### 2.14.0
 * passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
   been removed (backwards compatibility removed);
+* the `BackupManager::index` methods no longer returns, in the array for each file, the `filename` key;
 * `DeleteAllCommand`, `RotateCommand` and `SendCommand` classes had been deprecated and have been removed;
 * `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by 
   `BackupTrait` had been deprecated and has been removed;

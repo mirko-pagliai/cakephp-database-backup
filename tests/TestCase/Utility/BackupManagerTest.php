@@ -125,8 +125,7 @@ class BackupManagerTest extends TestCase
         $this->assertCount(3, $files);
 
         foreach ($files as $k => $file) {
-            $this->assertSame(['filename', 'basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
-            $this->assertSame(basename($createdFiles[$k]), $file['filename']);
+            $this->assertSame(['basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
             $this->assertSame(basename($createdFiles[$k]), $file['basename']);
             $this->assertSame($createdFiles[$k], $file['path']);
             $this->assertInstanceOf(Compression::class, $file['compression']);
