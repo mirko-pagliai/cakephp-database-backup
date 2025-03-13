@@ -21,7 +21,6 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Executor\AbstractExecutor;
 use InvalidArgumentException;
 use Symfony\Component\Filesystem\Path;
@@ -37,8 +36,6 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractBackupUtility
 {
-    use BackupTrait;
-
     /**
      * @var string
      */
@@ -156,7 +153,7 @@ abstract class AbstractBackupUtility
         if (empty($this->Executor)) {
             $Connection = $this->getConnection();
 
-            //For example `$driver Name` is `Mysql`
+            //For example `$driverName` is `Mysql`
             $driverName = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
 
             /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $executorClassName */
