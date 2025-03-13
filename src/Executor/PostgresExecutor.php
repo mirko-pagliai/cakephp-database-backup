@@ -14,11 +14,11 @@ declare(strict_types=1);
  * @since       2.1.0
  */
 
-namespace DatabaseBackup\Driver;
+namespace DatabaseBackup\Executor;
 
 /**
- * Postgres driver to export/import database backups.
+ * Postgres executor to export/import database backups.
  */
-class Postgres extends AbstractDriver
+class PostgresExecutor extends AbstractExecutor
 {
 }

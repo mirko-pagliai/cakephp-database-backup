@@ -21,7 +21,7 @@ use Cake\Core\App;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractDriver;
+use DatabaseBackup\Executor\AbstractExecutor;
 
 /**
  * DriverTestCase class.
@@ -33,9 +33,9 @@ abstract class DriverTestCase extends TestCase
     use BackupTrait;
 
     /**
-     * @var \DatabaseBackup\Driver\AbstractDriver
+     * @var \DatabaseBackup\Executor\AbstractExecutor
      */
-    protected AbstractDriver $Driver;
+    protected AbstractExecutor $Executor;
 
     /**
      * @inheritDoc
@@ -44,18 +44,23 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
-        /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $DriverClass */
-        $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
-        $this->Driver = new $DriverClass(ConnectionManager::get('test'));
+        $Connection = ConnectionManager::get('test');
+
+        //For example `$driverName` is `Mysql`
+        $driverName = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
+        /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $executorClassName */
+        $executorClassName = App::classname('DatabaseBackup.' . $driverName . 'Executor', 'Executor');
+
+        $this->Executor = new $executorClassName($Connection);
     }
 
     /**
      * @return void
-     * @uses \DatabaseBackup\Driver\AbstractDriver::getExportExecutable()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getExportExecutable()
      */
     public function testGetExportExecutable(): void
     {
-        $this->assertNotEmpty($this->Driver->getExportExecutable('backup.sql'));
+        $this->assertNotEmpty($this->Executor->getExportExecutable('backup.sql'));
 
         $cases = array_filter(
             array: Compression::cases(),
@@ -65,10 +70,10 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach ($cases as $Compression) {
             $filename = 'backup.' . $Compression->value;
-            $result = $this->Driver->getExportExecutable($filename);
+            $result = $this->Executor->getExportExecutable($filename);
             $expected = sprintf(
                 ' | %s > %s',
-                escapeshellarg($this->Driver->getBinary($Compression)),
+                escapeshellarg($this->Executor->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringEndsWith($expected, $result);
@@ -77,11 +82,11 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * @return void
-     * @uses \DatabaseBackup\Driver\AbstractDriver::getImportExecutable()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getImportExecutable()
      */
     public function testGetImportExecutable(): void
     {
-        $this->assertNotEmpty($this->Driver->getImportExecutable('backup.sql'));
+        $this->assertNotEmpty($this->Executor->getImportExecutable('backup.sql'));
 
         $cases = array_filter(
             array: Compression::cases(),
@@ -91,10 +96,10 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach ($cases as $Compression) {
             $filename = 'backup.' . $Compression->value;
-            $result = $this->Driver->getImportExecutable($filename);
+            $result = $this->Executor->getImportExecutable($filename);
             $expected = sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->Driver->getBinary($Compression)),
+                escapeshellarg($this->Executor->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringStartsWith($expected, $result);

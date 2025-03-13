@@ -78,11 +78,13 @@ class BackupExport extends AbstractBackupUtility
      */
     public function filename(string $filename): self
     {
+        $Executor = $this->getExecutor();
+
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
-            pathinfo($this->getDriver()->getConfig('database'), PATHINFO_FILENAME),
+            pathinfo($Executor->getConfig('database'), PATHINFO_FILENAME),
             date('YmdHis'),
-            str_replace(['127.0.0.1', '::1'], 'localhost', $this->getDriver()->getConfig('host') ?? 'localhost'),
+            str_replace(['127.0.0.1', '::1'], 'localhost', $Executor->getConfig('host') ?? 'localhost'),
             time(),
         ], $filename);
 
@@ -123,14 +125,14 @@ class BackupExport extends AbstractBackupUtility
     /**
      * Exports the database.
      *
-     * When exporting, this method will trigger these events (implemented by the driver instance):
+     * When exporting, this method will trigger these events (implemented by the `Executor` class):
      *  - `Backup.beforeExport`: will be triggered before export;
      *  - `Backup.afterExport`: will be triggered after export.
      *
      * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
      * @throws \RuntimeException When export fails
-     * @see \DatabaseBackup\Driver\AbstractDriver::afterExport()
-     * @see \DatabaseBackup\Driver\AbstractDriver::beforeExport()
+     * @see \DatabaseBackup\Executor\AbstractExecutor::afterExport()
+     * @see \DatabaseBackup\Executor\AbstractExecutor::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      */
     public function export(): string|false
@@ -143,14 +145,16 @@ class BackupExport extends AbstractBackupUtility
         $filename = $this->getFilename();
         unset($this->filename);
 
-        //Dispatches the `Backup.beforeExport` event implemented by the driver
-        $BeforeExport = $this->getDriver()->dispatchEvent('Backup.beforeExport');
+        $Executor = $this->getExecutor();
+
+        //Dispatches the `Backup.beforeExport` event implemented by the `Executor` class
+        $BeforeExport = $Executor->dispatchEvent('Backup.beforeExport');
         if ($BeforeExport->isStopped()) {
             return false;
         }
 
         //Exports
-        $Process = $this->getProcess($this->getDriver()->getExportExecutable($filename));
+        $Process = $this->getProcess($Executor->getExportExecutable($filename));
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
                 __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput()))
@@ -159,8 +163,8 @@ class BackupExport extends AbstractBackupUtility
 
         $this->getFilesystem()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
 
-        //Dispatches the `Backup.afterExport` event implemented by the driver
-        $this->getDriver()->dispatchEvent('Backup.afterExport');
+        //Dispatches the `Backup.afterExport` event implemented by the `Executor` class
+        $Executor->dispatchEvent('Backup.afterExport');
 
         if ($this->getRotate()) {
             BackupManager::rotate($this->getRotate());

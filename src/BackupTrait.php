@@ -42,9 +42,15 @@ trait BackupTrait
      *
      * @return string Driver name
      * @since 2.9.2
+     * @deprecated 2.14.0 the `BackupTrait::getDriverName()` method is deprecated. Will be removed in a future release
      */
     public function getDriverName(): string
     {
+        deprecationWarning(
+            '2.14.0',
+            'The `BackupTrait::getDriverName()` method is deprecated. Will be removed in a future release'
+        );
+
         $className = get_class($this->getConnection()->getDriver());
 
         return substr(strrchr($className, '\\') ?: '', 1);

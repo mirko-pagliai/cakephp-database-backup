@@ -14,7 +14,7 @@ declare(strict_types=1);
  * @since       2.0.0
  */
 
-namespace DatabaseBackup\Driver;
+namespace DatabaseBackup\Executor;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
@@ -26,16 +26,16 @@ use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 
 /**
- * Represents a driver containing all methods to export/import database backups according to the connection.
+ * Represents an `Executor` class containing all methods to export/import database backups, according to the connection.
  *
  * @method \Cake\Event\EventManager getEventManager()
  */
-abstract class AbstractDriver implements EventListenerInterface
+abstract class AbstractExecutor implements EventListenerInterface
 {
     use BackupTrait;
 
     /**
-     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Driver\AbstractDriver>
+     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Executor\AbstractExecutor>
      */
     use EventDispatcherTrait;
 
@@ -87,7 +87,10 @@ abstract class AbstractDriver implements EventListenerInterface
      */
     private function getExecutable(OperationType $OperationType): string
     {
-        $driverName = lcfirst(substr(strrchr($this::class, '\\') ?: '', 1));
+        /**
+         * `DatabaseBackup\Executor\MysqlExecutor` has to become `mysql`
+         */
+        $driverName = lcfirst(preg_replace('/^DatabaseBackup\\\\Executor\\\\(\w+)Executor$/', '$1', $this::class) ?: '');
 
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),

@@ -13,17 +13,17 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Executor;
 
-use DatabaseBackup\Driver\Sqlite;
+use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * SqliteTest class.
+ * PostgresExecutorTest class.
  */
-#[CoversClass(Sqlite::class)]
-class SqliteTest extends DriverTestCase
+#[CoversClass(PostgresExecutor::class)]
+class PostgresExecutorTest extends DriverTestCase
 {
     /**
      * @inheritDoc
@@ -32,8 +32,8 @@ class SqliteTest extends DriverTestCase
     {
         parent::setUp();
 
-        if ($this->getConnection()->config()['scheme'] !== 'sqlite') {
-            $this->markTestSkipped('Skipping tests for sqlite, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
+        if ($this->getConnection()->config()['scheme'] !== 'postgres') {
+            $this->markTestSkipped('Skipping tests for postgres, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
         }
     }
 }

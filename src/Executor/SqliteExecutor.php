@@ -14,12 +14,12 @@ declare(strict_types=1);
  * @since       2.0.0
  */
 
-namespace DatabaseBackup\Driver;
+namespace DatabaseBackup\Executor;
 
 /**
- * Sqlite driver to export/import database backups.
+ * Sqlite executor to export/import database backups.
  */
-class Sqlite extends AbstractDriver
+class SqliteExecutor extends AbstractExecutor
 {
     /**
      * @inheritDoc
