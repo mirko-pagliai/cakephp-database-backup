@@ -21,6 +21,8 @@ jobs:
           - php-version: '8.1'
             db-type: 'pgsql'
         include:
+          - php-version: '8.2'
+            db-type: 'mysql'
           - php-version: '8.1'
             db-type: 'mysql'
             prefer-lowest: 'prefer-lowest'
