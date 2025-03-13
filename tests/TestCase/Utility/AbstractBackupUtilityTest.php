@@ -15,13 +15,22 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use App\Database\Driver\FakeDriver;
 use BadMethodCallException;
 use Cake\Core\Configure;
-use DatabaseBackup\Driver\AbstractDriver;
+use Cake\Database\Driver\Mysql;
+use Cake\Database\Driver\Postgres;
+use Cake\Database\Driver\Sqlite;
+use Cake\Datasource\ConnectionInterface;
+use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\Executor\PostgresExecutor;
+use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;
 use Generator;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -29,9 +38,8 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * AbstractBackupUtilityTest.
- *
- * @uses \DatabaseBackup\Utility\AbstractBackupUtility
  */
+#[CoversClass(AbstractBackupUtility::class)]
 class AbstractBackupUtilityTest extends TestCase
 {
     /**
@@ -110,20 +118,82 @@ class AbstractBackupUtilityTest extends TestCase
     }
 
     /**
-     * @test
+     * @param class-string $expectedExecutorClassname
+     * @param class-string $driverClassname
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::getExecutor()
+     */
+    #[Test]
+    #[TestWith([MysqlExecutor::class, Mysql::class])]
+    #[TestWith([PostgresExecutor::class, Postgres::class])]
+    #[TestWith([SqliteExecutor::class, Sqlite::class])]
+    public function testGetExecutor(string $expectedExecutorClassname, string $driverClassname): void
+    {
+        $Connection = $this->createStub(ConnectionInterface::class);
+        $Connection
+            ->method('getDriver')
+            ->willReturn(new $driverClassname());
+
+        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getConnection']);
+        $Utility
+            ->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($Connection);
+
+        $result = $Utility->getExecutor();
+        $this->assertInstanceOf($expectedExecutorClassname, $result);
+    }
+
+    /**
+     * Tests for `getExecutor()` when the executor class for the driver does not exist.
+     *
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::getExecutor()
+     */
+    #[Test]
+    public function testGetExecutorNoExistingExecutor(): void
+    {
+        $Connection = $this->createStub(ConnectionInterface::class);
+        $Connection
+            ->method('getDriver')
+            ->willReturn(new FakeDriver());
+
+        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getConnection']);
+        $Utility
+            ->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($Connection);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
+        $Utility->getExecutor();
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\AbstractBackupUtility::getDriver()
      */
+    #[Test]
     public function testGetDriver(): void
     {
-        $Utility = $this->getMockBuilder(AbstractBackupUtility::class)
-            ->getMock();
-        $this->assertInstanceOf(AbstractDriver::class, $Utility->getDriver());
+        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getExecutor']);
+        $Utility->expects($this->once())
+            ->method('getExecutor');
 
-        $this->expectExceptionMessage('The `noExistingDriver` driver does not exist');
-        $Utility = $this->getMockBuilder(AbstractBackupUtility::class)
-            ->onlyMethods(['getDriverName', 'filename'])
-            ->getMock();
-        $Utility->method('getDriverName')->willReturn('noExistingDriver');
         $Utility->getDriver();
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Utility\AbstractBackupUtility::getDriver()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetDriverIsDeprecated(): void
+    {
+        $this->deprecated(function (): void {
+            $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getExecutor'])
+                ->getDriver();
+        });
     }
 }

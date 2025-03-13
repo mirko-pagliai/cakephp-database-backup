@@ -14,14 +14,14 @@ declare(strict_types=1);
  * @since       2.0.0
  */
 
-namespace DatabaseBackup\Driver;
+namespace DatabaseBackup\Executor;
 
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Mysql driver to export/import database backups.
+ * Mysql executor to export/import database backups.
  */
-class Mysql extends AbstractDriver
+class MysqlExecutor extends AbstractExecutor
 {
     /**
      * @since 2.1.0

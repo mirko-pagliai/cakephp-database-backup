@@ -21,6 +21,8 @@ use Cake\Datasource\ConnectionManager;
 
 /**
  * A trait that provides some methods used by all other classes.
+ *
+ * @deprecated 2.14.0 the `BackupTrait` is deprecated
  */
 trait BackupTrait
 {
@@ -31,9 +33,15 @@ trait BackupTrait
      *
      * @param string $name Connection name
      * @return \Cake\Datasource\ConnectionInterface
+     * @deprecated 2.14.0 the `BackupTrait::getConnection()` method is deprecated. Will be removed in a future release
      */
     public static function getConnection(string $name = ''): ConnectionInterface
     {
+        deprecationWarning(
+            '2.14.0',
+            'The `BackupTrait::getConnection()` method is deprecated. Will be removed in a future release'
+        );
+
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
 
@@ -42,9 +50,15 @@ trait BackupTrait
      *
      * @return string Driver name
      * @since 2.9.2
+     * @deprecated 2.14.0 the `BackupTrait::getDriverName()` method is deprecated. Will be removed in a future release
      */
     public function getDriverName(): string
     {
+        deprecationWarning(
+            '2.14.0',
+            'The `BackupTrait::getDriverName()` method is deprecated. Will be removed in a future release'
+        );
+
         $className = get_class($this->getConnection()->getDriver());
 
         return substr(strrchr($className, '\\') ?: '', 1);

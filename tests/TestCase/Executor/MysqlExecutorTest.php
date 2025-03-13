@@ -13,30 +13,30 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\Driver\Mysql;
+use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * MysqlTest class.
+ * MysqlExecutorTest class.
  */
-#[CoversClass(Mysql::class)]
-class MysqlTest extends DriverTestCase
+#[CoversClass(MysqlExecutor::class)]
+class MysqlExecutorTest extends DriverTestCase
 {
     /**
-     * Internal method to get a mock of `Mysql`.
+     * Internal method to get a mock of `MysqlExecutor`.
      *
      * @param array<int, non-empty-string> $methods Methods you want to mock
-     * @return \DatabaseBackup\Driver\Mysql&\PHPUnit\Framework\MockObject\MockObject
+     * @return \DatabaseBackup\Executor\MysqlExecutor&\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMysqlMock(array $methods = []): Mysql
+    protected function getMysqlMock(array $methods = []): MysqlExecutor
     {
-        return $this->getMockBuilder(Mysql::class)
+        return $this->getMockBuilder(MysqlExecutor::class)
             ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods($methods)
             ->getMock();
@@ -47,15 +47,15 @@ class MysqlTest extends DriverTestCase
      */
     protected function setUp(): void
     {
-        if ($this->getConnection()->config()['scheme'] !== 'mysql') {
-            $this->markTestSkipped('Skipping tests for mysql, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
-        }
-
         parent::setUp();
+
+        if (!$this->Executor instanceof MysqlExecutor) {
+            $this->markTestSkipped('Skipping tests for `MysqlExecutor`, current driver is `' . $this->Executor::class . '`');
+        }
     }
 
     /**
-     * @uses \DatabaseBackup\Driver\Mysql::afterExport()
+     * @uses \DatabaseBackup\Executor\MysqlExecutor::afterExport()
      */
     #[Test]
     public function testAfterExport(): void
@@ -68,7 +68,7 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Driver\Mysql::afterImport()
+     * @uses \DatabaseBackup\Executor\MysqlExecutor::afterImport()
      */
     #[Test]
     public function testAfterImport(): void
@@ -81,7 +81,7 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Driver\Mysql::beforeExport()
+     * @uses \DatabaseBackup\Executor\MysqlExecutor::beforeExport()
      */
     #[Test]
     public function testBeforeExport(): void
@@ -98,7 +98,7 @@ class MysqlTest extends DriverTestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Driver\Mysql::beforeImport()
+     * @uses \DatabaseBackup\Executor\MysqlExecutor::beforeImport()
      */
     #[Test]
     public function testBeforeImport(): void
@@ -116,7 +116,7 @@ class MysqlTest extends DriverTestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Driver\Mysql::deleteAuthFile()
+     * @uses \DatabaseBackup\Executor\MysqlExecutor::deleteAuthFile()
      */
     #[Test]
     public function testDeleteAuthFile(): void

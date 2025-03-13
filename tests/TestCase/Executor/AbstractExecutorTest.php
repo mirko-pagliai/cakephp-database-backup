@@ -13,10 +13,10 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Executor;
 
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractDriver;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,14 +24,14 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * AbstractDriverTest.
+ * AbstractExecutorTest.
  */
-#[CoversClass(AbstractDriver::class)]
-class AbstractDriverTest extends TestCase
+#[CoversClass(AbstractExecutor::class)]
+class AbstractExecutorTest extends TestCase
 {
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Driver\AbstractDriver::getBinary()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
      */
     #[Test]
     #[TestWith(['mysql'])]
@@ -39,14 +39,14 @@ class AbstractDriverTest extends TestCase
     #[TestWith([Compression::Gzip])]
     public function testGetBinary(string|Compression $binaryName): void
     {
-        $Driver = $this->createPartialMock(AbstractDriver::class, []);
+        $Driver = $this->createPartialMock(AbstractExecutor::class, []);
 
         $this->assertNotEmpty($Driver->getBinary($binaryName));
     }
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Driver\AbstractDriver::getBinary()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
      */
     #[Test]
     #[TestWith(['noExistingBinary', 'noExistingBinary'])]
@@ -55,7 +55,7 @@ class AbstractDriverTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
-        $this->createPartialMock(AbstractDriver::class, [])
+        $this->createPartialMock(AbstractExecutor::class, [])
             ->getBinary($binaryName);
     }
 }
