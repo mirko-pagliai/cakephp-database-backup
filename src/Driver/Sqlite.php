@@ -27,7 +27,7 @@ class Sqlite extends AbstractDriver
     public function beforeImport(): bool
     {
         /** @var \Cake\Database\Connection $Connection */
-        $Connection = $this->getConnection();
+        $Connection = $this->Connection;
         /** @var \Cake\Database\Schema\Collection $Schema */
         $Schema = $Connection->getSchemaCollection();
 

@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
@@ -223,14 +224,23 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportStoppedByBeforeExport(): void
     {
-        $Driver = $this->createPartialMock(AbstractDriver::class, ['beforeExport']);
-        $Driver->method('beforeExport')
+        $Driver = $this->getMockBuilder(AbstractDriver::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
+            ->onlyMethods(['beforeExport'])
+            ->getMock();
+
+        $Driver->expects($this->once())
+            ->method('beforeExport')
             ->willReturn(false);
+
         $Driver->getEventManager()->on($Driver);
 
-        $BackupExport = $this->createConfiguredMock(BackupExport::class, ['getDriver' => $Driver]);
-        $result = $BackupExport->export();
-        $this->assertFalse($result);
+        $BackupExport = $this->getMockBuilder(BackupExport::class)
+            ->onlyMethods(['getDriver'])
+            ->getMock();
+        $BackupExport->method('getDriver')
+            ->willReturn($Driver);
+        $this->assertFalse($BackupExport->export());
     }
 
     /**

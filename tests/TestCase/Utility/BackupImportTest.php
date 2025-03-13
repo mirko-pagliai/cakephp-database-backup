@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use BadMethodCallException;
+use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Driver\AbstractDriver;
@@ -67,8 +68,6 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method, with a no readable file.
-     *
      * @uses \DatabaseBackup\Utility\BackupImport::filename()
      */
     #[Test]
@@ -140,9 +139,14 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeExport(): void
     {
-        $Driver = $this->createPartialMock(AbstractDriver::class, ['beforeImport']);
+        $Driver = $this->getMockBuilder(AbstractDriver::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
+            ->onlyMethods(['beforeImport'])
+            ->getMock();
+
         $Driver->method('beforeImport')
             ->willReturn(false);
+
         $Driver->getEventManager()->on($Driver);
 
         $BackupImport = $this->createConfiguredMock(BackupImport::class, ['getDriver' => $Driver]);
