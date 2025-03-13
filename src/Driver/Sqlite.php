@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Driver;
 
+use DatabaseBackup\Executor\AbstractExecutor;
+
 /**
  * Sqlite driver to export/import database backups.
  */

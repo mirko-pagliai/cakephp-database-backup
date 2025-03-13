@@ -19,7 +19,7 @@ use BadMethodCallException;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractExecutor;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversClass;

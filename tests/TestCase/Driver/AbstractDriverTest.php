@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractExecutor;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -31,7 +31,7 @@ class AbstractDriverTest extends TestCase
 {
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Driver\AbstractExecutor::getBinary()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
      */
     #[Test]
     #[TestWith(['mysql'])]
@@ -46,7 +46,7 @@ class AbstractDriverTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Driver\AbstractExecutor::getBinary()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
      */
     #[Test]
     #[TestWith(['noExistingBinary', 'noExistingBinary'])]

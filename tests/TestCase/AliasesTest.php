@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase;
 
-use DatabaseBackup\Driver\AbstractExecutor;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 

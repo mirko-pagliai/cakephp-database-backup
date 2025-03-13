@@ -17,7 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use BadMethodCallException;
 use Cake\Core\Configure;
-use DatabaseBackup\Driver\AbstractExecutor;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;

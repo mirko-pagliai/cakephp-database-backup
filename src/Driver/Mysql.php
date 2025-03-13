@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Driver;
 
+use DatabaseBackup\Executor\AbstractExecutor;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

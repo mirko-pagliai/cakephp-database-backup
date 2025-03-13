@@ -14,7 +14,7 @@ declare(strict_types=1);
  * @since       2.0.0
  */
 
-namespace DatabaseBackup\Driver;
+namespace DatabaseBackup\Executor;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
@@ -35,7 +35,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     use BackupTrait;
 
     /**
-     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Driver\AbstractExecutor>
+     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Executor\AbstractExecutor>
      */
     use EventDispatcherTrait;
 

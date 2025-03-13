@@ -21,7 +21,7 @@ use Cake\Core\App;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractExecutor;
+use DatabaseBackup\Executor\AbstractExecutor;
 
 /**
  * DriverTestCase class.
@@ -33,7 +33,7 @@ abstract class DriverTestCase extends TestCase
     use BackupTrait;
 
     /**
-     * @var \DatabaseBackup\Driver\AbstractExecutor
+     * @var \DatabaseBackup\Executor\AbstractExecutor
      */
     protected AbstractExecutor $Driver;
 
@@ -44,14 +44,14 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
-        /** @var class-string<\DatabaseBackup\Driver\AbstractExecutor> $DriverClass */
+        /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $DriverClass */
         $DriverClass = App::className('DatabaseBackup.' . $this->getDriverName(), 'Driver');
         $this->Driver = new $DriverClass(ConnectionManager::get('test'));
     }
 
     /**
      * @return void
-     * @uses \DatabaseBackup\Driver\AbstractExecutor::getExportExecutable()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getExportExecutable()
      */
     public function testGetExportExecutable(): void
     {
@@ -77,7 +77,7 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * @return void
-     * @uses \DatabaseBackup\Driver\AbstractExecutor::getImportExecutable()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getImportExecutable()
      */
     public function testGetImportExecutable(): void
     {

@@ -129,9 +129,8 @@ class BackupExport extends AbstractBackupUtility
      *
      * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
      * @throws \RuntimeException When export fails
-     *
-     * @see \DatabaseBackup\Driver\AbstractExecutor::afterExport()
-     * @see \DatabaseBackup\Driver\AbstractExecutor::beforeExport()
+     * @see \DatabaseBackup\Executor\AbstractExecutor::afterExport()
+     * @see \DatabaseBackup\Executor\AbstractExecutor::beforeExport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      */
     public function export(): string|false

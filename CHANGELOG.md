@@ -5,6 +5,8 @@
   property via the magic methods `getX()` (be careful not to confuse the `getCompression()` method, which now returns
   the `$compression` property of `BackupExport`, with the old method provided by `BackupTrait`, which had been
   deprecated and has now been removed);
+* class `DatabaseBackup\Driver\AbstractDriver` has become `DatabaseBackup\Executor\AbstractExecutor`. Aliases have been
+  added to old classes for backwards compatibility, but will be removed in a future release;
 * passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
   been removed (backwards compatibility removed);
 * the `BackupManager::index` methods no longer returns, in the array for each file, the `filename` key;
@@ -389,7 +391,7 @@
 ### 2.1.1
 * `afterExport()`, `afterImport()`, `beforeExport()` and `beforeImport` methods
     are now real events;
-* now you can choose if you want to redirects stderr to `/dev/null`. This
+* now you can choose if you want to redirect stderr to `/dev/null`. This
     suppresses the output of executed commands.
 
 ### 2.1.0
@@ -450,7 +452,7 @@
 
 ### 1.0.1
 * added `BackupManager::deleteAll()` and `BackupShell::deleteAll()` methods;
-* improved tests. Also errors in the shell are checked.
+* improved tests. Also, errors in the shell are checked.
 
 ### 1.0.0
 * first release.
