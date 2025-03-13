@@ -36,8 +36,7 @@
   removed. So, the `BackupManager::send()` method (and, consequently, the internal `BackupManager::getEmailInstance()`
   method), the `BackupExport::send()` method and the `send` option for the `ExportCommand` have been removed;
 * the `delete()` and `deleteAll()` methods provided by `BackupManager` had been deprecated and have been removed;
-* the `rtr()` global function had been deprecated and has been removed;
-* requires at least `symfony/finder` `7.1` and `symfony/process` `7.1.7`.
+* the `rtr()` global function had been deprecated and has been removed.
 
 ## 2.13 branch
 ### 2.13.6
