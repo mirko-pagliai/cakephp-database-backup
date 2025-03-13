@@ -47,11 +47,11 @@ class MysqlExecutorTest extends DriverTestCase
      */
     protected function setUp(): void
     {
-        if ($this->getConnection()->config()['scheme'] !== 'mysql') {
-            $this->markTestSkipped('Skipping tests for mysql, current driver is `' . $this->getConnection()->config()['scheme'] . '`');
-        }
-
         parent::setUp();
+
+        if (!$this->Executor instanceof MysqlExecutor) {
+            $this->markTestSkipped('Skipping tests for `MysqlExecutor`, current driver is `' . $this->Executor::class . '`');
+        }
     }
 
     /**
