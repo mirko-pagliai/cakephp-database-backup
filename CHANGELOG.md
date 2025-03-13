@@ -27,6 +27,7 @@
   `getExecutor()` method;
 * the `AbstractBackupUtility::__get()` method is deprecated and will be removed in a future release;
 * `DeleteAllCommand`, `RotateCommand` and `SendCommand` classes had been deprecated and have been removed;
+* the `BackupTrait::getDriverName()` method is deprecated and will be removed in a future release;
 * `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by 
   `BackupTrait` had been deprecated and has been removed;
 * all classes, methods and code related to sending backups via email had been deprecated, and now they have been

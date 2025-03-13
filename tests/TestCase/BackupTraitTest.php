@@ -23,6 +23,7 @@ use DatabaseBackup\BackupTrait;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupTraitTest class.
@@ -64,5 +65,21 @@ class BackupTraitTest extends TestCase
 
         $this->expectException(MissingDatasourceConfigException::class);
         $Trait->getConnection('noExisting');
+    }
+
+    /**
+     * @uses \DatabaseBackup\BackupTrait::getDriverName()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetDriverNameIsDeprecated(): void
+    {
+        $Trait = new class {
+            use BackupTrait;
+        };
+
+        $this->deprecated(function () use ($Trait): void {
+            $Trait->getDriverName();
+        });
     }
 }
