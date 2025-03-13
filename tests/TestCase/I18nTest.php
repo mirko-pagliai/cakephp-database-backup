@@ -17,17 +17,14 @@ namespace DatabaseBackup\Test\TestCase;
 
 use Cake\I18n\I18n;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * I18nTest class.
  */
 class I18nTest extends TestCase
 {
-    /**
-     * Tests I18n translations.
-     *
-     * @test
-     */
+    #[Test]
     public function testI18nConstant(): void
     {
         $translator = I18n::getTranslator('database_backup', 'it');
