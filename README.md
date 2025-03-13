@@ -19,7 +19,7 @@ even a coffee is enough! Thank you.
 
 *DatabaseBackup* requires:
 
-*   `mariadb` and `mariadb-dump` for *MySql* databases (previously `mysql` and `mysqldump`);
+*   `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (previously `mysql` and `mysqldump`);
 *   `pg_dump` and `pg_restore` for *Postgres* databases;
 *   `sqlite3` for *Sqlite* databases.
 
@@ -85,6 +85,7 @@ See our wiki:
 * [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility)
 * [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility)
 * [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
+* [Create backup copies](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Create-backup-copies)
 * [Send backups via email](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Send-backups-via-email)
 
 Before opening an issue, check this list of [common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues).
