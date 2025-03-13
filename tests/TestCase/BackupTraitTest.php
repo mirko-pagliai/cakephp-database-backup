@@ -68,6 +68,22 @@ class BackupTraitTest extends TestCase
     }
 
     /**
+     * @uses \DatabaseBackup\BackupTrait::getConnection()
+     */
+    #[Test]
+    #[WithoutErrorHandler]
+    public function testGetConnectionIsDeprecated(): void
+    {
+        $Trait = new class {
+            use BackupTrait;
+        };
+
+        $this->deprecated(function () use ($Trait): void {
+            $Trait->getConnection();
+        });
+    }
+
+    /**
      * @uses \DatabaseBackup\BackupTrait::getDriverName()
      */
     #[Test]

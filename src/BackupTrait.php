@@ -21,6 +21,8 @@ use Cake\Datasource\ConnectionManager;
 
 /**
  * A trait that provides some methods used by all other classes.
+ *
+ * @deprecated 2.14.0 the `BackupTrait` is deprecated
  */
 trait BackupTrait
 {
@@ -31,9 +33,15 @@ trait BackupTrait
      *
      * @param string $name Connection name
      * @return \Cake\Datasource\ConnectionInterface
+     * @deprecated 2.14.0 the `BackupTrait::getConnection()` method is deprecated. Will be removed in a future release
      */
     public static function getConnection(string $name = ''): ConnectionInterface
     {
+        deprecationWarning(
+            '2.14.0',
+            'The `BackupTrait::getConnection()` method is deprecated. Will be removed in a future release'
+        );
+
         return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
     }
 
