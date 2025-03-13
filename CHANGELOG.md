@@ -24,6 +24,7 @@
   when the filename has not been set;
 * fixed a deprecation regarding a `Finder::sort()` method call;
 * the `TestCase::createSomeBackups()` method has been improved;
+* tests for `MysqlExecutor` (hence `MysqlExecutorTest`) can be run regardless of the driver in use;
 * the `AbstractBackupUtility::getDriver()` method is deprecated and will be removed in a future release. Use instead the
   `getExecutor()` method;
 * the `AbstractBackupUtility::__get()` method is deprecated and will be removed in a future release;
