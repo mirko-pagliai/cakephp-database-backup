@@ -35,7 +35,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * @var \DatabaseBackup\Executor\AbstractExecutor
      */
-    protected AbstractExecutor $Driver;
+    protected AbstractExecutor $Executor;
 
     /**
      * @inheritDoc
@@ -44,9 +44,14 @@ abstract class DriverTestCase extends TestCase
     {
         parent::setUp();
 
+        $Connection = ConnectionManager::get('test');
+
+        //For example `$driverName` is `Mysql`
+        $driverName = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
         /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $executorClassName */
-        $executorClassName = App::className('DatabaseBackup.' . $this->getDriverName() . 'Executor', 'Executor');
-        $this->Driver = new $executorClassName(ConnectionManager::get('test'));
+        $executorClassName = App::classname('DatabaseBackup.' . $driverName . 'Executor', 'Executor');
+
+        $this->Executor = new $executorClassName($Connection);
     }
 
     /**
@@ -55,7 +60,7 @@ abstract class DriverTestCase extends TestCase
      */
     public function testGetExportExecutable(): void
     {
-        $this->assertNotEmpty($this->Driver->getExportExecutable('backup.sql'));
+        $this->assertNotEmpty($this->Executor->getExportExecutable('backup.sql'));
 
         $cases = array_filter(
             array: Compression::cases(),
@@ -65,10 +70,10 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach ($cases as $Compression) {
             $filename = 'backup.' . $Compression->value;
-            $result = $this->Driver->getExportExecutable($filename);
+            $result = $this->Executor->getExportExecutable($filename);
             $expected = sprintf(
                 ' | %s > %s',
-                escapeshellarg($this->Driver->getBinary($Compression)),
+                escapeshellarg($this->Executor->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringEndsWith($expected, $result);
@@ -81,7 +86,7 @@ abstract class DriverTestCase extends TestCase
      */
     public function testGetImportExecutable(): void
     {
-        $this->assertNotEmpty($this->Driver->getImportExecutable('backup.sql'));
+        $this->assertNotEmpty($this->Executor->getImportExecutable('backup.sql'));
 
         $cases = array_filter(
             array: Compression::cases(),
@@ -91,10 +96,10 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach ($cases as $Compression) {
             $filename = 'backup.' . $Compression->value;
-            $result = $this->Driver->getImportExecutable($filename);
+            $result = $this->Executor->getImportExecutable($filename);
             $expected = sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->Driver->getBinary($Compression)),
+                escapeshellarg($this->Executor->getBinary($Compression)),
                 escapeshellarg($filename)
             );
             $this->assertStringStartsWith($expected, $result);
