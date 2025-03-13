@@ -145,7 +145,7 @@ abstract class AbstractBackupUtility
         if (empty($this->Driver)) {
             $name = $this->getDriverName();
             /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $className */
-            $className = App::classname('DatabaseBackup.' . $name, 'Driver');
+            $className = App::classname('DatabaseBackup.' . $name . 'Executor', 'Executor');
             if (!$className) {
                 throw new LogicException(__d('database_backup', 'The `{0}` driver does not exist', $name));
             }

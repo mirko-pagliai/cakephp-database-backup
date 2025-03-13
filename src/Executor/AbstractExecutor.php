@@ -87,7 +87,10 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     private function getExecutable(OperationType $OperationType): string
     {
-        $driverName = lcfirst(substr(strrchr($this::class, '\\') ?: '', 1));
+        /**
+         * `DatabaseBackup\Executor\MysqlExecutor` has to become `mysql`
+         */
+        $driverName = lcfirst(preg_replace('/^DatabaseBackup\\\\Executor\\\\(\w+)Executor$/', '$1', $this::class));
 
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),

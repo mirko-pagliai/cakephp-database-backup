@@ -5,10 +5,11 @@
   property via the magic methods `getX()` (be careful not to confuse the `getCompression()` method, which now returns
   the `$compression` property of `BackupExport`, with the old method provided by `BackupTrait`, which had been
   deprecated and has now been removed);
-* class `DatabaseBackup\Driver\AbstractDriver` has become `DatabaseBackup\Executor\AbstractExecutor`. Class
-  `DatabaseBackup\Driver\Sqlite` has become `DatabaseBackup\Executor\SqliteExecutor`. Class
-  `DatabaseBackup\Driver\Postgres` has become `DatabaseBackup\Executor\PostgresExecutor`. Aliases have been added to old
-  classes for backwards compatibility, but will be removed in a future release;
+* class `DatabaseBackup\Driver\AbstractDriver` has become `DatabaseBackup\Executor\AbstractExecutor`, class
+  `DatabaseBackup\Driver\Mysql` has become `DatabaseBackup\Executor\MysqlExecutor`, class `DatabaseBackup\Driver\Postgres`
+  has become `DatabaseBackup\Executor\PostgresExecutor` and class `DatabaseBackup\Driver\Sqlite` has become 
+  `DatabaseBackup\Executor\SqliteExecutor`. Aliases have been added to old classes for backwards compatibility, but will
+  be removed in a future release;
 * passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
   been removed (backwards compatibility removed);
 * the `BackupManager::index` methods no longer returns, in the array for each file, the `filename` key;
