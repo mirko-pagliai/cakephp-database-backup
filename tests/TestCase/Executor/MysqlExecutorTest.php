@@ -34,7 +34,7 @@ class MysqlExecutorTest extends DriverTestCase
      * @param array<int, non-empty-string> $methods Methods you want to mock
      * @return \DatabaseBackup\Executor\MysqlExecutor&\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMysqlMock(array $methods = []): MysqlExecutor
+    protected function getMysqlExecutorMock(array $methods = []): MysqlExecutor
     {
         return $this->getMockBuilder(MysqlExecutor::class)
             ->setConstructorArgs([ConnectionManager::get('test')])
@@ -43,28 +43,16 @@ class MysqlExecutorTest extends DriverTestCase
     }
 
     /**
-     * @inheritDoc
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (!$this->Executor instanceof MysqlExecutor) {
-            $this->markTestSkipped('Skipping tests for `MysqlExecutor`, current driver is `' . $this->Executor::class . '`');
-        }
-    }
-
-    /**
      * @uses \DatabaseBackup\Executor\MysqlExecutor::afterExport()
      */
     #[Test]
     public function testAfterExport(): void
     {
-        $Mysql = $this->getMysqlMock(['deleteAuthFile']);
-        $Mysql->expects($this->once())
+        $MysqlExecutor = $this->getMysqlExecutorMock(['deleteAuthFile']);
+        $MysqlExecutor->expects($this->once())
             ->method('deleteAuthFile');
 
-        $Mysql->dispatchEvent('Backup.afterExport');
+        $MysqlExecutor->dispatchEvent('Backup.afterExport');
     }
 
     /**
@@ -73,11 +61,11 @@ class MysqlExecutorTest extends DriverTestCase
     #[Test]
     public function testAfterImport(): void
     {
-        $Mysql = $this->getMysqlMock(['deleteAuthFile']);
-        $Mysql->expects($this->once())
+        $MysqlExecutor = $this->getMysqlExecutorMock(['deleteAuthFile']);
+        $MysqlExecutor->expects($this->once())
             ->method('deleteAuthFile');
 
-        $Mysql->dispatchEvent('Backup.afterImport');
+        $MysqlExecutor->dispatchEvent('Backup.afterImport');
     }
 
     /**
@@ -86,15 +74,15 @@ class MysqlExecutorTest extends DriverTestCase
     #[Test]
     public function testBeforeExport(): void
     {
-        $Mysql = $this->getMysqlMock(['writeAuthFile']);
-        $Mysql->expects($this->once())
+        $MysqlExecutor = $this->getMysqlExecutorMock(['writeAuthFile']);
+        $MysqlExecutor->expects($this->once())
             ->method('writeAuthFile')
             ->with('[mysqldump]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
                 'host={{HOST}}');
 
-        $Mysql->dispatchEvent('Backup.beforeExport');
+        $MysqlExecutor->dispatchEvent('Backup.beforeExport');
     }
 
     /**
@@ -103,15 +91,15 @@ class MysqlExecutorTest extends DriverTestCase
     #[Test]
     public function testBeforeImport(): void
     {
-        $Mysql = $this->getMysqlMock(['writeAuthFile']);
-        $Mysql->expects($this->once())
+        $MysqlExecutor = $this->getMysqlExecutorMock(['writeAuthFile']);
+        $MysqlExecutor->expects($this->once())
             ->method('writeAuthFile')
             ->with('[client]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
                 'host={{HOST}}');
 
-        $Mysql->dispatchEvent('Backup.beforeImport');
+        $MysqlExecutor->dispatchEvent('Backup.beforeImport');
     }
 
     /**
@@ -129,14 +117,16 @@ class MysqlExecutorTest extends DriverTestCase
             ->method('remove')
             ->with($expectedAuthFile);
 
-        $Mysql = $this->getMysqlMock(['getFilesystem', 'getAuthFilePath']);
-        $Mysql->method('getFilesystem')
+        $MysqlExecutor = $this->getMysqlExecutorMock(['getFilesystem', 'getAuthFilePath']);
+        $MysqlExecutor
+            ->method('getFilesystem')
             ->willReturn($Filesystem);
-        $Mysql->method('getAuthFilePath')
+        $MysqlExecutor
+            ->method('getAuthFilePath')
             ->willReturn($expectedAuthFile);
 
         //Dispatches an event (any) that we are sure will call and return the `deleteAuthFile()` method.
-        $result = $Mysql->dispatchEvent('Backup.afterExport');
+        $result = $MysqlExecutor->dispatchEvent('Backup.afterExport');
 
         $this->assertNull($result->getResult());
     }
