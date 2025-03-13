@@ -13,17 +13,17 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Executor;
 
-use DatabaseBackup\Driver\Sqlite;
+use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * SqliteTest class.
+ * SqliteExecutorTest class.
  */
-#[CoversClass(Sqlite::class)]
-class SqliteTest extends DriverTestCase
+#[CoversClass(SqliteExecutor::class)]
+class SqliteExecutorTest extends DriverTestCase
 {
     /**
      * @inheritDoc

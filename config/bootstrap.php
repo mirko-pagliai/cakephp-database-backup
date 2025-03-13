@@ -80,3 +80,4 @@ if (!is_dir($target) || !is_writeable($target)) {
  * @todo to be removed in version 2.15.0
  */
 class_alias(class: 'DatabaseBackup\Executor\AbstractExecutor', alias: 'DatabaseBackup\Driver\AbstractDriver');
+class_alias(class: 'DatabaseBackup\Executor\SqliteExecutor', alias: 'DatabaseBackup\Driver\Sqlite');
