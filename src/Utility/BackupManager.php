@@ -43,7 +43,7 @@ class BackupManager
             ->in(Configure::readOrFail('DatabaseBackup.target'))
             ->name('/\.sql(\.(gz|bz2))?$/')
             //Sorts in descending order by last modified date
-            ->sort(fn (SplFileInfo $a, SplFileInfo $b): bool => $a->getMTime() < $b->getMTime());
+            ->sort(fn (SplFileInfo $a, SplFileInfo $b): int => $b->getMTime() - $a->getMTime());
 
         $DateTimeZone = DateTime::now()->getTimezone();
 
