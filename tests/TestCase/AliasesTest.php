@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase;
 
 use DatabaseBackup\Executor\AbstractExecutor;
+use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -26,6 +27,7 @@ class AliasesTest extends TestCase
      */
     #[Test]
     #[TestWith([AbstractExecutor::class, 'DatabaseBackup\Driver\AbstractDriver'])]
+    #[TestWith([PostgresExecutor::class, 'DatabaseBackup\Driver\Postgres'])]
     #[TestWith([SqliteExecutor::class, 'DatabaseBackup\Driver\Sqlite'])]
     public function testAliases(string $expectedClass, string $aliasClass): void
     {

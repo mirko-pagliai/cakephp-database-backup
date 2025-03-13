@@ -13,17 +13,17 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Executor;
 
-use DatabaseBackup\Driver\Postgres;
+use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * PostgresTest class.
+ * PostgresExecutorTest class.
  */
-#[CoversClass(Postgres::class)]
-class PostgresTest extends DriverTestCase
+#[CoversClass(PostgresExecutor::class)]
+class PostgresExecutorTest extends DriverTestCase
 {
     /**
      * @inheritDoc
