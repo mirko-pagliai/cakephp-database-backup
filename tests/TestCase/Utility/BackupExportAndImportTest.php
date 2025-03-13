@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Datasource\ConnectionManager;
 use Cake\ORM\Table;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -34,8 +33,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class BackupExportAndImportTest extends TestCase
 {
-    use BackupTrait;
-
     /**
      * @var \Cake\ORM\Table
      */

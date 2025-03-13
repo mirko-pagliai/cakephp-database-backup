@@ -20,7 +20,6 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use InvalidArgumentException;
@@ -32,8 +31,6 @@ use InvalidArgumentException;
  */
 abstract class AbstractExecutor implements EventListenerInterface
 {
-    use BackupTrait;
-
     /**
      * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Executor\AbstractExecutor>
      */
