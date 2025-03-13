@@ -19,7 +19,6 @@ namespace DatabaseBackup\TestSuite;
 
 use Cake\Core\App;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 
@@ -30,8 +29,6 @@ use DatabaseBackup\Executor\AbstractExecutor;
  */
 abstract class DriverTestCase extends TestCase
 {
-    use BackupTrait;
-
     /**
      * @var \DatabaseBackup\Executor\AbstractExecutor
      */

@@ -18,15 +18,16 @@ namespace DatabaseBackup\Test\TestCase\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\I18n\DateTime;
 use Cake\I18n\Number;
+use DatabaseBackup\Command\IndexCommand;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
- * IndexCommandTest class
- *
- * @uses \DatabaseBackup\Command\IndexCommand
+ * IndexCommandTest class.
  */
+#[CoversClass(IndexCommand::class)]
 class IndexCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;

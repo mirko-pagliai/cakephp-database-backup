@@ -22,6 +22,7 @@
   than a `LogicException`) when export/import fails;
 * the `BackupImport::import()` methods now throws a `BadMethodCallException` exception (rather than a `LogicException`)
   when the filename has not been set;
+* fixed a deprecation regarding a `Finder::sort()` method call;
 * the `TestCase::createSomeBackups()` method has been improved;
 * the `AbstractBackupUtility::getDriver()` method is deprecated and will be removed in a future release. Use instead the
   `getExecutor()` method;

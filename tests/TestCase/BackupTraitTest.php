@@ -27,8 +27,6 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupTraitTest class.
- *
- * @uses \DatabaseBackup\BackupTrait
  */
 class BackupTraitTest extends TestCase
 {
