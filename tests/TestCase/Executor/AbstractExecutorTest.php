@@ -13,7 +13,7 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace DatabaseBackup\Test\TestCase\Driver;
+namespace DatabaseBackup\Test\TestCase\Executor;
 
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -24,10 +24,10 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * AbstractDriverTest.
+ * AbstractExecutorTest.
  */
 #[CoversClass(AbstractExecutor::class)]
-class AbstractDriverTest extends TestCase
+class AbstractExecutorTest extends TestCase
 {
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
