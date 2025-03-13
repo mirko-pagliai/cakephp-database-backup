@@ -69,6 +69,9 @@ class BackupExportTest extends TestCase
         $this->assertSame($Compression, $this->BackupExport->compression);
     }
 
+    /**
+     * @uses \DatabaseBackup\Utility\BackupExport::compression()
+     */
     #[Test]
     #[TestWith([Compression::None, null])]
     #[TestWith([Compression::Gzip, 'gzip'])]
@@ -79,6 +82,9 @@ class BackupExportTest extends TestCase
         $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
     }
 
+    /**
+     * @uses \DatabaseBackup\Utility\BackupExport::compression()
+     */
     #[Test]
     #[TestWith([null])]
     #[TestWith(['gzip'])]
