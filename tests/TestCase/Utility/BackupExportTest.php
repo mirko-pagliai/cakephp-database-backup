@@ -182,13 +182,13 @@ class BackupExportTest extends TestCase
             ->method('getFilesystem')
             ->willReturn($this->createStub(Filesystem::class));
 
-        $BackupExport->getDriver()->getEventManager()->setEventList(new EventList());
+        $BackupExport->getExecutor()->getEventManager()->setEventList(new EventList());
 
         $filename = $BackupExport->export();
         $this->assertIsString($filename);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($filename));
-        $this->assertEventFired('Backup.beforeExport', $BackupExport->getDriver()->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $BackupExport->getDriver()->getEventManager());
+        $this->assertEventFired('Backup.beforeExport', $BackupExport->getExecutor()->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $BackupExport->getExecutor()->getEventManager());
 
         //Exports with `compression()`
         $filename = $BackupExport
@@ -216,7 +216,7 @@ class BackupExportTest extends TestCase
     /**
      * Test for `export()` method.
      *
-     * Export is stopped by the `Backup.beforeExport` event (implemented by driver).
+     * Export is stopped by the `Backup.beforeExport` event (implemented by the `Executor` class).
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\BackupExport::export()
@@ -224,22 +224,23 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockBuilder(AbstractExecutor::class)
+        $Executor = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['beforeExport'])
             ->getMock();
 
-        $Driver->expects($this->once())
+        $Executor->expects($this->once())
             ->method('beforeExport')
             ->willReturn(false);
 
-        $Driver->getEventManager()->on($Driver);
+        $Executor->getEventManager()->on($Executor);
 
         $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['getDriver'])
+            ->onlyMethods(['getExecutor'])
             ->getMock();
-        $BackupExport->method('getDriver')
-            ->willReturn($Driver);
+        $BackupExport
+            ->method('getExecutor')
+            ->willReturn($Executor);
         $this->assertFalse($BackupExport->export());
     }
 

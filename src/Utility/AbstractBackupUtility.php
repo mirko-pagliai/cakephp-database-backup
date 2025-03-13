@@ -19,10 +19,11 @@ namespace DatabaseBackup\Utility;
 use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionInterface;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\BackupTrait;
 use DatabaseBackup\Executor\AbstractExecutor;
 use InvalidArgumentException;
-use LogicException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Process;
 
@@ -51,7 +52,7 @@ abstract class AbstractBackupUtility
     /**
      * @var \DatabaseBackup\Executor\AbstractExecutor
      */
-    private AbstractExecutor $Driver;
+    private AbstractExecutor $Executor;
 
     /**
      * Magic `__call()` method.
@@ -134,26 +135,57 @@ abstract class AbstractBackupUtility
     }
 
     /**
+     * Internal method to get the `Connection` instance.
+     *
+     * @return \Cake\Datasource\ConnectionInterface
+     */
+    protected function getConnection(): ConnectionInterface
+    {
+        return ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+    }
+
+    /**
+     * Gets the `Executor` instance according to the connection.
+     *
+     * @return \DatabaseBackup\Executor\AbstractExecutor
+     * @since 2.14.0
+     * @throws \InvalidArgumentException If the executor class does not exist
+     */
+    public function getExecutor(): AbstractExecutor
+    {
+        if (empty($this->Executor)) {
+            $Connection = $this->getConnection();
+
+            //For example `$driver Name` is `Mysql`
+            $driverName = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
+
+            /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $executorClassName */
+            $executorClassName = App::classname('DatabaseBackup.' . $driverName . 'Executor', 'Executor');
+            if (!$executorClassName) {
+                throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $driverName));
+            }
+
+            $this->Executor = new $executorClassName($Connection);
+        }
+
+        return $this->Executor;
+    }
+
+    /**
      * Gets the driver instance.
      *
      * @return \DatabaseBackup\Executor\AbstractExecutor A driver instance
-     * @throws \LogicException
      * @since 2.0.0
+     * @deprecated 2.14.0 the `AbstractExecutor::getDriver()` method is deprecated and will be removed in a future release. Use instead `getExecutor()`
      */
     public function getDriver(): AbstractExecutor
     {
-        if (empty($this->Driver)) {
-            $name = $this->getDriverName();
-            /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $className */
-            $className = App::classname('DatabaseBackup.' . $name . 'Executor', 'Executor');
-            if (!$className) {
-                throw new LogicException(__d('database_backup', 'The `{0}` driver does not exist', $name));
-            }
+        deprecationWarning(
+            '2.14.0',
+            'The `AbstractExecutor::getDriver()` method is deprecated and will be removed in a future release. Use instead `getExecutor()`'
+        );
 
-            $this->Driver = new $className($this->getConnection());
-        }
-
-        return $this->Driver;
+        return $this->getExecutor();
     }
 
     /**

@@ -10,6 +10,8 @@
   has become `DatabaseBackup\Executor\PostgresExecutor` and class `DatabaseBackup\Driver\Sqlite` has become 
   `DatabaseBackup\Executor\SqliteExecutor`. Aliases have been added to old classes for backwards compatibility, but will
   be removed in a future release;
+* added new `AbstractBackupUtility::getExecutor()` that gets the `Executor` instance (old `Driver` classes now renamed)
+  according to the connection; 
 * passing the `$compression` argument as a string or `null` to `BackupExport::compression()` had been deprecated and has
   been removed (backwards compatibility removed);
 * the `BackupManager::index` methods no longer returns, in the array for each file, the `filename` key;
@@ -21,6 +23,8 @@
 * the `BackupImport::import()` methods now throws a `BadMethodCallException` exception (rather than a `LogicException`)
   when the filename has not been set;
 * the `TestCase::createSomeBackups()` method has been improved;
+* the `AbstractBackupUtility::getDriver()` method is deprecated and will be removed in a future release. Use instead the
+  `getExecutor()` method;
 * the `AbstractBackupUtility::__get()` method is deprecated and will be removed in a future release;
 * `DeleteAllCommand`, `RotateCommand` and `SendCommand` classes had been deprecated and have been removed;
 * `getAbsolutePath()`, `getCompression()`, `getExtension()` and `getValidCompressions()` methods provided by 

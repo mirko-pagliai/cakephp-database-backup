@@ -107,14 +107,14 @@ class BackupImportTest extends TestCase
             ->method('getProcess')
             ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
 
-        $BackupImport->getDriver()->getEventManager()->setEventList(new EventList());
+        $BackupImport->getExecutor()->getEventManager()->setEventList(new EventList());
 
         $result = $BackupImport->filename($filename)
             ->import();
         $this->assertIsString($result);
         $this->assertSame($filename, $result);
-        $this->assertEventFired('Backup.beforeImport', $BackupImport->getDriver()->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $BackupImport->getDriver()->getEventManager());
+        $this->assertEventFired('Backup.beforeImport', $BackupImport->getExecutor()->getEventManager());
+        $this->assertEventFired('Backup.afterImport', $BackupImport->getExecutor()->getEventManager());
     }
 
     /**
@@ -131,7 +131,7 @@ class BackupImportTest extends TestCase
     /**
      * Test for `import()` method.
      *
-     * Import is stopped by the `Backup.beforeImport` event (implemented by driver).
+     * Import is stopped by the `Backup.beforeImport` event (implemented by the `Executor` class).
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Utility\BackupImport::import()
@@ -139,17 +139,17 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockBuilder(AbstractExecutor::class)
+        $Executor = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['beforeImport'])
             ->getMock();
 
-        $Driver->method('beforeImport')
+        $Executor->method('beforeImport')
             ->willReturn(false);
 
-        $Driver->getEventManager()->on($Driver);
+        $Executor->getEventManager()->on($Executor);
 
-        $BackupImport = $this->createConfiguredMock(BackupImport::class, ['getDriver' => $Driver]);
+        $BackupImport = $this->createConfiguredMock(BackupImport::class, ['getExecutor' => $Executor]);
         $result = $BackupImport
             ->filename($this->createBackup(fakeBackup: true))
             ->import();

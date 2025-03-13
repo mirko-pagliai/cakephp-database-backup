@@ -54,7 +54,7 @@ class BackupImport extends AbstractBackupUtility
     /**
      * Imports the database.
      *
-     * When importing, this method will trigger these events (implemented by the driver instance):
+     * When importing, this method will trigger these events (implemented by the `Executor` class):
      *  - `Backup.beforeImport`: will be triggered before import;
      *  - `Backup.afterImport`: will be triggered after import.
      *
@@ -75,22 +75,24 @@ class BackupImport extends AbstractBackupUtility
         $filename = $this->getFilename();
         unset($this->filename);
 
-        //Dispatches the `Backup.beforeImport` event implemented by the driver
-        $BeforeImport = $this->getDriver()->dispatchEvent('Backup.beforeImport');
+        //Dispatches the `Backup.beforeImport` event implemented by the `Executor` class
+        $BeforeImport = $this->getExecutor()->dispatchEvent('Backup.beforeImport');
         if ($BeforeImport->isStopped()) {
             return false;
         }
 
+        $Executor = $this->getExecutor();
+
         //Imports
-        $Process = $this->getProcess($this->getDriver()->getImportExecutable($filename));
+        $Process = $this->getProcess($Executor->getImportExecutable($filename));
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
                 __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput()))
             );
         }
 
-        //Dispatches the `Backup.afterImport` event implemented by the driver
-        $this->getDriver()->dispatchEvent('Backup.afterImport');
+        //Dispatches the `Backup.afterImport` event implemented by the `Executor` class
+        $Executor->dispatchEvent('Backup.afterImport');
 
         return $filename;
     }
