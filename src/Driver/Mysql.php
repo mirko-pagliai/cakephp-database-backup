@@ -21,7 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Mysql driver to export/import database backups.
  */
-class Mysql extends AbstractDriver
+class Mysql extends AbstractExecutor
 {
     /**
      * @since 2.1.0

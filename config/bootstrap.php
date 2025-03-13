@@ -73,3 +73,10 @@ if (!file_exists($target)) {
 if (!is_dir($target) || !is_writeable($target)) {
     trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target), E_USER_ERROR);
 }
+
+/**
+ * Aliases for old `Driver` classes.
+ *
+ * @todo to be removed in version 2.15.0
+ */
+class_alias(class: 'DatabaseBackup\Driver\AbstractExecutor', alias: 'DatabaseBackup\Driver\AbstractDriver');

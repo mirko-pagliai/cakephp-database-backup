@@ -61,8 +61,9 @@ class BackupImport extends AbstractBackupUtility
      * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
      * @throws \BadMethodCallException When the filename has not been set
      * @throws \RuntimeException When import fails
-     * @see \DatabaseBackup\Driver\AbstractDriver::afterImport()
-     * @see \DatabaseBackup\Driver\AbstractDriver::beforeImport()
+     *
+     * @see \DatabaseBackup\Driver\AbstractExecutor::afterImport()
+     * @see \DatabaseBackup\Driver\AbstractExecutor::beforeImport()
      * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      */
     public function import(): string|false

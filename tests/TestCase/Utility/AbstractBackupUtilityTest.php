@@ -17,7 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use BadMethodCallException;
 use Cake\Core\Configure;
-use DatabaseBackup\Driver\AbstractDriver;
+use DatabaseBackup\Driver\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;
@@ -117,7 +117,7 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Utility = $this->getMockBuilder(AbstractBackupUtility::class)
             ->getMock();
-        $this->assertInstanceOf(AbstractDriver::class, $Utility->getDriver());
+        $this->assertInstanceOf(AbstractExecutor::class, $Utility->getDriver());
 
         $this->expectExceptionMessage('The `noExistingDriver` driver does not exist');
         $Utility = $this->getMockBuilder(AbstractBackupUtility::class)

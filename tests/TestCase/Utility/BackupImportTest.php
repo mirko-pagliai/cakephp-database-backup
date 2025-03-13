@@ -19,7 +19,7 @@ use BadMethodCallException;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractDriver;
+use DatabaseBackup\Driver\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -139,7 +139,7 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockBuilder(AbstractDriver::class)
+        $Driver = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['beforeImport'])
             ->getMock();

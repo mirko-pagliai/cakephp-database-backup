@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Driver;
 
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractDriver;
+use DatabaseBackup\Driver\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,12 +26,12 @@ use PHPUnit\Framework\Attributes\TestWith;
 /**
  * AbstractDriverTest.
  */
-#[CoversClass(AbstractDriver::class)]
+#[CoversClass(AbstractExecutor::class)]
 class AbstractDriverTest extends TestCase
 {
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Driver\AbstractDriver::getBinary()
+     * @uses \DatabaseBackup\Driver\AbstractExecutor::getBinary()
      */
     #[Test]
     #[TestWith(['mysql'])]
@@ -39,14 +39,14 @@ class AbstractDriverTest extends TestCase
     #[TestWith([Compression::Gzip])]
     public function testGetBinary(string|Compression $binaryName): void
     {
-        $Driver = $this->createPartialMock(AbstractDriver::class, []);
+        $Driver = $this->createPartialMock(AbstractExecutor::class, []);
 
         $this->assertNotEmpty($Driver->getBinary($binaryName));
     }
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Driver\AbstractDriver::getBinary()
+     * @uses \DatabaseBackup\Driver\AbstractExecutor::getBinary()
      */
     #[Test]
     #[TestWith(['noExistingBinary', 'noExistingBinary'])]
@@ -55,7 +55,7 @@ class AbstractDriverTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
-        $this->createPartialMock(AbstractDriver::class, [])
+        $this->createPartialMock(AbstractExecutor::class, [])
             ->getBinary($binaryName);
     }
 }

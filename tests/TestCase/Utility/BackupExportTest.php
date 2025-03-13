@@ -19,7 +19,7 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
-use DatabaseBackup\Driver\AbstractDriver;
+use DatabaseBackup\Driver\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
@@ -224,7 +224,7 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportStoppedByBeforeExport(): void
     {
-        $Driver = $this->getMockBuilder(AbstractDriver::class)
+        $Driver = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([ConnectionManager::get('test')])
             ->onlyMethods(['beforeExport'])
             ->getMock();

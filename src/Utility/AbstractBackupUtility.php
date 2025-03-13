@@ -20,7 +20,7 @@ use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use DatabaseBackup\BackupTrait;
-use DatabaseBackup\Driver\AbstractDriver;
+use DatabaseBackup\Driver\AbstractExecutor;
 use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\Filesystem\Path;
@@ -49,9 +49,9 @@ abstract class AbstractBackupUtility
     protected int $timeout = 0;
 
     /**
-     * @var \DatabaseBackup\Driver\AbstractDriver
+     * @var \DatabaseBackup\Driver\AbstractExecutor
      */
-    private AbstractDriver $Driver;
+    private AbstractExecutor $Driver;
 
     /**
      * Magic `__call()` method.
@@ -136,15 +136,15 @@ abstract class AbstractBackupUtility
     /**
      * Gets the driver instance.
      *
-     * @return \DatabaseBackup\Driver\AbstractDriver A driver instance
+     * @return \DatabaseBackup\Driver\AbstractExecutor A driver instance
      * @throws \LogicException
      * @since 2.0.0
      */
-    public function getDriver(): AbstractDriver
+    public function getDriver(): AbstractExecutor
     {
         if (empty($this->Driver)) {
             $name = $this->getDriverName();
-            /** @var class-string<\DatabaseBackup\Driver\AbstractDriver> $className */
+            /** @var class-string<\DatabaseBackup\Driver\AbstractExecutor> $className */
             $className = App::classname('DatabaseBackup.' . $name, 'Driver');
             if (!$className) {
                 throw new LogicException(__d('database_backup', 'The `{0}` driver does not exist', $name));

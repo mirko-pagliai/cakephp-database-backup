@@ -19,7 +19,7 @@ namespace DatabaseBackup\Driver;
 /**
  * Sqlite driver to export/import database backups.
  */
-class Sqlite extends AbstractDriver
+class Sqlite extends AbstractExecutor
 {
     /**
      * @inheritDoc

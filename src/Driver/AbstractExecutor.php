@@ -26,16 +26,16 @@ use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 
 /**
- * Represents a driver containing all methods to export/import database backups according to the connection.
+ * Represents an `Executor` class containing all methods to export/import database backups, according to the connection.
  *
  * @method \Cake\Event\EventManager getEventManager()
  */
-abstract class AbstractDriver implements EventListenerInterface
+abstract class AbstractExecutor implements EventListenerInterface
 {
     use BackupTrait;
 
     /**
-     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Driver\AbstractDriver>
+     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Driver\AbstractExecutor>
      */
     use EventDispatcherTrait;
 
