@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.14 branch
+### 2.14.1
+* updated for `cakedc/cakephp-phpstan` to `^4.0` (and so `phpstan/phpstan` to `2.1.8`).
+
 ### 2.14.0
 * added new magic `AbstractBackupUtility::__call()` method. This allows `BackupExport` and `BackupImport` to access the
   property via the magic methods `getX()` (be careful not to confuse the `getCompression()` method, which now returns

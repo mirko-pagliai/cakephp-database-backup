@@ -31,7 +31,7 @@ class MysqlExecutorTest extends DriverTestCase
     /**
      * Internal method to get a mock of `MysqlExecutor`.
      *
-     * @param array<int, non-empty-string> $methods Methods you want to mock
+     * @param list<non-empty-string> $methods Methods you want to mock
      * @return \DatabaseBackup\Executor\MysqlExecutor&\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMysqlExecutorMock(array $methods = []): MysqlExecutor

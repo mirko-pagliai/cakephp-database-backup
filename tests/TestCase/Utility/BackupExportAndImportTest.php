@@ -93,8 +93,9 @@ class BackupExportAndImportTest extends TestCase
     #[Test]
     public function testGetMagicMethod(): void
     {
+        $this->BackupExport->rotate(2);
         // @phpstan-ignore property.protected
-        $this->assertIsInt($this->BackupExport->rotate);
+        $this->assertSame(2, $this->BackupExport->rotate);
 
         $this->expectExceptionMessage('Undefined property: ' . BackupExport::class . '::$noExistingProperty');
         // @phpstan-ignore property.notFound, expr.resultUnused
