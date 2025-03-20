@@ -73,7 +73,7 @@ class BackupImport extends AbstractBackupUtility
 
         //This allows the filename to be set again with a next call of this method
         $filename = $this->getFilename();
-        unset($this->filename);
+        $this->filename = '';
 
         //Dispatches the `Backup.beforeImport` event implemented by the `Executor` class
         $BeforeImport = $this->getExecutor()->dispatchEvent('Backup.beforeImport');

@@ -85,7 +85,7 @@ class BackupExport extends AbstractBackupUtility
             pathinfo($Executor->getConfig('database'), PATHINFO_FILENAME),
             date('YmdHis'),
             str_replace(['127.0.0.1', '::1'], 'localhost', $Executor->getConfig('host') ?? 'localhost'),
-            time(),
+            (string)time(),
         ], $filename);
 
         $filename = $this->makeAbsoluteFilename($filename);
@@ -143,7 +143,7 @@ class BackupExport extends AbstractBackupUtility
 
         //This allows the filename to be set again with a next call of this method
         $filename = $this->getFilename();
-        unset($this->filename);
+        $this->filename = '';
 
         $Executor = $this->getExecutor();
 
