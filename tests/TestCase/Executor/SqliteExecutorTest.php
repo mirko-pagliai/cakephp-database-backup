@@ -15,11 +15,11 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Cake\Database\Driver\Sqlite;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
