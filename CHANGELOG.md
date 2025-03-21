@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.14 branch
 ### 2.14.1
+* significant improvement for `SqlExecutor`. Also, improved related tests;
 * updated for `cakedc/cakephp-phpstan` to `^4.0` (and so `phpstan/phpstan` to `2.1.8`).
 
 ### 2.14.0

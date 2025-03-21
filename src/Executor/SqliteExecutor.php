@@ -22,21 +22,36 @@ namespace DatabaseBackup\Executor;
 class SqliteExecutor extends AbstractExecutor
 {
     /**
+     * Internal method to drop all tables.
+     *
+     * @return void
+     * @since 2.14.1
+     */
+    protected function dropAllTables(): void
+    {
+        /** @var \Cake\Database\Connection $Connection */
+        $Connection = $this->Connection;
+
+        $SchemaCollection = $Connection->getSchemaCollection();
+        foreach ($SchemaCollection->listTables() as $tableName) {
+            /** @var \Cake\Database\Schema\TableSchema $tableSchema */
+            $tableSchema = $SchemaCollection->describe($tableName);
+            foreach ($tableSchema->dropSql($Connection) as $dropSql) {
+                $Connection->execute($dropSql);
+            }
+        }
+    }
+
+    /**
      * @inheritDoc
      */
     public function beforeImport(): bool
     {
         /** @var \Cake\Database\Connection $Connection */
         $Connection = $this->Connection;
-        /** @var \Cake\Database\Schema\Collection $Schema */
-        $Schema = $Connection->getSchemaCollection();
 
-        //Drops each table
-        foreach ($Schema->listTables() as $table) {
-            /** @var \Cake\Database\Schema\TableSchema $TableSchema */
-            $TableSchema = $Schema->describe($table);
-            array_map([$Connection, 'execute'], $TableSchema->dropSql($Connection));
-        }
+        //For each table, drops the table
+        $this->dropAllTables();
 
         //Needs disconnect and re-connect because the database schema has changed
         $Connection->getDriver()->disconnect();
