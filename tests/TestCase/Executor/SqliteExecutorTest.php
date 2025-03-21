@@ -15,7 +15,11 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use Cake\Database\Connection;
 use Cake\Database\Driver\Sqlite;
+use Cake\Database\Schema\CollectionInterface;
+use Cake\Database\Schema\TableSchema;
+use Cake\Database\StatementInterface;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\DriverTestCase;
@@ -28,6 +32,58 @@ use PHPUnit\Framework\Attributes\Test;
 #[CoversClass(SqliteExecutor::class)]
 class SqliteExecutorTest extends DriverTestCase
 {
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Executor\SqliteExecutor::dropAllTables()
+     */
+    #[Test]
+    public function testDropAllTables(): void
+    {
+        /**
+         * `$Schema` describes the `articles` and `comments` tables.
+         */
+        $Schema = $this->createStub(CollectionInterface::class);
+        $Schema
+            ->method('listTables')
+            ->willReturn(['articles', 'comments']);
+        $Schema
+            ->method('describe')
+            ->willReturnCallback(function (string $tableName): TableSchema {
+                return $this->getMockBuilder(TableSchema::class)
+                    ->setConstructorArgs([$tableName])
+                    ->onlyMethods([])
+                    ->getMock();
+            });
+
+        $Connection = $this->createMock(Connection::class);
+        $Connection
+            ->method('getDriver')
+            ->willReturn(new Sqlite());
+        $Connection
+            ->method('getSchemaCollection')
+            ->willReturn($Schema);
+
+        /**
+         * The important thing is to check the number of times and the arguments with which the `Connection::execute()`
+         *  method is called.
+         */
+        $matcher = $this->exactly(2);
+        $Connection
+            ->expects($matcher)
+            ->method('execute')
+            ->willReturnCallback(function (string $sql) use ($matcher): StatementInterface {
+                match ($matcher->numberOfInvocations()) {
+                    1 =>  $this->assertEquals('DROP TABLE "articles"', $sql),
+                    2 =>  $this->assertEquals('DROP TABLE "comments"', $sql),
+                };
+
+                return $this->createStub(StatementInterface::class);
+            });
+
+        $SqliteExecutor = new SqliteExecutor($Connection);
+        $SqliteExecutor->dropAllTables();
+    }
+
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Executor\SqliteExecutor::beforeImport()

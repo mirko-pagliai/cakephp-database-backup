@@ -27,16 +27,17 @@ class SqliteExecutor extends AbstractExecutor
      * @return void
      * @since 2.14.1
      */
-    protected function dropAllTables(): void
+    public function dropAllTables(): void
     {
         /** @var \Cake\Database\Connection $Connection */
         $Connection = $this->Connection;
 
         $SchemaCollection = $Connection->getSchemaCollection();
         foreach ($SchemaCollection->listTables() as $tableName) {
-            /** @var \Cake\Database\Schema\TableSchema $tableSchema */
-            $tableSchema = $SchemaCollection->describe($tableName);
-            foreach ($tableSchema->dropSql($Connection) as $dropSql) {
+            /** @var \Cake\Database\Schema\TableSchema $TableSchema */
+            $TableSchema = $SchemaCollection->describe($tableName);
+
+            foreach ($TableSchema->dropSql($Connection) as $dropSql) {
                 $Connection->execute($dropSql);
             }
         }
