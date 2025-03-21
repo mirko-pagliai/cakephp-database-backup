@@ -15,9 +15,12 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use Cake\Database\Driver\Sqlite;
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * SqliteExecutorTest class.
@@ -26,14 +29,31 @@ use PHPUnit\Framework\Attributes\CoversClass;
 class SqliteExecutorTest extends DriverTestCase
 {
     /**
-     * @inheritDoc
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @uses \DatabaseBackup\Executor\SqliteExecutor::beforeImport()
      */
-    protected function setUp(): void
+    #[Test]
+    public function testBeforeImport(): void
     {
-        parent::setUp();
+        $Driver = $this->createPartialMock(Sqlite::class, ['connect', 'disconnect']);
+        $Driver
+            ->expects($this->once())
+            ->method('connect');
+        $Driver
+            ->expects($this->once())
+            ->method('disconnect');
 
-        if (!$this->Executor instanceof SqliteExecutor) {
-            $this->markTestSkipped('Skipping tests for `SqliteExecutor`, current driver is `' . $this->Executor::class . '`');
-        }
+        $SqliteExecutor = $this->getMockBuilder(SqliteExecutor::class)
+            ->setConstructorArgs([
+                $this->createConfiguredStub(ConnectionInterface::class, ['getDriver' => $Driver]),
+            ])
+            ->onlyMethods(['dropAllTables'])
+            ->getMock();
+
+        $SqliteExecutor
+            ->expects($this->once())
+            ->method('dropAllTables');
+
+        $SqliteExecutor->dispatchEvent('Backup.beforeImport');
     }
 }
