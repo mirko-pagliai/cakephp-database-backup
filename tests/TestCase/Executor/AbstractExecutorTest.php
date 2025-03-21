@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
@@ -30,22 +31,46 @@ use PHPUnit\Framework\Attributes\TestWith;
 class AbstractExecutorTest extends TestCase
 {
     /**
+     * @var \DatabaseBackup\Executor\AbstractExecutor&\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected AbstractExecutor $Executor;
+
+    /**
+     * {@inheritDoc}
+     *
      * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    protected function setUp(): void
+    {
+        $this->Executor = $this->getMockBuilder(AbstractExecutor::class)
+            ->setConstructorArgs([ConnectionManager::get('test')])
+            ->onlyMethods([])
+            ->getMock();
+    }
+
+    /**
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::implementedEvents()
+     */
+    #[Test]
+    public function testImplementedEvents(): void
+    {
+        $this->assertNotEmpty($this->Executor->implementedEvents());
+    }
+
+    /**
      * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
      */
     #[Test]
     #[TestWith(['mysql'])]
     #[TestWith(['gzip'])]
     #[TestWith([Compression::Gzip])]
+    #[TestWith([Compression::Bzip2])]
     public function testGetBinary(string|Compression $binaryName): void
     {
-        $Driver = $this->createPartialMock(AbstractExecutor::class, []);
-
-        $this->assertNotEmpty($Driver->getBinary($binaryName));
+        $this->assertNotEmpty($this->Executor->getBinary($binaryName));
     }
 
     /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
      * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
      */
     #[Test]
@@ -55,7 +80,18 @@ class AbstractExecutorTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
-        $this->createPartialMock(AbstractExecutor::class, [])
-            ->getBinary($binaryName);
+        $this->Executor->getBinary($binaryName);
+    }
+
+    /**
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getConfig()
+     */
+    #[Test]
+    #[TestWith(['localhost', 'host'])]
+    #[TestWith([null, 'noExisting'])]
+    public function testGetConfig(?string $expectedConfig, string $configKey): void
+    {
+        $result = $this->Executor->getConfig($configKey);
+        $this->assertSame($expectedConfig, $result);
     }
 }

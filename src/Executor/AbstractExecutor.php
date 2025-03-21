@@ -149,6 +149,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     /**
      * Called after export.
      *
+     * @codeCoverageIgnore
      * @return void
      * @since 2.1.0
      */
@@ -159,6 +160,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     /**
      * Called after import.
      *
+     * @codeCoverageIgnore
      * @return void
      * @since 2.1.0
      */
@@ -169,6 +171,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     /**
      * Called before export.
      *
+     * @codeCoverageIgnore
      * @return bool Returns `false` to stop the export
      * @since 2.1.0
      */
@@ -180,6 +183,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     /**
      * Called before import.
      *
+     * @codeCoverageIgnore
      * @return bool Returns `false` to stop the import
      * @since 2.1.0
      */
@@ -193,7 +197,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      *
      * @param \DatabaseBackup\Compression|string $binaryName Binary name
      * @return string
-     * @throws \LogicException
+     * @throws \InvalidArgumentException
      */
     public function getBinary(Compression|string $binaryName): string
     {
