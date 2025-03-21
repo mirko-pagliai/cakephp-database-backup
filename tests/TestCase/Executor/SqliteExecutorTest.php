@@ -39,13 +39,15 @@ class SqliteExecutorTest extends DriverTestCase
     #[Test]
     public function testDropAllTables(): void
     {
+        $tables = [1 => 'articles', 2 => 'comments'];
+
         /**
-         * `$Schema` describes the `articles` and `comments` tables.
+         * `$Schema` describes the tables.
          */
         $Schema = $this->createStub(CollectionInterface::class);
         $Schema
             ->method('listTables')
-            ->willReturn(['articles', 'comments']);
+            ->willReturn($tables);
         $Schema
             ->method('describe')
             ->willReturnCallback(function (string $tableName): TableSchema {
@@ -71,11 +73,9 @@ class SqliteExecutorTest extends DriverTestCase
         $Connection
             ->expects($matcher)
             ->method('execute')
-            ->willReturnCallback(function (string $sql) use ($matcher): StatementInterface {
-                match ($matcher->numberOfInvocations()) {
-                    1 =>  $this->assertEquals('DROP TABLE "articles"', $sql),
-                    2 =>  $this->assertEquals('DROP TABLE "comments"', $sql),
-                };
+            ->willReturnCallback(function (string $sql) use ($matcher, $tables): StatementInterface {
+                $expectedSql = sprintf('DROP TABLE "%s"', $tables[$matcher->numberOfInvocations()]);
+                $this->assertSame($expectedSql, $sql);
 
                 return $this->createStub(StatementInterface::class);
             });
