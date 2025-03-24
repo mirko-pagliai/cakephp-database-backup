@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use Override;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -43,6 +44,7 @@ class MysqlExecutor extends AbstractExecutor
      * @return void
      * @since 2.1.0
      */
+    #[Override]
     public function afterExport(): void
     {
         $this->deleteAuthFile();
@@ -54,6 +56,7 @@ class MysqlExecutor extends AbstractExecutor
      * @return void
      * @since 2.1.0
      */
+    #[Override]
     public function afterImport(): void
     {
         $this->deleteAuthFile();
@@ -71,6 +74,7 @@ class MysqlExecutor extends AbstractExecutor
      * @return bool
      * @since 2.1.0
      */
+    #[Override]
     public function beforeExport(): bool
     {
         return $this->writeAuthFile('[mysqldump]' . PHP_EOL .
@@ -91,6 +95,7 @@ class MysqlExecutor extends AbstractExecutor
      * @return bool
      * @since 2.1.0
      */
+    #[Override]
     public function beforeImport(): bool
     {
         return $this->writeAuthFile('[client]' . PHP_EOL .

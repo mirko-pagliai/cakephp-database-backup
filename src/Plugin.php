@@ -21,6 +21,7 @@ use Cake\Core\BasePlugin;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\Command\IndexCommand;
+use Override;
 
 /**
  * Plugin class.
@@ -28,11 +29,9 @@ use DatabaseBackup\Command\IndexCommand;
 class Plugin extends BasePlugin
 {
     /**
-     * Add console commands for the plugin.
-     *
-     * @param \Cake\Console\CommandCollection $commands The command collection to update
-     * @return \Cake\Console\CommandCollection
+     * @inheritDoc
      */
+    #[Override]
     public function console(CommandCollection $commands): CommandCollection
     {
         return $commands

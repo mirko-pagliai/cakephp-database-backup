@@ -22,6 +22,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use Override;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -54,6 +55,7 @@ abstract class Command extends BaseCommand
     /**
      * @inheritDoc
      */
+    #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         $io->out(__d('database_backup', 'Connection: {0}', $this->getConnection()->config()['name']));

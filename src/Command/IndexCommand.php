@@ -23,6 +23,7 @@ use Cake\Console\ConsoleOptionParser;
 use Cake\I18n\Number;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupManager;
+use Override;
 
 /**
  * Command to list database backups.
@@ -34,6 +35,7 @@ class IndexCommand extends BaseCommand
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser
@@ -51,6 +53,7 @@ class IndexCommand extends BaseCommand
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
      */
+    #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         $backups = BackupManager::index();

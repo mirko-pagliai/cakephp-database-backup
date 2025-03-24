@@ -23,6 +23,7 @@ use Cake\Event\EventListenerInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use InvalidArgumentException;
+use Override;
 
 /**
  * Represents an `Executor` class containing all methods to export/import database backups, according to the connection.
@@ -62,6 +63,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      *  in the object when the respective event is fired
      * @since 2.1.1
      */
+    #[Override]
     final public function implementedEvents(): array
     {
         return [

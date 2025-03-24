@@ -21,6 +21,7 @@ use Cake\Core\App;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
+use Override;
 
 /**
  * DriverTestCase class.
@@ -37,6 +38,7 @@ abstract class DriverTestCase extends TestCase
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

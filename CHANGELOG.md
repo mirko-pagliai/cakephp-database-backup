@@ -2,6 +2,7 @@
 ## 2.14 branch
 ### 2.14.1
 * significant improvement for `SqlExecutor`. Also, improved related tests;
+* added `symfony/polyfill-php83`. This allowed the `#[Override]` attribute to be added to all affected methods;
 * updated for `cakedc/cakephp-phpstan` to `^4.0` (and so `phpstan/phpstan` to `2.1.8`).
 
 ### 2.14.0
