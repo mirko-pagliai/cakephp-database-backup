@@ -83,7 +83,8 @@ jobs:
             if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_dsn='postgres://postgres:postgres@127.0.0.1/test'; fi
 
             if [[ ${{ matrix.php-version }} == '8.3' ]]; then
-             export XDEBUG_MODE=coverage && vendor/bin/phpunit --coverage-clover=coverage.xml
+              export XDEBUG_MODE=coverage
+              vendor/bin/phpunit --coverage-clover=coverage.xml
             else
               vendor/bin/phpunit
             fi
@@ -110,9 +111,6 @@ jobs:
 
         - name: Composer install
           run: composer update
-
-        - name: Composer show
-          run: composer show
 
         - name: Run PHP CodeSniffer
           continue-on-error: true
