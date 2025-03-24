@@ -87,7 +87,7 @@ class AbstractExecutorTest extends TestCase
      * @uses \DatabaseBackup\Executor\AbstractExecutor::getConfig()
      */
     #[Test]
-    #[TestWith(['localhost', 'host'])]
+    #[TestWith(['test', 'name'])]
     #[TestWith([null, 'noExisting'])]
     public function testGetConfig(?string $expectedConfig, string $configKey): void
     {

@@ -30,8 +30,6 @@ class MysqlExecutor extends AbstractExecutor
     private string $auth;
 
     /**
-     * Internal method to get a `Filesystem` instance.
-     *
      * @return \Symfony\Component\Filesystem\Filesystem
      */
     protected function getFilesystem(): Filesystem
