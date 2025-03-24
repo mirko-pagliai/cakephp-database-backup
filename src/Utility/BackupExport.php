@@ -18,6 +18,7 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
+use Override;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -76,6 +77,7 @@ class BackupExport extends AbstractBackupUtility
      * @throws \Symfony\Component\Filesystem\Exception\IOException If the target (directory) is not writable or if the filename already exists.
      * @throws \ValueError With a filename that does not match any supported compression.
      */
+    #[Override]
     public function filename(string $filename): self
     {
         $Executor = $this->getExecutor();

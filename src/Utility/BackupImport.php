@@ -18,6 +18,7 @@ namespace DatabaseBackup\Utility;
 
 use BadMethodCallException;
 use DatabaseBackup\Compression;
+use Override;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 
@@ -35,6 +36,7 @@ class BackupImport extends AbstractBackupUtility
      * @throws \Symfony\Component\Filesystem\Exception\IOException If the filename is not readable
      * @throws \ValueError With a filename that does not match any supported compression.
      */
+    #[Override]
     public function filename(string $filename): self
     {
         $filename = $this->makeAbsoluteFilename($filename);

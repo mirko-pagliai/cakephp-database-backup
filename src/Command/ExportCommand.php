@@ -26,6 +26,7 @@ use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use Exception;
+use Override;
 
 /**
  * Command to export a database backup.
@@ -37,6 +38,7 @@ class ExportCommand extends Command
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser
@@ -100,6 +102,7 @@ class ExportCommand extends Command
      * @return void
      * @throws \Cake\Console\Exception\StopException
      */
+    #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);

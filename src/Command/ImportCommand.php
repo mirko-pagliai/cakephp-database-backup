@@ -24,6 +24,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
+use Override;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -36,6 +37,7 @@ class ImportCommand extends Command
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser
@@ -94,6 +96,7 @@ class ImportCommand extends Command
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
      */
+    #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         parent::execute($args, $io);

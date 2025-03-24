@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use Override;
+
 /**
  * Sqlite executor to export/import database backups.
  */
@@ -46,6 +48,7 @@ class SqliteExecutor extends AbstractExecutor
     /**
      * @inheritDoc
      */
+    #[Override]
     public function beforeImport(): bool
     {
         /** @var \Cake\Database\Connection $Connection */
