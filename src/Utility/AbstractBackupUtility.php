@@ -57,7 +57,7 @@ abstract class AbstractBackupUtility
      * It provides all `getX()` methods to get properties.
      *
      * @param string $name
-     * @param array<mixed> $arguments
+     * @param array $arguments
      * @return mixed
      * @since 2.14.0
      * @throws \BadMethodCallException With a no existing property or method.
