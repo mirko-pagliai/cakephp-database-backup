@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use App\Database\Driver\FakeDriver;
 use BadMethodCallException;
 use Cake\Core\Configure;
+use Cake\Database\Driver;
 use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
 use Cake\Database\Driver\Sqlite;
@@ -120,11 +121,7 @@ class AbstractBackupUtilityTest extends TestCase
     #[TestWith([SqliteExecutor::class, Sqlite::class])]
     public function testGetExecutor(string $expectedExecutorClassname, string $driverClassname): void
     {
-        $Connection = $this->createMock(ConnectionInterface::class);
-        $Connection
-            ->expects($this->once())
-            ->method('getDriver')
-            ->willReturn(new $driverClassname());
+        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new $driverClassname()]);
 
         $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
 
@@ -138,11 +135,7 @@ class AbstractBackupUtilityTest extends TestCase
     #[Test]
     public function testGetExecutorNoExistingExecutor(): void
     {
-        $Connection = $this->createMock(ConnectionInterface::class);
-        $Connection
-            ->expects($this->once())
-            ->method('getDriver')
-            ->willReturn(new FakeDriver());
+        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new FakeDriver()]);
 
         $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
 
