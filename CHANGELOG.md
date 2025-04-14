@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.14 branch
 ### 2.14.1
+* method `AbstractBackupUtility::getExecutor()` now accepts the optional `$Connection` argument. The `getConnection()` 
+  method has been removed;
 * `getExecutable()`, `getExportExecutable()` and `getImportExecutable()` methods provided by `AbstractExecutor` have
   been renamed as `getCommand()`, `getExportCommand()` and `getImportCommand()`. This is because they never actually
   returned "executables", but rather commands. This makes their name clearer. For  `getExportExecutable()` and

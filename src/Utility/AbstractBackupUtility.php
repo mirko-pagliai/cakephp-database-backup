@@ -133,26 +133,16 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Internal method to get the `Connection` instance.
-     *
-     * @return \Cake\Datasource\ConnectionInterface
-     */
-    protected function getConnection(): ConnectionInterface
-    {
-        return ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
-    }
-
-    /**
      * Gets the `Executor` instance according to the connection.
      *
+     * @param \Cake\Datasource\ConnectionInterface|null $Connection
      * @return \DatabaseBackup\Executor\AbstractExecutor
      * @since 2.14.0
-     * @throws \InvalidArgumentException If the executor class does not exist
      */
-    public function getExecutor(): AbstractExecutor
+    public function getExecutor(?ConnectionInterface $Connection = null): AbstractExecutor
     {
         if (empty($this->Executor)) {
-            $Connection = $this->getConnection();
+            $Connection = $Connection ?: ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
 
             //For example `$driverName` is `Mysql`
             $driverName = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
