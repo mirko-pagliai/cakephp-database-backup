@@ -56,7 +56,6 @@ abstract class AbstractExecutor implements EventListenerInterface
      * @param array $arguments
      * @return string
      * @todo to be removed in a future release
-     *
      * @phpstan-ignore missingType.iterableValue
      */
     public function __call(string $name, array $arguments): string
