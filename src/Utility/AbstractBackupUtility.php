@@ -61,6 +61,8 @@ abstract class AbstractBackupUtility
      * @return mixed
      * @since 2.14.0
      * @throws \BadMethodCallException With a no existing property or method.
+     *
+     * @phpstan-ignore missingType.iterableValue
      */
     public function __call(string $name, array $arguments = []): mixed
     {
