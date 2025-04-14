@@ -22,7 +22,6 @@ class CommandTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Console\Command::makeRelativeFilename()
      */
     #[Test]
     #[TestWith(['backup.sql', 'backup.sql'])]
@@ -39,7 +38,6 @@ class CommandTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Console\Command::execute()
      */
     #[Test]
     public function testExecute(): void

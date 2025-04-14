@@ -19,7 +19,6 @@ class TestCaseTest extends CakeTestCase
 {
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\TestSuite\TestCase::createBackup()
      */
     #[Test]
     #[TestWith(['backup.sql', true])]
@@ -40,7 +39,7 @@ class TestCaseTest extends CakeTestCase
     }
 
     /**
-     * @uses \DatabaseBackup\TestSuite\TestCase::createSomeBackups()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testCreateSomeBackups(): void
@@ -52,19 +51,18 @@ class TestCaseTest extends CakeTestCase
             'backup_test_' . ($timestamp - 180) . '.sql.bz2',
         ];
 
-        $TestCase = $this->getMockBuilder(TestCase::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['createBackup'])
-            ->getMock();
+        $TestCase = $this->createPartialMock(TestCase::class, ['createBackup']);
 
         $TestCase->expects($this->exactly(3))
             ->method('createBackup')
+            // @phpstan-ignore argument.named
+            ->with(...self::withConsecutive([$expectedFiles[0]], [$expectedFiles[1]], [$expectedFiles[2]]))
             ->willReturnArgument(0);
 
-        $result = $TestCase->createSomeBackups(timestamp: $timestamp);
+        $resultFiles = $TestCase->createSomeBackups(timestamp: $timestamp);
 
-        array_map(callback: 'unlink', array: $result);
+        array_map(callback: 'unlink', array: $resultFiles);
 
-        $this->assertSame($expectedFiles, $result);
+        $this->assertSame($expectedFiles, $resultFiles);
     }
 }
