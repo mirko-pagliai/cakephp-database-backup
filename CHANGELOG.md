@@ -12,6 +12,7 @@
   Tests involving "Executor" classes do not use this class, as they have no need for it. The `PostgresExecutorTest` test
   class has also been removed, since the class it covers, by default, does not implement anything that the parent class
   does not;
+* all PHPUnit deprecations have finally been removed;
 * added `symfony/polyfill-php83`. This allowed the `#[Override]` attribute to be added to all affected methods;
 * we also begin to apply the `UsesClass` attribute and remove the old `@uses` tag;
 * updated for `cakedc/cakephp-phpstan` to `^4.0` (and so `phpstan/phpstan` to `2.1.8`).
