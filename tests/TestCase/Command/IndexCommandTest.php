@@ -21,13 +21,16 @@ use Cake\I18n\Number;
 use DatabaseBackup\Command\IndexCommand;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * IndexCommandTest class.
  */
 #[CoversClass(IndexCommand::class)]
+#[UsesClass(BackupManager::class)]
 class IndexCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;

@@ -22,13 +22,17 @@ use Cake\Console\TestSuite\StubConsoleOutput;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * ExportCommandTest class.
  */
 #[CoversClass(ExportCommand::class)]
+#[UsesClass(BackupExport::class)]
+#[UsesClass(BackupManager::class)]
 class ExportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;

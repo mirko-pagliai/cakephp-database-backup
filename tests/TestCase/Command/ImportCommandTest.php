@@ -25,11 +25,13 @@ use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * ImportCommandTest class.
  */
 #[CoversClass(ImportCommand::class)]
+#[UsesClass(BackupImport::class)]
 class ImportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;

@@ -30,9 +30,6 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
  */
 class BackupTraitTest extends TestCase
 {
-    /**
-     * @uses \DatabaseBackup\BackupTrait::getConnection()
-     */
     #[Test]
     #[TestWith([''])]
     #[TestWith(['test'])]
@@ -51,9 +48,6 @@ class BackupTraitTest extends TestCase
         $this->assertSame($connectionName ?: Configure::read('DatabaseBackup.connection'), $Connection->configName());
     }
 
-    /**
-     * @uses \DatabaseBackup\BackupTrait::getConnection()
-     */
     #[Test]
     public function testGetConnectionWithNoExistingConnection(): void
     {
@@ -65,9 +59,6 @@ class BackupTraitTest extends TestCase
         $Trait->getConnection('noExisting');
     }
 
-    /**
-     * @uses \DatabaseBackup\BackupTrait::getConnection()
-     */
     #[Test]
     #[WithoutErrorHandler]
     public function testGetConnectionIsDeprecated(): void
@@ -81,9 +72,6 @@ class BackupTraitTest extends TestCase
         });
     }
 
-    /**
-     * @uses \DatabaseBackup\BackupTrait::getDriverName()
-     */
     #[Test]
     #[WithoutErrorHandler]
     public function testGetDriverNameIsDeprecated(): void
