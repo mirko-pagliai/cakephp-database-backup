@@ -6,6 +6,10 @@
   returned "executables", but rather commands. This makes their name clearer. For  `getExportExecutable()` and
   `getImportExecutable()` methods backwards compatibility is ensured via the magic method `_call()` (with deprecation);
 * significant improvement for `SqlExecutor`. Also, improved related tests;
+* the `DriverTestCase` abstract class, used in particular for old, no longer existing "Driver" classes, has been removed.
+  Tests involving "Executor" classes do not use this class, as they have no need for it. The `PostgresExecutorTest` test
+  class has also been removed, since the class it covers, by default, does not implement anything that the parent class
+  does not;
 * added `symfony/polyfill-php83`. This allowed the `#[Override]` attribute to be added to all affected methods;
 * we also begin to apply the `UsesClass` attribute and remove the old `@uses` tag;
 * updated for `cakedc/cakephp-phpstan` to `^4.0` (and so `phpstan/phpstan` to `2.1.8`).

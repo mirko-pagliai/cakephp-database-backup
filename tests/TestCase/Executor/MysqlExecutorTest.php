@@ -16,8 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Datasource\ConnectionManager;
+use Cake\TestSuite\TestCase;
 use DatabaseBackup\Executor\MysqlExecutor;
-use DatabaseBackup\TestSuite\DriverTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Filesystem\Filesystem;
@@ -26,11 +26,9 @@ use Symfony\Component\Filesystem\Filesystem;
  * MysqlExecutorTest class.
  */
 #[CoversClass(MysqlExecutor::class)]
-class MysqlExecutorTest extends DriverTestCase
+class MysqlExecutorTest extends TestCase
 {
     /**
-     * Internal method to get a mock of `MysqlExecutor`.
-     *
      * @param list<non-empty-string> $methods Methods you want to mock
      * @return \DatabaseBackup\Executor\MysqlExecutor&\PHPUnit\Framework\MockObject\MockObject
      */
