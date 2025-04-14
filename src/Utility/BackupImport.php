@@ -86,7 +86,7 @@ class BackupImport extends AbstractBackupUtility
         $Executor = $this->getExecutor();
 
         //Imports
-        $Process = $this->getProcess($Executor->getImportExecutable($filename));
+        $Process = $this->getProcess($Executor->getImportCommand($filename));
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
                 __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput()))

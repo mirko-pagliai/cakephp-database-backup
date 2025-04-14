@@ -156,7 +156,7 @@ class BackupExport extends AbstractBackupUtility
         }
 
         //Exports
-        $Process = $this->getProcess($Executor->getExportExecutable($filename));
+        $Process = $this->getProcess($Executor->getExportCommand($filename));
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
                 __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput()))

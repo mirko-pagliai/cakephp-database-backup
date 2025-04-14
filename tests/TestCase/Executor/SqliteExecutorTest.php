@@ -22,7 +22,7 @@ use Cake\Database\Schema\TableSchema;
 use Cake\Database\StatementInterface;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
-use DatabaseBackup\TestSuite\DriverTestCase;
+use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -30,11 +30,10 @@ use PHPUnit\Framework\Attributes\Test;
  * SqliteExecutorTest class.
  */
 #[CoversClass(SqliteExecutor::class)]
-class SqliteExecutorTest extends DriverTestCase
+class SqliteExecutorTest extends TestCase
 {
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Executor\SqliteExecutor::dropAllTables()
      */
     #[Test]
     public function testDropAllTables(): void
@@ -86,7 +85,6 @@ class SqliteExecutorTest extends DriverTestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Executor\SqliteExecutor::beforeImport()
      */
     #[Test]
     public function testBeforeImport(): void
