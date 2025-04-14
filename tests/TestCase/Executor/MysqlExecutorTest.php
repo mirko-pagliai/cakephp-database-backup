@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
-use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\ConnectionInterface;
 use Cake\TestSuite\TestCase;
 use DatabaseBackup\Executor\MysqlExecutor;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -31,17 +31,20 @@ class MysqlExecutorTest extends TestCase
     /**
      * @param list<non-empty-string> $methods Methods you want to mock
      * @return \DatabaseBackup\Executor\MysqlExecutor&\PHPUnit\Framework\MockObject\MockObject
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     protected function getMysqlExecutorMock(array $methods = []): MysqlExecutor
     {
+        $Connection = $this->createStub(ConnectionInterface::class);
+
         return $this->getMockBuilder(MysqlExecutor::class)
-            ->setConstructorArgs([ConnectionManager::get('test')])
+            ->setConstructorArgs([$Connection])
             ->onlyMethods($methods)
             ->getMock();
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::afterExport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testAfterExport(): void
@@ -54,7 +57,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::afterImport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testAfterImport(): void
@@ -67,7 +70,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::beforeExport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testBeforeExport(): void
@@ -84,7 +87,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::beforeImport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testBeforeImport(): void
@@ -102,7 +105,6 @@ class MysqlExecutorTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::deleteAuthFile()
      */
     #[Test]
     public function testDeleteAuthFile(): void
