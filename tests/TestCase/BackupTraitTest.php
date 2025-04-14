@@ -29,7 +29,6 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 /**
  * BackupTraitTest class.
  */
-#[CoversTrait(BackupTrait::class)]
 class BackupTraitTest extends TestCase
 {
     #[Test]
