@@ -18,7 +18,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use App\Database\Driver\FakeDriver;
 use BadMethodCallException;
 use Cake\Core\Configure;
-use Cake\Database\Driver;
 use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
 use Cake\Database\Driver\Sqlite;
