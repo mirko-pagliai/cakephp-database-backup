@@ -15,11 +15,12 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
-use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -31,26 +32,29 @@ use PHPUnit\Framework\Attributes\TestWith;
 class AbstractExecutorTest extends TestCase
 {
     /**
+     * @var \Cake\Datasource\ConnectionInterface&\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected ConnectionInterface $Connection;
+
+    /**
      * @var \DatabaseBackup\Executor\AbstractExecutor&\PHPUnit\Framework\MockObject\MockObject
      */
     protected AbstractExecutor $Executor;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
+    #[Override]
     protected function setUp(): void
     {
-        $this->Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([ConnectionManager::get('test')])
-            ->onlyMethods([])
-            ->getMock();
+        $this->Connection = $this->createMock(ConnectionInterface::class);
+
+        $this->Executor = new class ($this->Connection) extends AbstractExecutor {
+        };
     }
 
-    /**
-     * @uses \DatabaseBackup\Executor\AbstractExecutor::implementedEvents()
-     */
     #[Test]
     public function testImplementedEvents(): void
     {
@@ -58,8 +62,57 @@ class AbstractExecutorTest extends TestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
+    #[Test]
+    #[TestWith(['exportExecutable > \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['exportExecutable | \'compressionBinary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
+    #[TestWith(['exportExecutable | \'compressionBinary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
+    public function testGetExportExecutable(string $expectedExportExecutable, string $filename): void
+    {
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getExecutable', 'getBinary']);
+
+        $Executor
+            ->expects($this->once())
+            ->method('getExecutable')
+            ->willReturn('exportExecutable');
+
+        $Executor
+            ->expects($this->any())
+            ->method('getBinary')
+            ->willReturn('compressionBinary');
+
+        $result = $Executor->getExportExecutable($filename);
+
+        $this->assertSame($expectedExportExecutable, $result);
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    #[Test]
+    #[TestWith(['importExecutable < \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.gz\' | importExecutable', 'filename.sql.gz'])]
+    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.bz2\' | importExecutable', 'filename.sql.bz2'])]
+    public function testGetImportExecutable(string $expectedImportExecutable, string $filename): void
+    {
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getExecutable', 'getBinary']);
+
+        $Executor
+            ->expects($this->once())
+            ->method('getExecutable')
+            ->willReturn('importExecutable');
+
+        $Executor
+            ->expects($this->any())
+            ->method('getBinary')
+            ->willReturn('compressionBinary');
+
+        $result = $Executor->getImportExecutable($filename);
+
+        $this->assertSame($expectedImportExecutable, $result);
+    }
+
     #[Test]
     #[TestWith(['mysql'])]
     #[TestWith(['gzip'])]
@@ -70,9 +123,6 @@ class AbstractExecutorTest extends TestCase
         $this->assertNotEmpty($this->Executor->getBinary($binaryName));
     }
 
-    /**
-     * @uses \DatabaseBackup\Executor\AbstractExecutor::getBinary()
-     */
     #[Test]
     #[TestWith(['noExistingBinary', 'noExistingBinary'])]
     #[TestWith(['none', Compression::None])]
@@ -83,14 +133,16 @@ class AbstractExecutorTest extends TestCase
         $this->Executor->getBinary($binaryName);
     }
 
-    /**
-     * @uses \DatabaseBackup\Executor\AbstractExecutor::getConfig()
-     */
     #[Test]
     #[TestWith(['test', 'name'])]
     #[TestWith([null, 'noExisting'])]
     public function testGetConfig(?string $expectedConfig, string $configKey): void
     {
+        $this->Connection
+            ->expects($this->once())
+            ->method('config')
+            ->willReturn(['name' => 'test']);
+
         $result = $this->Executor->getConfig($configKey);
         $this->assertSame($expectedConfig, $result);
     }

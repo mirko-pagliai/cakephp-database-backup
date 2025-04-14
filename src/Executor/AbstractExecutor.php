@@ -38,19 +38,12 @@ abstract class AbstractExecutor implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * @var \Cake\Datasource\ConnectionInterface
-     */
-    protected ConnectionInterface $Connection;
-
-    /**
      * Constructor.
      *
      * @param \Cake\Datasource\ConnectionInterface $Connection
      */
-    public function __construct(ConnectionInterface $Connection)
+    public function __construct(protected ConnectionInterface $Connection)
     {
-        $this->Connection = $Connection;
-
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
@@ -84,7 +77,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      * @param \DatabaseBackup\OperationType $OperationType
      * @return string
      */
-    private function getExecutable(OperationType $OperationType): string
+    protected function getExecutable(OperationType $OperationType): string
     {
         /**
          * `DatabaseBackup\Executor\MysqlExecutor` has to become `mysql`
