@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use BadMethodCallException;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -24,6 +25,7 @@ use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * AbstractExecutorTest.
@@ -37,12 +39,12 @@ class AbstractExecutorTest extends TestCase
     protected ConnectionInterface $Connection;
 
     /**
-     * @var \DatabaseBackup\Executor\AbstractExecutor&\PHPUnit\Framework\MockObject\MockObject
+     * @var \DatabaseBackup\Executor\AbstractExecutor
      */
     protected AbstractExecutor $Executor;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
@@ -55,6 +57,36 @@ class AbstractExecutorTest extends TestCase
         };
     }
 
+    /**
+     * @param non-empty-string $expectedNewMethod
+     * @param non-empty-string $oldMethod
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    #[Test]
+    #[TestWith(['getExportCommand', 'getExportExecutable'])]
+    #[TestWith(['getImportCommand', 'getImportExecutable'])]
+    #[WithoutErrorHandler]
+    public function testCallMagicMethod(string $expectedNewMethod, string $oldMethod): void
+    {
+        $Executor = $this->createPartialMock(AbstractExecutor::class, [$expectedNewMethod]);
+
+        $Executor
+            ->expects($this->once())
+            ->method($expectedNewMethod)
+            ->with($this->equalTo('filename.sql'));
+
+        $this->deprecated(fn () => $Executor->{$oldMethod}('filename.sql'));
+    }
+
+    #[Test]
+    public function testCallMagicMethodNoExistingMethod(): void
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method `' . $this->Executor::class . '::noExistingMethod()` does not exist');
+        // @phpstan-ignore method.notFound
+        $this->Executor->noExistingMethod();
+    }
+
     #[Test]
     public function testImplementedEvents(): void
     {
@@ -65,52 +97,52 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['exportExecutable > \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['exportExecutable | \'compressionBinary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
-    #[TestWith(['exportExecutable | \'compressionBinary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
-    public function testGetExportExecutable(string $expectedExportExecutable, string $filename): void
+    #[TestWith(['exportCommand > \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['exportCommand | \'compressionBinary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
+    #[TestWith(['exportCommand | \'compressionBinary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
+    public function testGetExportCommand(string $expectedExportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getExecutable', 'getBinary']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'getBinary']);
 
         $Executor
             ->expects($this->once())
-            ->method('getExecutable')
-            ->willReturn('exportExecutable');
+            ->method('getCommand')
+            ->willReturn('exportCommand');
 
         $Executor
             ->expects($this->any())
             ->method('getBinary')
             ->willReturn('compressionBinary');
 
-        $result = $Executor->getExportExecutable($filename);
+        $result = $Executor->getExportCommand($filename);
 
-        $this->assertSame($expectedExportExecutable, $result);
+        $this->assertSame($expectedExportCommand, $result);
     }
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['importExecutable < \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.gz\' | importExecutable', 'filename.sql.gz'])]
-    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.bz2\' | importExecutable', 'filename.sql.bz2'])]
-    public function testGetImportExecutable(string $expectedImportExecutable, string $filename): void
+    #[TestWith(['importCommand < \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.gz\' | importCommand', 'filename.sql.gz'])]
+    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.bz2\' | importCommand', 'filename.sql.bz2'])]
+    public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getExecutable', 'getBinary']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'getBinary']);
 
         $Executor
             ->expects($this->once())
-            ->method('getExecutable')
-            ->willReturn('importExecutable');
+            ->method('getCommand')
+            ->willReturn('importCommand');
 
         $Executor
             ->expects($this->any())
             ->method('getBinary')
             ->willReturn('compressionBinary');
 
-        $result = $Executor->getImportExecutable($filename);
+        $result = $Executor->getImportCommand($filename);
 
-        $this->assertSame($expectedImportExecutable, $result);
+        $this->assertSame($expectedImportCommand, $result);
     }
 
     #[Test]

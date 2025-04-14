@@ -1,6 +1,10 @@
 # 2.x branch
 ## 2.14 branch
 ### 2.14.1
+* `getExecutable()`, `getExportExecutable()` and `getImportExecutable()` methods provided by `AbstractExecutor` have
+  been renamed as `getCommand()`, `getExportCommand()` and `getImportCommand()`. This is because they never actually
+  returned "executables", but rather commands. This makes their name clearer. For  `getExportExecutable()` and
+  `getImportExecutable()` methods backwards compatibility is ensured via the magic method `_call()` (with deprecation);
 * significant improvement for `SqlExecutor`. Also, improved related tests;
 * added `symfony/polyfill-php83`. This allowed the `#[Override]` attribute to be added to all affected methods;
 * we also begin to apply the `UsesClass` attribute and remove the old `@uses` tag;

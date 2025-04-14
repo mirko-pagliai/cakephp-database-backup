@@ -55,11 +55,11 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * @return void
-     * @uses \DatabaseBackup\Executor\AbstractExecutor::getExportExecutable()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getExportCommand()
      */
-    public function testGetExportExecutable(): void
+    public function testGetExportCommand(): void
     {
-        $this->assertNotEmpty($this->Executor->getExportExecutable('backup.sql'));
+        $this->assertNotEmpty($this->Executor->getExportCommand('backup.sql'));
 
         $cases = array_filter(
             array: Compression::cases(),
@@ -69,7 +69,7 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach ($cases as $Compression) {
             $filename = 'backup.' . $Compression->value;
-            $result = $this->Executor->getExportExecutable($filename);
+            $result = $this->Executor->getExportCommand($filename);
             $expected = sprintf(
                 ' | %s > %s',
                 escapeshellarg($this->Executor->getBinary($Compression)),
@@ -81,11 +81,11 @@ abstract class DriverTestCase extends TestCase
 
     /**
      * @return void
-     * @uses \DatabaseBackup\Executor\AbstractExecutor::getImportExecutable()
+     * @uses \DatabaseBackup\Executor\AbstractExecutor::getImportCommand()
      */
-    public function testGetImportExecutable(): void
+    public function testGetImportCommand(): void
     {
-        $this->assertNotEmpty($this->Executor->getImportExecutable('backup.sql'));
+        $this->assertNotEmpty($this->Executor->getImportCommand('backup.sql'));
 
         $cases = array_filter(
             array: Compression::cases(),
@@ -95,7 +95,7 @@ abstract class DriverTestCase extends TestCase
         //Gzip and Bzip2 compressions
         foreach ($cases as $Compression) {
             $filename = 'backup.' . $Compression->value;
-            $result = $this->Executor->getImportExecutable($filename);
+            $result = $this->Executor->getImportCommand($filename);
             $expected = sprintf(
                 '%s -dc %s | ',
                 escapeshellarg($this->Executor->getBinary($Compression)),

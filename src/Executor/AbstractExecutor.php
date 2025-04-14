@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use BadMethodCallException;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Event\EventDispatcherTrait;
@@ -49,6 +50,37 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
+     * Magic `__call()` method.
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return string
+     * @todo to be removed in a future release
+     *
+     * @phpstan-ignore missingType.iterableValue
+     */
+    public function __call(string $name, array $arguments): string
+    {
+        $replacements = [
+            'getExportExecutable' => 'getExportCommand',
+            'getImportExecutable' => 'getImportCommand',
+        ];
+
+        $replacement = $replacements[$name] ?? null;
+        if ($replacement) {
+            deprecationWarning('2.14.1', sprintf(
+                'The `AbstractExecutor::%s()` method is deprecated and will be removed in a future release. Use instead `%s()`',
+                $name,
+                $replacement
+            ));
+
+            return $this->{$replacement}(...$arguments);
+        }
+
+        throw new BadMethodCallException('Method `' . $this::class . '::' . $name . '()` does not exist.');
+    }
+
+    /**
      * List of events this object is implementing. When the class is registered in an event manager, each individual
      *  method will be associated with the respective event.
      *
@@ -68,16 +100,16 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
-     * Gets and parses executable commands from the configuration, according to the type of requested operation
-     *  (`export` or `import`) and the connection driver.
+     * Gets and parses commands from the configuration, according to the type of requested `OperationType` and the
+     *  connection driver.
      *
-     * These executables are not yet final, use instead `getExportExecutable()` and `getImportExecutable()` methods to
-     *  have the final executables, including compression.
+     * These commands are not yet final: use instead `getExportCommand()` and `getImportCommand()` methods to
+     *  have the final commands.
      *
      * @param \DatabaseBackup\OperationType $OperationType
      * @return string
      */
-    protected function getExecutable(OperationType $OperationType): string
+    protected function getCommand(OperationType $OperationType): string
     {
         /**
          * `DatabaseBackup\Executor\MysqlExecutor` has to become `mysql`
@@ -99,16 +131,16 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to export the database, with compression if requested.
+     * Gets the command to export the database, with compression if requested.
      *
      * @param string $filename Filename where you want to export the database
      * @return string
      * @throws \LogicException
      * @throws \ValueError With a filename that does not match any supported compression.
      */
-    public function getExportExecutable(string $filename): string
+    public function getExportCommand(string $filename): string
     {
-        $exec = $this->getExecutable(OperationType::Export);
+        $exec = $this->getCommand(OperationType::Export);
 
         $Compression = Compression::fromFilename($filename);
         if ($Compression !== Compression::None) {
@@ -119,15 +151,15 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
-     * Gets the executable command to import the database, with compression if requested.
+     * Gets the command to import the database, with compression if requested.
      *
      * @param string $filename Filename from which you want to import the database
      * @return string
      * @throws \LogicException
      */
-    public function getImportExecutable(string $filename): string
+    public function getImportCommand(string $filename): string
     {
-        $exec = $this->getExecutable(OperationType::Import);
+        $exec = $this->getCommand(OperationType::Import);
 
         $Compression = Compression::fromFilename($filename);
         if ($Compression !== Compression::None) {
