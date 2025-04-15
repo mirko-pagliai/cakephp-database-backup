@@ -97,22 +97,27 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['exportCommand > \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['exportCommand | \'compressionBinary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
-    #[TestWith(['exportCommand | \'compressionBinary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
+    #[TestWith(['\'sqlite3-binary\' my-database .dump > \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['\'sqlite3-binary\' my-database .dump | \'gzip-binary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
+    #[TestWith(['\'sqlite3-binary\' my-database .dump | \'bzip2-binary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
     public function testGetExportCommand(string $expectedExportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'findBinary']);
-
-        $Executor
-            ->expects($this->once())
-            ->method('getCommand')
-            ->willReturn('exportCommand');
+        $Executor = $this->getMockBuilder(AbstractExecutor::class)
+            ->setConstructorArgs([$this->Connection, 'Sqlite'])
+            ->onlyMethods(['findBinary', 'getConfig'])
+            ->getMock();
 
         $Executor
             ->expects($this->any())
             ->method('findBinary')
-            ->willReturn('compressionBinary');
+            ->willReturnCallback(function (Compression|string $binaryName): string {
+                return ($binaryName instanceof Compression ? strtolower($binaryName->name) : $binaryName) . '-binary';
+            });
+
+        $Executor
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
 
         $result = $Executor->getExportCommand($filename);
 
@@ -123,59 +128,31 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['importCommand < \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.gz\' | importCommand', 'filename.sql.gz'])]
-    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.bz2\' | importCommand', 'filename.sql.bz2'])]
+    #[TestWith(['\'sqlite3-binary\' my-database < \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['\'gzip-binary\' -dc \'filename.sql.gz\' | \'sqlite3-binary\' my-database', 'filename.sql.gz'])]
+    #[TestWith(['\'bzip2-binary\' -dc \'filename.sql.bz2\' | \'sqlite3-binary\' my-database', 'filename.sql.bz2'])]
     public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'findBinary']);
-
-        $Executor
-            ->expects($this->once())
-            ->method('getCommand')
-            ->willReturn('importCommand');
+        $Executor = $this->getMockBuilder(AbstractExecutor::class)
+            ->setConstructorArgs([$this->Connection, 'Sqlite'])
+            ->onlyMethods(['findBinary', 'getConfig'])
+            ->getMock();
 
         $Executor
             ->expects($this->any())
             ->method('findBinary')
-            ->willReturn('compressionBinary');
+            ->willReturnCallback(function (Compression|string $binaryName): string {
+                return ($binaryName instanceof Compression ? strtolower($binaryName->name) : $binaryName) . '-binary';
+            });
+
+        $Executor
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
 
         $result = $Executor->getImportCommand($filename);
 
         $this->assertSame($expectedImportCommand, $result);
-    }
-
-    /**
-     * @param string $expectedBinary
-     * @param array<string|Compression> $name
-     * @return void
-     */
-    #[Test]
-    #[TestWith(['/usr/bin/mariadb', ['mysql']])]
-    #[TestWith(['/usr/bin/mariadb', ['mariadb', 'mysql']])]
-    #[TestWith(['/usr/bin/mariadb', ['noExistingMySqlBinary', 'mysql']])]
-    #[TestWith(['/usr/bin/gzip', ['gzip']])]
-    #[TestWith(['/usr/bin/gzip', [Compression::Gzip]])]
-    public function testFindBinary(string $expectedBinary, array $name): void
-    {
-        $binary = $this->Executor->findBinary(...$name);
-        $this->assertSame($expectedBinary, $binary);
-    }
-
-    /**
-     * @param string $expectedBinaryName
-     * @param array<string|Compression> $name
-     * @return void
-     */
-    #[Test]
-    #[TestWith(['noExistingBinary', ['noExistingBinary']])]
-    #[TestWith(['noExistingBinary', ['noExistingBinary', 'anotherNoExistingBinary']])]
-    #[TestWith(['none', [Compression::None]])]
-    public function testFindBinaryNoExistingBinary(string $expectedBinaryName, array $name): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
-        $this->Executor->findBinary(...$name);
     }
 
     #[Test]

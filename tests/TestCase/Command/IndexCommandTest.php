@@ -35,14 +35,8 @@ class IndexCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    /**
-     * @var string
-     */
     protected string $command = 'database_backup.index -v';
 
-    /**
-     * @uses \DatabaseBackup\Command\IndexCommand::execute()
-     */
     #[Test]
     public function testExecute(): void
     {
