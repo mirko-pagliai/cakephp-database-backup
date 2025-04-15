@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MysqlExecutor extends AbstractExecutor
 {
-    protected const EXPORT_BYNARY = ['mariadb-dump', 'mysqldump'];
+    protected const EXPORT_BINARY = ['mariadb-dump', 'mysqldump'];
 
     protected const IMPORT_BINARY = ['mariadb', 'mysql'];
 

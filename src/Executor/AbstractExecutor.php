@@ -30,7 +30,7 @@ use Symfony\Component\Process\ExecutableFinder;
 /**
  * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.
  *
- * "Executor" classes that extend this class must implement the `EXPORT_BYNARY` and `IMPORT_BINARY` constants, which can
+ * "Executor" classes that extend this class must implement the `EXPORT_BINARY` and `IMPORT_BINARY` constants, which can
  *  be strings or arrays of strings.
  *
  * @method \Cake\Event\EventManager getEventManager()

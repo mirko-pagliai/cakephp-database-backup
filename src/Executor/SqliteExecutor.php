@@ -23,7 +23,7 @@ use Override;
  */
 class SqliteExecutor extends AbstractExecutor
 {
-    protected const EXPORT_BYNARY = 'sqlite3';
+    protected const EXPORT_BINARY = 'sqlite3';
 
     protected const IMPORT_BINARY = 'sqlite3';
 
