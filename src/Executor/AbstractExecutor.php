@@ -27,7 +27,10 @@ use InvalidArgumentException;
 use Override;
 
 /**
- * Represents an `Executor` class containing all methods to export/import database backups, according to the connection.
+ * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.
+ *
+ * "Executor" classes that extend this class must implement the `EXPORT_BYNARY` and `IMPORT_BINARY` constants, which can
+ *  be strings or arrays of strings.
  *
  * @method \Cake\Event\EventManager getEventManager()
  */
