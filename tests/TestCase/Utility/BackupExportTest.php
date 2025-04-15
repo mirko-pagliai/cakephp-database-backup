@@ -203,7 +203,10 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportStoppedByBeforeExport(): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeExport', 'getConfig']);
+        $Executor = $this->createPartialMock(
+            AbstractExecutor::class,
+            ['beforeExport', 'getConfig', 'getExportBinary', 'getImportBinary']
+        );
 
         $Executor
             ->expects($this->once())

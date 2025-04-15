@@ -125,7 +125,7 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeImport(): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport', 'getExportBinary', 'getImportBinary']);
 
         $Executor
             ->expects($this->once())

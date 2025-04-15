@@ -23,9 +23,21 @@ use Override;
  */
 class SqliteExecutor extends AbstractExecutor
 {
-    protected const EXPORT_BINARY = 'sqlite3';
+    /**
+     * @inheritDoc
+     */
+    protected function getExportBinary(): string|array
+    {
+        return 'sqlite3';
+    }
 
-    protected const IMPORT_BINARY = 'sqlite3';
+    /**
+     * @inheritDoc
+     */
+    protected function getImportBinary(): string|array
+    {
+        return 'sqlite3';
+    }
 
     /**
      * Internal method to drop all tables.

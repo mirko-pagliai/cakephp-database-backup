@@ -3,6 +3,9 @@
 ### 2.15.0
 * added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
   been completely replaced by the first;
+* the `AbstractExecutor` class and all "Executor" classes that extend it now implement `getExportBinary()` and
+  `getImportBinary()` methods, which should return the names of the binaries (as a string or array of strings) related
+  to the respective driver;
 * the "Executors" classes now implement the `EXPORT_BINARY` and `IMPORT_BINARY` constants, which are strings or arrays
   of strings (e.g. in the case of `MysqlExecutor`).
 

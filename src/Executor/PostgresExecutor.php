@@ -21,7 +21,19 @@ namespace DatabaseBackup\Executor;
  */
 class PostgresExecutor extends AbstractExecutor
 {
-    protected const EXPORT_BINARY = 'pg_dump';
+    /**
+     * @inheritDoc
+     */
+    protected function getExportBinary(): string|array
+    {
+        return 'pg_dump';
+    }
 
-    protected const IMPORT_BINARY = 'pg_restore';
+    /**
+     * @inheritDoc
+     */
+    protected function getImportBinary(): string|array
+    {
+        return 'pg_restore';
+    }
 }

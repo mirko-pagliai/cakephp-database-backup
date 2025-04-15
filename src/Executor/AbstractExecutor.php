@@ -30,8 +30,8 @@ use Symfony\Component\Process\ExecutableFinder;
 /**
  * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.
  *
- * "Executor" classes that extend this class must implement the `EXPORT_BINARY` and `IMPORT_BINARY` constants, which can
- *  be strings or arrays of strings.
+ * "Executor" classes that extend this class must implement the `getExportBinary()` and `getImportBinary()` methods,
+ *  which should return the names of the binaries (as a string or array of strings) related to the respective driver.
  *
  * @method \Cake\Event\EventManager getEventManager()
  */
@@ -111,6 +111,20 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
+     * Returns the names of the binaries to export, (as a string or array of strings) related to the respective driver.
+     *
+     * @return string|array<string>
+     */
+    protected abstract function getExportBinary(): string|array;
+
+    /**
+     * Returns the names of the binaries to import, (as a string or array of strings) related to the respective driver.
+     *
+     * @return string|array<string>
+     */
+    protected abstract function getImportBinary(): string|array;
+
+    /**
      * Gets and parses commands from the configuration, according to the type of requested `OperationType` and the
      *  connection driver.
      *
@@ -124,18 +138,28 @@ abstract class AbstractExecutor implements EventListenerInterface
     {
         $driverName = lcfirst($this->name);
 
+        //Gets the binaries names
+        $binaries = (array)$this->{$OperationType == OperationType::Export ? 'getExportBinary' : 'getImportBinary'}();
+
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->findBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
+            '{{BINARY}}' => escapeshellarg($this->findBinary(...$binaries)),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
-        /** @var string $exec */
-        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $OperationType->value);
 
-        return str_replace(array_keys($replacements), $replacements, $exec);
+        /**
+         * Gets the command to execute.
+         *
+         * The value read from the configuration will be for example `DatabaseBackup.mysql.export`.
+         *
+         * @var string $command
+         */
+        $command = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $OperationType->value);
+
+        return str_replace(array_keys($replacements), $replacements, $command);
     }
 
     /**

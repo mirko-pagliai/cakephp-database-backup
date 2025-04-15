@@ -20,7 +20,6 @@ use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
-use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -53,8 +52,10 @@ class AbstractExecutorTest extends TestCase
     {
         $this->Connection = $this->createMock(ConnectionInterface::class);
 
-        $this->Executor = new class ($this->Connection) extends AbstractExecutor {
-        };
+        $this->Executor = $this->getMockBuilder(AbstractExecutor::class)
+            ->setConstructorArgs([$this->Connection])
+            ->onlyMethods(['getExportBinary', 'getImportBinary'])
+            ->getMock();
     }
 
     /**
@@ -68,7 +69,7 @@ class AbstractExecutorTest extends TestCase
     #[WithoutErrorHandler]
     public function testCallMagicMethod(string $expectedNewMethod, string $oldMethod): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, [$expectedNewMethod]);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getExportBinary', 'getImportBinary', $expectedNewMethod]);
 
         $Executor
             ->expects($this->once())
@@ -104,7 +105,7 @@ class AbstractExecutorTest extends TestCase
     {
         $Executor = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([$this->Connection, 'Sqlite'])
-            ->onlyMethods(['findBinary', 'getConfig'])
+            ->onlyMethods(['findBinary', 'getConfig', 'getExportBinary', 'getImportBinary'])
             ->getMock();
 
         $Executor
@@ -135,7 +136,7 @@ class AbstractExecutorTest extends TestCase
     {
         $Executor = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([$this->Connection, 'Sqlite'])
-            ->onlyMethods(['findBinary', 'getConfig'])
+            ->onlyMethods(['findBinary', 'getConfig', 'getExportBinary', 'getImportBinary'])
             ->getMock();
 
         $Executor

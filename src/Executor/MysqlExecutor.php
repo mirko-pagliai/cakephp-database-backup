@@ -24,10 +24,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MysqlExecutor extends AbstractExecutor
 {
-    protected const EXPORT_BINARY = ['mariadb-dump', 'mysqldump'];
-
-    protected const IMPORT_BINARY = ['mariadb', 'mysql'];
-
     /**
      * @since 2.1.0
      * @var string
@@ -107,6 +103,22 @@ class MysqlExecutor extends AbstractExecutor
             'user={{USER}}' . PHP_EOL .
             'password="{{PASSWORD}}"' . PHP_EOL .
             'host={{HOST}}');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getExportBinary(): string|array
+    {
+        return ['mariadb-dump', 'mysqldump'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getImportBinary(): string|array
+    {
+        return ['mariadb', 'mysql'];
     }
 
     /**
