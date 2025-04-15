@@ -71,25 +71,6 @@ class AbstractBackupUtilityTest extends TestCase
         $this->Utility->{$noExistingMethod}();
     }
 
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testMagicGetMethod(): void
-    {
-        $this->Utility->timeout(3);
-
-        // @phpstan-ignore property.protected
-        $this->deprecated(fn () => $this->Utility->timeout);
-    }
-
-    #[Test]
-    public function testMagicGetMethodNoExistingProperty(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Undefined property: ' . $this->Utility::class . '::$noExistingProperty');
-        // @phpstan-ignore property.notFound,expr.resultUnused
-        $this->Utility->noExistingProperty;
-    }
-
     /**
      * @return array<array{non-empty-string, non-empty-string}>
      */
