@@ -46,7 +46,8 @@ class SqliteExecutorTest extends TestCase
         /**
          * `$Schema` describes the tables.
          */
-        $Schema = $this->createStub(CollectionInterface::class);
+        $Schema = $this->createMock(CollectionInterface::class);
+
         $Schema
             ->expects($this->once())
             ->method('listTables')
