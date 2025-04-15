@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
-use BadMethodCallException;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Event\EventDispatcherTrait;
@@ -59,36 +58,6 @@ abstract class AbstractExecutor implements EventListenerInterface
 
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
-    }
-
-    /**
-     * Magic `__call()` method.
-     *
-     * @param string $name
-     * @param array $arguments
-     * @return string
-     * @todo to be removed in a future release
-     * @phpstan-ignore missingType.iterableValue
-     */
-    public function __call(string $name, array $arguments): string
-    {
-        $replacements = [
-            'getExportExecutable' => 'getExportCommand',
-            'getImportExecutable' => 'getImportCommand',
-        ];
-
-        $replacement = $replacements[$name] ?? null;
-        if ($replacement) {
-            deprecationWarning('2.14.1', sprintf(
-                'The `AbstractExecutor::%s()` method is deprecated and will be removed in a future release. Use instead `%s()`',
-                $name,
-                $replacement
-            ));
-
-            return $this->{$replacement}(...$arguments);
-        }
-
-        throw new BadMethodCallException('Method `' . $this::class . '::' . $name . '()` does not exist.');
     }
 
     /**

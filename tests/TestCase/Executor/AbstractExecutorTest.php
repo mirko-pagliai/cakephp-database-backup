@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
-use BadMethodCallException;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -24,7 +23,6 @@ use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * AbstractExecutorTest.
@@ -56,36 +54,6 @@ class AbstractExecutorTest extends TestCase
             ->setConstructorArgs([$this->Connection])
             ->onlyMethods(['getExportBinary', 'getImportBinary'])
             ->getMock();
-    }
-
-    /**
-     * @param non-empty-string $expectedNewMethod
-     * @param non-empty-string $oldMethod
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    #[Test]
-    #[TestWith(['getExportCommand', 'getExportExecutable'])]
-    #[TestWith(['getImportCommand', 'getImportExecutable'])]
-    #[WithoutErrorHandler]
-    public function testCallMagicMethod(string $expectedNewMethod, string $oldMethod): void
-    {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getExportBinary', 'getImportBinary', $expectedNewMethod]);
-
-        $Executor
-            ->expects($this->once())
-            ->method($expectedNewMethod)
-            ->with($this->equalTo('filename.sql'));
-
-        $this->deprecated(fn () => $Executor->{$oldMethod}('filename.sql'));
-    }
-
-    #[Test]
-    public function testCallMagicMethodNoExistingMethod(): void
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method `' . $this->Executor::class . '::noExistingMethod()` does not exist');
-        // @phpstan-ignore method.notFound
-        $this->Executor->noExistingMethod();
     }
 
     #[Test]

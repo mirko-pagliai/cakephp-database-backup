@@ -9,6 +9,8 @@
 * the "Executors" classes now implement the `EXPORT_BINARY` and `IMPORT_BINARY` constants, which are strings or arrays
   of strings (e.g. in the case of `MysqlExecutor`);
 * the `AbstractBackupUtility::_getDriver()` had been deprecated and has now been removed;
+* the `AbstractExecutor::__call()` magic method, which provided backwards compatibility for deprecated
+  `getExportExecutable()` and `getImportExecutable()` methods, has been removed;
 * the `AbstractBackupUtility::__get()` magic method, which allowed to read the properties of the "Executor" classes, had
   been deprecated and has now been removed;
 * `BackupTrait` had been deprecated and has now been removed;
