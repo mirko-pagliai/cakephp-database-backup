@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use BadMethodCallException;
-use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -103,10 +102,8 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'sqlite3-binary\' my-database .dump | \'bzip2-binary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
     public function testGetExportCommand(string $expectedExportCommand, string $filename): void
     {
-        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new Sqlite()]);
-
         $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$Connection])
+            ->setConstructorArgs([$this->Connection, 'Sqlite'])
             ->onlyMethods(['getBinary', 'getConfig'])
             ->getMock();
 
@@ -136,10 +133,8 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'bzip2-binary\' -dc \'filename.sql.bz2\' | \'sqlite3-binary\' my-database', 'filename.sql.bz2'])]
     public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
-        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new Sqlite()]);
-
         $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$Connection])
+            ->setConstructorArgs([$this->Connection, 'Sqlite'])
             ->onlyMethods(['getBinary', 'getConfig'])
             ->getMock();
 

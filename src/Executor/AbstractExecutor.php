@@ -38,13 +38,21 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     use EventDispatcherTrait;
 
+    protected string $name;
+
     /**
      * Constructor.
      *
      * @param \Cake\Datasource\ConnectionInterface $Connection
+     * @param string|null $name Driver name. By default, it will be automatically obtained from `$Connection`
      */
-    public function __construct(protected ConnectionInterface $Connection)
+    public function __construct(protected ConnectionInterface $Connection, ?string $name = null)
     {
+        /**
+         * For example, for `Cake\Database\Driver\Mysql` driver  the name will be `MySql`.
+         */
+        $this->name = $name ?: substr($Connection->getDriver()::class, strlen('Cake\\Database\\Driver\\'));
+
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
@@ -110,10 +118,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     protected function getCommand(OperationType $OperationType): string
     {
-        /**
-         * `DatabaseBackup\Executor\MysqlExecutor` has to become `mysql`
-         */
-        $driverName = lcfirst(substr($this->Connection->getDriver()::class, strlen('Cake\\Database\\Driver\\')));
+        $driverName = lcfirst($this->name);
 
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
