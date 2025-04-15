@@ -110,6 +110,47 @@ class MysqlExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
+    public function testWriteAuthFile(): void
+    {
+        $expectedContent = '[mysqldump]' . PHP_EOL .
+            'user=my-username' . PHP_EOL .
+            'password="my-password"' . PHP_EOL .
+            'host=my-host';
+
+        $FileSystem = $this->createPartialMock(Filesystem::class, ['dumpFile', 'exists']);
+
+        $FileSystem
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with($this->stringStartsWith(TMP), $this->equalTo($expectedContent));
+
+        $FileSystem
+            ->expects($this->once())
+            ->method('exists')
+            ->with($this->stringStartsWith(TMP))
+            ->willReturn(true);
+
+        $MysqlExecutor = $this->getMysqlExecutorMock(['getFilesystem', 'getConfig']);
+
+        $MysqlExecutor
+            ->expects($this->once())
+            ->method('getFilesystem')
+            ->willReturn($FileSystem);
+
+        $MysqlExecutor
+            ->expects($this->exactly(3))
+            ->method('getConfig')
+            ->willReturnCallback(fn (string $key): ?string => 'my-' . $key);
+
+        $result = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
+
+        $this->assertTrue($result->getResult());
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    #[Test]
     public function testDeleteAuthFile(): void
     {
         $expectedAuthFile = TMP . 'myAuthFile';
