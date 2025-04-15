@@ -77,13 +77,13 @@ class BackupImport extends AbstractBackupUtility
         $filename = $this->getFilename();
         $this->filename = '';
 
+        $Executor = $this->getExecutor();
+
         //Dispatches the `Backup.beforeImport` event implemented by the `Executor` class
-        $BeforeImport = $this->getExecutor()->dispatchEvent('Backup.beforeImport');
+        $BeforeImport = $Executor->dispatchEvent('Backup.beforeImport');
         if ($BeforeImport->isStopped()) {
             return false;
         }
-
-        $Executor = $this->getExecutor();
 
         //Imports
         $Process = $this->getProcess($Executor->getImportCommand($filename));
