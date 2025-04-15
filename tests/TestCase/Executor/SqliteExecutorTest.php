@@ -48,9 +48,12 @@ class SqliteExecutorTest extends TestCase
          */
         $Schema = $this->createStub(CollectionInterface::class);
         $Schema
+            ->expects($this->once())
             ->method('listTables')
             ->willReturn($tables);
+
         $Schema
+            ->expects($this->any())
             ->method('describe')
             ->willReturnCallback(function (string $tableName): TableSchema {
                 return $this->getMockBuilder(TableSchema::class)
@@ -60,10 +63,14 @@ class SqliteExecutorTest extends TestCase
             });
 
         $Connection = $this->createMock(Connection::class);
+
         $Connection
+            ->expects($this->any())
             ->method('getDriver')
             ->willReturn(new Sqlite());
+
         $Connection
+            ->expects($this->once())
             ->method('getSchemaCollection')
             ->willReturn($Schema);
 
@@ -93,9 +100,11 @@ class SqliteExecutorTest extends TestCase
     public function testBeforeImport(): void
     {
         $Driver = $this->createPartialMock(Sqlite::class, ['connect', 'disconnect']);
+
         $Driver
             ->expects($this->once())
             ->method('connect');
+
         $Driver
             ->expects($this->once())
             ->method('disconnect');

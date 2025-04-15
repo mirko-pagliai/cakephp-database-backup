@@ -20,9 +20,6 @@ class CommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[TestWith(['backup.sql', 'backup.sql'])]
     #[TestWith(['backup.sql', ROOT . 'backup.sql'])]
@@ -31,8 +28,9 @@ class CommandTest extends TestCase
     #[TestWith(['/anotherDir/backup.sql', '/anotherDir/backup.sql'])]
     public function testMakeRelativeFilename(string $expectedRelativeFilename, string $filename): void
     {
-        $result = $this->createPartialMock(Command::class, [])
-            ->makeRelativeFilename($filename);
+        $Command = new class extends Command {
+        };
+        $result = $Command->makeRelativeFilename($filename);
         $this->assertSame($expectedRelativeFilename, $result);
     }
 
@@ -46,7 +44,7 @@ class CommandTest extends TestCase
         $this->_err = new StubConsoleOutput();
 
         $Command = $this->createPartialMock(Command::class, []);
-        $result = $Command->run([], new ConsoleIo($this->_out, $this->_err));
+        $result = $Command->run(argv: [], io: new ConsoleIo($this->_out, $this->_err));
 
         $this->assertNull($result);
         $this->assertOutputContains('Connection: test');

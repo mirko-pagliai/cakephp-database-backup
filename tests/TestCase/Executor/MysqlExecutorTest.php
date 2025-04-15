@@ -53,7 +53,8 @@ class MysqlExecutorTest extends TestCase
     public function testAfterExport(): void
     {
         $MysqlExecutor = $this->getMysqlExecutorMock(['deleteAuthFile']);
-        $MysqlExecutor->expects($this->once())
+        $MysqlExecutor
+            ->expects($this->once())
             ->method('deleteAuthFile');
 
         $MysqlExecutor->dispatchEvent('Backup.afterExport');
@@ -66,7 +67,8 @@ class MysqlExecutorTest extends TestCase
     public function testAfterImport(): void
     {
         $MysqlExecutor = $this->getMysqlExecutorMock(['deleteAuthFile']);
-        $MysqlExecutor->expects($this->once())
+        $MysqlExecutor
+            ->expects($this->once())
             ->method('deleteAuthFile');
 
         $MysqlExecutor->dispatchEvent('Backup.afterImport');
@@ -79,7 +81,8 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeExport(): void
     {
         $MysqlExecutor = $this->getMysqlExecutorMock(['writeAuthFile']);
-        $MysqlExecutor->expects($this->once())
+        $MysqlExecutor
+            ->expects($this->once())
             ->method('writeAuthFile')
             ->with('[mysqldump]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
@@ -96,7 +99,8 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeImport(): void
     {
         $MysqlExecutor = $this->getMysqlExecutorMock(['writeAuthFile']);
-        $MysqlExecutor->expects($this->once())
+        $MysqlExecutor
+            ->expects($this->once())
             ->method('writeAuthFile')
             ->with('[client]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
@@ -157,15 +161,20 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem = $this->createPartialMock(Filesystem::class, ['remove']);
 
-        $Filesystem->expects($this->once())
+        $Filesystem
+            ->expects($this->once())
             ->method('remove')
             ->with($expectedAuthFile);
 
         $MysqlExecutor = $this->getMysqlExecutorMock(['getFilesystem', 'getAuthFilePath']);
+
         $MysqlExecutor
+            ->expects($this->once())
             ->method('getFilesystem')
             ->willReturn($Filesystem);
+
         $MysqlExecutor
+            ->expects($this->once())
             ->method('getAuthFilePath')
             ->willReturn($expectedAuthFile);
 

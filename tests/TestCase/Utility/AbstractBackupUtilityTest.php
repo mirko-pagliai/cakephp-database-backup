@@ -159,7 +159,8 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getExecutor']);
 
-        $Utility->expects($this->once())
+        $Utility
+            ->expects($this->once())
             ->method('getExecutor')
             ->with($this->anything());
 
