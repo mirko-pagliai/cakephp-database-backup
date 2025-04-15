@@ -100,7 +100,8 @@ class BackupImportTest extends TestCase
 
         $BackupImport->getExecutor()->getEventManager()->setEventList(new EventList());
 
-        $result = $BackupImport->filename($filename)
+        $result = $BackupImport
+            ->filename($filename)
             ->import();
         $this->assertIsString($result);
         $this->assertSame($filename, $result);

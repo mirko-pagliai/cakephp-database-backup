@@ -36,14 +36,8 @@ class ImportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    /**
-     * @var string
-     */
     protected string $command = 'database_backup.import -v';
 
-    /**
-     * @uses \DatabaseBackup\Command\ImportCommand::makeAbsoluteFilename()
-     */
     #[Test]
     #[TestWith(['file.sql', 'file.sql'])]
     #[TestWith([TMP . 'backups' . DS . 'file.sql', TMP . 'backups' . DS . 'file.sql'])]
@@ -54,9 +48,6 @@ class ImportCommandTest extends TestCase
         $this->assertSame($expectedFilename, $result);
     }
 
-    /**
-     * @uses \DatabaseBackup\Command\ImportCommand::execute()
-     */
     #[Test]
     public function testExecute(): void
     {
@@ -68,13 +59,11 @@ class ImportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * @uses \DatabaseBackup\Command\ImportCommand::execute()
-     */
     #[Test]
     public function testExecuteNoExistingFile(): void
     {
         $filename = '/noExistingDir/backup.sql';
+
         $this->exec($this->command . ' ' . $filename);
         $this->assertExitError();
         $this->assertErrorContains('File or directory `' . $filename . '` is not readable');
@@ -82,8 +71,6 @@ class ImportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--timeout` option.
-     *
-     * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     #[Test]
     public function testExecuteTimeoutOption(): void
@@ -96,21 +83,22 @@ class ImportCommandTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Command\ImportCommand::execute()
      */
     #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
         $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
+
         $ImportCommand
+            ->expects($this->once())
             ->method('getBackupImport')
             ->willReturn($this->createConfiguredMock(BackupImport::class, ['import' => false]));
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
         $ImportCommand->run(
-            ['--filename' => $this->createBackup(fakeBackup: true)],
-            new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
+            argv: ['--filename' => $this->createBackup(fakeBackup: true)],
+            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
         );
     }
 }

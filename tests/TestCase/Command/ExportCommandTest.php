@@ -37,14 +37,8 @@ class ExportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    /**
-     * @var string
-     */
     protected string $command = 'database_backup.export -v';
 
-    /**
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
-     */
     #[Test]
     public function testExecute(): void
     {
@@ -56,8 +50,6 @@ class ExportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--compression` option.
-     *
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
     public function testExecuteCompressionOption(): void
@@ -70,8 +62,6 @@ class ExportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--filename` option.
-     *
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
     public function testExecuteFilenameOption(): void
@@ -84,8 +74,6 @@ class ExportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--rotate` option.
-     *
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
     public function testExecuteRotateOption(): void
@@ -102,8 +90,6 @@ class ExportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--rotate` option, but no files to rotate.
-     *
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
     public function testExecuteRotateOptionWithNoFileToDelete(): void
@@ -117,8 +103,6 @@ class ExportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--timeout` option.
-     *
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
     public function testExecuteTimeoutOption(): void
@@ -129,9 +113,6 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
-     */
     #[Test]
     public function testExecuteNotWritableTarget(): void
     {
@@ -142,21 +123,22 @@ class ExportCommandTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
         $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
+
         $ExportCommand
+            ->expects($this->once())
             ->method('getBackupExport')
             ->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
         $ExportCommand->run(
-            [],
-            new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
+            argv: [],
+            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
         );
     }
 }

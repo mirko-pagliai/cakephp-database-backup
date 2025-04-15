@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.14 branch
 ### 2.14.1
+* many improvements for the `AbstractExecutor` abstract class;
 * method `AbstractBackupUtility::getExecutor()` now accepts the optional `$Connection` argument. The `getConnection()` 
   method has been removed;
 * `getExecutable()`, `getExportExecutable()` and `getImportExecutable()` methods provided by `AbstractExecutor` have

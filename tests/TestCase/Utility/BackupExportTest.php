@@ -243,7 +243,9 @@ class BackupExportTest extends TestCase
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
 
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
-        $BackupExport->method('getProcess')
+        $BackupExport
+            ->expects($this->once())
+            ->method('getProcess')
             ->willReturn($Process);
 
         $this->expectException(RuntimeException::class);
