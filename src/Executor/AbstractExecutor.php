@@ -113,16 +113,16 @@ abstract class AbstractExecutor implements EventListenerInterface
     /**
      * Returns the names of the binaries to export, (as a string or array of strings) related to the respective driver.
      *
-     * @return string|array<string>
+     * @return array<string>|string
      */
-    protected abstract function getExportBinary(): string|array;
+    abstract protected function getExportBinary(): string|array;
 
     /**
      * Returns the names of the binaries to import, (as a string or array of strings) related to the respective driver.
      *
-     * @return string|array<string>
+     * @return array<string>|string
      */
-    protected abstract function getImportBinary(): string|array;
+    abstract protected function getImportBinary(): string|array;
 
     /**
      * Gets and parses commands from the configuration, according to the type of requested `OperationType` and the
