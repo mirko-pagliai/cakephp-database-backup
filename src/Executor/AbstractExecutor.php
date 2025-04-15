@@ -25,6 +25,7 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Override;
+use Symfony\Component\Process\ExecutableFinder;
 
 /**
  * Represents an `Executor` class containing all methods to export/import database backups, according to the connection.
@@ -216,6 +217,28 @@ abstract class AbstractExecutor implements EventListenerInterface
     public function beforeImport(): bool
     {
         return true;
+    }
+
+    /**
+     * Finds e returns a binary
+     *
+     * @param \DatabaseBackup\Compression|string $name
+     * @return string|null
+     */
+    public function findBinary(Compression|string $name): ?string
+    {
+        if ($name instanceof Compression) {
+            $name = lcfirst($name->name);
+        }
+
+        $binary = Configure::read('DatabaseBackup.binaries.' . $name);
+        if ($binary) {
+            return $binary;
+        }
+
+        $ExecutableFinder = new ExecutableFinder();
+
+        return $ExecutableFinder->find(name: $name);
     }
 
     /**
