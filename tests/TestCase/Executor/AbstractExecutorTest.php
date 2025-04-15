@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use BadMethodCallException;
+use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -97,22 +98,29 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['exportCommand > \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['exportCommand | \'compressionBinary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
-    #[TestWith(['exportCommand | \'compressionBinary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
+    #[TestWith(['\'sqlite3-binary\' my-database .dump > \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['\'sqlite3-binary\' my-database .dump | \'gzip-binary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
+    #[TestWith(['\'sqlite3-binary\' my-database .dump | \'bzip2-binary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
     public function testGetExportCommand(string $expectedExportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'getBinary']);
+        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new Sqlite()]);
 
-        $Executor
-            ->expects($this->once())
-            ->method('getCommand')
-            ->willReturn('exportCommand');
+        $Executor = $this->getMockBuilder(AbstractExecutor::class)
+            ->setConstructorArgs([$Connection])
+            ->onlyMethods(['getBinary', 'getConfig'])
+            ->getMock();
 
         $Executor
             ->expects($this->any())
             ->method('getBinary')
-            ->willReturn('compressionBinary');
+            ->willReturnCallback(function (Compression|string $binaryName): string {
+                return ($binaryName instanceof Compression ? strtolower($binaryName->name) : $binaryName) . '-binary';
+            });
+
+        $Executor
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
 
         $result = $Executor->getExportCommand($filename);
 
@@ -123,22 +131,29 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['importCommand < \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.gz\' | importCommand', 'filename.sql.gz'])]
-    #[TestWith(['\'compressionBinary\' -dc \'filename.sql.bz2\' | importCommand', 'filename.sql.bz2'])]
+    #[TestWith(['\'sqlite3-binary\' my-database < \'filename.sql\'', 'filename.sql'])]
+    #[TestWith(['\'gzip-binary\' -dc \'filename.sql.gz\' | \'sqlite3-binary\' my-database', 'filename.sql.gz'])]
+    #[TestWith(['\'bzip2-binary\' -dc \'filename.sql.bz2\' | \'sqlite3-binary\' my-database', 'filename.sql.bz2'])]
     public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'getBinary']);
+        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new Sqlite()]);
 
-        $Executor
-            ->expects($this->once())
-            ->method('getCommand')
-            ->willReturn('importCommand');
+        $Executor = $this->getMockBuilder(AbstractExecutor::class)
+            ->setConstructorArgs([$Connection])
+            ->onlyMethods(['getBinary', 'getConfig'])
+            ->getMock();
 
         $Executor
             ->expects($this->any())
             ->method('getBinary')
-            ->willReturn('compressionBinary');
+            ->willReturnCallback(function (Compression|string $binaryName): string {
+                return ($binaryName instanceof Compression ? strtolower($binaryName->name) : $binaryName) . '-binary';
+            });
+
+        $Executor
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
 
         $result = $Executor->getImportCommand($filename);
 
