@@ -130,21 +130,4 @@ class AbstractBackupUtilityTest extends TestCase
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
         $this->Utility->getExecutor($Connection);
     }
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testGetDriver(): void
-    {
-        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getExecutor']);
-
-        $Utility
-            ->expects($this->once())
-            ->method('getExecutor')
-            ->with($this->anything());
-
-        $this->deprecated(fn () => $Utility->getDriver());
-    }
 }
