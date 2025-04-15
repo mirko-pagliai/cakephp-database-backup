@@ -21,15 +21,18 @@ use Cake\Database\Schema\CollectionInterface;
 use Cake\Database\Schema\TableSchema;
 use Cake\Database\StatementInterface;
 use Cake\Datasource\ConnectionInterface;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * SqliteExecutorTest class.
  */
 #[CoversClass(SqliteExecutor::class)]
+#[UsesClass(AbstractExecutor::class)]
 class SqliteExecutorTest extends TestCase
 {
     /**

@@ -27,9 +27,9 @@ use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
-use DatabaseBackup\Utility\BackupExport;
 use Generator;
 use InvalidArgumentException;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -42,11 +42,24 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 #[CoversClass(AbstractBackupUtility::class)]
 class AbstractBackupUtilityTest extends TestCase
 {
+    /**
+     * @var \DatabaseBackup\Utility\AbstractBackupUtility&\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected AbstractBackupUtility $Utility;
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    #[Override]
+    protected function setUp(): void
+    {
+        $this->Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
+    }
+
     #[Test]
     public function testMagicCallMethod(): void
     {
-        $Utility = new BackupExport();
-        $this->assertIsInt($Utility->getRotate());
+        $this->assertIsInt($this->Utility->getTimeout());
     }
 
     #[Test]
@@ -54,29 +67,28 @@ class AbstractBackupUtilityTest extends TestCase
     #[TestWith(['noExistingMethod'])]
     public function testMagicCallMethodWithNoExistingMethod(string $noExistingMethod): void
     {
-        $Utility = $this->getMockBuilder(AbstractBackupUtility::class)
-            ->onlyMethods(['filename'])
-            ->getMock();
-
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method `' . $Utility::class . '::' . $noExistingMethod . '()` does not exist.');
-        $Utility->{$noExistingMethod}();
+        $this->expectExceptionMessage('Method `' . $this->Utility::class . '::' . $noExistingMethod . '()` does not exist.');
+        $this->Utility->{$noExistingMethod}();
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[WithoutErrorHandler]
-    public function testMagicGetMethodIsDeprecated(): void
+    public function testMagicGetMethod(): void
     {
-        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
-        $Utility->timeout(3);
+        $this->Utility->timeout(3);
 
-        $this->deprecated(function () use ($Utility): void {
-            // @phpstan-ignore property.protected, expr.resultUnused
-            $Utility->timeout;
-        });
+        // @phpstan-ignore property.protected
+        $this->deprecated(fn () => $this->Utility->timeout);
+    }
+
+    #[Test]
+    public function testMagicGetMethodNoExistingProperty(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Undefined property: ' . $this->Utility::class . '::$noExistingProperty');
+        // @phpstan-ignore property.notFound,expr.resultUnused
+        $this->Utility->noExistingProperty;
     }
 
     public static function makeAbsoluteFilenameProvider(): Generator
@@ -97,15 +109,12 @@ class AbstractBackupUtilityTest extends TestCase
         ];
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[DataProvider('makeAbsoluteFilenameProvider')]
     public function testMakeAbsoluteFilename(string $expectedAbsolutePath, string $path): void
     {
-        $result = $this->createPartialMock(AbstractBackupUtility::class, ['filename'])
-            ->makeAbsoluteFilename($path);
+        $result = $this->Utility->makeAbsoluteFilename($path);
+
         $this->assertSame($expectedAbsolutePath, $result);
     }
 
@@ -122,25 +131,18 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new $driverClassname()]);
 
-        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
-
-        $result = $Utility->getExecutor($Connection);
+        $result = $this->Utility->getExecutor($Connection);
         $this->assertInstanceOf($expectedExecutorClassname, $result);
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testGetExecutorNoExistingExecutor(): void
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new FakeDriver()]);
 
-        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
-        $Utility->getExecutor($Connection);
+        $this->Utility->getExecutor($Connection);
     }
 
     /**
@@ -151,8 +153,10 @@ class AbstractBackupUtilityTest extends TestCase
     public function testGetDriver(): void
     {
         $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getExecutor']);
+
         $Utility->expects($this->once())
-            ->method('getExecutor');
+            ->method('getExecutor')
+            ->with($this->anything());
 
         $this->deprecated(fn () => $Utility->getDriver());
     }

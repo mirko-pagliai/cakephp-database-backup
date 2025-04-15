@@ -21,11 +21,13 @@ use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\UsesClass;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -37,6 +39,7 @@ use ValueError;
  * BackupExportTest class.
  */
 #[CoversClass(BackupExport::class)]
+#[UsesClass(AbstractBackupUtility::class)]
 class BackupExportTest extends TestCase
 {
     /**

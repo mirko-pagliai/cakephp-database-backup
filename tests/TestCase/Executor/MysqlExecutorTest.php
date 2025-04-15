@@ -17,15 +17,18 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Datasource\ConnectionInterface;
 use Cake\TestSuite\TestCase;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\MysqlExecutor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * MysqlExecutorTest class.
  */
 #[CoversClass(MysqlExecutor::class)]
+#[UsesClass(AbstractExecutor::class)]
 class MysqlExecutorTest extends TestCase
 {
     /**

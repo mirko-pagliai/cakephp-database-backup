@@ -32,6 +32,7 @@ class MysqlExecutor extends AbstractExecutor
 
     /**
      * @return \Symfony\Component\Filesystem\Filesystem
+     * @codeCoverageIgnore
      */
     protected function getFilesystem(): Filesystem
     {

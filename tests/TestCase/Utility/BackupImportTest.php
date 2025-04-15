@@ -21,10 +21,12 @@ use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\UsesClass;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -34,6 +36,7 @@ use ValueError;
  * BackupImportTest class.
  */
 #[CoversClass(BackupImport::class)]
+#[UsesClass(AbstractBackupUtility::class)]
 class BackupImportTest extends TestCase
 {
     /**
