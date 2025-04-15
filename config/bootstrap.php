@@ -79,7 +79,15 @@ if (!is_dir($target) || !is_writeable($target)) {
  *
  * @todo to be removed in version 2.15.0
  */
-class_alias(class: 'DatabaseBackup\Executor\AbstractExecutor', alias: 'DatabaseBackup\Driver\AbstractDriver');
-class_alias(class: 'DatabaseBackup\Executor\MysqlExecutor', alias: 'DatabaseBackup\Driver\Mysql');
-class_alias(class: 'DatabaseBackup\Executor\PostgresExecutor', alias: 'DatabaseBackup\Driver\Postgres');
-class_alias(class: 'DatabaseBackup\Executor\SqliteExecutor', alias: 'DatabaseBackup\Driver\Sqlite');
+foreach (
+    [
+        'DatabaseBackup\Executor\AbstractExecutor' => 'DatabaseBackup\Driver\AbstractDriver',
+        'DatabaseBackup\Executor\MysqlExecutor' => 'DatabaseBackup\Driver\Mysql',
+        'DatabaseBackup\Executor\PostgresExecutor' => 'DatabaseBackup\Driver\Postgres',
+        'DatabaseBackup\Executor\SqliteExecutor' => 'DatabaseBackup\Driver\Sqlite',
+    ] as $class => $alias
+) {
+    if (!class_exists($alias)) {
+        class_alias(class: $class, alias: $alias);
+    }
+}

@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -24,6 +23,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -50,16 +50,12 @@ class BackupExportTest extends TestCase
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->BackupExport = new BackupExport();
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupExport::compression()
-     */
     #[Test]
     #[TestWith([Compression::None])]
     #[TestWith([Compression::Gzip])]
@@ -70,9 +66,6 @@ class BackupExportTest extends TestCase
         $this->assertSame($Compression, $this->BackupExport->getCompression());
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupExport::filename()
-     */
     #[Test]
     #[TestWith(['backup.sql'])]
     #[TestWith(['backup.sql.gz'])]
@@ -99,29 +92,21 @@ class BackupExportTest extends TestCase
         $this->assertSame($expectedCompression, $this->BackupExport->getCompression());
     }
 
-    /**
-     * Test for `filename()` method, with a no writable target.
-     *
-     * @uses \DatabaseBackup\Utility\BackupExport::filename()
-     */
     #[Test]
     public function testFilenameWithNoWritableTarget(): void
     {
         $filename = '/noExistingDir/backup.sql';
+
         $this->expectException(IOException::class);
         $this->expectExceptionMessage('File or directory `' . dirname($filename) . '` is not writable');
         $this->BackupExport->filename($filename);
     }
 
-    /**
-     * Test for `filename()` method, with file already exist.
-     *
-     * @uses \DatabaseBackup\Utility\BackupExport::filename()
-     */
     #[Test]
     public function testFilenameWithFileAlreadyExists(): void
     {
         $filename = $this->createBackup();
+
         $this->expectException(IOException::class);
         $this->expectExceptionMessage('File `' . $filename . '` already exists');
         $this->BackupExport->filename($filename);
@@ -129,8 +114,6 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `filename()` method, with patterns on the filename (`{$DATABASE}`, `{$DATETIME}` and so on...).
-     *
-     * @uses \DatabaseBackup\Utility\BackupExport::filename()
      */
     #[Test]
     #[TestWith(['test.sql', '{$DATABASE}.sql'])]
@@ -146,23 +129,16 @@ class BackupExportTest extends TestCase
         $this->{$assertMethod}($expectedFilename, basename($result));
     }
 
-    /**
-     * Test for `filename()` method, with an invalid filename.
-     *
-     * @uses \DatabaseBackup\Utility\BackupExport::filename()
-     */
     #[Test]
     public function testFilenameInvalidFilename(): void
     {
         $filename = TMP . 'backup.txt';
+
         $this->expectException(ValueError::class);
         $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . $filename . '`');
         $this->BackupExport->filename($filename);
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupExport::rotate()
-     */
     #[Test]
     public function testRotate(): void
     {
@@ -172,16 +148,19 @@ class BackupExportTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExport(): void
     {
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getFilesystem', 'getProcess']);
+
         $BackupExport
+            ->expects($this->any())
             ->method('getProcess')
             ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+
         $BackupExport
+            ->expects($this->any())
             ->method('getFilesystem')
             ->willReturn($this->createStub(Filesystem::class));
 
@@ -217,41 +196,45 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `export()` method.
-     *
      * Export is stopped by the `Backup.beforeExport` event (implemented by the `Executor` class).
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExportStoppedByBeforeExport(): void
     {
-        $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([ConnectionManager::get('test')])
-            ->onlyMethods(['beforeExport'])
-            ->getMock();
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeExport', 'getConfig']);
 
-        $Executor->expects($this->once())
+        $Executor
+            ->expects($this->once())
             ->method('beforeExport')
             ->willReturn(false);
 
+        $Executor
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturn('');
+
         $Executor->getEventManager()->on($Executor);
 
-        $BackupExport = $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods(['getExecutor'])
-            ->getMock();
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getExecutor']);
+
         $BackupExport
+            ->expects($this->any())
             ->method('getExecutor')
             ->willReturn($Executor);
-        $this->assertFalse($BackupExport->export());
+
+        $result = $BackupExport
+            ->filename('backup_test.sql')
+            ->export();
+
+        $this->assertFalse($result);
     }
 
     /**
      * Test for `export()` method, on failure (error for `Process`).
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExportOnFailure(): void
@@ -273,7 +256,6 @@ class BackupExportTest extends TestCase
      *
      * @requires OS Linux
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExportWithDifferentChmod(): void
@@ -290,9 +272,12 @@ class BackupExportTest extends TestCase
 
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getFilesystem', 'getProcess']);
         $BackupExport
+            ->expects($this->once())
             ->method('getFilesystem')
             ->willReturn($Filesystem);
+
         $BackupExport
+            ->expects($this->once())
             ->method('getProcess')
             ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
 
@@ -305,7 +290,6 @@ class BackupExportTest extends TestCase
      * Test for `export()` method, `Process` exceeding the timeout.
      *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
-     * @uses \DatabaseBackup\Utility\BackupExport::export()
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
@@ -314,7 +298,9 @@ class BackupExportTest extends TestCase
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
 
         $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
-        $BackupExport->method('getProcess')
+        $BackupExport
+            ->expects($this->once())
+            ->method('getProcess')
             ->willThrowException($ProcessTimedOutException);
 
         $this->expectException(ProcessTimedOutException::class);

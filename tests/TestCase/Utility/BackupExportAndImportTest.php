@@ -20,6 +20,7 @@ use Cake\TestSuite\TestCase;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -46,7 +47,7 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @var array<string>
      */
-    public array $fixtures = [
+    protected array $fixtures = [
         'core.Articles',
         'core.Comments',
     ];
@@ -68,6 +69,7 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
