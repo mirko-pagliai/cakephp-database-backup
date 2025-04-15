@@ -145,6 +145,39 @@ class AbstractExecutorTest extends TestCase
         $this->assertSame($expectedImportCommand, $result);
     }
 
+    /**
+     * @param string $expectedBinary
+     * @param array<string|Compression> $name
+     * @return void
+     */
+    #[Test]
+    #[TestWith(['/usr/bin/mariadb', ['mysql']])]
+    #[TestWith(['/usr/bin/mariadb', ['mariadb', 'mysql']])]
+    #[TestWith(['/usr/bin/mariadb', ['noExistingMySqlBinary', 'mysql']])]
+    #[TestWith(['/usr/bin/gzip', ['gzip']])]
+    #[TestWith(['/usr/bin/gzip', [Compression::Gzip]])]
+    public function testFindBinary(string $expectedBinary, array $name): void
+    {
+        $binary = $this->Executor->findBinary(...$name);
+        $this->assertSame($expectedBinary, $binary);
+    }
+
+    /**
+     * @param string $expectedBinaryName
+     * @param array<string|Compression> $name
+     * @return void
+     */
+    #[Test]
+    #[TestWith(['noExistingBinary', ['noExistingBinary']])]
+    #[TestWith(['noExistingBinary', ['noExistingBinary', 'anotherNoExistingBinary']])]
+    #[TestWith(['none', [Compression::None]])]
+    public function testFindBinaryNoExistingBinary(string $expectedBinaryName, array $name): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
+        $this->Executor->findBinary(...$name);
+    }
+
     #[Test]
     #[TestWith(['mysql'])]
     #[TestWith(['gzip'])]
