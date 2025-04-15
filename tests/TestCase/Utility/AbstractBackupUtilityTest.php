@@ -27,7 +27,6 @@ use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
-use Generator;
 use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -91,21 +90,21 @@ class AbstractBackupUtilityTest extends TestCase
         $this->Utility->noExistingProperty;
     }
 
-    public static function makeAbsoluteFilenameProvider(): Generator
+    public static function makeAbsoluteFilenameProvider(): array
     {
-        yield [
-            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-            'file.txt',
-        ];
-
-        yield [
-            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-            Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-        ];
-
-        yield [
-            TMP . 'tmp_file',
-            TMP . 'tmp_file',
+        return [
+            [
+                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+                'file.txt',
+            ],
+            [
+                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
+            ],
+            [
+                TMP . 'tmp_file',
+                TMP . 'tmp_file',
+            ],
         ];
     }
 
