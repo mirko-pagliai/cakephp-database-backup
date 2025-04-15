@@ -90,6 +90,9 @@ class AbstractBackupUtilityTest extends TestCase
         $this->Utility->noExistingProperty;
     }
 
+    /**
+     * @return array<array{non-empty-string, non-empty-string}>
+     */
     public static function makeAbsoluteFilenameProvider(): array
     {
         return [
@@ -134,6 +137,9 @@ class AbstractBackupUtilityTest extends TestCase
         $this->assertInstanceOf($expectedExecutorClassname, $result);
     }
 
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
     #[Test]
     public function testGetExecutorNoExistingExecutor(): void
     {
