@@ -73,21 +73,3 @@ if (!file_exists($target)) {
 if (!is_dir($target) || !is_writeable($target)) {
     trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target), E_USER_ERROR);
 }
-
-/**
- * Aliases for old `Driver` classes.
- *
- * @todo to be removed in version 2.15.0
- */
-foreach (
-    [
-        'DatabaseBackup\Executor\AbstractExecutor' => 'DatabaseBackup\Driver\AbstractDriver',
-        'DatabaseBackup\Executor\MysqlExecutor' => 'DatabaseBackup\Driver\Mysql',
-        'DatabaseBackup\Executor\PostgresExecutor' => 'DatabaseBackup\Driver\Postgres',
-        'DatabaseBackup\Executor\SqliteExecutor' => 'DatabaseBackup\Driver\Sqlite',
-    ] as $class => $alias
-) {
-    if (!class_exists($alias)) {
-        class_alias(class: $class, alias: $alias);
-    }
-}

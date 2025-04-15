@@ -8,7 +8,8 @@
   to the respective driver;
 * the "Executors" classes now implement the `EXPORT_BINARY` and `IMPORT_BINARY` constants, which are strings or arrays
   of strings (e.g. in the case of `MysqlExecutor`);
-* `BackupTrait` had been deprecated and has now been removed.
+* `BackupTrait` had been deprecated and has now been removed;
+* aliases for old `Driver` classes have been removed.
 
 ## 2.14 branch
 ### 2.14.1
