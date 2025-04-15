@@ -102,7 +102,7 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['exportCommand | \'compressionBinary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
     public function testGetExportCommand(string $expectedExportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'getBinary']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'findBinary']);
 
         $Executor
             ->expects($this->once())
@@ -111,7 +111,7 @@ class AbstractExecutorTest extends TestCase
 
         $Executor
             ->expects($this->any())
-            ->method('getBinary')
+            ->method('findBinary')
             ->willReturn('compressionBinary');
 
         $result = $Executor->getExportCommand($filename);
@@ -128,7 +128,7 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'compressionBinary\' -dc \'filename.sql.bz2\' | importCommand', 'filename.sql.bz2'])]
     public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'getBinary']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getCommand', 'findBinary']);
 
         $Executor
             ->expects($this->once())
@@ -137,7 +137,7 @@ class AbstractExecutorTest extends TestCase
 
         $Executor
             ->expects($this->any())
-            ->method('getBinary')
+            ->method('findBinary')
             ->willReturn('compressionBinary');
 
         $result = $Executor->getImportCommand($filename);
@@ -176,26 +176,6 @@ class AbstractExecutorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
         $this->Executor->findBinary(...$name);
-    }
-
-    #[Test]
-    #[TestWith(['mysql'])]
-    #[TestWith(['gzip'])]
-    #[TestWith([Compression::Gzip])]
-    #[TestWith([Compression::Bzip2])]
-    public function testGetBinary(string|Compression $binaryName): void
-    {
-        $this->assertNotEmpty($this->Executor->getBinary($binaryName));
-    }
-
-    #[Test]
-    #[TestWith(['noExistingBinary', 'noExistingBinary'])]
-    #[TestWith(['none', Compression::None])]
-    public function testGetBinaryNoExistingBinary(string $expectedBinaryName, string|Compression $binaryName): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Binary for `' . $expectedBinaryName . '` could not be found. You have to set its path manually');
-        $this->Executor->getBinary($binaryName);
     }
 
     #[Test]

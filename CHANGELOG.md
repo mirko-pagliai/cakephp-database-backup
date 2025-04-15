@@ -1,4 +1,9 @@
 # 2.x branch
+## 2.15 branch
+### 2.15.0
+* added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
+  been completely replaced by the first.
+
 ## 2.14 branch
 ### 2.14.1
 * method `AbstractBackupUtility::getExecutor()` now accepts the optional `$Connection` argument. The `getConnection()` 

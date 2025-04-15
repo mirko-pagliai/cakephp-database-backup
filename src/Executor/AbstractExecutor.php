@@ -120,7 +120,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         $driverName = lcfirst(preg_replace('/^DatabaseBackup\\\\Executor\\\\(\w+)Executor$/', '$1', $this::class) ?: '');
 
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
+            '{{BINARY}}' => escapeshellarg($this->findBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
@@ -147,7 +147,7 @@ abstract class AbstractExecutor implements EventListenerInterface
 
         $Compression = Compression::fromFilename($filename);
         if ($Compression !== Compression::None) {
-            $exec .= ' | ' . escapeshellarg($this->getBinary($Compression));
+            $exec .= ' | ' . escapeshellarg($this->findBinary($Compression));
         }
 
         return $exec . ' > ' . escapeshellarg($filename);
@@ -168,7 +168,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         if ($Compression !== Compression::None) {
             return sprintf(
                 '%s -dc %s | ',
-                escapeshellarg($this->getBinary($Compression)),
+                escapeshellarg($this->findBinary($Compression)),
                 escapeshellarg($filename)
             ) . $exec;
         }
@@ -235,7 +235,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      *
      * @param \DatabaseBackup\Compression|string ...$name
      * @return string
-     * @since 2.14.1
+     * @since 2.15.0
      * @throws \InvalidArgumentException
      */
     public function findBinary(Compression|string ...$name): string
@@ -263,31 +263,6 @@ abstract class AbstractExecutor implements EventListenerInterface
             'Binary for `{0}` could not be found. You have to set its path manually',
             $name
         ));
-    }
-
-    /**
-     * Gets a binary path.
-     *
-     * @param \DatabaseBackup\Compression|string $binaryName Binary name
-     * @return string
-     * @throws \InvalidArgumentException
-     */
-    public function getBinary(Compression|string $binaryName): string
-    {
-        if ($binaryName instanceof Compression) {
-            $binaryName = lcfirst($binaryName->name);
-        }
-
-        $binary = Configure::read('DatabaseBackup.binaries.' . $binaryName);
-        if (!$binary) {
-            throw new InvalidArgumentException(__d(
-                'database_backup',
-                'Binary for `{0}` could not be found. You have to set its path manually',
-                $binaryName
-            ));
-        }
-
-        return $binary;
     }
 
     /**
