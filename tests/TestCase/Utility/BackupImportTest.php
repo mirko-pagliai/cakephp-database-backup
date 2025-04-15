@@ -16,15 +16,17 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use BadMethodCallException;
-use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupImport;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\UsesClass;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -34,6 +36,7 @@ use ValueError;
  * BackupImportTest class.
  */
 #[CoversClass(BackupImport::class)]
+#[UsesClass(AbstractBackupUtility::class)]
 class BackupImportTest extends TestCase
 {
     /**
@@ -44,16 +47,12 @@ class BackupImportTest extends TestCase
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->BackupImport = new BackupImport();
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupImport::filename()
-     */
     #[Test]
     #[TestWith([TMP . 'backups/backup.sql', 'backup.sql'])]
     #[TestWith([TMP . 'backups/backup.sql.gz', 'backup.sql.gz'])]
@@ -67,9 +66,6 @@ class BackupImportTest extends TestCase
         $this->assertSame($expectedFilename, $result);
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupImport::filename()
-     */
     #[Test]
     public function testFilenameNoReadableFile(): void
     {
@@ -79,11 +75,6 @@ class BackupImportTest extends TestCase
         $this->BackupImport->filename($filename);
     }
 
-    /**
-     * Test for `filename()` method, with an invalid filename.
-     *
-     * @uses \DatabaseBackup\Utility\BackupImport::filename()
-     */
     #[Test]
     public function testFilenameWithInvalidFilename(): void
     {
@@ -95,7 +86,6 @@ class BackupImportTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     public function testImport(): void
@@ -104,6 +94,7 @@ class BackupImportTest extends TestCase
 
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
         $BackupImport
+            ->expects($this->once())
             ->method('getProcess')
             ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
 
@@ -117,9 +108,6 @@ class BackupImportTest extends TestCase
         $this->assertEventFired('Backup.afterImport', $BackupImport->getExecutor()->getEventManager());
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupImport::import()
-     */
     #[Test]
     public function testImportOnMissingFilename(): void
     {
@@ -129,30 +117,33 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * Test for `import()` method.
-     *
      * Import is stopped by the `Backup.beforeImport` event (implemented by the `Executor` class).
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
-    public function testImportStoppedByBeforeExport(): void
+    public function testImportStoppedByBeforeImport(): void
     {
-        $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([ConnectionManager::get('test')])
-            ->onlyMethods(['beforeImport'])
-            ->getMock();
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport']);
 
-        $Executor->method('beforeImport')
+        $Executor
+            ->expects($this->once())
+            ->method('beforeImport')
             ->willReturn(false);
 
         $Executor->getEventManager()->on($Executor);
 
-        $BackupImport = $this->createConfiguredMock(BackupImport::class, ['getExecutor' => $Executor]);
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['getExecutor']);
+
+        $BackupImport
+            ->expects($this->any())
+            ->method('getExecutor')
+            ->willReturn($Executor);
+
         $result = $BackupImport
             ->filename($this->createBackup(fakeBackup: true))
             ->import();
+
         $this->assertFalse($result);
     }
 
@@ -160,7 +151,6 @@ class BackupImportTest extends TestCase
      * Test for `import()` method, on failure (error for `Process`).
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     public function testImportOnFailure(): void
@@ -169,7 +159,9 @@ class BackupImportTest extends TestCase
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
 
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
-        $BackupImport->method('getProcess')
+        $BackupImport
+            ->expects($this->once())
+            ->method('getProcess')
             ->willReturn($Process);
 
         $this->expectException(RuntimeException::class);
@@ -181,7 +173,6 @@ class BackupImportTest extends TestCase
      * Test for `import()` method, exceeding the timeout.
      *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
-     * @uses \DatabaseBackup\Utility\BackupImport::import()
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
@@ -190,7 +181,9 @@ class BackupImportTest extends TestCase
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
 
         $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
-        $BackupImport->method('getProcess')
+        $BackupImport
+            ->expects($this->once())
+            ->method('getProcess')
             ->willThrowException($ProcessTimedOutException);
 
         $this->expectException(ProcessTimedOutException::class);

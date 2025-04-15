@@ -15,33 +15,39 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
-use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\ConnectionInterface;
 use Cake\TestSuite\TestCase;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\MysqlExecutor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * MysqlExecutorTest class.
  */
 #[CoversClass(MysqlExecutor::class)]
+#[UsesClass(AbstractExecutor::class)]
 class MysqlExecutorTest extends TestCase
 {
     /**
      * @param list<non-empty-string> $methods Methods you want to mock
      * @return \DatabaseBackup\Executor\MysqlExecutor&\PHPUnit\Framework\MockObject\MockObject
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     protected function getMysqlExecutorMock(array $methods = []): MysqlExecutor
     {
+        $Connection = $this->createStub(ConnectionInterface::class);
+
         return $this->getMockBuilder(MysqlExecutor::class)
-            ->setConstructorArgs([ConnectionManager::get('test')])
+            ->setConstructorArgs([$Connection])
             ->onlyMethods($methods)
             ->getMock();
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::afterExport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testAfterExport(): void
@@ -54,7 +60,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::afterImport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testAfterImport(): void
@@ -67,7 +73,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::beforeExport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testBeforeExport(): void
@@ -84,7 +90,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::beforeImport()
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testBeforeImport(): void
@@ -102,7 +108,47 @@ class MysqlExecutorTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @uses \DatabaseBackup\Executor\MysqlExecutor::deleteAuthFile()
+     */
+    #[Test]
+    public function testWriteAuthFile(): void
+    {
+        $expectedContent = '[mysqldump]' . PHP_EOL .
+            'user=my-username' . PHP_EOL .
+            'password="my-password"' . PHP_EOL .
+            'host=my-host';
+
+        $FileSystem = $this->createPartialMock(Filesystem::class, ['dumpFile', 'exists']);
+
+        $FileSystem
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with($this->stringStartsWith(TMP), $this->equalTo($expectedContent));
+
+        $FileSystem
+            ->expects($this->once())
+            ->method('exists')
+            ->with($this->stringStartsWith(TMP))
+            ->willReturn(true);
+
+        $MysqlExecutor = $this->getMysqlExecutorMock(['getFilesystem', 'getConfig']);
+
+        $MysqlExecutor
+            ->expects($this->once())
+            ->method('getFilesystem')
+            ->willReturn($FileSystem);
+
+        $MysqlExecutor
+            ->expects($this->exactly(3))
+            ->method('getConfig')
+            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
+
+        $result = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
+
+        $this->assertTrue($result->getResult());
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testDeleteAuthFile(): void
