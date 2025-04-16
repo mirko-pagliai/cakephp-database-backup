@@ -24,6 +24,7 @@ use Cake\I18n\Number;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupManager;
 use Override;
+use function Cake\I18n\__d;
 
 /**
  * Command to list database backups.

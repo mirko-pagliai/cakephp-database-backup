@@ -21,6 +21,7 @@ use DatabaseBackup\Compression;
 use Override;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
+use function Cake\I18n\__d;
 
 /**
  * Utility to import databases.

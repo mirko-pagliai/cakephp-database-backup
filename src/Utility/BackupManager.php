@@ -24,6 +24,7 @@ use DatabaseBackup\Compression;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use function Cake\I18n\__d;
 
 /**
  * Utility to manage database backups.

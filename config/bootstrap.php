@@ -16,8 +16,6 @@ declare(strict_types=1);
 
 use Cake\Core\Configure;
 
-require_once CAKE . 'functions.php';
-
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,

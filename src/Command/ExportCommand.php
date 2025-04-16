@@ -27,6 +27,7 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
 use Exception;
 use Override;
+use function Cake\I18n\__d;
 
 /**
  * Command to export a database backup.

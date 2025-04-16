@@ -26,6 +26,7 @@ use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Override;
 use Symfony\Component\Filesystem\Path;
+use function Cake\I18n\__d;
 
 /**
  * Command to import a database backup.

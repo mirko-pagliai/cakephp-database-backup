@@ -24,6 +24,7 @@ use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Override;
 use Symfony\Component\Filesystem\Path;
+use function Cake\I18n\__d;
 
 /**
  * Base class for console commands.

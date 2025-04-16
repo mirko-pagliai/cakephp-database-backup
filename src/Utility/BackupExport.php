@@ -22,6 +22,7 @@ use Override;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use function Cake\I18n\__d;
 
 /**
  * Utility to export databases.

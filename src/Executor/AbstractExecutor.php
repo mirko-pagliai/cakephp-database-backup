@@ -25,6 +25,7 @@ use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Override;
 use Symfony\Component\Process\ExecutableFinder;
+use function Cake\I18n\__d;
 
 /**
  * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.

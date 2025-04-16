@@ -25,6 +25,7 @@ use DatabaseBackup\Executor\AbstractExecutor;
 use InvalidArgumentException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Process;
+use function Cake\I18n\__d;
 
 /**
  * AbstractBackupUtility.
