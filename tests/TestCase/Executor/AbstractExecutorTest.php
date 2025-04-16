@@ -20,7 +20,6 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -33,35 +32,28 @@ use Symfony\Component\Process\ExecutableFinder;
 class AbstractExecutorTest extends TestCase
 {
     /**
-     * @var \Cake\Datasource\ConnectionInterface&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected ConnectionInterface $Connection;
-
-    /**
-     * @var \DatabaseBackup\Executor\AbstractExecutor
-     */
-    protected AbstractExecutor $Executor;
-
-    /**
-     * {@inheritDoc}
-     *
+     * @param list<non-empty-string> $methods Methods you want to mock
+     * @param \Cake\Datasource\ConnectionInterface|null $Connection
+     * @return \DatabaseBackup\Executor\AbstractExecutor&\PHPUnit\Framework\MockObject\MockObject
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    #[Override]
-    protected function setUp(): void
+    protected function getAbstractExecutorMock(array $methods = [], ?ConnectionInterface $Connection = null): AbstractExecutor
     {
-        $this->Connection = $this->createMock(ConnectionInterface::class);
+        $Connection = $Connection ?? $this->createMock(ConnectionInterface::class);
 
-        $this->Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$this->Connection])
-            ->onlyMethods(['getExportBinary', 'getImportBinary'])
+        return $this->getMockBuilder(AbstractExecutor::class)
+            ->setConstructorArgs([$Connection, 'Sqlite'])
+            ->onlyMethods(array_merge($methods, ['getExportBinary', 'getImportBinary']))
             ->getMock();
     }
 
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
     #[Test]
     public function testImplementedEvents(): void
     {
-        $this->assertNotEmpty($this->Executor->implementedEvents());
+        $this->assertNotEmpty($this->getAbstractExecutorMock()->implementedEvents());
     }
 
     /**
@@ -89,10 +81,7 @@ class AbstractExecutorTest extends TestCase
                 default => '/usr/bin/' . $name
             });
 
-        $Executor = $this->createPartialMock(
-            AbstractExecutor::class,
-            ['getExecutableFinder', 'getExportBinary', 'getImportBinary']
-        );
+        $Executor = $this->getAbstractExecutorMock(['getExecutableFinder']);
 
         $Executor
             ->expects($this->once())
@@ -107,6 +96,7 @@ class AbstractExecutorTest extends TestCase
      * @param string $expectedExceptionMessage
      * @param array<string|Compression> $name
      * @return void
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     #[TestWith(['Binary for `none` could not be found. You have to set its path manually', [Compression::None]])]
@@ -116,7 +106,7 @@ class AbstractExecutorTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->Executor->findBinary(...$name);
+        $this->getAbstractExecutorMock()->findBinary(...$name);
     }
 
     /**
@@ -128,10 +118,7 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'export-binary\' my-database .dump | \'bzip2-binary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
     public function testGetExportCommand(string $expectedExportCommand, string $filename): void
     {
-        $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$this->Connection, 'Sqlite'])
-            ->onlyMethods(['findBinary', 'getConfig', 'getExportBinary', 'getImportBinary'])
-            ->getMock();
+        $Executor = $this->getAbstractExecutorMock(['findBinary', 'getConfig']);
 
         $Executor
             ->expects($this->any())
@@ -163,10 +150,7 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'bzip2-binary\' -dc \'filename.sql.bz2\' | \'import-binary\' my-database', 'filename.sql.bz2'])]
     public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
-        $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$this->Connection, 'Sqlite'])
-            ->onlyMethods(['findBinary', 'getConfig', 'getExportBinary', 'getImportBinary'])
-            ->getMock();
+        $Executor = $this->getAbstractExecutorMock(['findBinary', 'getConfig']);
 
         $Executor
             ->expects($this->any())
@@ -189,17 +173,24 @@ class AbstractExecutorTest extends TestCase
         $this->assertSame($expectedImportCommand, $result);
     }
 
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
     #[Test]
     #[TestWith(['test', 'name'])]
     #[TestWith([null, 'noExisting'])]
     public function testGetConfig(?string $expectedConfig, string $configKey): void
     {
-        $this->Connection
+        $Connection = $this->createMock(ConnectionInterface::class);
+
+        $Connection
             ->expects($this->once())
             ->method('config')
             ->willReturn(['name' => 'test']);
 
-        $result = $this->Executor->getConfig($configKey);
+        $Executor = $this->getAbstractExecutorMock(Connection: $Connection);
+
+        $result = $Executor->getConfig($configKey);
         $this->assertSame($expectedConfig, $result);
     }
 }
