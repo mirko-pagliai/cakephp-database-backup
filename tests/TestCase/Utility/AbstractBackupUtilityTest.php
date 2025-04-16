@@ -47,12 +47,22 @@ class AbstractBackupUtilityTest extends TestCase
     protected AbstractBackupUtility $Utility;
 
     /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @param list<non-empty-string> $methods Methods you want to mock
+     * @param \Cake\Datasource\ConnectionInterface|null $Connection
+     * @return \DatabaseBackup\Utility\AbstractBackupUtility&\PHPUnit\Framework\MockObject\MockObject
      */
+    protected function getBackupExportMock(array $methods = [], ?ConnectionInterface $Connection = null): AbstractBackupUtility
+    {
+        return $this->getMockBuilder(AbstractBackupUtility::class)
+            ->setConstructorArgs([$Connection])
+            ->onlyMethods(array_merge(['filename'], $methods))
+            ->getMock();
+    }
+
     #[Override]
     protected function setUp(): void
     {
-        $this->Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
+        $this->Utility = $this->getBackupExportMock();
     }
 
     #[Test]
@@ -133,8 +143,11 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new $driverClassname()]);
 
-        $result = $this->Utility->getExecutor($Connection);
-        $this->assertInstanceOf($expectedExecutorClassname, $result);
+        $Utility = $this->getBackupExportMock(Connection: $Connection);
+
+        $Executor = $Utility->getExecutor();
+
+        $this->assertInstanceOf($expectedExecutorClassname, $Executor);
     }
 
     /**
@@ -145,24 +158,22 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new FakeDriver()]);
 
+        $Utility = $this->getBackupExportMock(Connection: $Connection);
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
-        $this->Utility->getExecutor($Connection);
+        $Utility->getExecutor();
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[WithoutErrorHandler]
     public function testGetDriver(): void
     {
-        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getExecutor']);
+        $Utility = $this->getBackupExportMock(methods: ['getExecutor']);
 
         $Utility
             ->expects($this->once())
-            ->method('getExecutor')
-            ->with($this->anything());
+            ->method('getExecutor');
 
         $this->deprecated(fn () => $Utility->getDriver());
     }
