@@ -19,6 +19,7 @@ namespace DatabaseBackup\Console;
 use Cake\Console\Arguments;
 use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
@@ -38,6 +39,23 @@ abstract class Command extends BaseCommand
     public function getConnection(): ConnectionInterface
     {
         return ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
+    {
+        return $parser
+            ->addOption('timeout', [
+                'help' => __d(
+                    'database_backup',
+                    'Timeout for shell commands. Default value: {0} seconds',
+                    Configure::readOrFail('DatabaseBackup.processTimeout')
+                ),
+                'short' => 't',
+            ]);
     }
 
     /**

@@ -20,7 +20,6 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
-use Cake\Core\Configure;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
@@ -40,19 +39,13 @@ class ImportCommand extends Command
     #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
+        $parser = parent::buildOptionParser($parser);
+
         return $parser
             ->setDescription(__d('database_backup', 'Imports a database backup'))
             ->addArgument('filename', [
                 'help' => __d('database_backup', 'Filename. It can be an absolute path'),
                 'required' => true,
-            ])
-            ->addOption('timeout', [
-                'help' => __d(
-                    'database_backup',
-                    'Timeout for shell commands. Default value: {0} seconds',
-                    Configure::readOrFail('DatabaseBackup.processTimeout')
-                ),
-                'short' => 't',
             ]);
     }
 
