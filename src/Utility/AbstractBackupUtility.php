@@ -59,12 +59,16 @@ abstract class AbstractBackupUtility
     /**
      * Construct.
      *
-     * @param \Cake\Datasource\ConnectionInterface|null $Connection
+     * @param \Cake\Datasource\ConnectionInterface|string|null $Connection
      * @since 2.14.2
      */
-    public function __construct(?ConnectionInterface $Connection = null)
+    public function __construct(ConnectionInterface|string|null $Connection = null)
     {
-        $this->Connection = $Connection ?: ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+        if (!$Connection instanceof ConnectionInterface) {
+            $Connection = ConnectionManager::get($Connection ?: Configure::readOrFail('DatabaseBackup.connection'));
+        }
+
+        $this->Connection = $Connection;
     }
 
     /**

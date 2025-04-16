@@ -22,11 +22,13 @@ use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
+use Generator;
 use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -63,6 +65,32 @@ class AbstractBackupUtilityTest extends TestCase
     protected function setUp(): void
     {
         $this->Utility = $this->getBackupExportMock();
+    }
+
+    public static function providerTestConstruct(): Generator
+    {
+        yield [null];
+        yield ['test'];
+        yield [ConnectionManager::get('test')];
+    }
+
+    #[Test]
+    #[DataProvider('providerTestConstruct')]
+    public function testConstruct(ConnectionInterface|string|null $Connection): void
+    {
+        $Utility = new class ($Connection) extends AbstractBackupUtility {
+            public ConnectionInterface $Connection;
+
+            public function filename(string $filename): AbstractBackupUtility
+            {
+                return $this;
+            }
+        };
+
+        $Connection = $Utility->Connection;
+
+        $this->assertInstanceOf(ConnectionInterface::class, $Connection);
+        $this->assertSame('test', $Connection->config()['name']);
     }
 
     #[Test]

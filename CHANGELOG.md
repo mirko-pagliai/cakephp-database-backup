@@ -5,9 +5,9 @@
   and will be removed in a future release (backwards compatibility will be maintained up to branch `2.15.x`). Use the
   `DatabaseBackup.Mysql`, `DatabaseBackup.Postgres` and `DatabaseBackup.Sqlite` names instead in your bootstrap (the 
   driver name begins with a capital letter);
-* the constructor method `AbstractBackupUtility` now accepts `$Connection` as an optional argument. This means that by
-  instantiating `BackupExport` or `BackupImport` (which extend `AbstractBackupUtility`) it is possible to set a
-  connection beyond the default one.
+* the constructor method `AbstractBackupUtility` now accepts `$Connection` as an optional argument, as string (e.g.
+  `default` or `test`) or a `ConnectionInterface` instance. This means that by instantiating `BackupExport` or
+  `BackupImport` (which extend `AbstractBackupUtility`) it is possible to set a connection beyond the default one.
 
 ### 2.14.1
 * many improvements for the `AbstractExecutor` abstract class;
