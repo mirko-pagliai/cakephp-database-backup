@@ -9,7 +9,8 @@ With this version, the bootstrap does not do any of this anymore. Instead, the n
 For the user, nothing changes in this sense: the plugin will always prefer any manually set binaries, otherwise it will take care of searching for them.
 
 * added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
-  been completely replaced by the first;
+  been completely replaced by the first. The `findBinary()` method is now more accurate in finding binaries, and when it
+  throws an exception, it sets a more accurate and useful message;
 * the `AbstractExecutor` class and all "Executor" classes that extend it now implement `getExportBinary()` and
   `getImportBinary()` methods, which should return the names of the binaries (as a string or array of strings) related
   to the respective driver;
