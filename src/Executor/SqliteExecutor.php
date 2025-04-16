@@ -26,6 +26,7 @@ class SqliteExecutor extends AbstractExecutor
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function getExportBinary(): string|array
     {
         return 'sqlite3';
@@ -34,6 +35,7 @@ class SqliteExecutor extends AbstractExecutor
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function getImportBinary(): string|array
     {
         return 'sqlite3';

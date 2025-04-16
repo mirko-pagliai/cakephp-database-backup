@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use Override;
+
 /**
  * Postgres executor to export/import database backups.
  */
@@ -24,6 +26,7 @@ class PostgresExecutor extends AbstractExecutor
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function getExportBinary(): string|array
     {
         return 'pg_dump';
@@ -32,6 +35,7 @@ class PostgresExecutor extends AbstractExecutor
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function getImportBinary(): string|array
     {
         return 'pg_restore';

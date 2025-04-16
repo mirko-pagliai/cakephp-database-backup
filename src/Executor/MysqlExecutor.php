@@ -108,6 +108,7 @@ class MysqlExecutor extends AbstractExecutor
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function getExportBinary(): string|array
     {
         return ['mariadb-dump', 'mysqldump'];
@@ -116,6 +117,7 @@ class MysqlExecutor extends AbstractExecutor
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function getImportBinary(): string|array
     {
         return ['mariadb', 'mysql'];
