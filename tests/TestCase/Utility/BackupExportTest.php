@@ -48,6 +48,17 @@ class BackupExportTest extends TestCase
     protected BackupExport $BackupExport;
 
     /**
+     * @param list<non-empty-string> $methods Methods you want to mock
+     * @return \DatabaseBackup\Utility\BackupExport&\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getBackupExportMock(array $methods = []): BackupExport
+    {
+        return $this->getMockBuilder(BackupExport::class)
+            ->onlyMethods($methods)
+            ->getMock();
+    }
+
+    /**
      * @inheritDoc
      */
     #[Override]
@@ -88,6 +99,7 @@ class BackupExportTest extends TestCase
         $this->BackupExport
             ->compression(Compression::Gzip)
             ->filename($filename);
+
         $this->assertSame($expectedFilename, $this->BackupExport->getFilename());
         $this->assertSame($expectedCompression, $this->BackupExport->getCompression());
     }
@@ -152,7 +164,7 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExport(): void
     {
-        $BackupExport = $this->createPartialMock(BackupExport::class, ['getFilesystem', 'getProcess']);
+        $BackupExport = $this->getBackupExportMock(['getFilesystem', 'getProcess']);
 
         $BackupExport
             ->expects($this->any())
@@ -167,6 +179,7 @@ class BackupExportTest extends TestCase
         $BackupExport->getExecutor()->getEventManager()->setEventList(new EventList());
 
         $filename = $BackupExport->export();
+
         $this->assertIsString($filename);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($filename));
         $this->assertEventFired('Backup.beforeExport', $BackupExport->getExecutor()->getEventManager());
@@ -176,6 +189,7 @@ class BackupExportTest extends TestCase
         $filename = $BackupExport
             ->compression(Compression::Gzip)
             ->export();
+
         $this->assertIsString($filename);
         $this->assertMatchesRegularExpression('/backup_test_\d{14}\.sql\.gz$/', $filename);
 
@@ -183,6 +197,7 @@ class BackupExportTest extends TestCase
         $filename = $BackupExport
             ->filename('backup_test.sql.bz2')
             ->export();
+
         $this->assertIsString($filename);
         $this->assertMatchesRegularExpression('/backup_test\.sql\.bz2$/', $filename);
 
@@ -191,6 +206,7 @@ class BackupExportTest extends TestCase
         $filename = $BackupExport
             ->rotate(1)
             ->export();
+
         $this->assertIsString($filename);
         $this->assertSame(1, BackupManager::index()->count());
     }
@@ -220,7 +236,7 @@ class BackupExportTest extends TestCase
 
         $Executor->getEventManager()->on($Executor);
 
-        $BackupExport = $this->createPartialMock(BackupExport::class, ['getExecutor']);
+        $BackupExport = $this->getBackupExportMock(['getExecutor']);
 
         $BackupExport
             ->expects($this->any())
@@ -245,7 +261,8 @@ class BackupExportTest extends TestCase
         $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
 
-        $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
+        $BackupExport = $this->getBackupExportMock(['getProcess']);
+
         $BackupExport
             ->expects($this->once())
             ->method('getProcess')
@@ -270,12 +287,14 @@ class BackupExportTest extends TestCase
         Configure::write('DatabaseBackup.chmod', $chmodValue);
 
         $Filesystem = $this->createPartialMock(Filesystem::class, ['chmod']);
+
         $Filesystem
             ->expects($this->once())
             ->method('chmod')
             ->with($filename, $chmodValue);
 
-        $BackupExport = $this->createPartialMock(BackupExport::class, ['getFilesystem', 'getProcess']);
+        $BackupExport = $this->getBackupExportMock(['getFilesystem', 'getProcess']);
+
         $BackupExport
             ->expects($this->once())
             ->method('getFilesystem')
@@ -302,7 +321,8 @@ class BackupExportTest extends TestCase
     {
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
 
-        $BackupExport = $this->createPartialMock(BackupExport::class, ['getProcess']);
+        $BackupExport = $this->getBackupExportMock(['getProcess']);
+
         $BackupExport
             ->expects($this->once())
             ->method('getProcess')
