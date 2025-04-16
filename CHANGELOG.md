@@ -7,7 +7,9 @@
   driver name begins with a capital letter);
 * the constructor method `AbstractBackupUtility` now accepts `$Connection` as an optional argument, as string (e.g.
   `default` or `test`) or a `ConnectionInterface` instance. This means that by instantiating `BackupExport` or
-  `BackupImport` (which extend `AbstractBackupUtility`) it is possible to set a connection beyond the default one.
+  `BackupImport` (which extend `AbstractBackupUtility`) it is possible to set a connection beyond the default one;
+* removed from `ExportCommand::buildOptionParser()` the reference (as a helper) to the old `send` option, which was no
+  longer present (it had been forgotten).
 
 ### 2.14.1
 * many improvements for the `AbstractExecutor` abstract class;

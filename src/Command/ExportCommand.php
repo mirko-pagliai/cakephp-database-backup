@@ -67,11 +67,6 @@ class ExportCommand extends Command
                         'will be deleted'),
                     'short' => 'r',
                 ],
-                'send' => [
-                    'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
-                        'to indicate the recipient\'s email address'),
-                    'short' => 's',
-                ],
             ]);
     }
 
