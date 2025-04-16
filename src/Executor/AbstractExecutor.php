@@ -118,18 +118,17 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     protected function getCommand(OperationType $OperationType): string
     {
-        $driverName = lcfirst($this->name);
-
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[$driverName][$OperationType->value])),
+            '{{BINARY}}' => escapeshellarg($this->getBinary(DATABASE_BACKUP_EXECUTABLES[lcfirst($this->name)][$OperationType->value])),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),
             '{{DB_NAME}}' => $this->getConfig('database'),
         ];
+
         /** @var string $exec */
-        $exec = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $OperationType->value);
+        $exec = Configure::readOrFail('DatabaseBackup.' . $this->name . '.' . $OperationType->value);
 
         return str_replace(array_keys($replacements), $replacements, $exec);
     }
