@@ -31,18 +31,38 @@ if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
     ]);
 }
 
+/**
+ * Backward compatibility for old configuration names, such as `DatabaseBackup.mysql.export`.
+ */
+foreach (array_keys(DATABASE_BACKUP_EXECUTABLES) as $driverKey) {
+    foreach (['export', 'import'] as $operationKey) {
+        $name = 'DatabaseBackup.' . $driverKey . '.' . $operationKey;
+        if (!Configure::check($name)) {
+            continue;
+        }
+        $expectedName = 'DatabaseBackup.' . ucfirst($driverKey) . '.' . $operationKey;
+        Configure::write($expectedName, Configure::consume($name));
+
+        deprecationWarning('2.14.2', sprintf(
+            'The configuration name `%s` is deprecated and will be removed in a future release. Please use `%s` instead.',
+            $name,
+            $expectedName
+        ));
+    }
+}
+
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,
     'DatabaseBackup.connection' => 'default',
     'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
-    'DatabaseBackup.mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
-    'DatabaseBackup.mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
-    'DatabaseBackup.postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
-    'DatabaseBackup.postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
-    'DatabaseBackup.sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
-    'DatabaseBackup.sqlite.import' => '{{BINARY}} {{DB_NAME}}',
+    'DatabaseBackup.Mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.Mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.Postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.Postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.Sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
+    'DatabaseBackup.Sqlite.import' => '{{BINARY}} {{DB_NAME}}',
 ];
 Configure::write(array_filter($defaults, fn (string $key): bool => !Configure::check($key), ARRAY_FILTER_USE_KEY));
 
