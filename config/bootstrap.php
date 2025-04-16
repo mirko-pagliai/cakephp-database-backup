@@ -16,26 +16,6 @@ declare(strict_types=1);
 
 use Cake\Core\Configure;
 
-/**
- * Backward compatibility for old configuration names, such as `DatabaseBackup.mysql.export`.
- */
-foreach (array_keys(DATABASE_BACKUP_EXECUTABLES) as $driverKey) {
-    foreach (['export', 'import'] as $operationKey) {
-        $name = 'DatabaseBackup.' . $driverKey . '.' . $operationKey;
-        if (!Configure::check($name)) {
-            continue;
-        }
-        $expectedName = 'DatabaseBackup.' . ucfirst($driverKey) . '.' . $operationKey;
-        Configure::write($expectedName, Configure::consume($name));
-
-        deprecationWarning('2.14.2', sprintf(
-            'The configuration name `%s` is deprecated and will be removed in a future release. Please use `%s` instead.',
-            $name,
-            $expectedName
-        ));
-    }
-}
-
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,
