@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -57,19 +58,16 @@ class AbstractExecutorTest extends TestCase
     }
 
     /**
-     * @param string $expectedBinary
-     * @param array<string|\DatabaseBackup\Compression> $name
-     * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['/usr/bin/mariadb', ['mariadb']])]
-    #[TestWith(['/usr/bin/mariadb', ['mariadb', 'mysql']])]
-    #[TestWith(['/usr/bin/mariadb', ['mariadb', 'noExistingSecondBinary']])]
-    #[TestWith(['/usr/bin/mariadb', ['noExistingFirstBinary', 'mariadb']])]
-    #[TestWith(['/usr/bin/mysql', ['mysql']])]
-    #[TestWith(['/usr/bin/gzip', [Compression::Gzip]])]
-    public function testFindBinary(string $expectedBinary, array $name): void
+    #[TestWith(['/usr/bin/mariadb', 'mariadb'])]
+    #[TestWith(['/usr/bin/mariadb', 'mariadb', 'mysql'])]
+    #[TestWith(['/usr/bin/mariadb', 'mariadb', 'noExistingSecondBinary'])]
+    #[TestWith(['/usr/bin/mariadb', 'noExistingFirstBinary', 'mariadb'])]
+    #[TestWith(['/usr/bin/mysql', 'mysql'])]
+    #[TestWith(['/usr/bin/gzip', Compression::Gzip])]
+    public function testFindBinary(string $expectedBinary, string|Compression ...$name): void
     {
         $ExecutableFinder = $this->createPartialMock(ExecutableFinder::class, ['find']);
 
@@ -78,7 +76,7 @@ class AbstractExecutorTest extends TestCase
             ->method('find')
             ->willReturnCallback(fn (string $name): ?string => match ($name) {
                 'noExistingFirstBinary', 'noExistingSecondBinary' => null,
-                default => '/usr/bin/' . $name
+                default => '/usr/bin/' . strtolower($name)
             });
 
         $Executor = $this->getAbstractExecutorMock(['getExecutableFinder']);
@@ -93,19 +91,67 @@ class AbstractExecutorTest extends TestCase
     }
 
     /**
-     * @param string $expectedExceptionMessage
-     * @param array<string|Compression> $name
-     * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['Binary for `none` could not be found. You have to set its path manually', [Compression::None]])]
-    #[TestWith(['Binary for `noExistingBinary` could not be found. You have to set its path manually', ['noExistingBinary']])]
-    #[TestWith(['Binary for `noExistingFirstBinary`, `noExistingSecondBinary` could not be found. You have to set its path manually', ['noExistingFirstBinary', 'noExistingSecondBinary']])]
-    public function testFindBinaryWithNoExistingBinary(string $expectedExceptionMessage, array $name): void
+    #[TestWith(['/customPath/mariadb', 'mariadb'])]
+    #[TestWith(['/customPath/mariadb', 'mariadb', 'mysql'])]
+    #[TestWith(['/customPath/mariadb', 'mariadb', 'noExistingSecondBinary'])]
+    #[TestWith(['/customPath/mariadb', 'noExistingFirstBinary', 'mariadb'])]
+    #[TestWith(['/customPath/mysql', 'mysql'])]
+    #[TestWith(['/customPath/gzip', Compression::Gzip])]
+    public function testFindBinaryFromConfiguration(string $expectedBinary, string|Compression ...$name): void
+    {
+        Configure::write('DatabaseBackup.binaries.mariadb', '/customPath/mariadb');
+        Configure::write('DatabaseBackup.binaries.mysql', '/customPath/mysql');
+        Configure::write('DatabaseBackup.binaries.gzip', '/customPath/gzip');
+
+        $Executor = $this->getAbstractExecutorMock(['getExecutableFinder']);
+
+        $Executor
+            ->expects($this->once())
+            ->method('getExecutableFinder')
+            ->willReturn($this->createStub(ExecutableFinder::class));
+
+        $binary = $Executor->findBinary(...$name);
+        $this->assertSame($expectedBinary, $binary);
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    #[Test]
+    #[TestWith(['mariadb'])]
+    #[TestWith(['mariadb', 'mysql'])]
+    public function testFindBinaryWithNoExistingBinary(string|Compression ...$name): void
+    {
+        $Executor = $this->getAbstractExecutorMock(['getExecutableFinder']);
+
+        $Executor
+            ->expects($this->any())
+            ->method('getExecutableFinder')
+            ->willReturn($this->createStub(ExecutableFinder::class));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Binary for `mariadb` could not be found. You have to set its path manually on your bootstrap with: `%s`',
+            'Configure::write(\'DatabaseBackup.binaries.mariadb\', \'/your/full/path/to/mariadb\')'
+        ));
+        $Executor->findBinary(...$name);
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    #[Test]
+    #[TestWith([Compression::None])]
+    #[TestWith(['none'])]
+    #[TestWith([Compression::None, 'gzip'])]
+    #[TestWith(['gzip', Compression::None])]
+    public function testFindBinaryWithCompressionNone(string|Compression ...$name): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->expectExceptionMessage('Unable to search for binary for "none" Compression');
         $this->getAbstractExecutorMock()->findBinary(...$name);
     }
 

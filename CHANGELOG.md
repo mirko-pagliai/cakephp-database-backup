@@ -1,6 +1,13 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
+Until the previous version, the plugin bootstrap took care (always) of auto-discovering all possible executables (using `ExecutableFinder::find()`) and that had not already been set by the user, then stored the results in the configuration.
+Then the method `AbstractExecutor::getBinary()` (and before `AbstractDriver::getBinary()`) returned the value in the configuration or threw an exception, only when the binary was actually needed.
+
+With this version, the bootstrap does not do any of this anymore. Instead, the new method `AbstractExecutor::findBinary()` (which completely replaces the old one) takes care of reading from the configuration or searching for binaries only when necessary. This method is much better, both for the care of the operations it performs, and because it is able to manage aliases and fallback binaries (like for the `mariadb`/`mysql` pair).
+
+For the user, nothing changes in this sense: the plugin will always prefer any manually set binaries, otherwise it will take care of searching for them.
+
 * added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
   been completely replaced by the first;
 * the `AbstractExecutor` class and all "Executor" classes that extend it now implement `getExportBinary()` and

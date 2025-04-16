@@ -124,15 +124,18 @@ abstract class AbstractExecutor implements EventListenerInterface
             array: $name
         );
 
+        // Makes sure it doesn't contain `Compression::None`
+        if (array_any(array: $name, callback: fn (Compression|string $name): bool => $name == 'none')) {
+            throw new InvalidArgumentException('Unable to search for binary for "none" Compression');
+        }
+
         $ExecutableFinder = $this->getExecutableFinder();
 
         foreach ($name as $sName) {
-            $binary = Configure::read('DatabaseBackup.binaries.' . $sName);
-            if ($binary) {
-                return $binary;
-            }
-
-            $binary = $ExecutableFinder->find(name: $sName);
+            $binary = Configure::read(
+                var: 'DatabaseBackup.binaries.' . $sName,
+                default: $ExecutableFinder->find(name: $sName)
+            );
             if ($binary) {
                 return $binary;
             }
@@ -140,8 +143,9 @@ abstract class AbstractExecutor implements EventListenerInterface
 
         throw new InvalidArgumentException(__d(
             'database_backup',
-            'Binary for {0} could not be found. You have to set its path manually',
-            implode(', ', array_map(callback: fn (string $name): string => '`' . $name . '`', array: $name))
+            'Binary for `{0}` could not be found. You have to set its path manually on your bootstrap with: `{1}`',
+            $name[0],
+            'Configure::write(\'DatabaseBackup.binaries.' . $name[0] . '\', \'/your/full/path/to/' . $name[0] . '\')'
         ));
     }
 

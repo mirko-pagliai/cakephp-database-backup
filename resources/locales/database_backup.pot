@@ -113,7 +113,7 @@ msgid "Timeout for shell commands: {0} seconds"
 msgstr ""
 
 #: ./home/mirko/Libs/Plugins/cakephp-database-backup/src/Executor/AbstractExecutor.php:241
-msgid "Binary for {0} could not be found. You have to set its path manually"
+msgid "Binary for `{0}` could not be found. You have to set its path manually"
 msgstr ""
 
 #: ./home/mirko/Libs/Plugins/cakephp-database-backup/src/Utility/AbstractBackupUtility.php:153
