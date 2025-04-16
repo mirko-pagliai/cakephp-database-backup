@@ -52,9 +52,9 @@ abstract class AbstractExecutor implements EventListenerInterface
     public function __construct(protected ConnectionInterface $Connection, ?string $name = null)
     {
         /**
-         * For example, for `Cake\Database\Driver\Mysql` driver  the name will be `MySql`.
+         * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
          */
-        $this->name = $name ?: substr($Connection->getDriver()::class, strlen('Cake\\Database\\Driver\\'));
+        $this->name = $name ?: substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
 
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);

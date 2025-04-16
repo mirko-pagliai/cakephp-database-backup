@@ -115,22 +115,25 @@ abstract class AbstractBackupUtility
      * @param \Cake\Datasource\ConnectionInterface|null $Connection
      * @return \DatabaseBackup\Executor\AbstractExecutor
      * @since 2.14.0
+     * @throws \InvalidArgumentException If the Executor class does not exist
      */
     public function getExecutor(?ConnectionInterface $Connection = null): AbstractExecutor
     {
         if (empty($this->Executor)) {
             $Connection = $Connection ?: ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
 
-            //For example `$driverName` is `Mysql`
-            $driverName = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
+            /**
+             * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
+             */
+            $name = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
 
-            /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $executorClassName */
-            $executorClassName = App::classname('DatabaseBackup.' . $driverName . 'Executor', 'Executor');
-            if (!$executorClassName) {
-                throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $driverName));
+            /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $className */
+            $className = App::classname('DatabaseBackup.' . $name . 'Executor', 'Executor');
+            if (!$className) {
+                throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
             }
 
-            $this->Executor = new $executorClassName($Connection);
+            $this->Executor = new $className(Connection: $Connection, name: $name);
         }
 
         return $this->Executor;
