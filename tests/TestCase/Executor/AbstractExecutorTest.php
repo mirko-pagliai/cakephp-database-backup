@@ -24,6 +24,7 @@ use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Process\ExecutableFinder;
 
 /**
  * AbstractExecutorTest.
@@ -63,6 +64,12 @@ class AbstractExecutorTest extends TestCase
         $this->assertNotEmpty($this->Executor->implementedEvents());
     }
 
+    /**
+     * @param string $expectedBinary
+     * @param array<string|\DatabaseBackup\Compression> $name
+     * @return void
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
     #[Test]
     #[TestWith(['/usr/bin/mariadb', ['mariadb']])]
     #[TestWith(['/usr/bin/mariadb', ['mariadb', 'mysql']])]
@@ -72,11 +79,37 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['/usr/bin/gzip', [Compression::Gzip]])]
     public function testFindBinary(string $expectedBinary, array $name): void
     {
-        $result = $this->Executor->findBinary(...$name);
-        $this->assertSame($expectedBinary, $result);
+        $ExecutableFinder = $this->createPartialMock(ExecutableFinder::class, ['find']);
+
+        $ExecutableFinder
+            ->expects($this->any())
+            ->method('find')
+            ->willReturnCallback(fn (string $name): ?string => match ($name) {
+                'noExistingFirstBinary', 'noExistingSecondBinary' => null,
+                default => '/usr/bin/' . $name
+            });
+
+        $Executor = $this->createPartialMock(
+            AbstractExecutor::class,
+            ['getExecutableFinder', 'getExportBinary', 'getImportBinary']
+        );
+
+        $Executor
+            ->expects($this->once())
+            ->method('getExecutableFinder')
+            ->willReturn($ExecutableFinder);
+
+        $binary = $Executor->findBinary(...$name);
+        $this->assertSame($expectedBinary, $binary);
     }
 
+    /**
+     * @param string $expectedExceptionMessage
+     * @param array<string|Compression> $name
+     * @return void
+     */
     #[Test]
+    #[TestWith(['Binary for `none` could not be found. You have to set its path manually', [Compression::None]])]
     #[TestWith(['Binary for `noExistingBinary` could not be found. You have to set its path manually', ['noExistingBinary']])]
     #[TestWith(['Binary for `noExistingFirstBinary`, `noExistingSecondBinary` could not be found. You have to set its path manually', ['noExistingFirstBinary', 'noExistingSecondBinary']])]
     public function testFindBinaryWithNoExistingBinary(string $expectedExceptionMessage, array $name): void

@@ -44,6 +44,14 @@ abstract class AbstractExecutor implements EventListenerInterface
     protected string $name;
 
     /**
+     * @return \Symfony\Component\Process\ExecutableFinder
+     */
+    protected function getExecutableFinder(): ExecutableFinder
+    {
+        return new ExecutableFinder();
+    }
+
+    /**
      * Constructor.
      *
      * @param \Cake\Datasource\ConnectionInterface $Connection
@@ -116,13 +124,14 @@ abstract class AbstractExecutor implements EventListenerInterface
             array: $name
         );
 
+        $ExecutableFinder = $this->getExecutableFinder();
+
         foreach ($name as $sName) {
             $binary = Configure::read('DatabaseBackup.binaries.' . $sName);
             if ($binary) {
                 return $binary;
             }
 
-            $ExecutableFinder = new ExecutableFinder();
             $binary = $ExecutableFinder->find(name: $sName);
             if ($binary) {
                 return $binary;
@@ -132,10 +141,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         throw new InvalidArgumentException(__d(
             'database_backup',
             'Binary for {0} could not be found. You have to set its path manually',
-            implode(', ', array_map(
-                callback: fn (string $name): string => '`' . $name . '`',
-                array: $name
-            ))
+            implode(', ', array_map(callback: fn (string $name): string => '`' . $name . '`', array: $name))
         ));
     }
 
