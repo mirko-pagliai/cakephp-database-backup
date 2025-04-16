@@ -52,18 +52,18 @@ Configure::write(array_filter($defaults, fn (string $key): bool => !Configure::c
  * For `mysql` and `mysqldump` executables, it will first look for `mariadb` and `mariadb-dump` executables.
  * It then normally searches all other possible executables canonically.
  */
-$ExecutableFinder = new ExecutableFinder();
-foreach (['mariadb' => 'mysql', 'mariadb-dump' => 'mysqldump'] as $executable => $alias) {
-    if (!Configure::check('DatabaseBackup.binaries.' . $alias)) {
-        Configure::write('DatabaseBackup.binaries.' . $alias, $ExecutableFinder->find($executable));
-    }
-}
-$executables = array_merge(['bzip2', 'gzip'], ...array_values(array_map('array_values', DATABASE_BACKUP_EXECUTABLES)));
-foreach ($executables as $executable) {
-    if (!Configure::check('DatabaseBackup.binaries.' . $executable)) {
-        Configure::write('DatabaseBackup.binaries.' . $executable, $ExecutableFinder->find($executable));
-    }
-}
+//$ExecutableFinder = new ExecutableFinder();
+//foreach (['mariadb' => 'mysql', 'mariadb-dump' => 'mysqldump'] as $executable => $alias) {
+//    if (!Configure::check('DatabaseBackup.binaries.' . $alias)) {
+//        Configure::write('DatabaseBackup.binaries.' . $alias, $ExecutableFinder->find($executable));
+//    }
+//}
+//$executables = array_merge(['bzip2', 'gzip'], ...array_values(array_map('array_values', DATABASE_BACKUP_EXECUTABLES)));
+//foreach ($executables as $executable) {
+//    if (!Configure::check('DatabaseBackup.binaries.' . $executable)) {
+//        Configure::write('DatabaseBackup.binaries.' . $executable, $ExecutableFinder->find($executable));
+//    }
+//}
 
 //Checks for the target directory
 $target = Configure::read('DatabaseBackup.target');

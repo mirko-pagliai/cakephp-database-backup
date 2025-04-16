@@ -94,6 +94,52 @@ abstract class AbstractExecutor implements EventListenerInterface
     abstract protected function getImportBinary(): string|array;
 
     /**
+     * Finds and returns an executable binary by name.
+     *
+     * For example, with `mariadb` it should return `/usr/bin/mariadb`.
+     *
+     * It first checks and returns any value set by the configuration. If not present, it uses `ExecutableFinder::find)`.
+     * If the binary cannot be found, an exception is thrown.
+     *
+     * You can specify more than one name (for example, if there are possible aliases or fallbacks). In this case, the
+     *  first one found is returned.
+     *
+     * @param \DatabaseBackup\Compression|string ...$name
+     * @return string
+     * @since 2.15.0
+     * @throws \InvalidArgumentException
+     */
+    public function findBinary(Compression|string ...$name): string
+    {
+        $name = array_map(
+            callback: fn (Compression|string $name): string => $name instanceof Compression ? lcfirst($name->name) : $name,
+            array: $name
+        );
+
+        foreach ($name as $sName) {
+            $binary = Configure::read('DatabaseBackup.binaries.' . $sName);
+            if ($binary) {
+                return $binary;
+            }
+
+            $ExecutableFinder = new ExecutableFinder();
+            $binary = $ExecutableFinder->find(name: $sName);
+            if ($binary) {
+                return $binary;
+            }
+        }
+
+        throw new InvalidArgumentException(__d(
+            'database_backup',
+            'Binary for {0} could not be found. You have to set its path manually',
+            implode(', ', array_map(
+                callback: fn (string $name): string => '`' . $name . '`',
+                array: $name
+            ))
+        ));
+    }
+
+    /**
      * Gets and parses commands from the configuration, according to the type of requested `OperationType` and the
      *  connection driver.
      *
@@ -218,49 +264,6 @@ abstract class AbstractExecutor implements EventListenerInterface
     public function beforeImport(): bool
     {
         return true;
-    }
-
-    /**
-     * Finds and returns an executable binary by name.
-     *
-     * For example, with `mariadb` it should return `/usr/bin/mariadb`.
-     *
-     * It first checks and returns any value set by the configuration. If not present, it uses `ExecutableFinder::find)`.
-     * If the binary cannot be found, an exception is thrown.
-     *
-     * You can specify more than one name (for example, if there are possible aliases or fallbacks). In this case, the
-     *  first one found is returned.
-     *
-     * @param \DatabaseBackup\Compression|string ...$name
-     * @return string
-     * @since 2.15.0
-     * @throws \InvalidArgumentException
-     */
-    public function findBinary(Compression|string ...$name): string
-    {
-        $name = array_map(
-            callback: fn (Compression|string $name): string => $name instanceof Compression ? lcfirst($name->name) : $name,
-            array: $name
-        );
-
-        foreach ($name as $sName) {
-            $binary = Configure::read('DatabaseBackup.binaries.' . $sName);
-            if ($binary) {
-                return $binary;
-            }
-
-            $ExecutableFinder = new ExecutableFinder();
-            $binary = $ExecutableFinder->find(name: $sName);
-            if ($binary) {
-                return $binary;
-            }
-        }
-
-        throw new InvalidArgumentException(__d(
-            'database_backup',
-            'Binary for `{0}` could not be found. You have to set its path manually',
-            $name
-        ));
     }
 
     /**

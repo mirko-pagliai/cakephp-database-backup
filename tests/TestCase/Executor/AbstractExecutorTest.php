@@ -19,6 +19,7 @@ use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
+use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -60,6 +61,29 @@ class AbstractExecutorTest extends TestCase
     public function testImplementedEvents(): void
     {
         $this->assertNotEmpty($this->Executor->implementedEvents());
+    }
+
+    #[Test]
+    #[TestWith(['/usr/bin/mariadb', ['mariadb']])]
+    #[TestWith(['/usr/bin/mariadb', ['mariadb', 'mysql']])]
+    #[TestWith(['/usr/bin/mariadb', ['mariadb', 'noExistingSecondBinary']])]
+    #[TestWith(['/usr/bin/mariadb', ['noExistingFirstBinary', 'mariadb']])]
+    #[TestWith(['/usr/bin/mysql', ['mysql']])]
+    #[TestWith(['/usr/bin/gzip', [Compression::Gzip]])]
+    public function testFindBinary(string $expectedBinary, array $name): void
+    {
+        $result = $this->Executor->findBinary(...$name);
+        $this->assertSame($expectedBinary, $result);
+    }
+
+    #[Test]
+    #[TestWith(['Binary for `noExistingBinary` could not be found. You have to set its path manually', ['noExistingBinary']])]
+    #[TestWith(['Binary for `noExistingFirstBinary`, `noExistingSecondBinary` could not be found. You have to set its path manually', ['noExistingFirstBinary', 'noExistingSecondBinary']])]
+    public function testFindBinaryWithNoExistingBinary(string $expectedExceptionMessage, array $name): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->Executor->findBinary(...$name);
     }
 
     /**
