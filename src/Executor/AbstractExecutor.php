@@ -162,7 +162,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     protected function getCommand(OperationType $OperationType): string
     {
-        $driverName = lcfirst($this->name);
+        $driverName = $this->name;
 
         //Gets the binaries names
         $binaries = (array)$this->{$OperationType == OperationType::Export ? 'getExportBinary' : 'getImportBinary'}();

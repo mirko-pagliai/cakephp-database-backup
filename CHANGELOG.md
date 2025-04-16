@@ -27,6 +27,12 @@ Now, instead, the "Executor" classes implement the methods `getExportBinary()`/`
 * aliases for old `Driver` classes have been removed.
 
 ## 2.14 branch
+### 2.14.2
+* configuration names `DatabaseBackup.mysql`, `DatabaseBackup.postgres` and `DatabaseBackup.sqlite` are now deprecated
+  and will be removed in a future release (backwards compatibility will be maintained up to branch `2.15.x`). Use the
+  `DatabaseBackup.Mysql`, `DatabaseBackup.Postgres` and `DatabaseBackup.Sqlite` names instead in your bootstrap (the 
+  driver name begins with a capital letter).
+
 ### 2.14.1
 * many improvements for the `AbstractExecutor` abstract class;
 * method `AbstractBackupUtility::getExecutor()` now accepts the optional `$Connection` argument. The `getConnection()` 
