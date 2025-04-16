@@ -162,8 +162,6 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     protected function getCommand(OperationType $OperationType): string
     {
-        $driverName = lcfirst($this->name);
-
         //Gets the binaries names
         $binaries = (array)$this->{$OperationType == OperationType::Export ? 'getExportBinary' : 'getImportBinary'}();
 
@@ -183,7 +181,7 @@ abstract class AbstractExecutor implements EventListenerInterface
          *
          * @var string $command
          */
-        $command = Configure::readOrFail('DatabaseBackup.' . $driverName . '.' . $OperationType->value);
+        $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.' . $OperationType->value);
 
         return str_replace(array_keys($replacements), $replacements, $command);
     }

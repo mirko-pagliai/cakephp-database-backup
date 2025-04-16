@@ -22,12 +22,12 @@ $defaults = [
     'DatabaseBackup.connection' => 'default',
     'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
-    'DatabaseBackup.mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
-    'DatabaseBackup.mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
-    'DatabaseBackup.postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
-    'DatabaseBackup.postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
-    'DatabaseBackup.sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
-    'DatabaseBackup.sqlite.import' => '{{BINARY}} {{DB_NAME}}',
+    'DatabaseBackup.Mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.Mysql.import' => '{{BINARY}} --defaults-extra-file={{AUTH_FILE}} {{DB_NAME}}',
+    'DatabaseBackup.Postgres.export' => '{{BINARY}} --format=c -b --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.Postgres.import' => '{{BINARY}} --format=c -c -e --dbname=\'postgresql://{{DB_USER}}{{DB_PASSWORD}}@{{DB_HOST}}/{{DB_NAME}}\'',
+    'DatabaseBackup.Sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
+    'DatabaseBackup.Sqlite.import' => '{{BINARY}} {{DB_NAME}}',
 ];
 Configure::write(array_filter($defaults, fn (string $key): bool => !Configure::check($key), ARRAY_FILTER_USE_KEY));
 
