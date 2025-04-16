@@ -18,18 +18,6 @@ use Cake\Core\Configure;
 
 require_once CAKE . 'functions.php';
 
-/**
- * Executables. Name of driver as keys, Then, as value, an array that contains
- *  first the executable to export and then the executable to import backups.
- */
-if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
-    define('DATABASE_BACKUP_EXECUTABLES', [
-        'mysql' => ['export' => 'mysqldump', 'import' => 'mysql'],
-        'postgres' => ['export' => 'pg_dump', 'import' => 'pg_restore'],
-        'sqlite' => ['export' => 'sqlite3', 'import' => 'sqlite3'],
-    ]);
-}
-
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,
