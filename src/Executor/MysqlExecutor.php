@@ -106,7 +106,9 @@ class MysqlExecutor extends AbstractExecutor
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @codeCoverageIgnore
      */
     #[Override]
     protected function getExportBinary(): string|array
@@ -115,7 +117,9 @@ class MysqlExecutor extends AbstractExecutor
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @codeCoverageIgnore
      */
     #[Override]
     protected function getImportBinary(): string|array

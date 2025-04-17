@@ -24,7 +24,9 @@ use Override;
 class PostgresExecutor extends AbstractExecutor
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @codeCoverageIgnore
      */
     #[Override]
     protected function getExportBinary(): string|array
@@ -33,7 +35,9 @@ class PostgresExecutor extends AbstractExecutor
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @codeCoverageIgnore
      */
     #[Override]
     protected function getImportBinary(): string|array
