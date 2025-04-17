@@ -16,13 +16,6 @@ declare(strict_types=1);
 
 use Cake\Core\Configure;
 
-if (Configure::check('DatabaseBackup.connection')) {
-    deprecationWarning('2.14.2', sprintf(
-        'The configuration name `%s` is deprecated and will be removed in a future release. If you need to use a connection other than `default`, use the `$Connection` argument to the `BackupExport`/`BackupImport` constructor when instantiating these classes.',
-        'DatabaseBackup.connection'
-    ));
-}
-
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,

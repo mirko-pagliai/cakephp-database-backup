@@ -66,7 +66,7 @@ abstract class AbstractBackupUtility
     public function __construct(ConnectionInterface|string|null $Connection = null)
     {
         if (!$Connection instanceof ConnectionInterface) {
-            $Connection = ConnectionManager::get($Connection ?: Configure::read(var: 'DatabaseBackup.connection', default: 'default'));
+            $Connection = ConnectionManager::get($Connection ?: 'default');
         }
 
         $this->Connection = $Connection;
