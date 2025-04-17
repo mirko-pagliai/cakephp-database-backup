@@ -23,6 +23,8 @@ use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\Exception\MissingDatasourceConfigException;
+use MongoDB\Driver\Exception\ConnectionException;
 use Override;
 use Symfony\Component\Filesystem\Path;
 
@@ -32,14 +34,20 @@ use Symfony\Component\Filesystem\Path;
 abstract class Command extends BaseCommand
 {
     /**
+     * @var \Cake\Datasource\ConnectionInterface
+     */
+    protected ConnectionInterface $Connection;
+
+
+    /**
      * Gets the `Connection`.
      *
      * @return \Cake\Datasource\ConnectionInterface
      */
-    public function getConnection(): ConnectionInterface
-    {
-        return ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
-    }
+//    public function getConnection(): ConnectionInterface
+//    {
+//        return ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+//    }
 
     /**
      * @inheritDoc
@@ -48,13 +56,22 @@ abstract class Command extends BaseCommand
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return $parser
-            ->addOption('timeout', [
-                'help' => __d(
-                    'database_backup',
-                    'Timeout for shell commands. Default value: {0} seconds',
-                    Configure::readOrFail('DatabaseBackup.processTimeout')
-                ),
-                'short' => 't',
+            ->addOptions([
+                'connection' => [
+                    'default' => 'default',
+                    'help' => __d(
+                        'database_backup',
+                        'Name of the alternative connection to use, for example if you are not using the default connection'
+                    ),
+                ],
+                'timeout' => [
+                    'help' => __d(
+                        'database_backup',
+                        'Timeout for shell commands. Default value: {0} seconds',
+                        Configure::readOrFail('DatabaseBackup.processTimeout')
+                    ),
+                    'short' => 't',
+                ],
             ]);
     }
 
@@ -76,8 +93,14 @@ abstract class Command extends BaseCommand
     #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
-        $io->out(__d('database_backup', 'Connection: {0}', $this->getConnection()->config()['name']));
-        $io->out(__d('database_backup', 'Driver: {0}', $this->getConnection()->config()['driver']));
+        try {
+            $this->Connection = ConnectionManager::get($args->getOption('connection'));
+        } catch (MissingDatasourceConfigException $E) {
+            $io->abort($E->getMessage());
+        }
+
+        $io->out(__d('database_backup', 'Connection: {0}', $this->Connection->config()['name']));
+        $io->out(__d('database_backup', 'Driver: {0}', $this->Connection->config()['driver']));
 
         if ($args->getOption('timeout')) {
             $io->verbose(

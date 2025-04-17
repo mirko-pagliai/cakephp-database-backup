@@ -77,7 +77,7 @@ class ExportCommand extends Command
      */
     protected function getBackupExport(): BackupExport
     {
-        return new BackupExport();
+        return new BackupExport(Connection: $this->Connection);
     }
 
     /**
