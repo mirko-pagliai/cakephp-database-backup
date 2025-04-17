@@ -94,7 +94,9 @@ abstract class Command extends BaseCommand
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         try {
-            $this->Connection = ConnectionManager::get($args->getOption('connection'));
+            /** @var string $connectionName */
+            $connectionName = $args->getOption('connection');
+            $this->Connection = ConnectionManager::get($connectionName);
         } catch (MissingDatasourceConfigException $E) {
             $io->abort($E->getMessage());
         }
