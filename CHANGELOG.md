@@ -23,6 +23,9 @@ Now, instead, the "Executor" classes implement the methods `getExportBinary()`/`
   `getExportExecutable()` and `getImportExecutable()` methods, has been removed;
 * the `AbstractBackupUtility::__get()` magic method, which allowed to read the properties of the "Executor" classes, had
   been deprecated and has now been removed;
+* the `DatabaseBackup.connection` configuration name had been deprecated and now i have been removed;
+* configuration names `DatabaseBackup.mysql`, `DatabaseBackup.postgres` and `DatabaseBackup.sqlite` had been deprecated, 
+  and now they have been removed;
 * `BackupTrait` had been deprecated and has now been removed;
 * aliases for old `Driver` classes have been removed.
 
