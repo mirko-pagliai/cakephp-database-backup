@@ -19,6 +19,22 @@ enum Compression: string
     case Bzip2 = 'sql.bz2';
 
     /**
+     * Returns all valid cases.
+     *
+     * This is equivalent to saying all cases that match the `isValid()` method.
+     *
+     * @return array<\DatabaseBackup\Compression>
+     * @since 2.15.0
+     */
+    public static function validCases(): array
+    {
+        return array_filter(
+            array: Compression::cases(),
+            callback: fn (Compression $Compression): bool => $Compression->isValid(),
+        );
+    }
+
+    /**
      * Returns `true` if the current one is a valid `Compression`.
      *
      * This is equivalent to saying that it is different from `Compression::None`.

@@ -17,6 +17,16 @@ use ValueError;
 class CompressionTest extends TestCase
 {
     #[Test]
+    public function testValidCases(): void
+    {
+        $result = Compression::validCases();
+
+        $this->assertNotEmpty($result);
+        $this->assertContainsOnlyInstancesOf(Compression::class, $result);
+        $this->assertNotContains(Compression::None, $result);
+    }
+
+    #[Test]
     #[TestWith([false, Compression::None])]
     #[TestWith([true, Compression::Gzip])]
     #[TestWith([true, Compression::Bzip2])]

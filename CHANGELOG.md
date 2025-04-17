@@ -11,7 +11,7 @@ For the user, nothing changes in this sense: the plugin will always prefer any m
 Furthermore, the names of these binaries to search for, depending on the driver in use, were always defined in the bootstrap, via the constant `DATABASE_BACKUP_EXECUTABLES`.
 Now, instead, the "Executor" classes implement the methods `getExportBinary()`/`getImportBinary()`, which return the names of the binaries, as strings or arrays of strings in the case of aliases and fallback binaries.
 
-* added `Compression::isValid()` method;
+* added `Compression::isValid()` method and `Compression::validCases()` static method;
 * added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
   been completely replaced by the first. The `findBinary()` method is now more accurate in finding binaries, and when it
   throws an exception, it sets a more accurate and useful message;
