@@ -53,6 +53,26 @@ abstract class AbstractBackupUtility
     private AbstractExecutor $Executor;
 
     /**
+     * @var \Cake\Datasource\ConnectionInterface
+     */
+    protected ConnectionInterface $Connection;
+
+    /**
+     * Construct.
+     *
+     * @param \Cake\Datasource\ConnectionInterface|string|null $Connection
+     * @since 2.14.2
+     */
+    public function __construct(ConnectionInterface|string|null $Connection = null)
+    {
+        if (!$Connection instanceof ConnectionInterface) {
+            $Connection = ConnectionManager::get($Connection ?: 'default');
+        }
+
+        $this->Connection = $Connection;
+    }
+
+    /**
      * Magic `__call()` method.
      *
      * It provides all `getX()` methods to get properties.
@@ -113,20 +133,17 @@ abstract class AbstractBackupUtility
     /**
      * Gets the `Executor` instance according to the connection.
      *
-     * @param \Cake\Datasource\ConnectionInterface|null $Connection
      * @return \DatabaseBackup\Executor\AbstractExecutor
      * @since 2.14.0
      * @throws \InvalidArgumentException If the Executor class does not exist
      */
-    public function getExecutor(?ConnectionInterface $Connection = null): AbstractExecutor
+    public function getExecutor(): AbstractExecutor
     {
         if (empty($this->Executor)) {
-            $Connection = $Connection ?: ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
-
             /**
              * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
              */
-            $name = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
+            $name = substr(strrchr($this->Connection->getDriver()::class, '\\') ?: '', 1);
 
             /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $className */
             $className = App::classname('DatabaseBackup.' . $name . 'Executor', 'Executor');
@@ -134,7 +151,7 @@ abstract class AbstractBackupUtility
                 throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
             }
 
-            $this->Executor = new $className(Connection: $Connection, name: $name);
+            $this->Executor = new $className(Connection: $this->Connection, name: $name);
         }
 
         return $this->Executor;

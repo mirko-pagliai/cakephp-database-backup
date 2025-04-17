@@ -46,6 +46,7 @@ abstract class AbstractExecutor implements EventListenerInterface
 
     /**
      * @return \Symfony\Component\Process\ExecutableFinder
+     * @codeCoverageIgnore
      */
     protected function getExecutableFinder(): ExecutableFinder
     {

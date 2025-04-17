@@ -19,7 +19,6 @@ use Cake\Core\Configure;
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,
-    'DatabaseBackup.connection' => 'default',
     'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
     'DatabaseBackup.Mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',

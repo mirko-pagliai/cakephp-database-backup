@@ -45,6 +45,17 @@ class BackupImportTest extends TestCase
     protected BackupImport $BackupImport;
 
     /**
+     * @param list<non-empty-string> $methods Methods you want to mock
+     * @return \DatabaseBackup\Utility\BackupImport&\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getBackupImportMock(array $methods = []): BackupImport
+    {
+        return $this->getMockBuilder(BackupImport::class)
+            ->onlyMethods($methods)
+            ->getMock();
+    }
+
+    /**
      * @inheritDoc
      */
     #[Override]
@@ -92,7 +103,8 @@ class BackupImportTest extends TestCase
     {
         $filename = $this->createBackup(fakeBackup: true);
 
-        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
+        $BackupImport = $this->getBackupImportMock(['getProcess']);
+
         $BackupImport
             ->expects($this->once())
             ->method('getProcess')
@@ -103,6 +115,7 @@ class BackupImportTest extends TestCase
         $result = $BackupImport
             ->filename($filename)
             ->import();
+
         $this->assertIsString($result);
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeImport', $BackupImport->getExecutor()->getEventManager());
@@ -134,7 +147,7 @@ class BackupImportTest extends TestCase
 
         $Executor->getEventManager()->on($Executor);
 
-        $BackupImport = $this->createPartialMock(BackupImport::class, ['getExecutor']);
+        $BackupImport = $this->getBackupImportMock(['getExecutor']);
 
         $BackupImport
             ->expects($this->any())
@@ -159,7 +172,8 @@ class BackupImportTest extends TestCase
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
         $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
 
-        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
+        $BackupImport = $this->getBackupImportMock(['getProcess']);
+
         $BackupImport
             ->expects($this->once())
             ->method('getProcess')
@@ -167,7 +181,9 @@ class BackupImportTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
-        $BackupImport->filename($this->createBackup(fakeBackup: true))->import();
+        $BackupImport
+            ->filename($this->createBackup(fakeBackup: true))
+            ->import();
     }
 
     /**
@@ -181,7 +197,8 @@ class BackupImportTest extends TestCase
     {
         $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
 
-        $BackupImport = $this->createPartialMock(BackupImport::class, ['getProcess']);
+        $BackupImport = $this->getBackupImportMock(['getProcess']);
+
         $BackupImport
             ->expects($this->once())
             ->method('getProcess')
