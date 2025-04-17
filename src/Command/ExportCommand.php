@@ -20,7 +20,6 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
-use Cake\Core\Configure;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
@@ -41,6 +40,8 @@ class ExportCommand extends Command
     #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
+        $parser = parent::buildOptionParser($parser);
+
         return $parser
             ->setDescription(__d('database_backup', 'Exports a database backup'))
             ->addOptions([
@@ -66,19 +67,6 @@ class ExportCommand extends Command
                         'will be deleted'),
                     'short' => 'r',
                 ],
-                'send' => [
-                    'help' => __d('database_backup', 'Sends the backup file via email. You have ' .
-                        'to indicate the recipient\'s email address'),
-                    'short' => 's',
-                ],
-                'timeout' => [
-                    'help' => __d(
-                        'database_backup',
-                        'Timeout for shell commands. Default value: {0} seconds',
-                        Configure::readOrFail('DatabaseBackup.processTimeout')
-                    ),
-                    'short' => 't',
-                ],
             ]);
     }
 
@@ -89,7 +77,7 @@ class ExportCommand extends Command
      */
     protected function getBackupExport(): BackupExport
     {
-        return new BackupExport();
+        return new BackupExport(Connection: $this->Connection);
     }
 
     /**

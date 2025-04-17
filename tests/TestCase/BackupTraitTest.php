@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase;
 
-use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
@@ -31,10 +30,10 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 class BackupTraitTest extends TestCase
 {
     #[Test]
-    #[TestWith([''])]
-    #[TestWith(['test'])]
-    #[TestWith(['fake'])]
-    public function testGetConnection(string $connectionName): void
+    #[TestWith(['test', ''])]
+    #[TestWith(['test', 'test'])]
+    #[TestWith(['fake', 'fake'])]
+    public function testGetConnection(string $expectedConnectionName, string $connectionName): void
     {
         if ($connectionName == 'fake') {
             ConnectionManager::setConfig('fake', ['url' => 'mysql://root:password@localhost/my_database']);
@@ -45,7 +44,7 @@ class BackupTraitTest extends TestCase
         };
         $Connection = $Trait->getConnection($connectionName);
         $this->assertInstanceof(Connection::class, $Connection);
-        $this->assertSame($connectionName ?: Configure::read('DatabaseBackup.connection'), $Connection->configName());
+        $this->assertSame($expectedConnectionName, $Connection->configName());
     }
 
     #[Test]
@@ -68,7 +67,7 @@ class BackupTraitTest extends TestCase
         };
 
         $this->deprecated(function () use ($Trait): void {
-            $Trait->getConnection();
+            $Trait->getConnection('default');
         });
     }
 

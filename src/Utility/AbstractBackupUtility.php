@@ -52,6 +52,26 @@ abstract class AbstractBackupUtility
     private AbstractExecutor $Executor;
 
     /**
+     * @var \Cake\Datasource\ConnectionInterface
+     */
+    protected ConnectionInterface $Connection;
+
+    /**
+     * Construct.
+     *
+     * @param \Cake\Datasource\ConnectionInterface|string|null $Connection
+     * @since 2.14.2
+     */
+    public function __construct(ConnectionInterface|string|null $Connection = null)
+    {
+        if (!$Connection instanceof ConnectionInterface) {
+            $Connection = ConnectionManager::get($Connection ?: Configure::read(var: 'DatabaseBackup.connection', default: 'default'));
+        }
+
+        $this->Connection = $Connection;
+    }
+
+    /**
      * Magic `__call()` method.
      *
      * It provides all `getX()` methods to get properties.
@@ -135,17 +155,14 @@ abstract class AbstractBackupUtility
     /**
      * Gets the `Executor` instance according to the connection.
      *
-     * @param \Cake\Datasource\ConnectionInterface|null $Connection
      * @return \DatabaseBackup\Executor\AbstractExecutor
      * @since 2.14.0
      */
-    public function getExecutor(?ConnectionInterface $Connection = null): AbstractExecutor
+    public function getExecutor(): AbstractExecutor
     {
         if (empty($this->Executor)) {
-            $Connection = $Connection ?: ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
-
             //For example `$driverName` is `Mysql`
-            $driverName = substr(strrchr($Connection->getDriver()::class, '\\') ?: '', 1);
+            $driverName = substr(strrchr($this->Connection->getDriver()::class, '\\') ?: '', 1);
 
             /** @var class-string<\DatabaseBackup\Executor\AbstractExecutor> $executorClassName */
             $executorClassName = App::classname('DatabaseBackup.' . $driverName . 'Executor', 'Executor');
@@ -153,7 +170,7 @@ abstract class AbstractBackupUtility
                 throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $driverName));
             }
 
-            $this->Executor = new $executorClassName($Connection);
+            $this->Executor = new $executorClassName(Connection: $this->Connection);
         }
 
         return $this->Executor;

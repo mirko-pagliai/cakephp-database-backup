@@ -42,7 +42,7 @@ trait BackupTrait
             'The `BackupTrait::getConnection()` method is deprecated. Will be removed in a future release'
         );
 
-        return ConnectionManager::get($name ?: Configure::readOrFail('DatabaseBackup.connection'));
+        return ConnectionManager::get($name ?: Configure::read(var: 'DatabaseBackup.connection', default: 'default'));
     }
 
     /**

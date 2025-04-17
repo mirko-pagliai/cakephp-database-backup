@@ -6,8 +6,10 @@ namespace DatabaseBackup\Test\TestCase\Console;
 use Cake\Console\ConsoleIo;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Console\TestSuite\StubConsoleOutput;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\TestSuite\TestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -20,6 +22,21 @@ class CommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
+    /**
+     * @var \DatabaseBackup\Console\Command
+     */
+    protected Command $Command;
+
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    protected function setUp(): void
+    {
+        $this->Command = new class extends Command {
+        };
+    }
+
     #[Test]
     #[TestWith(['backup.sql', 'backup.sql'])]
     #[TestWith(['backup.sql', ROOT . 'backup.sql'])]
@@ -28,27 +45,23 @@ class CommandTest extends TestCase
     #[TestWith(['/anotherDir/backup.sql', '/anotherDir/backup.sql'])]
     public function testMakeRelativeFilename(string $expectedRelativeFilename, string $filename): void
     {
-        $Command = new class extends Command {
-        };
-        $result = $Command->makeRelativeFilename($filename);
+        $result = $this->Command->makeRelativeFilename($filename);
         $this->assertSame($expectedRelativeFilename, $result);
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testExecute(): void
     {
+        $expectedConnection = ConnectionManager::get('test');
+
         $this->_out = new StubConsoleOutput();
         $this->_err = new StubConsoleOutput();
 
-        $Command = $this->createPartialMock(Command::class, []);
-        $result = $Command->run(argv: [], io: new ConsoleIo($this->_out, $this->_err));
+        $result = $this->Command->run(argv: [], io: new ConsoleIo($this->_out, $this->_err));
 
         $this->assertNull($result);
-        $this->assertOutputContains('Connection: test');
-        $this->assertOutputContains('Driver: ' . $Command->getConnection()->getDriver()::class);
+        $this->assertOutputContains('Connection: ' . $expectedConnection->config()['name']);
+        $this->assertOutputContains('Driver: ' . $expectedConnection->getDriver()::class);
         $this->assertErrorEmpty();
     }
 }

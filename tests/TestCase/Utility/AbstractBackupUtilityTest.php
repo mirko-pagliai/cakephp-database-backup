@@ -22,11 +22,13 @@ use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
+use Generator;
 use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,12 +49,48 @@ class AbstractBackupUtilityTest extends TestCase
     protected AbstractBackupUtility $Utility;
 
     /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @param list<non-empty-string> $methods Methods you want to mock
+     * @param \Cake\Datasource\ConnectionInterface|null $Connection
+     * @return \DatabaseBackup\Utility\AbstractBackupUtility&\PHPUnit\Framework\MockObject\MockObject
      */
+    protected function getBackupExportMock(array $methods = [], ?ConnectionInterface $Connection = null): AbstractBackupUtility
+    {
+        return $this->getMockBuilder(AbstractBackupUtility::class)
+            ->setConstructorArgs([$Connection])
+            ->onlyMethods(array_merge(['filename'], $methods))
+            ->getMock();
+    }
+
     #[Override]
     protected function setUp(): void
     {
-        $this->Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename']);
+        $this->Utility = $this->getBackupExportMock();
+    }
+
+    public static function providerTestConstruct(): Generator
+    {
+        yield [null];
+        yield ['test'];
+        yield [ConnectionManager::get('test')];
+    }
+
+    #[Test]
+    #[DataProvider('providerTestConstruct')]
+    public function testConstruct(ConnectionInterface|string|null $Connection): void
+    {
+        $Utility = new class ($Connection) extends AbstractBackupUtility {
+            public ConnectionInterface $Connection;
+
+            public function filename(string $filename): AbstractBackupUtility
+            {
+                return $this;
+            }
+        };
+
+        $Connection = $Utility->Connection;
+
+        $this->assertInstanceOf(ConnectionInterface::class, $Connection);
+        $this->assertSame('test', $Connection->config()['name']);
     }
 
     #[Test]
@@ -133,8 +171,11 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new $driverClassname()]);
 
-        $result = $this->Utility->getExecutor($Connection);
-        $this->assertInstanceOf($expectedExecutorClassname, $result);
+        $Utility = $this->getBackupExportMock(Connection: $Connection);
+
+        $Executor = $Utility->getExecutor();
+
+        $this->assertInstanceOf($expectedExecutorClassname, $Executor);
     }
 
     /**
@@ -145,24 +186,22 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new FakeDriver()]);
 
+        $Utility = $this->getBackupExportMock(Connection: $Connection);
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
-        $this->Utility->getExecutor($Connection);
+        $Utility->getExecutor();
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[WithoutErrorHandler]
     public function testGetDriver(): void
     {
-        $Utility = $this->createPartialMock(AbstractBackupUtility::class, ['filename', 'getExecutor']);
+        $Utility = $this->getBackupExportMock(methods: ['getExecutor']);
 
         $Utility
             ->expects($this->once())
-            ->method('getExecutor')
-            ->with($this->anything());
+            ->method('getExecutor');
 
         $this->deprecated(fn () => $Utility->getDriver());
     }

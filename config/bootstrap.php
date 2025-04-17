@@ -51,10 +51,16 @@ foreach (array_keys(DATABASE_BACKUP_EXECUTABLES) as $driverKey) {
     }
 }
 
+if (Configure::check('DatabaseBackup.connection')) {
+    deprecationWarning('2.14.2', sprintf(
+        'The configuration name `%s` is deprecated and will be removed in a future release. If you need to use a connection other than `default`, use the `$Connection` argument to the `BackupExport`/`BackupImport` constructor when instantiating these classes.',
+        'DatabaseBackup.connection'
+    ));
+}
+
 //Writes default configuration values
 $defaults = [
     'DatabaseBackup.chmod' => 0664,
-    'DatabaseBackup.connection' => 'default',
     'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
     'DatabaseBackup.Mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
