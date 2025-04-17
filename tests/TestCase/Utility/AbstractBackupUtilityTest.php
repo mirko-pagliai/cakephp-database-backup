@@ -131,6 +131,15 @@ class AbstractBackupUtilityTest extends TestCase
         $this->assertSame($expectedAbsolutePath, $result);
     }
 
+    #[Test]
+    public function testTimeout(): void
+    {
+        $result = $this->Utility->timeout(60);
+        $this->assertSame($this->Utility, $result);
+
+        $this->assertSame(60, $this->Utility->getTimeout());
+    }
+
     /**
      * @param class-string $expectedExecutorClassname
      * @param class-string $driverClassname
