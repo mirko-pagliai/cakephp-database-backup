@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Console;
 
-use Cake\Console\CommandInterface;
 use Cake\Console\ConsoleIo;
 use Cake\Console\Exception\StopException;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
