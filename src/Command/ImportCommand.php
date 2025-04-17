@@ -56,7 +56,7 @@ class ImportCommand extends Command
      */
     protected function getBackupImport(): BackupImport
     {
-        return new BackupImport();
+        return new BackupImport(Connection: $this->Connection);
     }
 
     /**
