@@ -86,7 +86,6 @@ if (!getenv('db_dsn')) {
 }
 ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
 
-Configure::write('DatabaseBackup.connection', 'test');
 Configure::write('DatabaseBackup.target', TMP . 'backups' . DS);
 
 /**
@@ -106,7 +105,7 @@ $loader = new SchemaLoader();
 /** @uses tests/schema.php */
 $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
 
-$Connection = ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
+$Connection = ConnectionManager::get('test');
 echo sprintf(
     'Running tests for database `%s` with `%s` driver',
     $Connection->config()['name'],

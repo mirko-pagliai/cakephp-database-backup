@@ -16,6 +16,9 @@ msgstr ""
 "Language: it_IT\n"
 "X-Generator: Lokalize 22.12.3\n"
 
+msgid "Name of the alternative connection to use, for example if you are not using the default connection"
+msgstr "Nome della connessione alternativa da utilizzare, ad esempio se non si sta utilizzando la connessione di default"
+
 #: ./home/mirko/Libs/Plugins/cakephp-database-backup/src/Command/ExportCommand.php:45
 msgid "Exports a database backup"
 msgstr "Esporta un backup del database"
