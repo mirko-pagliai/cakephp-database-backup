@@ -24,7 +24,6 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
-use MongoDB\Driver\Exception\ConnectionException;
 use Override;
 use Symfony\Component\Filesystem\Path;
 
@@ -37,17 +36,6 @@ abstract class Command extends BaseCommand
      * @var \Cake\Datasource\ConnectionInterface
      */
     protected ConnectionInterface $Connection;
-
-
-    /**
-     * Gets the `Connection`.
-     *
-     * @return \Cake\Datasource\ConnectionInterface
-     */
-//    public function getConnection(): ConnectionInterface
-//    {
-//        return ConnectionManager::get(Configure::readOrFail('DatabaseBackup.connection'));
-//    }
 
     /**
      * @inheritDoc
