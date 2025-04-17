@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Console;
 
+use Cake\Console\CommandInterface;
 use Cake\Console\ConsoleIo;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Console\TestSuite\StubConsoleOutput;
@@ -63,5 +64,21 @@ class CommandTest extends TestCase
         $this->assertOutputContains('Connection: ' . $expectedConnection->config()['name']);
         $this->assertOutputContains('Driver: ' . $expectedConnection->getDriver()::class);
         $this->assertErrorEmpty();
+    }
+
+    #[Test]
+    public function testExecuteNoExistingConnection(): void
+    {
+        $this->_out = new StubConsoleOutput();
+        $this->_err = new StubConsoleOutput();
+
+        $result = $this->Command->run(
+            argv: ['--connection noExisting'],
+            io: new ConsoleIo($this->_out, $this->_err)
+        );
+
+        $this->assertSame(CommandInterface::CODE_ERROR, $result);
+        $this->assertOutputEmpty();
+        $this->assertErrorContains('Error: Unknown option `connection noExisting`.');
     }
 }
