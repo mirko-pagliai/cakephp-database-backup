@@ -59,7 +59,7 @@ class IndexCommandTest extends TestCase
             $Compression = Compression::fromFilename($file);
             $row = [
                 basename($file),
-                $Compression == Compression::None ? '' : lcfirst($Compression->name),
+                $Compression->isValid() ? lcfirst($Compression->name) : '',
                 Number::toReadableSize(filesize($file) ?: 0),
                 DateTime::createFromTimestamp(filemtime($file) ?: 0)->nice(),
             ];

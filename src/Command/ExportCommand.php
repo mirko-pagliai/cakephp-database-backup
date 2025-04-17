@@ -48,10 +48,7 @@ class ExportCommand extends Command
             ->addOptions([
                 'compression' => [
                     'choices' => array_map(callback: 'lcfirst', array: array_column(
-                        array: array_filter(
-                            array: Compression::cases(),
-                            callback: fn (Compression $Compression): bool => $Compression != Compression::None,
-                        ),
+                        array: Compression::validCases(),
                         column_key: 'name',
                     )),
                     'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),

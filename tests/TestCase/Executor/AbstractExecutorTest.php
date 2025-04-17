@@ -145,7 +145,6 @@ class AbstractExecutorTest extends TestCase
      */
     #[Test]
     #[TestWith([Compression::None])]
-    #[TestWith(['none'])]
     #[TestWith([Compression::None, 'gzip'])]
     #[TestWith(['gzip', Compression::None])]
     public function testFindBinaryWithCompressionNone(string|Compression ...$name): void

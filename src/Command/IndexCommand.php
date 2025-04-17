@@ -21,7 +21,6 @@ use Cake\Console\BaseCommand;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\I18n\Number;
-use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupManager;
 use Override;
 use function Cake\I18n\__d;
@@ -74,10 +73,7 @@ class IndexCommand extends BaseCommand
         $rows = $backups
             ->map(fn (array $backup): array => [
                 'basename' => $backup['basename'],
-                'compression' => match ($backup['compression']) {
-                    Compression::None => '',
-                    default => lcfirst($backup['compression']->name)
-                },
+                'compression' => $backup['compression']->isValid() ? lcfirst($backup['compression']->name) : '',
                 'size' => Number::toReadableSize($backup['size']),
                 'datetime' => $backup['datetime']->nice(),
             ])

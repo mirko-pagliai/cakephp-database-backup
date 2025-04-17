@@ -119,15 +119,15 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     public function findBinary(Compression|string ...$name): string
     {
+        // Makes sure it doesn't contain `Compression::None`
+        if (array_any(array: $name, callback: fn (Compression|string $name): bool => $name instanceof Compression && !$name->isValid())) {
+            throw new InvalidArgumentException('Unable to search for binary for "none" Compression');
+        }
+
         $name = array_map(
             callback: fn (Compression|string $name): string => $name instanceof Compression ? lcfirst($name->name) : $name,
             array: $name
         );
-
-        // Makes sure it doesn't contain `Compression::None`
-        if (array_any(array: $name, callback: fn (Compression|string $name): bool => $name == 'none')) {
-            throw new InvalidArgumentException('Unable to search for binary for "none" Compression');
-        }
 
         $ExecutableFinder = $this->getExecutableFinder();
 
@@ -198,7 +198,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         $exec = $this->getCommand(OperationType::Export);
 
         $Compression = Compression::fromFilename($filename);
-        if ($Compression !== Compression::None) {
+        if ($Compression->isValid()) {
             $exec .= ' | ' . escapeshellarg($this->findBinary($Compression));
         }
 
@@ -217,7 +217,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         $exec = $this->getCommand(OperationType::Import);
 
         $Compression = Compression::fromFilename($filename);
-        if ($Compression !== Compression::None) {
+        if ($Compression->isValid()) {
             return sprintf(
                 '%s -dc %s | ',
                 escapeshellarg($this->findBinary($Compression)),
