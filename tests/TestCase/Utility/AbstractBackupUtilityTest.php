@@ -113,19 +113,12 @@ class AbstractBackupUtilityTest extends TestCase
      */
     public static function makeAbsoluteFilenameProvider(): array
     {
+        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
+
         return [
-            [
-                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-                'file.txt',
-            ],
-            [
-                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-            ],
-            [
-                TMP . 'tmp_file',
-                TMP . 'tmp_file',
-            ],
+            [$defaultTarget . 'file.txt', 'file.txt',],
+            [$defaultTarget . 'file.txt', $defaultTarget . 'file.txt'],
+            [TMP . 'tmp_file', TMP . 'tmp_file'],
         ];
     }
 
