@@ -5,6 +5,7 @@ namespace DatabaseBackup\Test\TestCase\Console;
 
 use Cake\Console\CommandInterface;
 use Cake\Console\ConsoleIo;
+use Cake\Console\Exception\StopException;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Console\TestSuite\StubConsoleOutput;
 use Cake\Datasource\ConnectionManager;
@@ -67,18 +68,13 @@ class CommandTest extends TestCase
     }
 
     #[Test]
-    public function testExecuteNoExistingConnection(): void
+    public function testExecuteWithNoExistingConnection(): void
     {
-        $this->_out = new StubConsoleOutput();
-        $this->_err = new StubConsoleOutput();
-
-        $result = $this->Command->run(
-            argv: ['--connection noExisting'],
-            io: new ConsoleIo($this->_out, $this->_err)
+        $this->expectException(StopException::class);
+        $this->expectExceptionMessage('The datasource configuration `noExisting` was not found.');
+        $this->Command->run(
+            argv: ['--connection=noExisting'],
+            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
         );
-
-        $this->assertSame(CommandInterface::CODE_ERROR, $result);
-        $this->assertOutputEmpty();
-        $this->assertErrorContains('Error: Unknown option `connection noExisting`.');
     }
 }
