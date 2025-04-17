@@ -11,6 +11,7 @@ For the user, nothing changes in this sense: the plugin will always prefer any m
 Furthermore, the names of these binaries to search for, depending on the driver in use, were always defined in the bootstrap, via the constant `DATABASE_BACKUP_EXECUTABLES`.
 Now, instead, the "Executor" classes implement the methods `getExportBinary()`/`getImportBinary()`, which return the names of the binaries, as strings or arrays of strings in the case of aliases and fallback binaries.
 
+* added `Compression::isValid()` method;
 * added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
   been completely replaced by the first. The `findBinary()` method is now more accurate in finding binaries, and when it
   throws an exception, it sets a more accurate and useful message;
@@ -23,7 +24,7 @@ Now, instead, the "Executor" classes implement the methods `getExportBinary()`/`
   `getExportExecutable()` and `getImportExecutable()` methods, has been removed;
 * the `AbstractBackupUtility::__get()` magic method, which allowed to read the properties of the "Executor" classes, had
   been deprecated and has now been removed;
-* the `DatabaseBackup.connection` configuration name had been deprecated and now i have been removed;
+* the `DatabaseBackup.connection` configuration name had been deprecated and now have been removed;
 * configuration names `DatabaseBackup.mysql`, `DatabaseBackup.postgres` and `DatabaseBackup.sqlite` had been deprecated, 
   and now they have been removed;
 * `BackupTrait` had been deprecated and has now been removed;

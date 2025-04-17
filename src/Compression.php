@@ -19,6 +19,19 @@ enum Compression: string
     case Bzip2 = 'sql.bz2';
 
     /**
+     * Returns `true` if the current one is a valid `Compression`.
+     *
+     * This is equivalent to saying that it is different from `Compression::None`.
+     *
+     * @return bool
+     * @since 2.15.0
+     */
+    public function isValid(): bool
+    {
+        return $this !== Compression::None;
+    }
+
+    /**
      * Returns the matching `Compression` starting from a filename.
      *
      * @param string $filename

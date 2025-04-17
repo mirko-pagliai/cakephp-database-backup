@@ -17,6 +17,15 @@ use ValueError;
 class CompressionTest extends TestCase
 {
     #[Test]
+    #[TestWith([false, Compression::None])]
+    #[TestWith([true, Compression::Gzip])]
+    #[TestWith([true, Compression::Bzip2])]
+    public function testIsValid(bool $expectedIsValid, Compression $Compression): void
+    {
+        $this->assertSame($expectedIsValid, $Compression->isValid());
+    }
+
+    #[Test]
     #[TestWith([Compression::None, 'filename.sql'])]
     #[TestWith([Compression::None, 'FILENAME.SQL'])]
     #[TestWith([Compression::Gzip, 'filename.sql.gz'])]
