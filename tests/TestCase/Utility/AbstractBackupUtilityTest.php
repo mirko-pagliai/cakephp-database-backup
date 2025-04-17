@@ -113,19 +113,12 @@ class AbstractBackupUtilityTest extends TestCase
      */
     public static function makeAbsoluteFilenameProvider(): array
     {
+        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
+
         return [
-            [
-                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-                'file.txt',
-            ],
-            [
-                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-                Configure::readOrFail('DatabaseBackup.target') . 'file.txt',
-            ],
-            [
-                TMP . 'tmp_file',
-                TMP . 'tmp_file',
-            ],
+            [$defaultTarget . 'file.txt', 'file.txt',],
+            [$defaultTarget . 'file.txt', $defaultTarget . 'file.txt'],
+            [TMP . 'tmp_file', TMP . 'tmp_file'],
         ];
     }
 
@@ -136,6 +129,15 @@ class AbstractBackupUtilityTest extends TestCase
         $result = $this->Utility->makeAbsoluteFilename($path);
 
         $this->assertSame($expectedAbsolutePath, $result);
+    }
+
+    #[Test]
+    public function testTimeout(): void
+    {
+        $result = $this->Utility->timeout(60);
+        $this->assertSame($this->Utility, $result);
+
+        $this->assertSame(60, $this->Utility->getTimeout());
     }
 
     /**

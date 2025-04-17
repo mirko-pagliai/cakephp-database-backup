@@ -42,8 +42,6 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     use EventDispatcherTrait;
 
-    protected string $name;
-
     /**
      * @return \Symfony\Component\Process\ExecutableFinder
      * @codeCoverageIgnore
@@ -59,7 +57,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      * @param \Cake\Datasource\ConnectionInterface $Connection
      * @param string|null $name Driver name. By default, it will be automatically obtained from `$Connection`
      */
-    public function __construct(protected ConnectionInterface $Connection, ?string $name = null)
+    public function __construct(protected ConnectionInterface $Connection, protected ?string $name = null)
     {
         /**
          * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
