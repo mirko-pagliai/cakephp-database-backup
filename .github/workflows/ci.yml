@@ -119,12 +119,6 @@ jobs:
         - name: Show PHPCS results in PR
           run: cs2pr ./phpcs-report.xml
 
-        - name: Run psalm
-          if: success() || failure()
-          env:
-            db_dsn: 'sqlite:///:memory:'
-          run: vendor/bin/psalm --output-format=github --php-version=8.1
-
         - name: Run phpstan
           if: success() || failure()
           env:

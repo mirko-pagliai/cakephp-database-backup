@@ -43,7 +43,8 @@ Now, instead, the "Executor" classes implement the methods `getExportBinary()`/`
   `DatabaseBackup.Mysql`, `DatabaseBackup.Postgres` and `DatabaseBackup.Sqlite` names instead in your bootstrap (the 
   driver name begins with a capital letter);
 * removed from `ExportCommand::buildOptionParser()` the reference (as a helper) to the old `send` option, which was no
-  longer present (it had been forgotten).
+  longer present (it had been forgotten);
+* removed Psalm (for the same reasons given for CakePHP, see [here](https://github.com/cakephp/cakephp/pull/18340)).
 
 ### 2.14.1
 * many improvements for the `AbstractExecutor` abstract class;

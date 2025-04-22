@@ -35,12 +35,12 @@ use PHPUnit\Framework\Attributes\TestWith;
 class BackupExportAndImportTest extends TestCase
 {
     /**
-     * @var \Cake\ORM\Table
+     * @var \Cake\ORM\Table<array<string, \Cake\ORM\Behavior>>
      */
     protected Table $Articles;
 
     /**
-     * @var \Cake\ORM\Table
+     * @var \Cake\ORM\Table<array<string, \Cake\ORM\Behavior>>
      */
     protected Table $Comments;
 

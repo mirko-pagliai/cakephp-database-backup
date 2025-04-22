@@ -12,7 +12,5 @@ parameters:
     bootstrapFiles:
         - tests/bootstrap.php
 
-    treatPhpDocTypesAsCertain: false
-
     excludePaths:
         -  tests/test_app/
