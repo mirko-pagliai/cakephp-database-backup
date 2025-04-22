@@ -165,8 +165,8 @@ abstract class AbstractExecutor implements EventListenerInterface
         $binaries = (array)$this->{$OperationType == OperationType::Export ? 'getExportBinary' : 'getImportBinary'}();
 
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->findBinary(...$binaries)),
-            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? escapeshellarg($this->getAuthFilePath()) : '',
+            '{{BINARY}}' => $this->findBinary(...$binaries),
+            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
             '{{DB_HOST}}' => $this->getConfig('host'),
@@ -183,6 +183,31 @@ abstract class AbstractExecutor implements EventListenerInterface
         $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.' . $OperationType->value);
 
         return str_replace(array_keys($replacements), $replacements, $command);
+    }
+
+    public function getNewCommand(OperationType $OperationType, string $filename): string
+    {
+        $command = $this->getCommand($OperationType);
+
+        $Compression = Compression::fromFilename($filename);
+
+        if ($OperationType == OperationType::Export) {
+            if ($Compression->isValid()) {
+                $command .= ' | ' . $this->findBinary($Compression);
+            }
+
+            return $command . ' > ' . $filename;
+        } else {
+            if ($Compression->isValid()) {
+                return sprintf(
+                    '%s -dc %s | ',
+                    $this->findBinary($Compression),
+                    $filename
+                ) . $command;
+            }
+
+            return $command . ' < ' . $filename;
+        }
     }
 
     /**
