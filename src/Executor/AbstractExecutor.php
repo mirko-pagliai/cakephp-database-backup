@@ -25,6 +25,7 @@ use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Override;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 use function Cake\I18n\__d;
 
 /**
@@ -201,6 +202,30 @@ abstract class AbstractExecutor implements EventListenerInterface
         }
 
         return $command;
+    }
+
+    protected function getProcess(string $command): Process
+    {
+        return Process::fromShellCommandline(command: $command);
+    }
+
+    public function runProcess(OperationType $OperationType, string $filename): Process
+    {
+        $command = $this->getRawCommand(OperationType: $OperationType, Compression: Compression::fromFilename($filename));
+
+        $Process = $this->getProcess(command: $command);
+
+        $Process->run(env: [
+            'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
+            'BINARY' => $OperationType == OperationType::Export ? $this->getExportBinary() : $this->getImportBinary(),
+            'DB_HOST' => $this->getConfig('host'),
+            'DB_NAME' => $this->getConfig('database'),
+            'DB_PASSWORD' => $this->getConfig('password'),
+            'DB_USER' => $this->getConfig('username'),
+            'FILENAME' => $filename,
+        ]);
+
+        return $Process;
     }
 
     /**

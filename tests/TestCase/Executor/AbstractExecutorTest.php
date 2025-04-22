@@ -26,6 +26,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * AbstractExecutorTest.
@@ -104,6 +105,36 @@ class AbstractExecutorTest extends TestCase
         $result = $Executor->getRawCommand($OperationType, $Compression);
 
         $this->assertSame($expectedCommand, $result);
+    }
+
+    public function testRunProcess(): void
+    {
+        $Process = $this->createMock(Process::class);
+        $Process
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->equalTo(null), $this->equalTo([
+                'AUTH_FILE' => '',
+                'BINARY' => 'export-binary',
+                'DB_HOST' => 'my-host',
+                'DB_NAME' => 'my-database',
+                'DB_PASSWORD' => 'my-password',
+                'DB_USER' => 'my-username',
+                'FILENAME' => 'filename.sql',
+            ]))
+            ->willReturn(1);
+
+        $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig', 'getProcess']);
+
+        $Executor
+            ->expects($this->once())
+            ->method('getProcess')
+            ->with($this->equalTo('${:BINARY} ${:DB_NAME} .dump > ${:FILENAME:}'))
+            ->willReturn($Process);
+
+        $result = $Executor->runProcess(OperationType::Export, 'filename.sql');
+
+        $this->assertInstanceOf(Process::class, $result);
     }
 
     /**
