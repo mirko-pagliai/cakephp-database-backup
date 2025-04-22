@@ -187,7 +187,7 @@ abstract class AbstractExecutor implements EventListenerInterface
 
     public function getNewCommand(OperationType $OperationType, string $filename): string
     {
-        $command = $this->getCommand($OperationType);
+        $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $OperationType->value);
 
         $Compression = Compression::fromFilename($filename);
 
@@ -196,18 +196,20 @@ abstract class AbstractExecutor implements EventListenerInterface
                 $command .= ' | ' . $this->findBinary($Compression);
             }
 
-            return $command . ' > ' . $filename;
+            $command .= ' > ' . $filename;
         } else {
             if ($Compression->isValid()) {
-                return sprintf(
+                $command = sprintf(
                     '%s -dc %s | ',
                     $this->findBinary($Compression),
                     $filename
                 ) . $command;
+            } else {
+                $command .= ' < ' . $filename;
             }
-
-            return $command . ' < ' . $filename;
         }
+
+        return $command;
     }
 
     /**
