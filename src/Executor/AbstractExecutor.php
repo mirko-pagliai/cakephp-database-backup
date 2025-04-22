@@ -193,19 +193,15 @@ abstract class AbstractExecutor implements EventListenerInterface
 
         if ($OperationType == OperationType::Export) {
             if ($Compression->isValid()) {
-                $command .= ' | ' . $this->findBinary($Compression);
+                $command .= ' | ${:COMPRESSION_BINARY:} > ${:FILENAME:}';
+            } else {
+                $command .= ' > ${:FILENAME:}';
             }
-
-            $command .= ' > ' . $filename;
         } else {
             if ($Compression->isValid()) {
-                $command = sprintf(
-                    '%s -dc %s | ',
-                    $this->findBinary($Compression),
-                    $filename
-                ) . $command;
+                $command = '${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ' . $command;
             } else {
-                $command .= ' < ' . $filename;
+                $command .= ' < ${:FILENAME:}';
             }
         }
 

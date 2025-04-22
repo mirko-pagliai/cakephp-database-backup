@@ -91,12 +91,12 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump > filename.sql', OperationType::Export, 'filename.sql'])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | gzip-binary > filename.sql.gz', OperationType::Export, 'filename.sql.gz'])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | bzip2-binary > filename.sql.bz2', OperationType::Export, 'filename.sql.bz2'])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} < filename.sql', OperationType::Import, 'filename.sql'])]
-    #[TestWith(['gzip-binary -dc filename.sql.gz | ${:BINARY} ${:DB_NAME}', OperationType::Import, 'filename.sql.gz'])]
-    #[TestWith(['bzip2-binary -dc filename.sql.bz2 | ${:BINARY} ${:DB_NAME}', OperationType::Import, 'filename.sql.bz2'])]
+    #[TestWith(['${:BINARY} ${:DB_NAME} .dump > ${:FILENAME:}', OperationType::Export, 'filename.sql'])]
+    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, 'filename.sql.gz'])]
+    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, 'filename.sql.bz2'])]
+    #[TestWith(['${:BINARY} ${:DB_NAME} < ${:FILENAME:}', OperationType::Import, 'filename.sql'])]
+    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, 'filename.sql.gz'])]
+    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, 'filename.sql.bz2'])]
     public function testGetNewCommand(string $expectedCommand, OperationType $OperationType, string $filename): void
     {
         $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig']);
