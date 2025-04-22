@@ -185,7 +185,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         return str_replace(array_keys($replacements), $replacements, $command);
     }
 
-    public function getNewCommand(OperationType $OperationType, Compression $Compression = Compression::None): string
+    public function getRawCommand(OperationType $OperationType, Compression $Compression = Compression::None): string
     {
         $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $OperationType->value);
 

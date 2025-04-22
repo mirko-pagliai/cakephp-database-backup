@@ -97,11 +97,11 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['${:BINARY} ${:DB_NAME} < ${:FILENAME:}', OperationType::Import, Compression::None])]
     #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, Compression::Gzip])]
     #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, Compression::Bzip2])]
-    public function testGetNewCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
+    public function testGetRawCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
         $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig']);
 
-        $result = $Executor->getNewCommand($OperationType, $Compression);
+        $result = $Executor->getRawCommand($OperationType, $Compression);
 
         $this->assertSame($expectedCommand, $result);
     }
