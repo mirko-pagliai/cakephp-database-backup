@@ -204,7 +204,7 @@ abstract class AbstractBackupUtility
     protected function getProcess(string $command): Process
     {
         $Process = Process::fromShellCommandline(command: $command);
-        $Process->setTimeout(timeout: $this->getTimeout() ?? Configure::readOrFail('DatabaseBackup.processTimeout'));
+        $Process->setTimeout(timeout: $this->getTimeout() ?: Configure::readOrFail('DatabaseBackup.processTimeout'));
         $Process->run();
 
         return $Process;

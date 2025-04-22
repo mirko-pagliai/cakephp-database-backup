@@ -96,7 +96,7 @@ class AbstractBackupUtilityTest extends TestCase
     #[Test]
     public function testMagicCallMethod(): void
     {
-        $this->assertIsInt($this->Utility->getTimeout());
+        $this->assertSame(0, $this->Utility->getTimeout());
     }
 
     #[Test]
