@@ -185,21 +185,19 @@ abstract class AbstractExecutor implements EventListenerInterface
         return str_replace(array_keys($replacements), $replacements, $command);
     }
 
-    public function getNewCommand(OperationType $OperationType, string $filename): string
+    public function getNewCommand(OperationType $OperationType, Compression $Compression = Compression::None): string
     {
         $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $OperationType->value);
 
-        $Compression = Compression::fromFilename($filename);
-
-        if ($OperationType == OperationType::Export) {
-            if ($Compression->isValid()) {
+        if ($Compression->isValid()) {
+            if ($OperationType == OperationType::Export) {
                 $command .= ' | ${:COMPRESSION_BINARY:} > ${:FILENAME:}';
             } else {
-                $command .= ' > ${:FILENAME:}';
+                $command = '${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ' . $command;
             }
         } else {
-            if ($Compression->isValid()) {
-                $command = '${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ' . $command;
+            if ($OperationType == OperationType::Export) {
+                $command .= ' > ${:FILENAME:}';
             } else {
                 $command .= ' < ${:FILENAME:}';
             }

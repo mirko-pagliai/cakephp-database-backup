@@ -91,17 +91,17 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump > ${:FILENAME:}', OperationType::Export, 'filename.sql'])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, 'filename.sql.gz'])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, 'filename.sql.bz2'])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} < ${:FILENAME:}', OperationType::Import, 'filename.sql'])]
-    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, 'filename.sql.gz'])]
-    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, 'filename.sql.bz2'])]
-    public function testGetNewCommand(string $expectedCommand, OperationType $OperationType, string $filename): void
+    #[TestWith(['${:BINARY} ${:DB_NAME} .dump > ${:FILENAME:}', OperationType::Export, Compression::None])]
+    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, Compression::Gzip])]
+    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, Compression::Bzip2])]
+    #[TestWith(['${:BINARY} ${:DB_NAME} < ${:FILENAME:}', OperationType::Import, Compression::None])]
+    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, Compression::Gzip])]
+    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, Compression::Bzip2])]
+    public function testGetNewCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
         $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig']);
 
-        $result = $Executor->getNewCommand($OperationType, $filename);
+        $result = $Executor->getNewCommand($OperationType, $Compression);
 
         $this->assertSame($expectedCommand, $result);
     }
