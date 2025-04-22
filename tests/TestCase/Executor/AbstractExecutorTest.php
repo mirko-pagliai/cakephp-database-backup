@@ -48,11 +48,11 @@ class AbstractExecutorTest extends TestCase
             ->onlyMethods(array_merge($methods, ['getExportBinary', 'getImportBinary']))
             ->getMock();
 
-        foreach (['getExportBinary' => 'export-binary', 'getImportBinary' => 'import-binary'] as $method => $binary) {
+        foreach (['getExportBinary' => 'export-binary', 'getImportBinary' => 'import-binary'] as $methodName => $returnValue) {
             $Executor
                 ->expects($this->any())
-                ->method($method)
-                ->willReturn($binary);
+                ->method($methodName)
+                ->willReturn($returnValue);
         }
 
         if (in_array(needle: 'getConfig', haystack: $methods)) {
