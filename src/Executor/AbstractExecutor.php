@@ -165,7 +165,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         $binaries = (array)$this->{$OperationType == OperationType::Export ? 'getExportBinary' : 'getImportBinary'}();
 
         $replacements = [
-            '{{BINARY}}' => $this->findBinary(...$binaries),
+            '{{BINARY}}' => escapeshellarg($this->findBinary(...$binaries)),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',

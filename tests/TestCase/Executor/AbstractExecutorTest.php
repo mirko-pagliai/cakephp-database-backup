@@ -43,10 +43,26 @@ class AbstractExecutorTest extends TestCase
     {
         $Connection = $Connection ?? $this->createMock(ConnectionInterface::class);
 
-        return $this->getMockBuilder(AbstractExecutor::class)
+        $Executor = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([$Connection, 'Sqlite'])
             ->onlyMethods(array_merge($methods, ['getExportBinary', 'getImportBinary']))
             ->getMock();
+
+        foreach (['getExportBinary' => 'export-binary', 'getImportBinary' => 'import-binary'] as $method => $binary) {
+            $Executor
+                ->expects($this->any())
+                ->method($method)
+                ->willReturn($binary);
+        }
+
+        if (in_array(needle: 'getConfig', haystack: $methods)) {
+            $Executor
+                ->expects($this->any())
+                ->method('getConfig')
+                ->willReturnCallback(fn (string $key): string => 'my-' . $key);
+        }
+
+        return $Executor;
     }
 
     /**
@@ -71,16 +87,6 @@ class AbstractExecutorTest extends TestCase
 
         $Executor
             ->expects($this->any())
-            ->method('getExportBinary')
-            ->willReturn('export-binary');
-
-        $Executor
-            ->expects($this->any())
-            ->method('getImportBinary')
-            ->willReturn('import-binary');
-
-        $Executor
-            ->expects($this->any())
             ->method('findBinary')
             ->willReturnCallback(function (Compression|string $binaryName): string {
                 if ($binaryName instanceof Compression) {
@@ -89,11 +95,6 @@ class AbstractExecutorTest extends TestCase
 
                 return $binaryName;
             });
-
-        $Executor
-            ->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
 
         $result = $Executor->getNewCommand($OperationType, $filename);
 
@@ -219,11 +220,6 @@ class AbstractExecutorTest extends TestCase
                 return 'export-binary';
             });
 
-        $Executor
-            ->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
-
         $result = $Executor->getExportCommand($filename);
 
         $this->assertSame($expectedExportCommand, $result);
@@ -250,11 +246,6 @@ class AbstractExecutorTest extends TestCase
 
                 return 'import-binary';
             });
-
-        $Executor
-            ->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
 
         $result = $Executor->getImportCommand($filename);
 
