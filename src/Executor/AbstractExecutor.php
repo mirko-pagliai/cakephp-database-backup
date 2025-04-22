@@ -187,20 +187,17 @@ abstract class AbstractExecutor implements EventListenerInterface
 
     public function getRawCommand(OperationType $OperationType, Compression $Compression): string
     {
+        $isExport = $OperationType == OperationType::Export;
         $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $OperationType->value);
 
         if ($Compression->isValid()) {
-            if ($OperationType == OperationType::Export) {
+            if ($isExport) {
                 $command .= ' | ${:COMPRESSION_BINARY:} > ${:FILENAME:}';
             } else {
                 $command = '${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ' . $command;
             }
         } else {
-            if ($OperationType == OperationType::Export) {
-                $command .= ' > ${:FILENAME:}';
-            } else {
-                $command .= ' < ${:FILENAME:}';
-            }
+            $command .= ' ' . ($isExport ? '>' : '<') . ' ${:FILENAME:}';
         }
 
         return $command;
