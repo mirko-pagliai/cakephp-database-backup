@@ -55,6 +55,19 @@ class AbstractExecutorTest extends TestCase
                 ->willReturn($returnValue);
         }
 
+        if (in_array(needle: 'findBinary', haystack: $methods)) {
+            $Executor
+                ->expects($this->any())
+                ->method('findBinary')
+                ->willReturnCallback(function (Compression|string $binaryName): string {
+                    if ($binaryName instanceof Compression) {
+                        return strtolower($binaryName->name) . '-binary';
+                    }
+
+                    return $binaryName;
+                });
+        }
+
         if (in_array(needle: 'getConfig', haystack: $methods)) {
             $Executor
                 ->expects($this->any())
@@ -75,26 +88,15 @@ class AbstractExecutorTest extends TestCase
     }
 
     #[Test]
-    #[TestWith(['export-binary my-database .dump > filename.sql', OperationType::Export, 'filename.sql'])]
-    #[TestWith(['export-binary my-database .dump | gzip-binary > filename.sql.gz', OperationType::Export, 'filename.sql.gz'])]
-    #[TestWith(['export-binary my-database .dump | bzip2-binary > filename.sql.bz2', OperationType::Export, 'filename.sql.bz2'])]
-    #[TestWith(['import-binary my-database < filename.sql', OperationType::Import, 'filename.sql'])]
-    #[TestWith(['gzip-binary -dc filename.sql.gz | import-binary my-database', OperationType::Import, 'filename.sql.gz'])]
-    #[TestWith(['bzip2-binary -dc filename.sql.bz2 | import-binary my-database', OperationType::Import, 'filename.sql.bz2'])]
+    #[TestWith(['\'export-binary\' my-database .dump > filename.sql', OperationType::Export, 'filename.sql'])]
+    #[TestWith(['\'export-binary\' my-database .dump | gzip-binary > filename.sql.gz', OperationType::Export, 'filename.sql.gz'])]
+    #[TestWith(['\'export-binary\' my-database .dump | bzip2-binary > filename.sql.bz2', OperationType::Export, 'filename.sql.bz2'])]
+    #[TestWith(['\'import-binary\' my-database < filename.sql', OperationType::Import, 'filename.sql'])]
+    #[TestWith(['gzip-binary -dc filename.sql.gz | \'import-binary\' my-database', OperationType::Import, 'filename.sql.gz'])]
+    #[TestWith(['bzip2-binary -dc filename.sql.bz2 | \'import-binary\' my-database', OperationType::Import, 'filename.sql.bz2'])]
     public function testGetNewCommand(string $expectedCommand, OperationType $OperationType, string $filename): void
     {
         $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig']);
-
-        $Executor
-            ->expects($this->any())
-            ->method('findBinary')
-            ->willReturnCallback(function (Compression|string $binaryName): string {
-                if ($binaryName instanceof Compression) {
-                    return strtolower($binaryName->name) . '-binary';
-                }
-
-                return $binaryName;
-            });
 
         $result = $Executor->getNewCommand($OperationType, $filename);
 
@@ -209,17 +211,6 @@ class AbstractExecutorTest extends TestCase
     {
         $Executor = $this->getAbstractExecutorMock(['findBinary', 'getConfig']);
 
-        $Executor
-            ->expects($this->any())
-            ->method('findBinary')
-            ->willReturnCallback(function (Compression|string $binaryName): string {
-                if ($binaryName instanceof Compression) {
-                    return strtolower($binaryName->name) . '-binary';
-                }
-
-                return 'export-binary';
-            });
-
         $result = $Executor->getExportCommand($filename);
 
         $this->assertSame($expectedExportCommand, $result);
@@ -235,17 +226,6 @@ class AbstractExecutorTest extends TestCase
     public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
         $Executor = $this->getAbstractExecutorMock(['findBinary', 'getConfig']);
-
-        $Executor
-            ->expects($this->any())
-            ->method('findBinary')
-            ->willReturnCallback(function (Compression|string $binaryName): string {
-                if ($binaryName instanceof Compression) {
-                    return strtolower($binaryName->name) . '-binary';
-                }
-
-                return 'import-binary';
-            });
 
         $result = $Executor->getImportCommand($filename);
 
