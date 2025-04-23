@@ -9,16 +9,16 @@ With this version, the bootstrap does not do any of this anymore. Instead, the n
 For the user, nothing changes in this sense: the plugin will always prefer any manually set binaries, otherwise it will take care of searching for them.
 
 Furthermore, the names of these binaries to search for, depending on the driver in use, were always defined in the bootstrap, via the constant `DATABASE_BACKUP_EXECUTABLES`.
-Now, instead, the "Executor" classes implement the methods `getExportBinary()`/`getImportBinary()`, which return the names of the binaries, as strings or arrays of strings in the case of aliases and fallback binaries.
+Now, instead, the "Executor" classes implement the `getBinary()` method, which return the names of the binaries, as strings or arrays of strings in the case of aliases and fallback binaries.
 
 * added `Compression::isValid()` method and `Compression::validCases()` static method;
 * added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
   been completely replaced by the first. The `findBinary()` method is now more accurate in finding binaries, and when it
   throws an exception, it sets a more accurate and useful message;
-* the `AbstractExecutor` class and all "Executor" classes that extend it now implement `getExportBinary()` and
-  `getImportBinary()` methods, which should return the names of the binaries (as a string or array of strings, e.g. in
-  the case of `MysqlExecutor`) related to the respective driver; The `DATABASE_BACKUP_EXECUTABLES` constant, previously
-  defined in the bootstrap, has been removed;
+* the `AbstractExecutor` class and all "Executor" classes that extend it now implement the `getBinary()` method, which
+  should return the names of the binaries (as a string or array of strings, e.g. in the case of `MysqlExecutor`) related
+  to the respective driver; The `DATABASE_BACKUP_EXECUTABLES` constant, previously defined in the bootstrap, has been
+  removed;
 * the `AbstractBackupUtility::_getDriver()` had been deprecated and has now been removed;
 * the `AbstractExecutor::__call()` magic method, which provided backwards compatibility for deprecated
   `getExportExecutable()` and `getImportExecutable()` methods, has been removed;

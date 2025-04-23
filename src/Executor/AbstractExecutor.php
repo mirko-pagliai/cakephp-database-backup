@@ -30,8 +30,9 @@ use function Cake\I18n\__d;
 /**
  * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.
  *
- * "Executor" classes that extend this class must implement the `getExportBinary()` and `getImportBinary()` methods,
- *  which should return the names of the binaries (as a string or array of strings) related to the respective driver.
+ * "Executor" classes that extend this class must implement the `getBinary()` method, which should return the names of
+ *  the binaries (as a string or array of strings) related to the respective driver, possibly based on the
+ *  `$OperationType` argument passed.
  *
  * @method \Cake\Event\EventManager getEventManager()
  */
@@ -88,18 +89,12 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
-     * Returns the names of the binaries to export, (as a string or array of strings) related to the respective driver.
+     * Returns the binaries names to export/import (as a string or array of strings), related to the respective driver.
      *
+     * @param \DatabaseBackup\OperationType $OperationType
      * @return array<string>|string
      */
-    abstract protected function getExportBinary(): string|array;
-
-    /**
-     * Returns the names of the binaries to import, (as a string or array of strings) related to the respective driver.
-     *
-     * @return array<string>|string
-     */
-    abstract protected function getImportBinary(): string|array;
+    abstract protected function getBinary(OperationType $OperationType): string|array;
 
     /**
      * Finds and returns an executable binary by name.
@@ -162,7 +157,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     protected function getCommand(OperationType $OperationType): string
     {
         //Gets the binaries names
-        $binaries = (array)$this->{$OperationType == OperationType::Export ? 'getExportBinary' : 'getImportBinary'}();
+        $binaries = (array)$this->getBinary($OperationType);
 
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->findBinary(...$binaries)),
