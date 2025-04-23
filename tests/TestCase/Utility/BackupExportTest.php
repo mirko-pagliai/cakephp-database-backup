@@ -221,7 +221,7 @@ class BackupExportTest extends TestCase
     {
         $Executor = $this->createPartialMock(
             AbstractExecutor::class,
-            ['beforeExport', 'getConfig', 'getExportBinary', 'getImportBinary']
+            ['beforeExport', 'getConfig', 'getBinary']
         );
 
         $Executor

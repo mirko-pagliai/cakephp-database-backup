@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use DatabaseBackup\OperationType;
 use Override;
 
 /**
@@ -24,24 +25,11 @@ use Override;
 class PostgresExecutor extends AbstractExecutor
 {
     /**
-     * {@inheritDoc}
-     *
-     * @codeCoverageIgnore
+     * @inheritDoc
      */
     #[Override]
-    protected function getExportBinary(): string|array
+    protected function getBinary(OperationType $OperationType): string|array
     {
-        return 'pg_dump';
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @codeCoverageIgnore
-     */
-    #[Override]
-    protected function getImportBinary(): string|array
-    {
-        return 'pg_restore';
+        return $OperationType == OperationType::Export ? 'pg_dump' : 'pg_restore';
     }
 }

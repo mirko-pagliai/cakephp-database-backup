@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use DatabaseBackup\OperationType;
 use Override;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -106,25 +107,12 @@ class MysqlExecutor extends AbstractExecutor
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @codeCoverageIgnore
+     * @inheritDoc
      */
     #[Override]
-    protected function getExportBinary(): string|array
+    protected function getBinary(OperationType $OperationType): string|array
     {
-        return ['mariadb-dump', 'mysqldump'];
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @codeCoverageIgnore
-     */
-    #[Override]
-    protected function getImportBinary(): string|array
-    {
-        return ['mariadb', 'mysql'];
+        return $OperationType == OperationType::Export ? ['mariadb-dump', 'mysqldump'] : ['mariadb', 'mysql'];
     }
 
     /**

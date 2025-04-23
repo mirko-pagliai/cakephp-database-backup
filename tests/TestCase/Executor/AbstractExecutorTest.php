@@ -46,15 +46,13 @@ class AbstractExecutorTest extends TestCase
 
         $Executor = $this->getMockBuilder(AbstractExecutor::class)
             ->setConstructorArgs([$Connection, 'Sqlite'])
-            ->onlyMethods(array_merge($methods, ['getExportBinary', 'getImportBinary']))
+            ->onlyMethods(array_merge($methods, ['getBinary']))
             ->getMock();
 
-        foreach (['getExportBinary' => 'export-binary', 'getImportBinary' => 'import-binary'] as $methodName => $returnValue) {
-            $Executor
-                ->expects($this->any())
-                ->method($methodName)
-                ->willReturn($returnValue);
-        }
+        $Executor
+            ->expects($this->any())
+            ->method('getBinary')
+            ->willReturnCallback(fn (OperationType $OperationType): string => $OperationType->name . '-binary');
 
         if (in_array(needle: 'findBinary', haystack: $methods)) {
             $Executor

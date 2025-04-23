@@ -138,7 +138,10 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeImport(): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport', 'getExportBinary', 'getImportBinary']);
+        $Executor = $this->createPartialMock(
+            AbstractExecutor::class,
+            ['beforeImport', 'getBinary']
+        );
 
         $Executor
             ->expects($this->once())
@@ -170,7 +173,10 @@ class BackupImportTest extends TestCase
     public function testImportOnFailure(): void
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
-        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
+        $Process = $this->createConfiguredMock(
+            Process::class,
+            ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]
+        );
 
         $BackupImport = $this->getBackupImportMock(['getProcess']);
 
