@@ -16,6 +16,9 @@
     <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall.MissingTrailingComma">
         <severity>0</severity>
     </rule>
+    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration.MissingTrailingComma">
+        <severity>0</severity>
+    </rule>
 
     <exclude-pattern>/coverage/</exclude-pattern>
     <exclude-pattern>/vendor</exclude-pattern>

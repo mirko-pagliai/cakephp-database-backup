@@ -36,13 +36,16 @@ class AbstractExecutorTest extends TestCase
 {
     /**
      * @param list<non-empty-string> $methods Methods you want to mock
-     * @param \Cake\Datasource\ConnectionInterface|null $Connection
-     * @param \DatabaseBackup\OperationType|null $OperationType
+     * @param \Cake\Datasource\ConnectionInterface|null $Connection A `ConnectionInterface` or `null` for a default mock
+     * @param \DatabaseBackup\OperationType|null $OperationType An `OperationType` or `null` for a default value
      * @return \DatabaseBackup\Executor\AbstractExecutor&\PHPUnit\Framework\MockObject\MockObject
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    protected function getAbstractExecutorMock(array $methods = [], ?ConnectionInterface $Connection = null, ?OperationType $OperationType = null): AbstractExecutor
-    {
+    protected function getAbstractExecutorMock(
+        array $methods = [],
+        ?ConnectionInterface $Connection = null,
+        ?OperationType $OperationType = null
+    ): AbstractExecutor {
         $Connection = $Connection ?? $this->createMock(ConnectionInterface::class);
         $OperationType = $OperationType ?? OperationType::Export;
 
@@ -127,7 +130,10 @@ class AbstractExecutorTest extends TestCase
             ]))
             ->willReturn(1);
 
-        $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig', 'getProcess'], OperationType: OperationType::Export);
+        $Executor = $this->getAbstractExecutorMock(
+            methods: ['findBinary', 'getConfig', 'getProcess'],
+            OperationType: OperationType::Export
+        );
 
         $Executor
             ->expects($this->once())
