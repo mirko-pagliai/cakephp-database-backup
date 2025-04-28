@@ -110,9 +110,9 @@ class MysqlExecutor extends AbstractExecutor
      * @inheritDoc
      */
     #[Override]
-    protected function getBinary(OperationType $OperationType): string|array
+    protected function getBinary(): string|array
     {
-        return $OperationType == OperationType::Export ? ['mariadb-dump', 'mysqldump'] : ['mariadb', 'mysql'];
+        return $this->OperationType == OperationType::Export ? ['mariadb-dump', 'mysqldump'] : ['mariadb', 'mysql'];
     }
 
     /**

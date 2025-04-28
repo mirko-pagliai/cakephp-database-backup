@@ -37,22 +37,24 @@ class AbstractExecutorTest extends TestCase
     /**
      * @param list<non-empty-string> $methods Methods you want to mock
      * @param \Cake\Datasource\ConnectionInterface|null $Connection
+     * @param \DatabaseBackup\OperationType|null $OperationType
      * @return \DatabaseBackup\Executor\AbstractExecutor&\PHPUnit\Framework\MockObject\MockObject
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    protected function getAbstractExecutorMock(array $methods = [], ?ConnectionInterface $Connection = null): AbstractExecutor
+    protected function getAbstractExecutorMock(array $methods = [], ?ConnectionInterface $Connection = null, ?OperationType $OperationType = null): AbstractExecutor
     {
         $Connection = $Connection ?? $this->createMock(ConnectionInterface::class);
+        $OperationType = $OperationType ?? OperationType::Export;
 
         $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$Connection, 'Sqlite'])
+            ->setConstructorArgs([$Connection, $OperationType, 'Sqlite'])
             ->onlyMethods(array_merge($methods, ['getBinary']))
             ->getMock();
 
         $Executor
             ->expects($this->any())
             ->method('getBinary')
-            ->willReturnCallback(fn (OperationType $OperationType): string => lcfirst($OperationType->name . '-binary'));
+            ->willReturnCallback(fn (): string => lcfirst($OperationType->name . '-binary'));
 
         if (in_array(needle: 'findBinary', haystack: $methods)) {
             $Executor
@@ -98,9 +100,9 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetRawCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
-        $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig']);
+        $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig'], OperationType: $OperationType);
 
-        $result = $Executor->getRawCommand($OperationType, $Compression);
+        $result = $Executor->getRawCommand(Compression: $Compression);
 
         $this->assertSame($expectedCommand, $result);
     }
@@ -125,7 +127,7 @@ class AbstractExecutorTest extends TestCase
             ]))
             ->willReturn(1);
 
-        $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig', 'getProcess']);
+        $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig', 'getProcess'], OperationType: OperationType::Export);
 
         $Executor
             ->expects($this->once())
@@ -133,7 +135,7 @@ class AbstractExecutorTest extends TestCase
             ->with($this->equalTo('"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"'))
             ->willReturn($Process);
 
-        $Executor->runProcess(OperationType::Export, 'filename.sql');
+        $Executor->runProcess(filename: 'filename.sql');
     }
 
     /**

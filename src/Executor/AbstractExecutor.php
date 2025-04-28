@@ -57,9 +57,10 @@ abstract class AbstractExecutor implements EventListenerInterface
      * Constructor.
      *
      * @param \Cake\Datasource\ConnectionInterface $Connection
+     * @param \DatabaseBackup\OperationType $OperationType
      * @param string|null $name Driver name. By default, it will be automatically obtained from `$Connection`
      */
-    public function __construct(protected ConnectionInterface $Connection, protected ?string $name = null)
+    public function __construct(protected ConnectionInterface $Connection, protected OperationType $OperationType, protected ?string $name = null)
     {
         /**
          * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
@@ -92,10 +93,9 @@ abstract class AbstractExecutor implements EventListenerInterface
     /**
      * Returns the binary names to export/import (as a string or array of strings), related to the respective driver.
      *
-     * @param \DatabaseBackup\OperationType $OperationType
      * @return array<string>|string
      */
-    abstract protected function getBinary(OperationType $OperationType): string|array;
+    abstract protected function getBinary(): string|array;
 
     /**
      * Finds and returns an executable binary by name.
@@ -186,10 +186,10 @@ abstract class AbstractExecutor implements EventListenerInterface
         return str_replace(array_keys($replacements), $replacements, $command);
     }
 
-    public function getRawCommand(OperationType $OperationType, Compression $Compression): string
+    public function getRawCommand(Compression $Compression): string
     {
-        $isExport = $OperationType == OperationType::Export;
-        $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $OperationType->value);
+        $isExport = $this->OperationType == OperationType::Export;
+        $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $this->OperationType->value);
 
         if ($Compression->isValid()) {
             if ($isExport) {
@@ -209,15 +209,15 @@ abstract class AbstractExecutor implements EventListenerInterface
         return Process::fromShellCommandline(command: $command);
     }
 
-    public function runProcess(OperationType $OperationType, string $filename): Process
+    public function runProcess(string $filename): Process
     {
-        $command = $this->getRawCommand(OperationType: $OperationType, Compression: Compression::fromFilename($filename));
+        $command = $this->getRawCommand(Compression: Compression::fromFilename($filename));
 
         $Process = $this->getProcess(command: $command);
 
         $Process->run(env: [
             'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
-            'BINARY' => $this->findBinary(...(array)$this->getBinary(OperationType: $OperationType)),
+            'BINARY' => $this->findBinary(...(array)$this->getBinary()),
             'DB_HOST' => $this->getConfig('host'),
             'DB_NAME' => $this->getConfig('database'),
             'DB_PASSWORD' => $this->getConfig('password'),

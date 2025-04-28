@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
-use DatabaseBackup\OperationType;
 use Override;
 
 /**
@@ -28,7 +27,7 @@ class SqliteExecutor extends AbstractExecutor
      * @inheritDoc
      */
     #[Override]
-    protected function getBinary(OperationType $OperationType): string|array
+    protected function getBinary(): string|array
     {
         return 'sqlite3';
     }
