@@ -21,8 +21,10 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
+use Generator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Process\ExecutableFinder;
@@ -110,38 +112,86 @@ class AbstractExecutorTest extends TestCase
         $this->assertSame($expectedCommand, $result);
     }
 
+    public static function providerTestRunProcess(): Generator
+    {
+        $defaultEnv = [
+            'AUTH_FILE' => '',
+            'DB_HOST' => 'my-host',
+            'DB_NAME' => 'my-database',
+            'DB_PASSWORD' => 'my-password',
+            'DB_USER' => 'my-username',
+        ];
+
+        yield [
+            $defaultEnv + [
+                'BINARY' => 'export-binary',
+                'COMPRESSION_BINARY' => null,
+            ],
+            '"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"',
+            'filename.sql',
+            OperationType::Export,
+        ];
+
+        yield [
+            $defaultEnv + [
+                'BINARY' => 'import-binary',
+                'COMPRESSION_BINARY' => null,
+            ],
+            '"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"',
+            'filename.sql',
+            OperationType::Import,
+        ];
+
+        yield [
+            $defaultEnv + [
+                'BINARY' => 'export-binary',
+                'COMPRESSION_BINARY' => 'gzip-binary',
+            ],
+            '"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"',
+            'filename.sql.gz',
+            OperationType::Export,
+        ];
+
+        yield [
+            $defaultEnv + [
+                'BINARY' => 'import-binary',
+                'COMPRESSION_BINARY' => 'gzip-binary',
+            ],
+            '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"',
+            'filename.sql.gz',
+            OperationType::Import,
+        ];
+    }
+
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    public function testRunProcess(): void
+    #[Test]
+    #[DataProvider('providerTestRunProcess')]
+    public function testRunProcess(array $expectedEnvVars, string $expectedCommand, string $filename, OperationType $OperationType): void
     {
         $Process = $this->createMock(Process::class);
         $Process
             ->expects($this->once())
             ->method('run')
-            ->with($this->equalTo(null), $this->equalTo([
-                'AUTH_FILE' => '',
-                'BINARY' => 'export-binary',
-                'DB_HOST' => 'my-host',
-                'DB_NAME' => 'my-database',
-                'DB_PASSWORD' => 'my-password',
-                'DB_USER' => 'my-username',
-                'FILENAME' => 'filename.sql',
-            ]))
+            ->with(
+                null,
+                $this->equalTo($expectedEnvVars + ['FILENAME' => $filename])
+            )
             ->willReturn(1);
 
         $Executor = $this->getAbstractExecutorMock(
             methods: ['findBinary', 'getConfig', 'getProcess'],
-            OperationType: OperationType::Export
+            OperationType: $OperationType
         );
 
         $Executor
             ->expects($this->once())
             ->method('getProcess')
-            ->with($this->equalTo('"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"'))
+            ->with($this->equalTo($expectedCommand))
             ->willReturn($Process);
 
-        $Executor->runProcess(filename: 'filename.sql');
+        $Executor->runProcess(filename: $filename);
     }
 
     /**

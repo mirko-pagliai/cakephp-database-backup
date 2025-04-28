@@ -192,6 +192,8 @@ abstract class AbstractExecutor implements EventListenerInterface
     public function getRawCommand(Compression $Compression): string
     {
         $isExport = $this->OperationType == OperationType::Export;
+
+        //This is the base command
         $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $this->OperationType->value);
 
         if ($Compression->isValid()) {
@@ -214,13 +216,14 @@ abstract class AbstractExecutor implements EventListenerInterface
 
     public function runProcess(string $filename): Process
     {
-        $command = $this->getRawCommand(Compression: Compression::fromFilename($filename));
+        $Compression = Compression::fromFilename($filename);
 
-        $Process = $this->getProcess(command: $command);
+        $Process = $this->getProcess(command: $this->getRawCommand(Compression: $Compression));
 
         $Process->run(env: [
             'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
             'BINARY' => $this->findBinary(...(array)$this->getBinary()),
+            'COMPRESSION_BINARY' => $Compression->isValid() ? $this->findBinary($Compression) : null,
             'DB_HOST' => $this->getConfig('host'),
             'DB_NAME' => $this->getConfig('database'),
             'DB_PASSWORD' => $this->getConfig('password'),
