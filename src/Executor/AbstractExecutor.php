@@ -157,11 +157,11 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     protected function getCommand(OperationType $OperationType): string
     {
-        //Gets the binaries names
-        $binaries = (array)$this->getBinary($OperationType);
+        //Gets the binary names
+        $binary = (array)$this->getBinary($OperationType);
 
         $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->findBinary(...$binaries)),
+            '{{BINARY}}' => escapeshellarg($this->findBinary(...$binary)),
             '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
             '{{DB_USER}}' => $this->getConfig('username'),
             '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
