@@ -54,6 +54,17 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
+     * @param string $command The command line to pass to the shell of the OS
+     * @return \Symfony\Component\Process\Process
+     * @codeCoverageIgnore
+     * @see https://symfony.com/doc/current/components/process.html
+     */
+    protected function getProcess(string $command): Process
+    {
+        return Process::fromShellCommandline(command: $command);
+    }
+
+    /**
      * Constructor.
      *
      * @param \Cake\Datasource\ConnectionInterface $Connection
@@ -193,25 +204,21 @@ abstract class AbstractExecutor implements EventListenerInterface
     {
         $isExport = $this->OperationType == OperationType::Export;
 
-        //This is the base command
+        /**
+         * This is the base command.
+         * It still needs to be properly articulated.
+         */
         $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $this->OperationType->value);
 
-        if ($Compression->isValid()) {
-            if ($isExport) {
-                $command .= ' | "${:COMPRESSION_BINARY}" > "${:FILENAME}"';
-            } else {
-                $command = '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | ' . $command;
-            }
-        } else {
-            $command .= ' ' . ($isExport ? '>' : '<') . ' "${:FILENAME}"';
+        if (!$Compression->isValid()) {
+            return $command . ' ' . ($isExport ? '>' : '<') . ' "${:FILENAME}"';
         }
 
-        return $command;
-    }
+        if ($isExport) {
+            return $command . ' | "${:COMPRESSION_BINARY}" > "${:FILENAME}"';
+        }
 
-    protected function getProcess(string $command): Process
-    {
-        return Process::fromShellCommandline(command: $command);
+        return '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | ' . $command;
     }
 
     public function runProcess(string $filename): Process
