@@ -90,12 +90,12 @@ class AbstractExecutorTest extends TestCase
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump > ${:FILENAME:}', OperationType::Export, Compression::None])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, Compression::Gzip])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} .dump | ${:COMPRESSION_BINARY:} > ${:FILENAME:}', OperationType::Export, Compression::Bzip2])]
-    #[TestWith(['${:BINARY} ${:DB_NAME} < ${:FILENAME:}', OperationType::Import, Compression::None])]
-    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, Compression::Gzip])]
-    #[TestWith(['${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ${:BINARY} ${:DB_NAME}', OperationType::Import, Compression::Bzip2])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export, Compression::None])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Gzip])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Bzip2])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import, Compression::None])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Gzip])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetRawCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
         $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig']);
@@ -105,6 +105,9 @@ class AbstractExecutorTest extends TestCase
         $this->assertSame($expectedCommand, $result);
     }
 
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
     public function testRunProcess(): void
     {
         $Process = $this->createMock(Process::class);
@@ -127,12 +130,10 @@ class AbstractExecutorTest extends TestCase
         $Executor
             ->expects($this->once())
             ->method('getProcess')
-            ->with($this->equalTo('${:BINARY} ${:DB_NAME} .dump > ${:FILENAME:}'))
+            ->with($this->equalTo('"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"'))
             ->willReturn($Process);
 
-        $result = $Executor->runProcess(OperationType::Export, 'filename.sql');
-
-        $this->assertInstanceOf(Process::class, $result);
+        $Executor->runProcess(OperationType::Export, 'filename.sql');
     }
 
     /**

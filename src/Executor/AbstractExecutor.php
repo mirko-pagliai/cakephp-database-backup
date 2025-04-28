@@ -188,12 +188,12 @@ abstract class AbstractExecutor implements EventListenerInterface
 
         if ($Compression->isValid()) {
             if ($isExport) {
-                $command .= ' | ${:COMPRESSION_BINARY:} > ${:FILENAME:}';
+                $command .= ' | "${:COMPRESSION_BINARY}" > "${:FILENAME}"';
             } else {
-                $command = '${:COMPRESSION_BINARY:} -dc ${:FILENAME:} | ' . $command;
+                $command = '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | ' . $command;
             }
         } else {
-            $command .= ' ' . ($isExport ? '>' : '<') . ' ${:FILENAME:}';
+            $command .= ' ' . ($isExport ? '>' : '<') . ' "${:FILENAME}"';
         }
 
         return $command;
