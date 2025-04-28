@@ -90,7 +90,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
-     * Returns the binaries names to export/import (as a string or array of strings), related to the respective driver.
+     * Returns the binary names to export/import (as a string or array of strings), related to the respective driver.
      *
      * @param \DatabaseBackup\OperationType $OperationType
      * @return array<string>|string

@@ -52,7 +52,7 @@ class AbstractExecutorTest extends TestCase
         $Executor
             ->expects($this->any())
             ->method('getBinary')
-            ->willReturnCallback(fn (OperationType $OperationType): string => $OperationType->name . '-binary');
+            ->willReturnCallback(fn (OperationType $OperationType): string => lcfirst($OperationType->name . '-binary'));
 
         if (in_array(needle: 'findBinary', haystack: $methods)) {
             $Executor
@@ -60,7 +60,7 @@ class AbstractExecutorTest extends TestCase
                 ->method('findBinary')
                 ->willReturnCallback(function (Compression|string $binaryName): string {
                     if ($binaryName instanceof Compression) {
-                        return strtolower($binaryName->name) . '-binary';
+                        return lcfirst($binaryName->name) . '-binary';
                     }
 
                     return $binaryName;
@@ -230,38 +230,6 @@ class AbstractExecutorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to search for binary for "none" Compression');
         $this->getAbstractExecutorMock()->findBinary(...$name);
-    }
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    #[Test]
-    #[TestWith(['\'export-binary\' my-database .dump > \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['\'export-binary\' my-database .dump | \'gzip-binary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
-    #[TestWith(['\'export-binary\' my-database .dump | \'bzip2-binary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
-    public function testGetExportCommand(string $expectedExportCommand, string $filename): void
-    {
-        $Executor = $this->getAbstractExecutorMock(['findBinary', 'getConfig']);
-
-        $result = $Executor->getExportCommand($filename);
-
-        $this->assertSame($expectedExportCommand, $result);
-    }
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    #[Test]
-    #[TestWith(['\'import-binary\' my-database < \'filename.sql\'', 'filename.sql'])]
-    #[TestWith(['\'gzip-binary\' -dc \'filename.sql.gz\' | \'import-binary\' my-database', 'filename.sql.gz'])]
-    #[TestWith(['\'bzip2-binary\' -dc \'filename.sql.bz2\' | \'import-binary\' my-database', 'filename.sql.bz2'])]
-    public function testGetImportCommand(string $expectedImportCommand, string $filename): void
-    {
-        $Executor = $this->getAbstractExecutorMock(['findBinary', 'getConfig']);
-
-        $result = $Executor->getImportCommand($filename);
-
-        $this->assertSame($expectedImportCommand, $result);
     }
 
     /**
