@@ -108,6 +108,11 @@ abstract class AbstractExecutor implements EventListenerInterface
      * You can specify more than one name (for example, if there are possible aliases or fallbacks). In this case, the
      *  first one found is returned.
      *
+     * To use `findBinary()` in conjunction with `getBinary()`:
+     * ```
+     * $this->findBinary(...(array)$this->getBinary())
+     * ```
+     *
      * @param \DatabaseBackup\Compression|string ...$name
      * @return string
      * @since 2.15.0
@@ -212,7 +217,7 @@ abstract class AbstractExecutor implements EventListenerInterface
 
         $Process->run(env: [
             'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
-            'BINARY' => $this->getBinary(OperationType: $OperationType),
+            'BINARY' => $this->findBinary(...(array)$this->getBinary(OperationType: $OperationType)),
             'DB_HOST' => $this->getConfig('host'),
             'DB_NAME' => $this->getConfig('database'),
             'DB_PASSWORD' => $this->getConfig('password'),
