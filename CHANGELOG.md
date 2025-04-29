@@ -13,6 +13,11 @@
   driver name begins with a capital letter);
 * removed from `ExportCommand::buildOptionParser()` the reference (as a helper) to the old `send` option, which was no
   longer present (it had been forgotten);
+* starting with CakePHP 5.2, [returning values from event listeners/callbacks is deprecated](https://book.cakephp.org/5/en/appendices/5-2-migration-guide.html#event).
+  For this reason, the `beforeExport()` and `beforeImport()` event methods provided by `AbstractExecutor`,
+  `MysqlExecutor` and `SqliteExecutor` no longer return a boolean. Optionally these methods can use the
+  `$Event->setResult()` method to set a result. Currently, the `void` return type is not explicit to ensure backwards
+  compatibility, it will be made explicit in a future release;
 * removed Psalm (for the same reasons given for CakePHP, see [here](https://github.com/cakephp/cakephp/pull/18340)).
 
 ### 2.14.1

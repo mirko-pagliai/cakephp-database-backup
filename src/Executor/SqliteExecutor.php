@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use Cake\Event\EventInterface;
 use Override;
 
 /**
@@ -49,7 +50,7 @@ class SqliteExecutor extends AbstractExecutor
      * @inheritDoc
      */
     #[Override]
-    public function beforeImport(): bool
+    public function beforeImport(EventInterface $Event)
     {
         /** @var \Cake\Database\Connection $Connection */
         $Connection = $this->Connection;
@@ -60,7 +61,5 @@ class SqliteExecutor extends AbstractExecutor
         //Needs disconnect and re-connect because the database schema has changed
         $Connection->getDriver()->disconnect();
         $Connection->getDriver()->connect();
-
-        return true;
     }
 }
