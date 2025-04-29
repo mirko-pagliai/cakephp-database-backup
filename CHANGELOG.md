@@ -1,5 +1,9 @@
 # 2.x branch
 ## 2.14 branch
+### 2.14.3
+* the `AbstractBackupUtility::__call()` method now also supports uppercase named properties (bug fixed). This provides
+  the `getConnection()` magic method.
+
 ### 2.14.2
 * the constructor method `AbstractBackupUtility` now accepts `$Connection` as an optional argument, as string (e.g.
   `default` or `test`) or a `ConnectionInterface` instance. This means that by instantiating `BackupExport` or
