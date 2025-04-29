@@ -83,13 +83,13 @@ class AbstractBackupUtilityTest extends TestCase
 
         $Connection = $Utility->Connection;
 
-        $this->assertInstanceOf(ConnectionInterface::class, $Connection);
         $this->assertSame('test', $Connection->config()['name']);
     }
 
     #[Test]
     public function testMagicCallMethod(): void
     {
+        $this->assertInstanceOf(ConnectionInterface::class, $this->Utility->getConnection());
         $this->assertSame(0, $this->Utility->getTimeout());
     }
 
