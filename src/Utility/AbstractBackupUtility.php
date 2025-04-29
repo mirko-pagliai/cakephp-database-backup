@@ -32,6 +32,7 @@ use function Cake\I18n\__d;
  *
  * Provides the code common to the `BackupExport` and `BackupImport` classes.
  *
+ * @method \Cake\Datasource\ConnectionInterface getConnection()
  * @method string getFilename()
  * @method int getTimeout()
  */
@@ -87,9 +88,11 @@ abstract class AbstractBackupUtility
     public function __call(string $name, array $arguments = []): mixed
     {
         if (str_starts_with($name, 'get')) {
-            $property = lcfirst(substr($name, 3));
-            if (property_exists($this, $property)) {
-                return $this->{$property};
+            $property = substr($name, 3);
+            foreach ([$property, lcfirst($property)] as $property) {
+                if (property_exists($this, $property)) {
+                    return $this->{$property};
+                }
             }
         }
 
