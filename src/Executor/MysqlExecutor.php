@@ -76,6 +76,7 @@ class MysqlExecutor extends AbstractExecutor
      * @param \Cake\Event\EventInterface<object> $Event
      * @return void
      * @since 2.1.0
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     #[Override]
     public function beforeExport(EventInterface $Event)
@@ -100,6 +101,7 @@ class MysqlExecutor extends AbstractExecutor
      * @param \Cake\Event\EventInterface<object> $Event
      * @return void
      * @since 2.1.0
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     #[Override]
     public function beforeImport(EventInterface $Event)
