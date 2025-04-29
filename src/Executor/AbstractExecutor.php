@@ -167,6 +167,13 @@ abstract class AbstractExecutor implements EventListenerInterface
         ));
     }
 
+    /**
+     * Gets the properly formatted "raw" command, based on the type of operation and the compression required.
+     *
+     * @param \DatabaseBackup\Compression $Compression
+     * @return string
+     * @since 2.15.0
+     */
     public function getCommand(Compression $Compression): string
     {
         $isExport = $this->OperationType == OperationType::Export;

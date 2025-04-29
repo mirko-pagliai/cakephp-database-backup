@@ -35,8 +35,11 @@ Now, instead, the "Executor" classes implement the `getBinaryName()` method, whi
 * added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
   been completely replaced by `findBinary()` and `getBinaryName()`. The `findBinary()` method is now more accurate in
   finding binaries, and when it throws an exception, it sets a more accurate and useful message;
-* the `AbstractBackupUtility::getProcess()` method and the `getCommand()`, `getExportCommand()` `getImportCommand()`
-  methods provided by `AbstractExecutor` have been removed;
+* the `AbstractBackupUtility::getCommand()` method has been completely rewritten and simplified, considering that now
+  more complex operations (e.g. escaping) are delegated to others. It is to be understood as completely different from
+  the previous one and for this reason the `@since` tag has been updated. The `getExportCommand()` and
+  `getImportCommand()` methods have been removed, since they are merged;
+* the `AbstractBackupUtility::getProcess()` method has been removed;
 * now the constructor of `AbstractExecutor` also requires the `$OperationType` argument and, optionally, the `$timeout`
   parameter;
 * the `AbstractBackupUtility::_getDriver()` had been deprecated and has now been removed;
