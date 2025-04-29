@@ -75,7 +75,7 @@ class ImportCommandTest extends TestCase
     #[Test]
     public function testExecuteTimeoutOption(): void
     {
-        $this->exec($this->command . ' --timeout 10 ' . $this->createBackup());
+        $this->exec($this->command . ' --timeout 10 ' . $this->createBackup(fakeBackup: true));
         $this->assertExitSuccess();
         $this->assertOutputContains('Timeout for shell commands: 10 seconds');
         $this->assertErrorEmpty();

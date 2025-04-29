@@ -42,6 +42,15 @@ abstract class TestCase extends CakeTestCase
     }
 
     /**
+     * @return \DatabaseBackup\Utility\BackupExport
+     * @codeCoverageIgnore
+     */
+    protected function getBackupExport(): BackupExport
+    {
+        return new BackupExport();
+    }
+
+    /**
      * Creates a backup file for tests.
      *
      * @param string $filename
@@ -59,7 +68,9 @@ abstract class TestCase extends CakeTestCase
             return $filename;
         }
 
-        return (new BackupExport())->filename($filename)->export() ?: '';
+        return $this->getBackupExport()
+            ->filename($filename)
+            ->export() ?: '';
     }
 
     /**
