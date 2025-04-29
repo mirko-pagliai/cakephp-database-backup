@@ -165,42 +165,6 @@ abstract class AbstractExecutor implements EventListenerInterface
         ));
     }
 
-    /**
-     * Gets and parses commands from the configuration, according to the type of requested `OperationType` and the
-     *  connection driver.
-     *
-     * These commands are not yet final: use instead `getExportCommand()` and `getImportCommand()` methods to
-     *  have the final commands.
-     *
-     * @param \DatabaseBackup\OperationType $OperationType
-     * @return string
-     */
-    protected function getCommand(OperationType $OperationType): string
-    {
-        //Gets the binary names
-        $binary = (array)$this->getBinary();
-
-        $replacements = [
-            '{{BINARY}}' => escapeshellarg($this->findBinary(...$binary)),
-            '{{AUTH_FILE}}' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
-            '{{DB_USER}}' => $this->getConfig('username'),
-            '{{DB_PASSWORD}}' => $this->getConfig('password') ? ':' . $this->getConfig('password') : '',
-            '{{DB_HOST}}' => $this->getConfig('host'),
-            '{{DB_NAME}}' => $this->getConfig('database'),
-        ];
-
-        /**
-         * Gets the command to execute.
-         *
-         * The value read from the configuration will be for example `DatabaseBackup.mysql.export`.
-         *
-         * @var string $command
-         */
-        $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.' . $OperationType->value);
-
-        return str_replace(array_keys($replacements), $replacements, $command);
-    }
-
     public function getRawCommand(Compression $Compression): string
     {
         $isExport = $this->OperationType == OperationType::Export;
@@ -240,49 +204,6 @@ abstract class AbstractExecutor implements EventListenerInterface
         ]);
 
         return $Process;
-    }
-
-    /**
-     * Gets the command to export the database, with compression if requested.
-     *
-     * @param string $filename Filename where you want to export the database
-     * @return string
-     * @throws \LogicException
-     * @throws \ValueError With a filename that does not match any supported compression.
-     */
-    public function getExportCommand(string $filename): string
-    {
-        $exec = $this->getCommand(OperationType::Export);
-
-        $Compression = Compression::fromFilename($filename);
-        if ($Compression->isValid()) {
-            $exec .= ' | ' . escapeshellarg($this->findBinary($Compression));
-        }
-
-        return $exec . ' > ' . escapeshellarg($filename);
-    }
-
-    /**
-     * Gets the command to import the database, with compression if requested.
-     *
-     * @param string $filename Filename from which you want to import the database
-     * @return string
-     * @throws \LogicException
-     */
-    public function getImportCommand(string $filename): string
-    {
-        $exec = $this->getCommand(OperationType::Import);
-
-        $Compression = Compression::fromFilename($filename);
-        if ($Compression->isValid()) {
-            return sprintf(
-                '%s -dc %s | ',
-                escapeshellarg($this->findBinary($Compression)),
-                escapeshellarg($filename)
-            ) . $exec;
-        }
-
-        return $exec . ' < ' . escapeshellarg($filename);
     }
 
     /**
