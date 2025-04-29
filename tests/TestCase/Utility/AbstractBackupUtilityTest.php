@@ -146,7 +146,10 @@ class AbstractBackupUtilityTest extends TestCase
     #[TestWith([SqliteExecutor::class, Sqlite::class])]
     public function testGetExecutor(string $expectedExecutorClassname, string $driverClassname): void
     {
-        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new $driverClassname()]);
+        $Connection = $this->createConfiguredMock(
+            ConnectionInterface::class,
+            ['getDriver' => new $driverClassname()]
+        );
 
         $Utility = new class (Connection: $Connection) extends AbstractBackupUtility {
             protected OperationType $OperationType = OperationType::Export;

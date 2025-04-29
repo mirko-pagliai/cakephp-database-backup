@@ -159,7 +159,12 @@ abstract class AbstractBackupUtility
                 throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
             }
 
-            $this->Executor = new $className(Connection: $this->Connection, OperationType: $this->OperationType, name: $name);
+            $this->Executor = new $className(
+                Connection: $this->Connection,
+                OperationType: $this->OperationType,
+                timeout: $this->getTimeout() ?: Configure::readOrFail('DatabaseBackup.processTimeout'),
+                name: $name
+            );
         }
 
         return $this->Executor;

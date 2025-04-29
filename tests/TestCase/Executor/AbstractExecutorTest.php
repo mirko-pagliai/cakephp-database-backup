@@ -52,7 +52,7 @@ class AbstractExecutorTest extends TestCase
         $OperationType = $OperationType ?? OperationType::Export;
 
         $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$Connection, $OperationType, 'Sqlite'])
+            ->setConstructorArgs([$Connection, $OperationType, 0, 'Sqlite'])
             ->onlyMethods(array_merge($methods, ['getBinary']))
             ->getMock();
 

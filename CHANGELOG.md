@@ -21,7 +21,8 @@ Now, instead, the "Executor" classes implement the `getBinary()` method, which r
   removed;
 * the `AbstractBackupUtility::getProcess()` method and the `getCommand()`, `getExportCommand()` `getImportCommand()`
   methods provided by `AbstractExecutor` have been removed;
-* now the constructor of `AbstractExecutor` also requires the `$OperationType` argument;
+* now the constructor of `AbstractExecutor` also requires the `$OperationType` argument and, optionally, the `$timeout`
+  parameter;
 * the `AbstractBackupUtility::_getDriver()` had been deprecated and has now been removed;
 * the `AbstractExecutor::__call()` magic method, which provided backwards compatibility for deprecated
   `getExportExecutable()` and `getImportExecutable()` methods, has been removed;

@@ -62,7 +62,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      */
     protected function getProcess(string $command): Process
     {
-        return Process::fromShellCommandline(command: $command);
+        return Process::fromShellCommandline(command: $command, timeout: $this->timeout);
     }
 
     /**
@@ -70,11 +70,13 @@ abstract class AbstractExecutor implements EventListenerInterface
      *
      * @param \Cake\Datasource\ConnectionInterface $Connection
      * @param \DatabaseBackup\OperationType $OperationType
+     * @param int $timeout
      * @param string|null $name Driver name. By default, it will be automatically obtained from `$Connection`
      */
     public function __construct(
         protected ConnectionInterface $Connection,
         protected OperationType $OperationType,
+        protected int $timeout = 0,
         protected ?string $name = null
     ) {
         /**
