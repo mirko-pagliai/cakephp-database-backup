@@ -48,17 +48,6 @@ class BackupExportTest extends TestCase
     protected BackupExport $BackupExport;
 
     /**
-     * @param list<non-empty-string> $methods Methods you want to mock
-     * @return \DatabaseBackup\Utility\BackupExport&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getBackupExportMock(array $methods = []): BackupExport
-    {
-        return $this->getMockBuilder(BackupExport::class)
-            ->onlyMethods($methods)
-            ->getMock();
-    }
-
-    /**
      * @inheritDoc
      */
     #[Override]
@@ -117,7 +106,7 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testFilenameWithFileAlreadyExists(): void
     {
-        $filename = $this->createBackup();
+        $filename = $this->createBackup(fakeBackup: true);
 
         $this->expectException(IOException::class);
         $this->expectExceptionMessage('File `' . $filename . '` already exists');
@@ -164,12 +153,26 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExport(): void
     {
-        $BackupExport = $this->getBackupExportMock(['getFilesystem', 'getProcess']);
+        $Process = $this->createConfiguredMock(Process::class, ['isSuccessful' => true]);
+
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'getConfig', 'runProcess']);
+
+        $Executor
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturnCallback(fn (string $key): string  => $key == 'database' ? 'test' : $key);
+
+        $Executor
+            ->expects($this->any())
+            ->method('runProcess')
+            ->willReturn($Process);
+
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getFilesystem', 'getExecutor']);
 
         $BackupExport
             ->expects($this->any())
-            ->method('getProcess')
-            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+            ->method('getExecutor')
+            ->willReturn($Executor);
 
         $BackupExport
             ->expects($this->any())
@@ -178,7 +181,8 @@ class BackupExportTest extends TestCase
 
         $BackupExport->getExecutor()->getEventManager()->setEventList(new EventList());
 
-        $filename = $BackupExport->export();
+        $filename = $BackupExport
+            ->export();
 
         $this->assertIsString($filename);
         $this->assertMatchesRegularExpression('/^backup_test_\d{14}\.sql$/', basename($filename));
@@ -236,7 +240,7 @@ class BackupExportTest extends TestCase
 
         $Executor->getEventManager()->on($Executor);
 
-        $BackupExport = $this->getBackupExportMock(['getExecutor']);
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getExecutor']);
 
         $BackupExport
             ->expects($this->any())
@@ -259,14 +263,23 @@ class BackupExportTest extends TestCase
     public function testExportOnFailure(): void
     {
         $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
-        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
 
-        $BackupExport = $this->getBackupExportMock(['getProcess']);
+        $Process = $this->createConfiguredMock(
+            Process::class,
+            ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]
+        );
+
+        $Executor = $this->createConfiguredMock(
+            AbstractExecutor::class,
+            ['runProcess' => $Process, 'getConfig' => '']
+        );
+
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getExecutor']);
 
         $BackupExport
-            ->expects($this->once())
-            ->method('getProcess')
-            ->willReturn($Process);
+            ->expects($this->any())
+            ->method('getExecutor')
+            ->willReturn($Executor);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Export failed with error message: `' . $expectedError . '`');
@@ -286,6 +299,11 @@ class BackupExportTest extends TestCase
         $chmodValue = 0777;
         Configure::write('DatabaseBackup.chmod', $chmodValue);
 
+        $Executor = $this->createConfiguredMock(AbstractExecutor::class, [
+            'runProcess' => $this->createConfiguredMock(Process::class, ['isSuccessful' => true]),
+            'getConfig' => '',
+        ]);
+
         $Filesystem = $this->createPartialMock(Filesystem::class, ['chmod']);
 
         $Filesystem
@@ -293,7 +311,7 @@ class BackupExportTest extends TestCase
             ->method('chmod')
             ->with($filename, $chmodValue);
 
-        $BackupExport = $this->getBackupExportMock(['getFilesystem', 'getProcess']);
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getExecutor', 'getFilesystem']);
 
         $BackupExport
             ->expects($this->once())
@@ -301,9 +319,9 @@ class BackupExportTest extends TestCase
             ->willReturn($Filesystem);
 
         $BackupExport
-            ->expects($this->once())
-            ->method('getProcess')
-            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+            ->expects($this->any())
+            ->method('getExecutor')
+            ->willReturn($Executor);
 
         $BackupExport
             ->filename($filename)
@@ -319,14 +337,24 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportProcessExceedingTimeout(): void
     {
-        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'getConfig', 'runProcess']);
 
-        $BackupExport = $this->getBackupExportMock(['getProcess']);
+        $Executor
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturn('');
+
+        $Executor
+            ->expects($this->once())
+            ->method('runProcess')
+            ->willThrowException(new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1));
+
+        $BackupExport = $this->createPartialMock(BackupExport::class, ['getExecutor']);
 
         $BackupExport
-            ->expects($this->once())
-            ->method('getProcess')
-            ->willThrowException($ProcessTimedOutException);
+            ->expects($this->any())
+            ->method('getExecutor')
+            ->willReturn($Executor);
 
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');

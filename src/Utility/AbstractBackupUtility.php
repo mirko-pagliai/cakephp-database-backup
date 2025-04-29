@@ -22,6 +22,7 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\AbstractExecutor;
+use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Process;
@@ -56,6 +57,11 @@ abstract class AbstractBackupUtility
      * @var \Cake\Datasource\ConnectionInterface
      */
     protected ConnectionInterface $Connection;
+
+    /**
+     * @var \DatabaseBackup\OperationType
+     */
+    protected OperationType $OperationType;
 
     /**
      * Construct.
@@ -131,7 +137,7 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Gets the `Executor` instance according to the connection.
+     * Gets the `Executor` instance, according to the connection.
      *
      * @return \DatabaseBackup\Executor\AbstractExecutor
      * @since 2.14.0
@@ -151,7 +157,7 @@ abstract class AbstractBackupUtility
                 throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
             }
 
-            $this->Executor = new $className(Connection: $this->Connection, name: $name);
+            $this->Executor = new $className(Connection: $this->Connection, OperationType: $this->OperationType, name: $name);
         }
 
         return $this->Executor;

@@ -18,6 +18,7 @@ namespace DatabaseBackup\Utility;
 
 use BadMethodCallException;
 use DatabaseBackup\Compression;
+use DatabaseBackup\OperationType;
 use Override;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -28,6 +29,11 @@ use function Cake\I18n\__d;
  */
 class BackupImport extends AbstractBackupUtility
 {
+    /**
+     * @inheritDoc
+     */
+    protected OperationType $OperationType = OperationType::Import;
+
     /**
      * Sets the filename.
      *
@@ -47,6 +53,7 @@ class BackupImport extends AbstractBackupUtility
             );
         }
 
+        //This is only useful to possibly throw a `ValueError`
         Compression::fromFilename($filename);
 
         $this->filename = $filename;
@@ -87,7 +94,7 @@ class BackupImport extends AbstractBackupUtility
         }
 
         //Imports
-        $Process = $this->getProcess($Executor->getImportCommand($filename));
+        $Process = $Executor->runProcess($filename);
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
                 __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput()))

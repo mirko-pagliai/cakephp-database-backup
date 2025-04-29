@@ -103,12 +103,19 @@ class BackupImportTest extends TestCase
     {
         $filename = $this->createBackup(fakeBackup: true);
 
-        $BackupImport = $this->getBackupImportMock(['getProcess']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'runProcess']);
+
+        $Executor
+            ->expects($this->once())
+            ->method('runProcess')
+            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+
+        $BackupImport = $this->getBackupImportMock(['getExecutor']);
 
         $BackupImport
-            ->expects($this->once())
-            ->method('getProcess')
-            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+            ->expects($this->any())
+            ->method('getExecutor')
+            ->willReturn($Executor);
 
         $BackupImport->getExecutor()->getEventManager()->setEventList(new EventList());
 
@@ -138,10 +145,7 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeImport(): void
     {
-        $Executor = $this->createPartialMock(
-            AbstractExecutor::class,
-            ['beforeImport', 'getBinary']
-        );
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport', 'getBinary']);
 
         $Executor
             ->expects($this->once())
@@ -173,17 +177,23 @@ class BackupImportTest extends TestCase
     public function testImportOnFailure(): void
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
+
         $Process = $this->createConfiguredMock(
             Process::class,
             ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]
         );
 
-        $BackupImport = $this->getBackupImportMock(['getProcess']);
+        $Executor = $this->createConfiguredMock(
+            AbstractExecutor::class,
+            ['getBinary' => '', 'runProcess' => $Process]
+        );
+
+        $BackupImport = $this->getBackupImportMock(['getExecutor']);
 
         $BackupImport
             ->expects($this->once())
-            ->method('getProcess')
-            ->willReturn($Process);
+            ->method('getExecutor')
+            ->willReturn($Executor);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Import failed with error message: `' . $expectedError . '`');
@@ -201,14 +211,19 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportExceedingTimeout(): void
     {
-        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'getConfig', 'runProcess']);
 
-        $BackupImport = $this->getBackupImportMock(['getProcess']);
+        $Executor
+            ->expects($this->once())
+            ->method('runProcess')
+            ->willThrowException(new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1));
+
+        $BackupImport = $this->getBackupImportMock(['getExecutor']);
 
         $BackupImport
             ->expects($this->once())
-            ->method('getProcess')
-            ->willThrowException($ProcessTimedOutException);
+            ->method('getExecutor')
+            ->willReturn($Executor);
 
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');

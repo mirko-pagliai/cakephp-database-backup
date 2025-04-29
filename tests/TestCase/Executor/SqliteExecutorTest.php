@@ -23,6 +23,7 @@ use Cake\Database\StatementInterface;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -90,7 +91,7 @@ class SqliteExecutorTest extends TestCase
                 return $this->createStub(StatementInterface::class);
             });
 
-        $SqliteExecutor = new SqliteExecutor($Connection);
+        $SqliteExecutor = new SqliteExecutor(Connection: $Connection, OperationType: OperationType::Export);
         $SqliteExecutor->dropAllTables();
     }
 
@@ -113,6 +114,7 @@ class SqliteExecutorTest extends TestCase
         $SqliteExecutor = $this->getMockBuilder(SqliteExecutor::class)
             ->setConstructorArgs([
                 $this->createConfiguredStub(ConnectionInterface::class, ['getDriver' => $Driver]),
+                OperationType::Export,
             ])
             ->onlyMethods(['dropAllTables'])
             ->getMock();

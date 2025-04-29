@@ -26,6 +26,7 @@ use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use Generator;
@@ -47,23 +48,16 @@ class AbstractBackupUtilityTest extends TestCase
      */
     protected AbstractBackupUtility $Utility;
 
-    /**
-     * @param list<non-empty-string> $methods Methods you want to mock
-     * @param \Cake\Datasource\ConnectionInterface|null $Connection
-     * @return \DatabaseBackup\Utility\AbstractBackupUtility&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getBackupExportMock(array $methods = [], ?ConnectionInterface $Connection = null): AbstractBackupUtility
-    {
-        return $this->getMockBuilder(AbstractBackupUtility::class)
-            ->setConstructorArgs([$Connection])
-            ->onlyMethods(array_merge(['filename'], $methods))
-            ->getMock();
-    }
-
     #[Override]
     protected function setUp(): void
     {
-        $this->Utility = $this->getBackupExportMock();
+        $this->Utility = new class (Connection: null) extends AbstractBackupUtility {
+            protected OperationType $OperationType = OperationType::Export;
+
+            public function filename(string $filename): AbstractBackupUtility
+            {
+            }
+        };
     }
 
     public static function providerTestConstruct(): Generator
@@ -153,7 +147,13 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new $driverClassname()]);
 
-        $Utility = $this->getBackupExportMock(Connection: $Connection);
+        $Utility = new class (Connection: $Connection) extends AbstractBackupUtility {
+            protected OperationType $OperationType = OperationType::Export;
+
+            public function filename(string $filename): AbstractBackupUtility
+            {
+            }
+        };
 
         $Executor = $Utility->getExecutor();
 
@@ -168,7 +168,13 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new FakeDriver()]);
 
-        $Utility = $this->getBackupExportMock(Connection: $Connection);
+        $Utility = new Class (Connection: $Connection) extends AbstractBackupUtility {
+            protected OperationType $OperationType = OperationType::Export;
+
+            public function filename(string $filename): AbstractBackupUtility
+            {
+            }
+        };
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');

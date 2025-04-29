@@ -18,6 +18,7 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
+use DatabaseBackup\OperationType;
 use Override;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -32,6 +33,11 @@ use function Cake\I18n\__d;
  */
 class BackupExport extends AbstractBackupUtility
 {
+    /**
+     * @inheritDoc
+     */
+    protected OperationType $OperationType = OperationType::Export;
+
     /**
      * @var \DatabaseBackup\Compression
      */
@@ -157,7 +163,7 @@ class BackupExport extends AbstractBackupUtility
         }
 
         //Exports
-        $Process = $this->getProcess($Executor->getExportCommand($filename));
+        $Process = $Executor->runProcess(filename: $filename);
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
                 __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput()))

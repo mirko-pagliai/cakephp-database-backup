@@ -19,6 +19,7 @@ use Cake\Datasource\ConnectionInterface;
 use Cake\TestSuite\TestCase;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\OperationType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -41,7 +42,7 @@ class MysqlExecutorTest extends TestCase
         $Connection = $this->createStub(ConnectionInterface::class);
 
         return $this->getMockBuilder(MysqlExecutor::class)
-            ->setConstructorArgs([$Connection])
+            ->setConstructorArgs([$Connection, OperationType::Export])
             ->onlyMethods($methods)
             ->getMock();
     }
