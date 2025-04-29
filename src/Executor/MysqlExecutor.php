@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use Cake\Event\EventInterface;
 use DatabaseBackup\OperationType;
 use Override;
 use Symfony\Component\Filesystem\Filesystem;
@@ -73,16 +74,19 @@ class MysqlExecutor extends AbstractExecutor
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
      *
-     * @return bool
+     * @param \Cake\Event\EventInterface<object> $Event
+     * @return void
      * @since 2.1.0
      */
     #[Override]
-    public function beforeExport(): bool
+    public function beforeExport(EventInterface $Event): void
     {
-        return $this->writeAuthFile('[mysqldump]' . PHP_EOL .
+        $result = $this->writeAuthFile('[mysqldump]' . PHP_EOL .
             'user={{USER}}' . PHP_EOL .
             'password="{{PASSWORD}}"' . PHP_EOL .
             'host={{HOST}}');
+
+        $Event->setResult($result);
     }
 
     /**
@@ -94,16 +98,19 @@ class MysqlExecutor extends AbstractExecutor
      * user can execute a `ps aux | grep mysqldump` and see the password).
      * So it creates a temporary file to store the configuration options.
      *
-     * @return bool
+     * @param \Cake\Event\EventInterface<object> $Event
+     * @return void
      * @since 2.1.0
      */
     #[Override]
-    public function beforeImport(): bool
+    public function beforeImport(EventInterface $Event): void
     {
-        return $this->writeAuthFile('[client]' . PHP_EOL .
+        $result = $this->writeAuthFile('[client]' . PHP_EOL .
             'user={{USER}}' . PHP_EOL .
             'password="{{PASSWORD}}"' . PHP_EOL .
             'host={{HOST}}');
+
+        $Event->setResult($result);
     }
 
     /**

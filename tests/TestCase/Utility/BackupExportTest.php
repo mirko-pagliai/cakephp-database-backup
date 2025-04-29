@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Event\EventInterface;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -231,7 +232,7 @@ class BackupExportTest extends TestCase
         $Executor
             ->expects($this->once())
             ->method('beforeExport')
-            ->willReturn(false);
+            ->willReturnCallback(fn (EventInterface $Event) => $Event->stopPropagation());
 
         $Executor
             ->expects($this->any())

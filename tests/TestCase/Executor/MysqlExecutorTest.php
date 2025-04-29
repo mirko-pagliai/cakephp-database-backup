@@ -88,9 +88,11 @@ class MysqlExecutorTest extends TestCase
             ->with('[mysqldump]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}');
+                'host={{HOST}}')
+            ->willReturn(true);
 
-        $MysqlExecutor->dispatchEvent('Backup.beforeExport');
+        $Event = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
+        $this->assertTrue($Event->getResult());
     }
 
     /**
@@ -106,9 +108,11 @@ class MysqlExecutorTest extends TestCase
             ->with('[client]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}');
+                'host={{HOST}}')
+            ->willReturn(true);
 
-        $MysqlExecutor->dispatchEvent('Backup.beforeImport');
+        $Event = $MysqlExecutor->dispatchEvent('Backup.beforeImport');
+        $this->assertTrue($Event->getResult());
     }
 
     /**

@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use BadMethodCallException;
+use Cake\Event\EventInterface;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -150,7 +151,7 @@ class BackupImportTest extends TestCase
         $Executor
             ->expects($this->once())
             ->method('beforeImport')
-            ->willReturn(false);
+            ->willReturnCallback(fn (EventInterface $Event) => $Event->stopPropagation());
 
         $Executor->getEventManager()->on($Executor);
 
