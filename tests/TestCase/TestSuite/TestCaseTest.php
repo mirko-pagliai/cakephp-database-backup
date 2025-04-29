@@ -5,9 +5,10 @@ namespace DatabaseBackup\Test\TestCase\TestSuite;
 
 use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\TestSuite\TestCase;
+use DatabaseBackup\Utility\BackupExport;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * TestCaseTest.
@@ -18,23 +19,66 @@ use PHPUnit\Framework\Attributes\TestWith;
 class TestCaseTest extends CakeTestCase
 {
     /**
+     * @return array<array{string}>
+     */
+    public static function providerTestCreateBackup(): array
+    {
+        return [
+            ['backup.sql'],
+            ['backup.sql.gz'],
+            ['backup.sql.bz2'],
+        ];
+    }
+
+    /**
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
-    #[TestWith(['backup.sql', true])]
-    #[TestWith(['backup.sql', false])]
-    #[TestWith(['backup.sql.gz', true])]
-    #[TestWith(['backup.sql.gz', false])]
-    #[TestWith(['backup.sql.bz2', true])]
-    #[TestWith(['backup.sql.bz2', false])]
-    public function testCreateBackup(string $filename, bool $realBackup): void
+    #[DataProvider('providerTestCreateBackup')]
+    public function testCreateBackup(string $filename): void
     {
-        $result = $this->createPartialMock(TestCase::class, [])
-            ->createBackup($filename, $realBackup);
+        $BackupExport = $this->createMock(BackupExport::class);
+
+        $BackupExport
+            ->expects($this->once())
+            ->method('filename')
+            ->with($filename)
+            ->willReturnSelf();
+
+        $BackupExport
+            ->expects($this->once())
+            ->method('export')
+            ->willReturn($filename);
+
+        $TestCase = $this->createPartialMock(TestCase::class, ['getBackupExport']);
+
+        $TestCase
+            ->expects($this->once())
+            ->method('getBackupExport')
+            ->willReturn($BackupExport);
+
+        $result = $TestCase->createBackup(filename: $filename);
+
+        $this->assertSame($filename, $result);
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    #[Test]
+    #[DataProvider('providerTestCreateBackup')]
+    public function testCreateBackupAsFakeBackup(string $filename): void
+    {
+        $TestCase = $this->createPartialMock(TestCase::class, ['getBackupExport']);
+
+        $TestCase
+            ->expects($this->never())
+            ->method('getBackupExport');
+
+        $result = $TestCase->createBackup(filename: $filename, fakeBackup: true);
 
         $this->assertFileExists($result);
         unlink($result);
-
         $this->assertSame(TMP . 'backups' . DS . $filename, $result);
     }
 
