@@ -195,6 +195,13 @@ abstract class AbstractExecutor implements EventListenerInterface
         return '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | ' . $command;
     }
 
+    /**
+     * Gets and runs a `Process` instance, based on the the given file.
+     *
+     * @param string $filename The name of the file to be processed
+     * @return \Symfony\Component\Process\Process The executed process instance.
+     * @since 2.15.0
+     */
     public function runProcess(string $filename): Process
     {
         $Compression = Compression::fromFilename($filename);

@@ -39,7 +39,9 @@ Now, instead, the "Executor" classes implement the `getBinaryName()` method, whi
   more complex operations (e.g. escaping) are delegated to others. It is to be understood as completely different from
   the previous one and for this reason the `@since` tag has been updated. The `getExportCommand()` and
   `getImportCommand()` methods have been removed, since they are merged;
-* the `AbstractBackupUtility::getProcess()` method has been removed;
+* the method `AbstractExecutor::runProcess()` has been added (even more explicit in its name). Through this method, some
+  operations (e.g. escaping) are delegated to the "Process" component. The `AbstractBackupUtility::getProcess()` method
+  has been removed;
 * now the constructor of `AbstractExecutor` also requires the `$OperationType` argument and, optionally, the `$timeout`
   parameter;
 * the `AbstractBackupUtility::_getDriver()` had been deprecated and has now been removed;
