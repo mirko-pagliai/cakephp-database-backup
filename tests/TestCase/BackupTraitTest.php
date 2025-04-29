@@ -36,6 +36,7 @@ class BackupTraitTest extends TestCase
     #[TestWith(['test', ''])]
     #[TestWith(['test', 'test'])]
     #[TestWith(['fake', 'fake'])]
+    #[WithoutErrorHandler]
     public function testGetConnection(string $expectedConnectionName, string $connectionName): void
     {
         if ($connectionName == 'fake') {
