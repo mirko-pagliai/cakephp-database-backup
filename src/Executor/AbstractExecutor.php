@@ -19,6 +19,7 @@ namespace DatabaseBackup\Executor;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Event\EventDispatcherTrait;
+use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
@@ -248,25 +249,27 @@ abstract class AbstractExecutor implements EventListenerInterface
     /**
      * Called before export.
      *
-     * @codeCoverageIgnore
-     * @return bool Returns `false` to stop the export
+     * @param \Cake\Event\EventInterface<object> $Event
+     * @return void
      * @since 2.1.0
+     * @codeCoverageIgnore
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
-    public function beforeExport(): bool
+    public function beforeExport(EventInterface $Event)
     {
-        return true;
     }
 
     /**
      * Called before import.
      *
-     * @codeCoverageIgnore
-     * @return bool Returns `false` to stop the import
+     * @param \Cake\Event\EventInterface<object> $Event
+     * @return void
      * @since 2.1.0
+     * @codeCoverageIgnore
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
-    public function beforeImport(): bool
+    public function beforeImport(EventInterface $Event)
     {
-        return true;
     }
 
     /**
