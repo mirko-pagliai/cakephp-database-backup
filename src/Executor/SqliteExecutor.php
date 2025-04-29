@@ -60,7 +60,7 @@ class SqliteExecutor extends AbstractExecutor
      * @inheritDoc
      */
     #[Override]
-    public function beforeImport(EventInterface $Event)
+    public function beforeImport(EventInterface $Event): void
     {
         /** @var \Cake\Database\Connection $Connection */
         $Connection = $this->Connection;

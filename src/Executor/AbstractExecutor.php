@@ -253,9 +253,8 @@ abstract class AbstractExecutor implements EventListenerInterface
      * @return void
      * @since 2.1.0
      * @codeCoverageIgnore
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
-    public function beforeExport(EventInterface $Event)
+    public function beforeExport(EventInterface $Event): void
     {
     }
 
@@ -266,9 +265,8 @@ abstract class AbstractExecutor implements EventListenerInterface
      * @return void
      * @since 2.1.0
      * @codeCoverageIgnore
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
-    public function beforeImport(EventInterface $Event)
+    public function beforeImport(EventInterface $Event): void
     {
     }
 

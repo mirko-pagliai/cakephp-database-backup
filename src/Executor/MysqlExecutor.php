@@ -79,7 +79,7 @@ class MysqlExecutor extends AbstractExecutor
      * @since 2.1.0
      */
     #[Override]
-    public function beforeExport(EventInterface $Event)
+    public function beforeExport(EventInterface $Event): void
     {
         $result = $this->writeAuthFile('[mysqldump]' . PHP_EOL .
             'user={{USER}}' . PHP_EOL .
@@ -103,7 +103,7 @@ class MysqlExecutor extends AbstractExecutor
      * @since 2.1.0
      */
     #[Override]
-    public function beforeImport(EventInterface $Event)
+    public function beforeImport(EventInterface $Event): void
     {
         $result = $this->writeAuthFile('[client]' . PHP_EOL .
             'user={{USER}}' . PHP_EOL .
