@@ -167,7 +167,7 @@ abstract class AbstractExecutor implements EventListenerInterface
         ));
     }
 
-    public function getRawCommand(Compression $Compression): string
+    public function getCommand(Compression $Compression): string
     {
         $isExport = $this->OperationType == OperationType::Export;
 
@@ -192,7 +192,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     {
         $Compression = Compression::fromFilename($filename);
 
-        $Process = $this->getProcess(command: $this->getRawCommand(Compression: $Compression));
+        $Process = $this->getProcess(command: $this->getCommand(Compression: $Compression));
 
         $Process->run(env: [
             'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
