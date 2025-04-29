@@ -29,6 +29,9 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
  */
 class BackupTraitTest extends TestCase
 {
+    /**
+     * @deprecated
+     */
     #[Test]
     #[TestWith(['test', ''])]
     #[TestWith(['test', 'test'])]
@@ -42,12 +45,18 @@ class BackupTraitTest extends TestCase
         $Trait = new class {
             use BackupTrait;
         };
-        $Connection = $Trait->getConnection($connectionName);
-        $this->assertInstanceof(Connection::class, $Connection);
-        $this->assertSame($expectedConnectionName, $Connection->configName());
+        $this->deprecated(function () use ($Trait, $expectedConnectionName, $connectionName): void {
+            $Connection = $Trait->getConnection($connectionName);
+            $this->assertInstanceof(Connection::class, $Connection);
+            $this->assertSame($expectedConnectionName, $Connection->configName());
+        });
     }
 
+    /**
+     * @deprecated
+     */
     #[Test]
+    #[WithoutErrorHandler]
     public function testGetConnectionWithNoExistingConnection(): void
     {
         $Trait = new class {
@@ -55,9 +64,12 @@ class BackupTraitTest extends TestCase
         };
 
         $this->expectException(MissingDatasourceConfigException::class);
-        $Trait->getConnection('noExisting');
+        $this->deprecated(fn () => $Trait->getConnection('noExisting'));
     }
 
+    /**
+     * @deprecated
+     */
     #[Test]
     #[WithoutErrorHandler]
     public function testGetConnectionIsDeprecated(): void
@@ -66,11 +78,12 @@ class BackupTraitTest extends TestCase
             use BackupTrait;
         };
 
-        $this->deprecated(function () use ($Trait): void {
-            $Trait->getConnection('default');
-        });
+        $this->deprecated(fn () => $Trait->getConnection('default'));
     }
 
+    /**
+     * @deprecated
+     */
     #[Test]
     #[WithoutErrorHandler]
     public function testGetDriverNameIsDeprecated(): void
@@ -79,8 +92,6 @@ class BackupTraitTest extends TestCase
             use BackupTrait;
         };
 
-        $this->deprecated(function () use ($Trait): void {
-            $Trait->getDriverName();
-        });
+        $this->deprecated(fn () => $Trait->getDriverName());
     }
 }
