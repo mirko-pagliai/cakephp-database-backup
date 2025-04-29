@@ -156,7 +156,10 @@ class BackupExportTest extends TestCase
     {
         $Process = $this->createConfiguredMock(Process::class, ['isSuccessful' => true]);
 
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'getConfig', 'runProcess']);
+        $Executor = $this->createPartialMock(
+            AbstractExecutor::class,
+            ['getBinaryName', 'getConfig', 'runProcess']
+        );
 
         $Executor
             ->expects($this->any())
@@ -226,7 +229,7 @@ class BackupExportTest extends TestCase
     {
         $Executor = $this->createPartialMock(
             AbstractExecutor::class,
-            ['beforeExport', 'getConfig', 'getBinary']
+            ['beforeExport', 'getConfig', 'getBinaryName']
         );
 
         $Executor
@@ -338,7 +341,10 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportProcessExceedingTimeout(): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'getConfig', 'runProcess']);
+        $Executor = $this->createPartialMock(
+            AbstractExecutor::class,
+            ['getBinaryName', 'getConfig', 'runProcess']
+        );
 
         $Executor
             ->expects($this->any())

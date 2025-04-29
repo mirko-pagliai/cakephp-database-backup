@@ -175,7 +175,7 @@ abstract class AbstractExecutor implements EventListenerInterface
          * This is the base command.
          * It still needs to be properly articulated.
          */
-        $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.new.' . $this->OperationType->value);
+        $command = Configure::readOrFail('DatabaseBackup.' . $this->name . '.' . $this->OperationType->value);
 
         if (!$Compression->isValid()) {
             return $command . ' ' . ($isExport ? '>' : '<') . ' "${:FILENAME}"';

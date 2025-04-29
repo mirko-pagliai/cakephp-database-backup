@@ -1,6 +1,20 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
+First of all, all export or import commands (and their syntax) defined in configuration in bootstrap file have changed.
+More precisely, all shell commands now use variables in the syntax defined by the Symfony Process component (so `"${:NAME}"`, see [here](https://symfony.com/doc/current/components/process.html#using-features-from-the-os-shell)), since starting from this version, the Process component will take care of command escaping.
+
+For example, from:
+```
+{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}
+```
+to:
+```
+"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}"
+```
+
+This means that if you have defined a custom command, overwriting the default one, you will need to update it, according to the new syntax.
+
 Until the previous version, the plugin bootstrap took care (always) of auto-discovering all possible executables (using `ExecutableFinder::find()`) and that had not already been set by the user, then stored the results in the configuration.
 Then the method `AbstractExecutor::getBinaryName()` returns the value in the configuration or threw an exception, only when the binary was actually needed.
 
@@ -11,6 +25,8 @@ For the user, nothing changes in this sense: the plugin will always prefer any m
 Furthermore, the names of these binaries to search for, depending on the driver in use, were always defined in the bootstrap, via the constant `DATABASE_BACKUP_EXECUTABLES`.
 Now, instead, the "Executor" classes implement the `getBinaryName()` method, which return the names of the binaries, as strings or arrays of strings in the case of aliases and fallback binaries.
 
+* all shell commands now use variables in the syntax defined by the Symfony Process component (so `"${:NAME}"`), since starting from
+  this version the Process component will take care of command escaping;
 * added `Compression::isValid()` method and `Compression::validCases()` static method;
 * the `AbstractExecutor` class and all "Executor" classes that extend it now implement the `getBinaryName()` method, which
   should return the names of the binaries (as a string or array of strings, e.g. in the case of `MysqlExecutor`) related

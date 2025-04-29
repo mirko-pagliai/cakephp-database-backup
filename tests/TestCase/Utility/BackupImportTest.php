@@ -104,7 +104,7 @@ class BackupImportTest extends TestCase
     {
         $filename = $this->createBackup(fakeBackup: true);
 
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'runProcess']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinaryName', 'runProcess']);
 
         $Executor
             ->expects($this->once())
@@ -146,7 +146,7 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeImport(): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport', 'getBinary']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport', 'getBinaryName']);
 
         $Executor
             ->expects($this->once())
@@ -186,7 +186,7 @@ class BackupImportTest extends TestCase
 
         $Executor = $this->createConfiguredMock(
             AbstractExecutor::class,
-            ['getBinary' => '', 'runProcess' => $Process]
+            ['getBinaryName' => '', 'runProcess' => $Process]
         );
 
         $BackupImport = $this->getBackupImportMock(['getExecutor']);
@@ -212,7 +212,7 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportExceedingTimeout(): void
     {
-        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinary', 'getConfig', 'runProcess']);
+        $Executor = $this->createPartialMock(AbstractExecutor::class, ['getBinaryName', 'getConfig', 'runProcess']);
 
         $Executor
             ->expects($this->once())
