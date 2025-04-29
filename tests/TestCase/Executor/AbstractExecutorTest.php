@@ -58,7 +58,7 @@ class AbstractExecutorTest extends TestCase
 
         $Executor
             ->expects($this->any())
-            ->method('getBinary')
+            ->method('getBinaryName')
             ->willReturnCallback(fn (): string => lcfirst($OperationType->name . '-binary'));
 
         if (in_array(needle: 'findBinary', haystack: $methods)) {

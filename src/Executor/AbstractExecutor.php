@@ -32,9 +32,9 @@ use function Cake\I18n\__d;
 /**
  * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.
  *
- * "Executor" classes that extend this class must implement the `getBinary()` method, which should return the names of
- *  the binaries (as a string or array of strings) related to the respective driver, possibly based on the
- *  `$OperationType` argument passed.
+ * "Executor" classes that extend this class must implement the `getBinaryName()` method, which should return the names
+ *  of the binaries (as a string or array of strings) related to the respective driver, possibly based on the
+ *  `$OperationType` property.
  *
  * @method \Cake\Event\EventManager getEventManager()
  */
@@ -112,7 +112,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      *
      * @return array<string>|string
      */
-    abstract protected function getBinary(): string|array;
+    abstract protected function getBinaryName(): string|array;
 
     /**
      * Finds and returns an executable binary by name.
@@ -125,9 +125,9 @@ abstract class AbstractExecutor implements EventListenerInterface
      * You can specify more than one name (for example, if there are possible aliases or fallbacks). In this case, the
      *  first one found is returned.
      *
-     * To use `findBinary()` in conjunction with `getBinary()`:
+     * To use `findBinary()` in conjunction with `getBinaryName()`:
      * ```
-     * $this->findBinary(...(array)$this->getBinary())
+     * $this->findBinary(...(array)$this->getBinaryName())
      * ```
      *
      * @param \DatabaseBackup\Compression|string ...$name
@@ -196,7 +196,7 @@ abstract class AbstractExecutor implements EventListenerInterface
 
         $Process->run(env: [
             'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
-            'BINARY' => $this->findBinary(...(array)$this->getBinary()),
+            'BINARY' => $this->findBinary(...(array)$this->getBinaryName()),
             'COMPRESSION_BINARY' => $Compression->isValid() ? $this->findBinary($Compression) : null,
             'DB_HOST' => $this->getConfig('host'),
             'DB_NAME' => $this->getConfig('database'),

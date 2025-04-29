@@ -2,23 +2,23 @@
 ## 2.15 branch
 ### 2.15.0
 Until the previous version, the plugin bootstrap took care (always) of auto-discovering all possible executables (using `ExecutableFinder::find()`) and that had not already been set by the user, then stored the results in the configuration.
-Then the method `AbstractExecutor::getBinary()` (and before `AbstractDriver::getBinary()`) returned the value in the configuration or threw an exception, only when the binary was actually needed.
+Then the method `AbstractExecutor::getBinaryName()` returns the value in the configuration or threw an exception, only when the binary was actually needed.
 
 With this version, the bootstrap does not do any of this anymore. Instead, the new method `AbstractExecutor::findBinary()` (which completely replaces the old one) takes care of reading from the configuration or searching for binaries only when necessary. This method is much better, both for the care of the operations it performs, and because it is able to manage aliases and fallback binaries (like for the `mariadb`/`mysql` pair).
 
 For the user, nothing changes in this sense: the plugin will always prefer any manually set binaries, otherwise it will take care of searching for them.
 
 Furthermore, the names of these binaries to search for, depending on the driver in use, were always defined in the bootstrap, via the constant `DATABASE_BACKUP_EXECUTABLES`.
-Now, instead, the "Executor" classes implement the `getBinary()` method, which return the names of the binaries, as strings or arrays of strings in the case of aliases and fallback binaries.
+Now, instead, the "Executor" classes implement the `getBinaryName()` method, which return the names of the binaries, as strings or arrays of strings in the case of aliases and fallback binaries.
 
 * added `Compression::isValid()` method and `Compression::validCases()` static method;
-* added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
-  been completely replaced by the first. The `findBinary()` method is now more accurate in finding binaries, and when it
-  throws an exception, it sets a more accurate and useful message;
-* the `AbstractExecutor` class and all "Executor" classes that extend it now implement the `getBinary()` method, which
+* the `AbstractExecutor` class and all "Executor" classes that extend it now implement the `getBinaryName()` method, which
   should return the names of the binaries (as a string or array of strings, e.g. in the case of `MysqlExecutor`) related
   to the respective driver; The `DATABASE_BACKUP_EXECUTABLES` constant, previously defined in the bootstrap, has been
   removed;
+* added `AbstractExecutor::findBinary()` method. The `AbstractExecutor::getBinary()` method no longer exists, as it has
+  been completely replaced by `findBinary()` and `getBinaryName()`. The `findBinary()` method is now more accurate in
+  finding binaries, and when it throws an exception, it sets a more accurate and useful message;
 * the `AbstractBackupUtility::getProcess()` method and the `getCommand()`, `getExportCommand()` `getImportCommand()`
   methods provided by `AbstractExecutor` have been removed;
 * now the constructor of `AbstractExecutor` also requires the `$OperationType` argument and, optionally, the `$timeout`
