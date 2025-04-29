@@ -25,7 +25,6 @@ use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Process\Process;
 use function Cake\I18n\__d;
 
 /**
@@ -161,22 +160,5 @@ abstract class AbstractBackupUtility
         }
 
         return $this->Executor;
-    }
-
-    /**
-     * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
-     *
-     * @param string $command The command line to pass to the shell of the OS
-     * @return \Symfony\Component\Process\Process
-     * @see https://symfony.com/doc/current/components/process.html
-     * @since 2.8.7
-     */
-    protected function getProcess(string $command): Process
-    {
-        $Process = Process::fromShellCommandline(command: $command);
-        $Process->setTimeout(timeout: $this->getTimeout() ?: Configure::readOrFail('DatabaseBackup.processTimeout'));
-        $Process->run();
-
-        return $Process;
     }
 }
