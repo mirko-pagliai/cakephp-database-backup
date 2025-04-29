@@ -160,7 +160,7 @@ class BackupExportTest extends TestCase
         $Executor
             ->expects($this->any())
             ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string  => $key == 'database' ? 'test' : $key);
+            ->willReturnCallback(fn (string $key): string => $key == 'database' ? 'test' : $key);
 
         $Executor
             ->expects($this->any())

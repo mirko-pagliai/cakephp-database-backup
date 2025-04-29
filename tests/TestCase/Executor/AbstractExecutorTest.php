@@ -164,6 +164,11 @@ class AbstractExecutorTest extends TestCase
     }
 
     /**
+     * @param array<string, string> $expectedEnvVars
+     * @param string $expectedCommand
+     * @param string $filename
+     * @param \DatabaseBackup\OperationType $OperationType
+     * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]

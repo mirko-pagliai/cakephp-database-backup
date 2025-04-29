@@ -44,7 +44,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 class AbstractBackupUtilityTest extends TestCase
 {
     /**
-     * @var \DatabaseBackup\Utility\AbstractBackupUtility&\PHPUnit\Framework\MockObject\MockObject
+     * @var \DatabaseBackup\Utility\AbstractBackupUtility
      */
     protected AbstractBackupUtility $Utility;
 
@@ -56,6 +56,7 @@ class AbstractBackupUtilityTest extends TestCase
 
             public function filename(string $filename): AbstractBackupUtility
             {
+                return $this;
             }
         };
     }
@@ -152,6 +153,7 @@ class AbstractBackupUtilityTest extends TestCase
 
             public function filename(string $filename): AbstractBackupUtility
             {
+                return $this;
             }
         };
 
@@ -168,11 +170,12 @@ class AbstractBackupUtilityTest extends TestCase
     {
         $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new FakeDriver()]);
 
-        $Utility = new Class (Connection: $Connection) extends AbstractBackupUtility {
+        $Utility = new class (Connection: $Connection) extends AbstractBackupUtility {
             protected OperationType $OperationType = OperationType::Export;
 
             public function filename(string $filename): AbstractBackupUtility
             {
+                return $this;
             }
         };
 

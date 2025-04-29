@@ -177,7 +177,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     protected function getCommand(OperationType $OperationType): string
     {
         //Gets the binary names
-        $binary = (array)$this->getBinary($OperationType);
+        $binary = (array)$this->getBinary();
 
         $replacements = [
             '{{BINARY}}' => escapeshellarg($this->findBinary(...$binary)),
