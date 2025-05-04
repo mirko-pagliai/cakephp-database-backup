@@ -71,12 +71,46 @@ class ImportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--timeout` option.
+     *
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testExecuteTimeoutOption(): void
     {
-        $this->exec($this->command . ' --timeout 10 ' . $this->createBackup(fakeBackup: true));
-        $this->assertExitSuccess();
+        $filename = $this->createBackup(fakeBackup: true);
+
+        $this->_out = new StubConsoleOutput();
+        $this->_err = new StubConsoleOutput();
+
+        $BackupImport = $this->createPartialMock(BackupImport::class, ['filename', 'import', 'timeout']);
+
+        $BackupImport
+            ->expects($this->once())
+            ->method('filename')
+            ->willReturnSelf();
+
+        $BackupImport
+            ->expects($this->once())
+            ->method('timeout')
+            ->with(10);
+
+        $BackupImport
+            ->expects($this->once())
+            ->method('import')
+            ->willReturn($filename);
+
+        $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
+        $ImportCommand
+            ->expects($this->once())
+            ->method('getBackupImport')
+            ->willReturn($BackupImport);
+
+        $ImportCommand->executeCommand(
+            $ImportCommand,
+            [$this->createBackup(fakeBackup: true), '--timeout=10', '--verbose'],
+            new ConsoleIo($this->_out, $this->_err)
+        );
+
         $this->assertOutputContains('Timeout for shell commands: 10 seconds');
         $this->assertErrorEmpty();
     }
