@@ -36,6 +36,8 @@ Now, instead, the "Executor" classes implement the `getBinary()` method, which r
 ### 2.14.3
 * the `AbstractBackupUtility::__call()` method now also supports uppercase named properties (bug fixed). This provides
   the `getConnection()` magic method;
+* the signature of `AbstractBackupUtility::__call()` method has changed (from 
+  `__call(string $name, array $arguments = []): mixed` to `__call(string $method, array $args): mixed`);
 * increased use of fake backup files for testing, where there is no need to use real backups for testing.
 
 ### 2.14.2
