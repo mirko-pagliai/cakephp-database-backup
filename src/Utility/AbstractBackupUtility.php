@@ -77,11 +77,10 @@ abstract class AbstractBackupUtility
      *
      * It provides all `getX()` methods to get properties.
      *
-     * @param string $name
-     * @param array $arguments
+     * @param string $method
+     * @param array $args
      * @return mixed
      * @since 2.14.0
-     * @throws \BadMethodCallException With a no existing property or method.
      * @phpstan-ignore missingType.iterableValue
      */
     public function __call(string $method, array $args): mixed
