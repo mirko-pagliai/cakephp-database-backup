@@ -84,10 +84,10 @@ abstract class AbstractBackupUtility
      * @throws \BadMethodCallException With a no existing property or method.
      * @phpstan-ignore missingType.iterableValue
      */
-    public function __call(string $name, array $arguments = []): mixed
+    public function __call(string $method, array $args): mixed
     {
-        if (str_starts_with($name, 'get')) {
-            $property = substr($name, 3);
+        if (str_starts_with($method, 'get')) {
+            $property = substr($method, 3);
             foreach ([$property, lcfirst($property)] as $property) {
                 if (property_exists($this, $property)) {
                     return $this->{$property};
@@ -95,7 +95,7 @@ abstract class AbstractBackupUtility
             }
         }
 
-        throw new BadMethodCallException('Method `' . $this::class . '::' . $name . '()` does not exist.');
+        throw new BadMethodCallException('Method `' . $this::class . '::' . $method . '()` does not exist.');
     }
 
     /**
