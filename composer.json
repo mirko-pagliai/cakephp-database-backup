@@ -24,7 +24,8 @@
         "cakephp/cakephp-codesniffer": "^5.0",
         "cakedc/cakephp-phpstan": "^4.0",
         "cakephp/migrations": "^4.0",
-        "phpunit/phpunit": "^10.5.5 || ^11.1.3"
+        "phpunit/phpunit": "^10.5.5 || ^11.1.3",
+        "mockery/mockery": "^1.6"
     },
     "autoload": {
         "psr-4": {
