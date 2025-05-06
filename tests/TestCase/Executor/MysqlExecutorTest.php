@@ -42,11 +42,11 @@ class MysqlExecutorTest extends TestCase
             Mockery::spy('Connection', ConnectionInterface::class),
             OperationType::Export,
         ]);
+        $MysqlExecutor->shouldAllowMockingProtectedMethods();
 
         $MysqlExecutor->dispatchEvent('Backup.afterExport');
 
         $MysqlExecutor
-            ->shouldAllowMockingProtectedMethods()
             ->shouldHaveReceived('deleteAuthFile')
             ->once();
     }
@@ -59,10 +59,11 @@ class MysqlExecutorTest extends TestCase
             Mockery::spy('Connection', ConnectionInterface::class),
             OperationType::Export,
         ]);
+        $MysqlExecutor->shouldAllowMockingProtectedMethods();
 
         $MysqlExecutor->dispatchEvent('Backup.afterImport');
+
         $MysqlExecutor
-            ->shouldAllowMockingProtectedMethods()
             ->shouldHaveReceived('deleteAuthFile')
             ->once();
     }
@@ -75,12 +76,12 @@ class MysqlExecutorTest extends TestCase
             Mockery::spy('Connection', ConnectionInterface::class),
             OperationType::Export,
         ]);
+        $MysqlExecutor->shouldAllowMockingProtectedMethods();
 
         $Event = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
         $this->assertTrue($Event->getResult());
 
         $MysqlExecutor
-            ->shouldAllowMockingProtectedMethods()
             ->shouldHaveReceived('writeAuthFile')
             ->once()
             ->with('[mysqldump]' . PHP_EOL .
@@ -97,12 +98,12 @@ class MysqlExecutorTest extends TestCase
             Mockery::spy('Connection', ConnectionInterface::class),
             OperationType::Export,
         ]);
+        $MysqlExecutor->shouldAllowMockingProtectedMethods();
 
         $Event = $MysqlExecutor->dispatchEvent('Backup.beforeImport');
         $this->assertTrue($Event->getResult());
 
         $MysqlExecutor
-            ->shouldAllowMockingProtectedMethods()
             ->shouldHaveReceived('writeAuthFile')
             ->once()
             ->with('[client]' . PHP_EOL .
