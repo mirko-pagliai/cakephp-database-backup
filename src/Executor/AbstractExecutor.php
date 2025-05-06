@@ -46,26 +46,6 @@ abstract class AbstractExecutor implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
-     * @return \Symfony\Component\Process\ExecutableFinder
-     * @codeCoverageIgnore
-     */
-    protected function getExecutableFinder(): ExecutableFinder
-    {
-        return new ExecutableFinder();
-    }
-
-    /**
-     * @param string $command The command line to pass to the shell of the OS
-     * @return \Symfony\Component\Process\Process
-     * @codeCoverageIgnore
-     * @see https://symfony.com/doc/current/components/process.html
-     */
-    protected function getProcess(string $command): Process
-    {
-        return Process::fromShellCommandline(command: $command, timeout: $this->timeout);
-    }
-
-    /**
      * Constructor.
      *
      * @param \Cake\Datasource\ConnectionInterface $Connection
@@ -147,7 +127,7 @@ abstract class AbstractExecutor implements EventListenerInterface
             array: $name
         );
 
-        $ExecutableFinder = $this->getExecutableFinder();
+        $ExecutableFinder = new ExecutableFinder();
 
         foreach ($name as $sName) {
             $binary = Configure::read(
@@ -196,7 +176,7 @@ abstract class AbstractExecutor implements EventListenerInterface
     }
 
     /**
-     * Gets and runs a `Process` instance, based on the the given file.
+     * Gets and runs a `Process` instance, based on the given file.
      *
      * @param string $filename The name of the file to be processed
      * @return \Symfony\Component\Process\Process The executed process instance.
@@ -206,7 +186,10 @@ abstract class AbstractExecutor implements EventListenerInterface
     {
         $Compression = Compression::fromFilename($filename);
 
-        $Process = $this->getProcess(command: $this->getCommand(Compression: $Compression));
+        /**
+         * @see https://symfony.com/doc/current/components/process.html
+         */
+        $Process = Process::fromShellCommandline(command: $this->getCommand(Compression: $Compression), timeout: $this->timeout);
 
         $Process->run(env: [
             'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',

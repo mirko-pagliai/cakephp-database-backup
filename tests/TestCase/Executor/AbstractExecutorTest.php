@@ -23,12 +23,13 @@ use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Generator;
 use InvalidArgumentException;
+use Mockery;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 
 /**
  * AbstractExecutorTest.
@@ -37,171 +38,56 @@ use Symfony\Component\Process\Process;
 class AbstractExecutorTest extends TestCase
 {
     /**
-     * @param list<non-empty-string> $methods Methods you want to mock
-     * @param \Cake\Datasource\ConnectionInterface|null $Connection A `ConnectionInterface` or `null` for a default mock
-     * @param \DatabaseBackup\OperationType|null $OperationType An `OperationType` or `null` for a default value
-     * @return \DatabaseBackup\Executor\AbstractExecutor&\PHPUnit\Framework\MockObject\MockObject
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @var \DatabaseBackup\Executor\AbstractExecutor
      */
-    protected function getAbstractExecutorMock(
-        array $methods = [],
-        ?ConnectionInterface $Connection = null,
-        ?OperationType $OperationType = null
-    ): AbstractExecutor {
-        $Connection = $Connection ?? $this->createMock(ConnectionInterface::class);
-        $OperationType = $OperationType ?? OperationType::Export;
-
-        $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$Connection, $OperationType, 0, 'Sqlite'])
-            ->onlyMethods(array_merge($methods, ['getBinaryName']))
-            ->getMock();
-
-        $Executor
-            ->expects($this->any())
-            ->method('getBinaryName')
-            ->willReturnCallback(fn (): string => lcfirst($OperationType->name . '-binary'));
-
-        if (in_array(needle: 'findBinary', haystack: $methods)) {
-            $Executor
-                ->expects($this->any())
-                ->method('findBinary')
-                ->willReturnCallback(function (Compression|string $binaryName): string {
-                    if ($binaryName instanceof Compression) {
-                        return lcfirst($binaryName->name) . '-binary';
-                    }
-
-                    return $binaryName;
-                });
-        }
-
-        if (in_array(needle: 'getConfig', haystack: $methods)) {
-            $Executor
-                ->expects($this->any())
-                ->method('getConfig')
-                ->willReturnCallback(fn (string $key): string => 'my-' . $key);
-        }
-
-        return $Executor;
-    }
+    protected AbstractExecutor $Executor;
 
     /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @inheritDoc
      */
+    #[Override]
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        /** @var \Cake\Datasource\ConnectionInterface&\Mockery\MockInterface $Connection */
+        $Connection = Mockery::mock('Connection', ConnectionInterface::class, [
+            'config' => [
+                'host' => 'my-host',
+                'database' => 'my-database',
+                'password' => 'my-password',
+                'username' => 'my-username',
+            ],
+        ]);
+
+        $this->Executor = new class (
+            Connection: $Connection,
+            OperationType: OperationType::Export,
+            name: 'Sqlite'
+        ) extends AbstractExecutor {
+            public function resetOperationType(OperationType $OperationType): self
+            {
+                $this->OperationType = $OperationType;
+
+                return $this;
+            }
+
+            /**
+             * @inheritDoc
+             */
+            protected function getBinaryName(): string
+            {
+                return lcfirst($this->OperationType->name . '-binary');
+            }
+        };
+    }
+
     #[Test]
     public function testImplementedEvents(): void
     {
-        $this->assertNotEmpty($this->getAbstractExecutorMock()->implementedEvents());
+        $this->assertNotEmpty($this->Executor->implementedEvents());
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    #[Test]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export, Compression::None])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Gzip])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Bzip2])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import, Compression::None])]
-    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Gzip])]
-    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
-    public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
-    {
-        $Executor = $this->getAbstractExecutorMock(methods: ['findBinary', 'getConfig'], OperationType: $OperationType);
-
-        $result = $Executor->getCommand(Compression: $Compression);
-
-        $this->assertSame($expectedCommand, $result);
-    }
-
-    public static function providerTestRunProcess(): Generator
-    {
-        $defaultEnv = [
-            'AUTH_FILE' => '',
-            'DB_HOST' => 'my-host',
-            'DB_NAME' => 'my-database',
-            'DB_PASSWORD' => 'my-password',
-            'DB_USER' => 'my-username',
-        ];
-
-        yield [
-            $defaultEnv + [
-                'BINARY' => 'export-binary',
-                'COMPRESSION_BINARY' => null,
-            ],
-            '"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"',
-            'filename.sql',
-            OperationType::Export,
-        ];
-
-        yield [
-            $defaultEnv + [
-                'BINARY' => 'import-binary',
-                'COMPRESSION_BINARY' => null,
-            ],
-            '"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"',
-            'filename.sql',
-            OperationType::Import,
-        ];
-
-        yield [
-            $defaultEnv + [
-                'BINARY' => 'export-binary',
-                'COMPRESSION_BINARY' => 'gzip-binary',
-            ],
-            '"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"',
-            'filename.sql.gz',
-            OperationType::Export,
-        ];
-
-        yield [
-            $defaultEnv + [
-                'BINARY' => 'import-binary',
-                'COMPRESSION_BINARY' => 'gzip-binary',
-            ],
-            '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"',
-            'filename.sql.gz',
-            OperationType::Import,
-        ];
-    }
-
-    /**
-     * @param array<string, string> $expectedEnvVars
-     * @param string $expectedCommand
-     * @param string $filename
-     * @param \DatabaseBackup\OperationType $OperationType
-     * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    #[Test]
-    #[DataProvider('providerTestRunProcess')]
-    public function testRunProcess(array $expectedEnvVars, string $expectedCommand, string $filename, OperationType $OperationType): void
-    {
-        $Process = $this->createMock(Process::class);
-        $Process
-            ->expects($this->once())
-            ->method('run')
-            ->with(
-                null,
-                $this->equalTo($expectedEnvVars + ['FILENAME' => $filename])
-            )
-            ->willReturn(1);
-
-        $Executor = $this->getAbstractExecutorMock(
-            methods: ['findBinary', 'getConfig', 'getProcess'],
-            OperationType: $OperationType
-        );
-
-        $Executor
-            ->expects($this->once())
-            ->method('getProcess')
-            ->with($this->equalTo($expectedCommand))
-            ->willReturn($Process);
-
-        $Executor->runProcess(filename: $filename);
-    }
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[TestWith(['/usr/bin/mariadb', 'mariadb'])]
     #[TestWith(['/usr/bin/mariadb', 'mariadb', 'mysql'])]
@@ -209,32 +95,24 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['/usr/bin/mariadb', 'noExistingFirstBinary', 'mariadb'])]
     #[TestWith(['/usr/bin/mysql', 'mysql'])]
     #[TestWith(['/usr/bin/gzip', Compression::Gzip])]
+    #[RunInSeparateProcess]
     public function testFindBinary(string $expectedBinary, string|Compression ...$name): void
     {
-        $ExecutableFinder = $this->createPartialMock(ExecutableFinder::class, ['find']);
-
+        /** @var \Symfony\Component\Process\ExecutableFinder&\Mockery\MockInterface $ExecutableFinder */
+        $ExecutableFinder = Mockery::mock('overload:Symfony\Component\Process\ExecutableFinder');
         $ExecutableFinder
-            ->expects($this->any())
-            ->method('find')
-            ->willReturnCallback(fn (string $name): ?string => match ($name) {
+            ->shouldReceive('find')
+            ->atLeast()
+            ->once()
+            ->andReturnUsing(fn (string $name): ?string => match ($name) {
                 'noExistingFirstBinary', 'noExistingSecondBinary' => null,
                 default => '/usr/bin/' . strtolower($name)
             });
 
-        $Executor = $this->getAbstractExecutorMock(['getExecutableFinder']);
-
-        $Executor
-            ->expects($this->once())
-            ->method('getExecutableFinder')
-            ->willReturn($ExecutableFinder);
-
-        $binary = $Executor->findBinary(...$name);
+        $binary = $this->Executor->findBinary(...$name);
         $this->assertSame($expectedBinary, $binary);
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[TestWith(['/customPath/mariadb', 'mariadb'])]
     #[TestWith(['/customPath/mariadb', 'mariadb', 'mysql'])]
@@ -248,43 +126,21 @@ class AbstractExecutorTest extends TestCase
         Configure::write('DatabaseBackup.binaries.mysql', '/customPath/mysql');
         Configure::write('DatabaseBackup.binaries.gzip', '/customPath/gzip');
 
-        $Executor = $this->getAbstractExecutorMock(['getExecutableFinder']);
-
-        $Executor
-            ->expects($this->once())
-            ->method('getExecutableFinder')
-            ->willReturn($this->createStub(ExecutableFinder::class));
-
-        $binary = $Executor->findBinary(...$name);
+        $binary = $this->Executor->findBinary(...$name);
         $this->assertSame($expectedBinary, $binary);
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
-    #[TestWith(['mariadb'])]
-    #[TestWith(['mariadb', 'mysql'])]
-    public function testFindBinaryWithNoExistingBinary(string|Compression ...$name): void
+    public function testFindBinaryWithNoExistingBinary(): void
     {
-        $Executor = $this->getAbstractExecutorMock(['getExecutableFinder']);
-
-        $Executor
-            ->expects($this->any())
-            ->method('getExecutableFinder')
-            ->willReturn($this->createStub(ExecutableFinder::class));
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
-            'Binary for `mariadb` could not be found. You have to set its path manually on your bootstrap with: `%s`',
-            'Configure::write(\'DatabaseBackup.binaries.mariadb\', \'/your/full/path/to/mariadb\')'
+            'Binary for `noExisting` could not be found. You have to set its path manually on your bootstrap with: `%s`',
+            'Configure::write(\'DatabaseBackup.binaries.noExisting\', \'/your/full/path/to/noExisting\')'
         ));
-        $Executor->findBinary(...$name);
+        $this->Executor->findBinary('noExisting');
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     #[TestWith([Compression::None])]
     #[TestWith([Compression::None, 'gzip'])]
@@ -293,27 +149,114 @@ class AbstractExecutorTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to search for binary for "none" Compression');
-        $this->getAbstractExecutorMock()->findBinary(...$name);
+        $this->Executor->findBinary(...$name);
+    }
+
+    #[Test]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export, Compression::None])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Gzip])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Bzip2])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import, Compression::None])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Gzip])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
+    public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
+    {
+        /** @phpstan-ignore-next-line */
+        $this->Executor->resetOperationType(OperationType: $OperationType);
+
+        $result = $this->Executor->getCommand(Compression: $Compression);
+        $this->assertSame($expectedCommand, $result);
+    }
+
+    public static function providerTestRunProcess(): Generator
+    {
+        yield [
+            ['COMPRESSION_BINARY' => null],
+            '"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"',
+            'filename.sql',
+            OperationType::Export,
+        ];
+
+        yield [
+            ['COMPRESSION_BINARY' => null],
+            '"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"',
+            'filename.sql',
+            OperationType::Import,
+        ];
+
+        yield [
+            ['COMPRESSION_BINARY' => '/usr/bin/gzip'],
+            '"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"',
+            'filename.sql.gz',
+            OperationType::Export,
+        ];
+
+        yield [
+            ['COMPRESSION_BINARY' => '/usr/bin/gzip'],
+            '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"',
+            'filename.sql.gz',
+            OperationType::Import,
+        ];
     }
 
     /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @param array<string, string> $expectedEnvVars
+     * @param string $expectedCommand
+     * @param string $filename
+     * @param \DatabaseBackup\OperationType $OperationType
+     * @return void
      */
     #[Test]
-    #[TestWith(['test', 'name'])]
+    #[DataProvider('providerTestRunProcess')]
+    #[RunInSeparateProcess]
+    public function testRunProcess(array $expectedEnvVars, string $expectedCommand, string $filename, OperationType $OperationType): void
+    {
+        Mockery::mock('overload:Symfony\Component\Process\ExecutableFinder')
+            ->shouldReceive('find')
+            ->atLeast()
+            ->once()
+            ->andReturnUsing(fn (string $name): ?string => match ($name) {
+                'noExistingFirstBinary', 'noExistingSecondBinary' => null,
+                default => '/usr/bin/' . strtolower($name)
+            });
+
+        $Process = Mockery::mock('alias:Symfony\Component\Process\Process');
+
+        $Process
+            ->shouldReceive('fromShellCommandline')
+            ->once()
+            ->withSomeOfArgs($expectedCommand)
+            ->andReturnSelf();
+
+        $Process
+            ->shouldReceive('run')
+            ->once()
+            ->withArgs(fn (?callable $callback = null, array $env = []): bool => !array_diff(
+                $env,
+                $expectedEnvVars + [
+                    'AUTH_FILE' => '',
+                    'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
+                    'DB_HOST' => 'my-host',
+                    'DB_NAME' => 'my-database',
+                    'DB_PASSWORD' => 'my-password',
+                    'DB_USER' => 'my-username',
+                    'FILENAME' => $filename,
+                ]
+            ));
+
+        /** @phpstan-ignore-next-line */
+        $this->Executor->resetOperationType(OperationType: $OperationType);
+
+        $result = $this->Executor->runProcess(filename: $filename);
+        $this->assertSame($Process, $result);
+    }
+
+    #[Test]
+    #[TestWith(['my-database', 'database'])]
     #[TestWith([null, 'noExisting'])]
     public function testGetConfig(?string $expectedConfig, string $configKey): void
     {
-        $Connection = $this->createMock(ConnectionInterface::class);
-
-        $Connection
-            ->expects($this->once())
-            ->method('config')
-            ->willReturn(['name' => 'test']);
-
-        $Executor = $this->getAbstractExecutorMock(Connection: $Connection);
-
-        $result = $Executor->getConfig($configKey);
+        $result = $this->Executor->getConfig($configKey);
         $this->assertSame($expectedConfig, $result);
     }
 }

@@ -14,3 +14,8 @@ parameters:
 
     excludePaths:
         -  tests/test_app/
+
+    ignoreErrors:
+        -
+            message: '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage::\w+\(\)#'
+            path: tests/TestCase
