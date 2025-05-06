@@ -91,23 +91,19 @@ class AbstractExecutorTest extends TestCase
     #[Test]
     #[TestWith(['/usr/bin/mariadb', 'mariadb'])]
     #[TestWith(['/usr/bin/mariadb', 'mariadb', 'mysql'])]
-    #[TestWith(['/usr/bin/mariadb', 'mariadb', 'noExistingSecondBinary'])]
-    #[TestWith(['/usr/bin/mariadb', 'noExistingFirstBinary', 'mariadb'])]
+    #[TestWith(['/usr/bin/mariadb', 'mariadb', 'noExisting'])]
+    #[TestWith(['/usr/bin/mariadb', 'noExisting', 'mariadb'])]
     #[TestWith(['/usr/bin/mysql', 'mysql'])]
     #[TestWith(['/usr/bin/gzip', Compression::Gzip])]
     #[RunInSeparateProcess]
     public function testFindBinary(string $expectedBinary, string|Compression ...$name): void
     {
         /** @var \Symfony\Component\Process\ExecutableFinder&\Mockery\MockInterface $ExecutableFinder */
-        $ExecutableFinder = Mockery::mock('overload:Symfony\Component\Process\ExecutableFinder');
+        $ExecutableFinder = Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder');
         $ExecutableFinder
             ->shouldReceive('find')
-            ->atLeast()
-            ->once()
-            ->andReturnUsing(fn (string $name): ?string => match ($name) {
-                'noExistingFirstBinary', 'noExistingSecondBinary' => null,
-                default => '/usr/bin/' . strtolower($name)
-            });
+            ->between(1, 2)
+            ->andReturnUsing(fn (string $name): ?string => $name == 'noExisting' ? null : '/usr/bin/' . strtolower($name));
 
         $binary = $this->Executor->findBinary(...$name);
         $this->assertSame($expectedBinary, $binary);
@@ -116,8 +112,8 @@ class AbstractExecutorTest extends TestCase
     #[Test]
     #[TestWith(['/customPath/mariadb', 'mariadb'])]
     #[TestWith(['/customPath/mariadb', 'mariadb', 'mysql'])]
-    #[TestWith(['/customPath/mariadb', 'mariadb', 'noExistingSecondBinary'])]
-    #[TestWith(['/customPath/mariadb', 'noExistingFirstBinary', 'mariadb'])]
+    #[TestWith(['/customPath/mariadb', 'mariadb', 'noExisting'])]
+    #[TestWith(['/customPath/mariadb', 'noExisting', 'mariadb'])]
     #[TestWith(['/customPath/mysql', 'mysql'])]
     #[TestWith(['/customPath/gzip', Compression::Gzip])]
     public function testFindBinaryFromConfiguration(string $expectedBinary, string|Compression ...$name): void
@@ -215,10 +211,7 @@ class AbstractExecutorTest extends TestCase
             ->shouldReceive('find')
             ->atLeast()
             ->once()
-            ->andReturnUsing(fn (string $name): ?string => match ($name) {
-                'noExistingFirstBinary', 'noExistingSecondBinary' => null,
-                default => '/usr/bin/' . strtolower($name)
-            });
+            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . strtolower($name));
 
         $Process = Mockery::mock('alias:Symfony\Component\Process\Process');
 
