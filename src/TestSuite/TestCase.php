@@ -20,6 +20,7 @@ use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupManager;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Override;
 use Symfony\Component\Filesystem\Path;
 
@@ -28,6 +29,8 @@ use Symfony\Component\Filesystem\Path;
  */
 abstract class TestCase extends CakeTestCase
 {
+    use MockeryPHPUnitIntegration;
+
     /**
      * @inheritDoc
      */

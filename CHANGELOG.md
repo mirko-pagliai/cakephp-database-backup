@@ -51,6 +51,7 @@ Now, instead, the "Executor" classes implement the `getBinaryName()` method, whi
   `SqliteExecutor` now explicitly return `void`;
 * the `AbstractBackupUtility::__get()` magic method, which allowed reading the properties of the "Executor" classes, had
   been deprecated and has now been removed;
+* migration to Mockery. We need to use the `TestCase` class of the plugin;
 * the `DatabaseBackup.connection` configuration name had been deprecated and now have been removed;
 * configuration names `DatabaseBackup.mysql`, `DatabaseBackup.postgres` and `DatabaseBackup.sqlite` had been deprecated, 
   and now they have been removed;
@@ -61,6 +62,8 @@ Now, instead, the "Executor" classes implement the `getBinaryName()` method, whi
 ### 2.14.3
 * the `AbstractBackupUtility::__call()` method now also supports uppercase named properties (bug fixed). This provides
   the `getConnection()` magic method;
+* the signature of `AbstractBackupUtility::__call()` method has changed (from 
+  `__call(string $name, array $arguments = []): mixed` to `__call(string $method, array $args): mixed`);
 * increased use of fake backup files for testing, where there is no need to use real backups for testing.
 
 ### 2.14.2
