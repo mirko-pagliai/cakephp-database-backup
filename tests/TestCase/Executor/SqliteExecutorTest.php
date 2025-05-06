@@ -57,12 +57,7 @@ class SqliteExecutorTest extends TestCase
         $Schema
             ->expects($this->any())
             ->method('describe')
-            ->willReturnCallback(function (string $tableName): TableSchema {
-                return $this->getMockBuilder(TableSchema::class)
-                    ->setConstructorArgs([$tableName])
-                    ->onlyMethods([])
-                    ->getMock();
-            });
+            ->willReturnCallback(fn (string $tableName): TableSchema => new TableSchema($tableName));
 
         $Connection = $this->createMock(Connection::class);
 
