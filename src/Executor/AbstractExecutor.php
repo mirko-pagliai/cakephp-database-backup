@@ -92,7 +92,7 @@ abstract class AbstractExecutor implements EventListenerInterface
      *
      * @return array<string>|string
      */
-    abstract protected function getBinaryName(): string|array;
+    abstract public function getBinaryName(): string|array;
 
     /**
      * Finds and returns an executable binary by name.

@@ -33,15 +33,6 @@ class MysqlExecutor extends AbstractExecutor
     private string $auth;
 
     /**
-     * @return \Symfony\Component\Filesystem\Filesystem
-     * @codeCoverageIgnore
-     */
-    protected function getFilesystem(): Filesystem
-    {
-        return new Filesystem();
-    }
-
-    /**
      * Called after export.
      *
      * @return void
@@ -117,7 +108,7 @@ class MysqlExecutor extends AbstractExecutor
      * @inheritDoc
      */
     #[Override]
-    protected function getBinaryName(): string|array
+    public function getBinaryName(): string|array
     {
         return $this->OperationType == OperationType::Export ? ['mariadb-dump', 'mysqldump'] : ['mariadb', 'mysql'];
     }
@@ -148,6 +139,8 @@ class MysqlExecutor extends AbstractExecutor
      */
     protected function writeAuthFile(string $content): bool
     {
+        $authFilePath = $this->getAuthFilePath();
+
         $content = str_replace(
             [
                 '{{USER}}',
@@ -162,10 +155,10 @@ class MysqlExecutor extends AbstractExecutor
             $content
         );
 
-        $Filesystem = $this->getFilesystem();
-        $Filesystem->dumpFile($this->getAuthFilePath(), $content);
+        $Filesystem = new Filesystem();
+        $Filesystem->dumpFile($authFilePath, $content);
 
-        return $Filesystem->exists($this->getAuthFilePath());
+        return $Filesystem->exists($authFilePath);
     }
 
     /**
@@ -176,7 +169,8 @@ class MysqlExecutor extends AbstractExecutor
      */
     protected function deleteAuthFile(): void
     {
-        $this->getFilesystem()->remove($this->getAuthFilePath());
+        $Filesystem = new Filesystem();
+        $Filesystem->remove($this->getAuthFilePath());
 
         unset($this->auth);
     }

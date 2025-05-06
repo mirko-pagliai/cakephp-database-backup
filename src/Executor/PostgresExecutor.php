@@ -28,7 +28,7 @@ class PostgresExecutor extends AbstractExecutor
      * @inheritDoc
      */
     #[Override]
-    protected function getBinaryName(): string|array
+    public function getBinaryName(): string|array
     {
         return $this->OperationType == OperationType::Export ? 'pg_dump' : 'pg_restore';
     }

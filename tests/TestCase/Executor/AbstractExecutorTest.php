@@ -75,7 +75,7 @@ class AbstractExecutorTest extends TestCase
             /**
              * @inheritDoc
              */
-            protected function getBinaryName(): string
+            public function getBinaryName(): string
             {
                 return lcfirst($this->OperationType->name . '-binary');
             }

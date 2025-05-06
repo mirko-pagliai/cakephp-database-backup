@@ -16,14 +16,16 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Datasource\ConnectionInterface;
-use Cake\TestSuite\TestCase;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\OperationType;
+use DatabaseBackup\TestSuite\TestCase;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\UsesClass;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * MysqlExecutorTest class.
@@ -32,160 +34,162 @@ use Symfony\Component\Filesystem\Filesystem;
 #[UsesClass(AbstractExecutor::class)]
 class MysqlExecutorTest extends TestCase
 {
-    /**
-     * @param list<non-empty-string> $methods Methods you want to mock
-     * @return \DatabaseBackup\Executor\MysqlExecutor&\PHPUnit\Framework\MockObject\MockObject
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    protected function getMysqlExecutorMock(array $methods = []): MysqlExecutor
-    {
-        $Connection = $this->createStub(ConnectionInterface::class);
-
-        return $this->getMockBuilder(MysqlExecutor::class)
-            ->setConstructorArgs([$Connection, OperationType::Export])
-            ->onlyMethods($methods)
-            ->getMock();
-    }
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testAfterExport(): void
     {
-        $MysqlExecutor = $this->getMysqlExecutorMock(['deleteAuthFile']);
-        $MysqlExecutor
-            ->expects($this->once())
-            ->method('deleteAuthFile');
+        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
+        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[deleteAuthFile]', [
+            Mockery::spy('Connection', ConnectionInterface::class),
+            OperationType::Export,
+        ]);
 
         $MysqlExecutor->dispatchEvent('Backup.afterExport');
+
+        $MysqlExecutor
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldHaveReceived('deleteAuthFile')
+            ->once();
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testAfterImport(): void
     {
-        $MysqlExecutor = $this->getMysqlExecutorMock(['deleteAuthFile']);
-        $MysqlExecutor
-            ->expects($this->once())
-            ->method('deleteAuthFile');
+        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
+        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[deleteAuthFile]', [
+            Mockery::spy('Connection', ConnectionInterface::class),
+            OperationType::Export,
+        ]);
 
         $MysqlExecutor->dispatchEvent('Backup.afterImport');
+        $MysqlExecutor
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldHaveReceived('deleteAuthFile')
+            ->once();
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testBeforeExport(): void
     {
-        $MysqlExecutor = $this->getMysqlExecutorMock(['writeAuthFile']);
-        $MysqlExecutor
-            ->expects($this->once())
-            ->method('writeAuthFile')
-            ->with('[mysqldump]' . PHP_EOL .
-                'user={{USER}}' . PHP_EOL .
-                'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}')
-            ->willReturn(true);
+        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
+        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[writeAuthFile]', [
+            Mockery::spy('Connection', ConnectionInterface::class),
+            OperationType::Export,
+        ]);
 
         $Event = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
         $this->assertTrue($Event->getResult());
+
+        $MysqlExecutor
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldHaveReceived('writeAuthFile')
+            ->once()
+            ->with('[mysqldump]' . PHP_EOL .
+                'user={{USER}}' . PHP_EOL .
+                'password="{{PASSWORD}}"' . PHP_EOL .
+                'host={{HOST}}');
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testBeforeImport(): void
     {
-        $MysqlExecutor = $this->getMysqlExecutorMock(['writeAuthFile']);
-        $MysqlExecutor
-            ->expects($this->once())
-            ->method('writeAuthFile')
-            ->with('[client]' . PHP_EOL .
-                'user={{USER}}' . PHP_EOL .
-                'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}')
-            ->willReturn(true);
+        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
+        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[writeAuthFile]', [
+            Mockery::spy('Connection', ConnectionInterface::class),
+            OperationType::Export,
+        ]);
 
         $Event = $MysqlExecutor->dispatchEvent('Backup.beforeImport');
         $this->assertTrue($Event->getResult());
+
+        $MysqlExecutor
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldHaveReceived('writeAuthFile')
+            ->once()
+            ->with('[client]' . PHP_EOL .
+                'user={{USER}}' . PHP_EOL .
+                'password="{{PASSWORD}}"' . PHP_EOL .
+                'host={{HOST}}');
     }
 
     /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @param array<string> $expectedBinaryNames
+     * @param \DatabaseBackup\OperationType $OperationType
+     * @return void
      */
     #[Test]
+    #[TestWith([['mariadb-dump', 'mysqldump'], OperationType::Export])]
+    #[TestWith([['mariadb', 'mysql'], OperationType::Import])]
+    public function testGetBinaryName(array $expectedBinaryNames, OperationType $OperationType): void
+    {
+        $MysqlExecutor = new MysqlExecutor(
+            /** @phpstan-ignore-next-line */
+            Connection: Mockery::spy('Connection', ConnectionInterface::class),
+            OperationType: $OperationType
+        );
+
+        $this->assertSame($expectedBinaryNames, $MysqlExecutor->getBinaryName());
+    }
+
+    #[Test]
+    #[RunInSeparateProcess]
     public function testWriteAuthFile(): void
     {
-        $expectedContent = '[mysqldump]' . PHP_EOL .
-            'user=my-username' . PHP_EOL .
-            'password="my-password"' . PHP_EOL .
-            'host=my-host';
-
-        $FileSystem = $this->createPartialMock(Filesystem::class, ['dumpFile', 'exists']);
-
-        $FileSystem
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with($this->stringStartsWith(TMP), $this->equalTo($expectedContent));
-
-        $FileSystem
-            ->expects($this->once())
-            ->method('exists')
-            ->with($this->stringStartsWith(TMP))
-            ->willReturn(true);
-
-        $MysqlExecutor = $this->getMysqlExecutorMock(['getFilesystem', 'getConfig']);
-
-        $MysqlExecutor
-            ->expects($this->once())
-            ->method('getFilesystem')
-            ->willReturn($FileSystem);
-
-        $MysqlExecutor
-            ->expects($this->exactly(3))
-            ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
-
-        $result = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
-
-        $this->assertTrue($result->getResult());
-    }
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    #[Test]
-    public function testDeleteAuthFile(): void
-    {
-        $expectedAuthFile = TMP . 'myAuthFile';
-
-        $Filesystem = $this->createPartialMock(Filesystem::class, ['remove']);
+        /** @var \Symfony\Component\Filesystem\Filesystem&\Mockery\MockInterface $Filesystem */
+        $Filesystem = Mockery::mock('overload:Symfony\Component\Filesystem\Filesystem');
 
         $Filesystem
-            ->expects($this->once())
-            ->method('remove')
-            ->with($expectedAuthFile);
+            ->shouldReceive('dumpFile')
+            ->once()
+            ->with('/path/to/my/auth/file', 'my-content');
 
-        $MysqlExecutor = $this->getMysqlExecutorMock(['getFilesystem', 'getAuthFilePath']);
+        $Filesystem
+            ->shouldReceive('exists')
+            ->once()
+            ->with('/path/to/my/auth/file')
+            ->andReturnTrue();
+
+        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
+        $MysqlExecutor = Mockery::mock(MysqlExecutor::class)
+            ->makePartial();
+
+        $MysqlExecutor->shouldAllowMockingProtectedMethods();
 
         $MysqlExecutor
-            ->expects($this->once())
-            ->method('getFilesystem')
-            ->willReturn($Filesystem);
+            ->shouldReceive('getAuthFilePath')
+            ->once()
+            ->andReturn('/path/to/my/auth/file');
 
         $MysqlExecutor
-            ->expects($this->once())
-            ->method('getAuthFilePath')
-            ->willReturn($expectedAuthFile);
+            ->shouldReceive('getConfig')
+            ->times(3);
 
-        //Dispatches an event (any) that we are sure will call and return the `deleteAuthFile()` method.
-        $result = $MysqlExecutor->dispatchEvent('Backup.afterExport');
+        $result = $MysqlExecutor->writeAuthFile('my-content');
+        $this->assertTrue($result);
+    }
 
-        $this->assertNull($result->getResult());
+    #[Test]
+    #[RunInSeparateProcess]
+    public function testDeleteAuthFile(): void
+    {
+        /** @var \Symfony\Component\Filesystem\Filesystem&\Mockery\MockInterface $Filesystem */
+        $Filesystem = Mockery::mock('overload:Symfony\Component\Filesystem\Filesystem');
+
+        $Filesystem
+            ->shouldReceive('remove')
+            ->once()
+            ->with('/path/to/my/auth/file');
+
+        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
+        $MysqlExecutor = Mockery::mock(MysqlExecutor::class)
+            ->makePartial();
+
+        $MysqlExecutor->shouldAllowMockingProtectedMethods();
+
+        $MysqlExecutor
+            ->shouldReceive('getAuthFilePath')
+            ->once()
+            ->andReturn('/path/to/my/auth/file');
+
+        $MysqlExecutor->deleteAuthFile();
     }
 }

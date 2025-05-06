@@ -28,7 +28,7 @@ class SqliteExecutor extends AbstractExecutor
      * @inheritDoc
      */
     #[Override]
-    protected function getBinaryName(): string|array
+    public function getBinaryName(): string|array
     {
         return 'sqlite3';
     }
