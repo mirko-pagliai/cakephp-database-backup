@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Core\Configure;
+use Cake\Database\Connection;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -50,34 +51,13 @@ class AbstractExecutorTest extends TestCase
     {
         parent::setUp();
 
-        /** @var \Cake\Datasource\ConnectionInterface&\Mockery\MockInterface $Connection */
-        $Connection = Mockery::mock('Connection', ConnectionInterface::class, [
-            'config' => [
-                'host' => 'my-host',
-                'database' => 'my-database',
-                'password' => 'my-password',
-                'username' => 'my-username',
-            ],
-        ]);
-
         $this->Executor = new class (
-            Connection: $Connection,
-            OperationType: OperationType::Export,
-            name: 'Sqlite'
+            Connection: new Connection(['driver' => 'Sqlite']),
+            OperationType: OperationType::Export
         ) extends AbstractExecutor {
-            public function resetOperationType(OperationType $OperationType): self
-            {
-                $this->OperationType = $OperationType;
-
-                return $this;
-            }
-
-            /**
-             * @inheritDoc
-             */
             public function getBinaryName(): string
             {
-                return lcfirst($this->OperationType->name . '-binary');
+                return $this->OperationType->value . '-binary';
             }
         };
     }
@@ -103,7 +83,10 @@ class AbstractExecutorTest extends TestCase
         $ExecutableFinder
             ->shouldReceive('find')
             ->between(1, 2)
-            ->andReturnUsing(fn (string $name): ?string => $name == 'noExisting' ? null : '/usr/bin/' . strtolower($name));
+            ->andReturnUsing(fn (string $name): ?string => match ($name) {
+                'noExisting' => null,
+                default => '/usr/bin/' . $name,
+            });
 
         $binary = $this->Executor->findBinary(...$name);
         $this->assertSame($expectedBinary, $binary);
@@ -157,8 +140,7 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
-        /** @phpstan-ignore-next-line */
-        $this->Executor->resetOperationType(OperationType: $OperationType);
+        $this->Executor->OperationType = $OperationType;
 
         $result = $this->Executor->getCommand(Compression: $Compression);
         $this->assertSame($expectedCommand, $result);
@@ -211,7 +193,7 @@ class AbstractExecutorTest extends TestCase
             ->shouldReceive('find')
             ->atLeast()
             ->once()
-            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . strtolower($name));
+            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
 
         $Process = Mockery::mock('alias:Symfony\Component\Process\Process');
 
@@ -237,8 +219,7 @@ class AbstractExecutorTest extends TestCase
                 ]
             ));
 
-        /** @phpstan-ignore-next-line */
-        $this->Executor->resetOperationType(OperationType: $OperationType);
+        $this->Executor->OperationType = $OperationType;
 
         $result = $this->Executor->runProcess(filename: $filename);
         $this->assertSame($Process, $result);
@@ -247,9 +228,15 @@ class AbstractExecutorTest extends TestCase
     #[Test]
     #[TestWith(['my-database', 'database'])]
     #[TestWith([null, 'noExisting'])]
-    public function testGetConfig(?string $expectedConfig, string $configKey): void
+    public function testGetConfig(?string $expectedValue, string $configName): void
     {
-        $result = $this->Executor->getConfig($configKey);
-        $this->assertSame($expectedConfig, $result);
+        $this->Executor->Connection = Mockery::mock(Connection::class);
+        $this->Executor->Connection
+            ->shouldReceive('config')
+            ->withNoArgs()
+            ->andReturn(['database' => 'my-database']);
+
+        $result = $this->Executor->getConfig($configName);
+        $this->assertSame($expectedValue, $result);
     }
 }

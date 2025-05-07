@@ -54,8 +54,8 @@ abstract class AbstractExecutor implements EventListenerInterface
      * @param string|null $name Driver name. By default, it will be automatically obtained from `$Connection`
      */
     public function __construct(
-        protected ConnectionInterface $Connection,
-        protected OperationType $OperationType,
+        public ConnectionInterface $Connection,
+        public OperationType $OperationType,
         protected int $timeout = 0,
         protected ?string $name = null
     ) {
