@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Database\Connection;
 use Cake\Database\Driver\Postgres;
+use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;

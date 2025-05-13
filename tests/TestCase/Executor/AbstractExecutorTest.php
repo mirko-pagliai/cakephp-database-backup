@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Core\Configure;
 use Cake\Database\Connection;
-use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\OperationType;
@@ -230,11 +229,13 @@ class AbstractExecutorTest extends TestCase
     #[TestWith([null, 'noExisting'])]
     public function testGetConfig(?string $expectedValue, string $configName): void
     {
-        $this->Executor->Connection = Mockery::mock(Connection::class);
-        $this->Executor->Connection
+        /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
+        $Connection = Mockery::mock(Connection::class)
             ->shouldReceive('config')
-            ->withNoArgs()
-            ->andReturn(['database' => 'my-database']);
+            ->andReturn(['database' => 'my-database'])
+            ->getMock();
+
+        $this->Executor->Connection = $Connection;
 
         $result = $this->Executor->getConfig($configName);
         $this->assertSame($expectedValue, $result);
