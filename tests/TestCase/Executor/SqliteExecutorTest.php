@@ -19,7 +19,6 @@ use Cake\Database\Connection;
 use Cake\Database\Driver\Sqlite;
 use Cake\Database\Schema\CollectionInterface;
 use Cake\Database\Schema\TableSchema;
-use Cake\Database\Schema\TableSchemaInterface;
 use Cake\Database\StatementInterface;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -38,16 +37,16 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(AbstractExecutor::class)]
 class SqliteExecutorTest extends TestCase
 {
-    #[TestWith([OperationType::Export])]
-    #[TestWith([OperationType::Import])]
-    public function testGetBinaryName(OperationType $OperationType): void
+    #[TestWith(['sqlite3', OperationType::Export])]
+    #[TestWith(['sqlite3', OperationType::Import])]
+    public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
         $executor = new SqliteExecutor(
             Connection: new Connection(['driver' => Sqlite::class]),
             OperationType: $OperationType,
         );
 
-        $this->assertSame('sqlite3', $executor->getBinaryName());
+        $this->assertSame($expectedBinaryName, $executor->getBinaryName());
     }
 
     /**
