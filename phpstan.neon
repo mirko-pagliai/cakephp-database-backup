@@ -19,5 +19,5 @@ parameters:
 
     ignoreErrors:
         -
-            message: '#Call to an undefined method Mockery[\w\\\|]+::\w+\(\)\.#'
+            message: '#Call to an undefined method Mockery\\[\w\|\\]+::\w+\(\)\.#'
             path: tests/TestCase

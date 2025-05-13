@@ -16,11 +16,11 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Database\Connection;
+use Cake\Database\Driver;
 use Cake\Database\Driver\Sqlite;
 use Cake\Database\Schema\CollectionInterface;
 use Cake\Database\Schema\TableSchema;
-use Cake\Database\StatementInterface;
-use Cake\Datasource\ConnectionInterface;
+use Cake\Database\Schema\TableSchemaInterface;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
@@ -50,31 +50,25 @@ class SqliteExecutorTest extends TestCase
         $this->assertSame($expectedBinaryName, $executor->getBinaryName());
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testDropAllTables(): void
     {
-        $tables = [1 => 'articles', 2 => 'comments'];
+        $Schema = new class implements CollectionInterface {
+            public function listTables(): array
+            {
+                return [1 => 'articles', 2 => 'comments'];
+            }
 
-        /**
-         * `$Schema` describes the tables.
-         */
-        $Schema = $this->createMock(CollectionInterface::class);
+            public function describe(string $name, array $options = []): TableSchemaInterface
+            {
+                return new TableSchema($name);
+            }
+        };
 
-        $Schema
-            ->expects($this->once())
-            ->method('listTables')
-            ->willReturn($tables);
-
-        $Schema
-            ->expects($this->any())
-            ->method('describe')
-            ->willReturnCallback(fn (string $tableName): TableSchema => new TableSchema($tableName));
-
+        /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
         $Connection = Mockery::mock(Connection::class, [['driver' => Sqlite::class]])->makePartial();
         $Connection->setSchemaCollection($Schema);
+
         $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
         $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
 
@@ -82,34 +76,29 @@ class SqliteExecutorTest extends TestCase
         $SqliteExecutor->dropAllTables();
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testBeforeImport(): void
     {
-        $Driver = $this->createPartialMock(Sqlite::class, ['connect', 'disconnect']);
+        /** @var \Cake\Database\Driver&\Mockery\MockInterface $Driver */
+        $Driver = Mockery::spy(Sqlite::class);
 
-        $Driver
-            ->expects($this->once())
-            ->method('connect');
+        $Connection = new class ($Driver) extends Connection {
+            public function __construct(protected Driver $Driver)
+            {
+            }
 
-        $Driver
-            ->expects($this->once())
-            ->method('disconnect');
+            public function getDriver(string $role = self::ROLE_WRITE): Driver
+            {
+                return $this->Driver;
+            }
+        };
 
-        $SqliteExecutor = $this->getMockBuilder(SqliteExecutor::class)
-            ->setConstructorArgs([
-                $this->createConfiguredStub(ConnectionInterface::class, ['getDriver' => $Driver]),
-                OperationType::Export,
-            ])
-            ->onlyMethods(['dropAllTables'])
-            ->getMock();
-
-        $SqliteExecutor
-            ->expects($this->once())
-            ->method('dropAllTables');
-
+        /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
+        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [$Connection, OperationType::Export]);
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
+
+        $SqliteExecutor->shouldHaveReceived('dropAllTables')->once();
+        $Driver->shouldHaveReceived('connect')->once();
+        $Driver->shouldHaveReceived('disconnect')->once();
     }
 }
