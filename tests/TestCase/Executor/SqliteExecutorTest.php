@@ -25,6 +25,7 @@ use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -72,32 +73,10 @@ class SqliteExecutorTest extends TestCase
             ->method('describe')
             ->willReturnCallback(fn (string $tableName): TableSchema => new TableSchema($tableName));
 
-        $Connection = $this->createMock(Connection::class);
-
-        $Connection
-            ->expects($this->any())
-            ->method('getDriver')
-            ->willReturn(new Sqlite());
-
-        $Connection
-            ->expects($this->once())
-            ->method('getSchemaCollection')
-            ->willReturn($Schema);
-
-        /**
-         * The important thing is to check the number of times and the arguments with which the `Connection::execute()`
-         *  method is called.
-         */
-        $matcher = $this->exactly(2);
-        $Connection
-            ->expects($matcher)
-            ->method('execute')
-            ->willReturnCallback(function (string $sql) use ($matcher, $tables): StatementInterface {
-                $expectedSql = sprintf('DROP TABLE "%s"', $tables[$matcher->numberOfInvocations()]);
-                $this->assertSame($expectedSql, $sql);
-
-                return $this->createStub(StatementInterface::class);
-            });
+        $Connection = Mockery::mock(Connection::class, [['driver' => Sqlite::class]])->makePartial();
+        $Connection->setSchemaCollection($Schema);
+        $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
+        $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
 
         $SqliteExecutor = new SqliteExecutor(Connection: $Connection, OperationType: OperationType::Export);
         $SqliteExecutor->dropAllTables();
