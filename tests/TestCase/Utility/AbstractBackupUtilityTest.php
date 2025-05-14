@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
-use App\Database\Driver\FakeDriver;
 use App\Database\FakeConnection;
 use BadMethodCallException;
 use Cake\Core\Configure;
@@ -23,14 +22,12 @@ use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
-use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
-use Generator;
 use InvalidArgumentException;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -52,45 +49,34 @@ class AbstractBackupUtilityTest extends TestCase
     #[Override]
     protected function setUp(): void
     {
-        $this->Utility = new class (Connection: null) extends AbstractBackupUtility {
-            protected OperationType $OperationType = OperationType::Export;
-
+        $this->Utility = new class (Connection: new FakeConnection()) extends AbstractBackupUtility {
             public function filename(string $filename): AbstractBackupUtility
             {
                 return $this;
             }
         };
-    }
-
-    public static function providerTestConstruct(): Generator
-    {
-        yield [null];
-        yield ['test'];
-        yield [ConnectionManager::get('test')];
     }
 
     #[Test]
-    #[DataProvider('providerTestConstruct')]
+    #[TestWith([null])]
+    #[TestWith(['test'])]
+    #[TestWith([new FakeConnection()])]
     public function testConstruct(ConnectionInterface|string|null $Connection): void
     {
         $Utility = new class ($Connection) extends AbstractBackupUtility {
-            public ConnectionInterface $Connection;
-
             public function filename(string $filename): AbstractBackupUtility
             {
                 return $this;
             }
         };
 
-        $Connection = $Utility->Connection;
-
-        $this->assertSame('test', $Connection->config()['name']);
+        $this->assertSame('test', $Utility->Connection->config()['name']);
     }
 
     #[Test]
     public function testMagicCallMethod(): void
     {
-        $this->assertInstanceOf(ConnectionInterface::class, $this->Utility->getConnection());
+        $this->assertInstanceOf(FakeConnection::class, $this->Utility->getConnection());
         $this->assertSame(0, $this->Utility->getTimeout());
     }
 
@@ -107,7 +93,7 @@ class AbstractBackupUtilityTest extends TestCase
     /**
      * @return array<array{non-empty-string, non-empty-string}>
      */
-    public static function makeAbsoluteFilenameProvider(): array
+    public static function providerTestMakeAbsoluteFilename(): array
     {
         $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
 
@@ -119,7 +105,7 @@ class AbstractBackupUtilityTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('makeAbsoluteFilenameProvider')]
+    #[DataProvider('providerTestMakeAbsoluteFilename')]
     public function testMakeAbsoluteFilename(string $expectedAbsolutePath, string $path): void
     {
         $result = $this->Utility->makeAbsoluteFilename($path);
@@ -147,19 +133,15 @@ class AbstractBackupUtilityTest extends TestCase
     #[TestWith([SqliteExecutor::class, Sqlite::class])]
     public function testGetExecutor(string $expectedExecutorClassname, string $driverClassname): void
     {
-        $Connection = $this->createConfiguredMock(
-            ConnectionInterface::class,
-            ['getDriver' => new $driverClassname()]
-        );
+        $Connection = new FakeConnection(['driver' => $driverClassname]);
 
         $Utility = new class (Connection: $Connection) extends AbstractBackupUtility {
-            protected OperationType $OperationType = OperationType::Export;
-
             public function filename(string $filename): AbstractBackupUtility
             {
                 return $this;
             }
         };
+        $Utility->OperationType = OperationType::Export;
 
         $Executor = $Utility->getExecutor();
 
@@ -169,16 +151,13 @@ class AbstractBackupUtilityTest extends TestCase
     #[Test]
     public function testGetExecutorNoExistingExecutor(): void
     {
-        $Connection = new FakeConnection();
-
-        $Utility = new class (Connection: $Connection) extends AbstractBackupUtility {
-            protected OperationType $OperationType = OperationType::Export;
-
+        $Utility = new class (Connection: new FakeConnection()) extends AbstractBackupUtility {
             public function filename(string $filename): AbstractBackupUtility
             {
                 return $this;
             }
         };
+        $Utility->OperationType = OperationType::Export;
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');

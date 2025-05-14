@@ -56,12 +56,12 @@ abstract class AbstractBackupUtility
     /**
      * @var \Cake\Datasource\ConnectionInterface
      */
-    protected ConnectionInterface $Connection;
+    public ConnectionInterface $Connection;
 
     /**
      * @var \DatabaseBackup\OperationType
      */
-    protected OperationType $OperationType;
+    public OperationType $OperationType;
 
     /**
      * Construct.

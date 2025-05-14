@@ -32,7 +32,7 @@ class BackupImport extends AbstractBackupUtility
     /**
      * @inheritDoc
      */
-    protected OperationType $OperationType = OperationType::Import;
+    public OperationType $OperationType = OperationType::Import;
 
     /**
      * Sets the filename.

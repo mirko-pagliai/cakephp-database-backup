@@ -36,7 +36,7 @@ class BackupExport extends AbstractBackupUtility
     /**
      * @inheritDoc
      */
-    protected OperationType $OperationType = OperationType::Export;
+    public OperationType $OperationType = OperationType::Export;
 
     /**
      * @var \DatabaseBackup\Compression

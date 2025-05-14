@@ -18,6 +18,7 @@ class FakeDriver extends Driver
 
     public function enabled(): bool
     {
+        return true;
     }
 
     public function disableForeignKeySQL(): string
