@@ -16,7 +16,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
+use App\Utility\FakeBackupUtility;
 use BadMethodCallException;
+use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
@@ -29,9 +31,11 @@ use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use InvalidArgumentException;
+use Mockery;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 
@@ -49,12 +53,7 @@ class AbstractBackupUtilityTest extends TestCase
     #[Override]
     protected function setUp(): void
     {
-        $this->Utility = new class (Connection: new FakeConnection()) extends AbstractBackupUtility {
-            public function filename(string $filename): AbstractBackupUtility
-            {
-                return $this;
-            }
-        };
+        $this->Utility = new FakeBackupUtility();
     }
 
     #[Test]
@@ -63,20 +62,15 @@ class AbstractBackupUtilityTest extends TestCase
     #[TestWith([new FakeConnection()])]
     public function testConstruct(ConnectionInterface|string|null $Connection): void
     {
-        $Utility = new class ($Connection) extends AbstractBackupUtility {
-            public function filename(string $filename): AbstractBackupUtility
-            {
-                return $this;
-            }
-        };
-
-        $this->assertSame('test', $Utility->Connection->config()['name']);
+        $Utility = new FakeBackupUtility($Connection);
+        $connectionName = $Utility->Connection->config()['name'];
+        $this->assertSame('test', $connectionName);
     }
 
     #[Test]
     public function testMagicCallMethod(): void
     {
-        $this->assertInstanceOf(FakeConnection::class, $this->Utility->getConnection());
+        $this->assertInstanceOf(ConnectionInterface::class, $this->Utility->getConnection());
         $this->assertSame(0, $this->Utility->getTimeout());
     }
 
@@ -116,16 +110,15 @@ class AbstractBackupUtilityTest extends TestCase
     #[Test]
     public function testTimeout(): void
     {
-        $result = $this->Utility->timeout(60);
-        $this->assertSame($this->Utility, $result);
+        $timeout = $this->Utility->timeout(60);
 
+        $this->assertSame($this->Utility, $timeout);
         $this->assertSame(60, $this->Utility->getTimeout());
     }
 
     /**
      * @param class-string $expectedExecutorClassname
      * @param class-string $driverClassname
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     #[TestWith([MysqlExecutor::class, Mysql::class])]
@@ -134,13 +127,7 @@ class AbstractBackupUtilityTest extends TestCase
     public function testGetExecutor(string $expectedExecutorClassname, string $driverClassname): void
     {
         $Connection = new FakeConnection(['driver' => $driverClassname]);
-
-        $Utility = new class (Connection: $Connection) extends AbstractBackupUtility {
-            public function filename(string $filename): AbstractBackupUtility
-            {
-                return $this;
-            }
-        };
+        $Utility = new FakeBackupUtility($Connection);
         $Utility->OperationType = OperationType::Export;
 
         $Executor = $Utility->getExecutor();
@@ -151,16 +138,10 @@ class AbstractBackupUtilityTest extends TestCase
     #[Test]
     public function testGetExecutorNoExistingExecutor(): void
     {
-        $Utility = new class (Connection: new FakeConnection()) extends AbstractBackupUtility {
-            public function filename(string $filename): AbstractBackupUtility
-            {
-                return $this;
-            }
-        };
-        $Utility->OperationType = OperationType::Export;
+        $this->Utility->OperationType = OperationType::Export;
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
-        $Utility->getExecutor();
+        $this->Utility->getExecutor();
     }
 }
