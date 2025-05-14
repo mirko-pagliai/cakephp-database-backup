@@ -205,7 +205,7 @@ class AbstractExecutorTest extends TestCase
         $Process
             ->shouldReceive('run')
             ->withArgs(
-                function (callable $callback = null, array $env = []) use ($expectedEnvVars, $filename, $OperationType): bool {
+                function (?callable $callback = null, array $env = []) use ($expectedEnvVars, $filename, $OperationType): bool {
                     $this->assertSame([], array_diff(
                         $env,
                         $expectedEnvVars + [

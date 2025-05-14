@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
-use Cake\Datasource\ConnectionInterface;
+use App\Database\FakeConnection;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\OperationType;
@@ -36,11 +36,6 @@ use PHPUnit\Framework\Attributes\UsesClass;
 class MysqlExecutorTest extends TestCase
 {
     /**
-     * @var \Cake\Datasource\ConnectionInterface&\Mockery\MockInterface
-     */
-    protected ConnectionInterface $Connection;
-
-    /**
      * @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface
      */
     protected MysqlExecutor $Executor;
@@ -53,14 +48,15 @@ class MysqlExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->Connection = Mockery::mock(ConnectionInterface::class)->shouldIgnoreMissing();
-
-        $this->Executor = Mockery::spy(
+        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $Executor */
+        $Executor = Mockery::spy(
             'DatabaseBackup\Executor\MysqlExecutor[deleteAuthFile, writeAuthFile]',
-            [$this->Connection, OperationType::Export]
+            [new FakeConnection(), OperationType::Export]
         );
-        $this->Executor->shouldAllowMockingProtectedMethods();
-        $this->Executor->makePartial();
+        $Executor->shouldAllowMockingProtectedMethods();
+        $Executor->makePartial();
+
+        $this->Executor = $Executor;
     }
 
     #[Test]
@@ -125,7 +121,7 @@ class MysqlExecutorTest extends TestCase
     #[TestWith([['mariadb', 'mysql'], OperationType::Import])]
     public function testGetBinaryName(array $expectedBinaryNames, OperationType $OperationType): void
     {
-        $Executor = new MysqlExecutor(Connection: $this->Connection, OperationType: $OperationType);
+        $Executor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
 
         $this->assertSame($expectedBinaryNames, $Executor->getBinaryName());
     }
@@ -162,6 +158,7 @@ class MysqlExecutorTest extends TestCase
             ->shouldReceive('getConfig')
             ->times(3);
 
+        // @phpstan-ignore method.protected
         $result = $MysqlExecutor->writeAuthFile('my-content');
         $this->assertTrue($result);
     }
@@ -188,6 +185,7 @@ class MysqlExecutorTest extends TestCase
             ->andReturn('/path/to/my/auth/file')
             ->once();
 
+        // @phpstan-ignore method.protected
         $MysqlExecutor->deleteAuthFile();
     }
 }

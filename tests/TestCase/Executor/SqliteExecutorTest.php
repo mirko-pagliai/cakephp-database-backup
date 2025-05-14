@@ -15,19 +15,18 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use App\Database\FakeConnection;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
 use Cake\Database\Driver\Sqlite;
 use Cake\Database\Schema\CollectionInterface;
 use Cake\Database\Schema\TableSchema;
 use Cake\Database\Schema\TableSchemaInterface;
-use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -40,27 +39,11 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(AbstractExecutor::class)]
 class SqliteExecutorTest extends TestCase
 {
-    /**
-     * @var \Cake\Datasource\ConnectionInterface&\Mockery\MockInterface
-     */
-    protected ConnectionInterface $Connection;
-
-    /**
-     * @inheritDoc
-     */
-    #[Override]
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->Connection = Mockery::mock(ConnectionInterface::class)->shouldIgnoreMissing();
-    }
-
     #[TestWith(['sqlite3', OperationType::Export])]
     #[TestWith(['sqlite3', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
-        $Executor = new SqliteExecutor(Connection: $this->Connection, OperationType: $OperationType);
+        $Executor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
 
         $this->assertSame($expectedBinaryName, $Executor->getBinaryName());
     }
