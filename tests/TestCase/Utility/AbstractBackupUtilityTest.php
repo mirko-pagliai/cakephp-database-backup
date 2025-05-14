@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\Driver\FakeDriver;
+use App\Database\FakeConnection;
 use BadMethodCallException;
 use Cake\Core\Configure;
 use Cake\Database\Driver\Mysql;
@@ -165,13 +166,10 @@ class AbstractBackupUtilityTest extends TestCase
         $this->assertInstanceOf($expectedExecutorClassname, $Executor);
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testGetExecutorNoExistingExecutor(): void
     {
-        $Connection = $this->createConfiguredMock(ConnectionInterface::class, ['getDriver' => new FakeDriver()]);
+        $Connection = new FakeConnection();
 
         $Utility = new class (Connection: $Connection) extends AbstractBackupUtility {
             protected OperationType $OperationType = OperationType::Export;
