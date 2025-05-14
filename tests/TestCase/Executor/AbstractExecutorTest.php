@@ -191,32 +191,38 @@ class AbstractExecutorTest extends TestCase
         Mockery::mock('overload:Symfony\Component\Process\ExecutableFinder')
             ->shouldReceive('find')
             ->atLeast()
-            ->once()
-            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
+            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name)
+            ->once();
 
         $Process = Mockery::mock('alias:Symfony\Component\Process\Process');
 
         $Process
             ->shouldReceive('fromShellCommandline')
-            ->once()
             ->withSomeOfArgs($expectedCommand)
-            ->andReturnSelf();
+            ->andReturnSelf()
+            ->once();
 
         $Process
             ->shouldReceive('run')
-            ->once()
-            ->withArgs(fn (?callable $callback = null, array $env = []): bool => !array_diff(
-                $env,
-                $expectedEnvVars + [
-                    'AUTH_FILE' => '',
-                    'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
-                    'DB_HOST' => 'my-host',
-                    'DB_NAME' => 'my-database',
-                    'DB_PASSWORD' => 'my-password',
-                    'DB_USER' => 'my-username',
-                    'FILENAME' => $filename,
-                ]
-            ));
+            ->withArgs(
+                function (callable $callback = null, array $env = []) use ($expectedEnvVars, $filename, $OperationType): bool {
+                    $this->assertSame([], array_diff(
+                        $env,
+                        $expectedEnvVars + [
+                            'AUTH_FILE' => '',
+                            'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
+                            'DB_HOST' => 'my-host',
+                            'DB_NAME' => 'my-database',
+                            'DB_PASSWORD' => 'my-password',
+                            'DB_USER' => 'my-username',
+                            'FILENAME' => $filename,
+                        ],
+                    ));
+
+                    return true;
+                }
+            )
+            ->once();
 
         $this->Executor->OperationType = $OperationType;
 

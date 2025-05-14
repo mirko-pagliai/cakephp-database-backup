@@ -21,11 +21,13 @@ use Cake\Database\Driver\Sqlite;
 use Cake\Database\Schema\CollectionInterface;
 use Cake\Database\Schema\TableSchema;
 use Cake\Database\Schema\TableSchemaInterface;
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -38,16 +40,29 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(AbstractExecutor::class)]
 class SqliteExecutorTest extends TestCase
 {
+    /**
+     * @var \Cake\Datasource\ConnectionInterface&\Mockery\MockInterface
+     */
+    protected ConnectionInterface $Connection;
+
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->Connection = Mockery::mock(ConnectionInterface::class)->shouldIgnoreMissing();
+    }
+
     #[TestWith(['sqlite3', OperationType::Export])]
     #[TestWith(['sqlite3', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
-        $executor = new SqliteExecutor(
-            Connection: new Connection(['driver' => Sqlite::class]),
-            OperationType: $OperationType,
-        );
+        $Executor = new SqliteExecutor(Connection: $this->Connection, OperationType: $OperationType);
 
-        $this->assertSame($expectedBinaryName, $executor->getBinaryName());
+        $this->assertSame($expectedBinaryName, $Executor->getBinaryName());
     }
 
     #[Test]
@@ -69,8 +84,13 @@ class SqliteExecutorTest extends TestCase
         $Connection = Mockery::mock(Connection::class, [['driver' => Sqlite::class]])->makePartial();
         $Connection->setSchemaCollection($Schema);
 
-        $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
-        $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
+        $Connection->shouldReceive('execute')
+            ->with('DROP TABLE "articles"')
+            ->once();
+
+        $Connection->shouldReceive('execute')
+            ->with('DROP TABLE "comments"')
+            ->once();
 
         $SqliteExecutor = new SqliteExecutor(Connection: $Connection, OperationType: OperationType::Export);
         $SqliteExecutor->dropAllTables();
@@ -95,10 +115,18 @@ class SqliteExecutorTest extends TestCase
 
         /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
         $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [$Connection, OperationType::Export]);
+
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
 
-        $SqliteExecutor->shouldHaveReceived('dropAllTables')->once();
-        $Driver->shouldHaveReceived('connect')->once();
-        $Driver->shouldHaveReceived('disconnect')->once();
+        $SqliteExecutor
+            ->shouldHaveReceived('dropAllTables')
+            ->once();
+
+        $Driver
+            ->shouldHaveReceived('connect')
+            ->once();
+        $Driver
+            ->shouldHaveReceived('disconnect')
+            ->once();
     }
 }

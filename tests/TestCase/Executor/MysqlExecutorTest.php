@@ -21,6 +21,7 @@ use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,19 +35,40 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(AbstractExecutor::class)]
 class MysqlExecutorTest extends TestCase
 {
+    /**
+     * @var \Cake\Datasource\ConnectionInterface&\Mockery\MockInterface
+     */
+    protected ConnectionInterface $Connection;
+
+    /**
+     * @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface
+     */
+    protected MysqlExecutor $Executor;
+
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->Connection = Mockery::mock(ConnectionInterface::class)->shouldIgnoreMissing();
+
+        $this->Executor = Mockery::spy(
+            'DatabaseBackup\Executor\MysqlExecutor[deleteAuthFile, writeAuthFile]',
+            [$this->Connection, OperationType::Export]
+        );
+        $this->Executor->shouldAllowMockingProtectedMethods();
+        $this->Executor->makePartial();
+    }
+
     #[Test]
     public function testAfterExport(): void
     {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[deleteAuthFile]', [
-            Mockery::spy('Connection', ConnectionInterface::class),
-            OperationType::Export,
-        ]);
-        $MysqlExecutor->shouldAllowMockingProtectedMethods();
+        $this->Executor->dispatchEvent('Backup.afterExport');
 
-        $MysqlExecutor->dispatchEvent('Backup.afterExport');
-
-        $MysqlExecutor
+        $this->Executor
             ->shouldHaveReceived('deleteAuthFile')
             ->once();
     }
@@ -54,16 +76,9 @@ class MysqlExecutorTest extends TestCase
     #[Test]
     public function testAfterImport(): void
     {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[deleteAuthFile]', [
-            Mockery::spy('Connection', ConnectionInterface::class),
-            OperationType::Export,
-        ]);
-        $MysqlExecutor->shouldAllowMockingProtectedMethods();
+        $this->Executor->dispatchEvent('Backup.afterImport');
 
-        $MysqlExecutor->dispatchEvent('Backup.afterImport');
-
-        $MysqlExecutor
+        $this->Executor
             ->shouldHaveReceived('deleteAuthFile')
             ->once();
     }
@@ -71,45 +86,33 @@ class MysqlExecutorTest extends TestCase
     #[Test]
     public function testBeforeExport(): void
     {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[writeAuthFile]', [
-            Mockery::spy('Connection', ConnectionInterface::class),
-            OperationType::Export,
-        ]);
-        $MysqlExecutor->shouldAllowMockingProtectedMethods();
+        $Event = $this->Executor->dispatchEvent('Backup.beforeExport');
 
-        $Event = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
         $this->assertTrue($Event->getResult());
 
-        $MysqlExecutor
+        $this->Executor
             ->shouldHaveReceived('writeAuthFile')
-            ->once()
             ->with('[mysqldump]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}');
+                'host={{HOST}}')
+            ->once();
     }
 
     #[Test]
     public function testBeforeImport(): void
     {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy('DatabaseBackup\Executor\MysqlExecutor[writeAuthFile]', [
-            Mockery::spy('Connection', ConnectionInterface::class),
-            OperationType::Export,
-        ]);
-        $MysqlExecutor->shouldAllowMockingProtectedMethods();
+        $Event = $this->Executor->dispatchEvent('Backup.beforeImport');
 
-        $Event = $MysqlExecutor->dispatchEvent('Backup.beforeImport');
         $this->assertTrue($Event->getResult());
 
-        $MysqlExecutor
+        $this->Executor
             ->shouldHaveReceived('writeAuthFile')
-            ->once()
             ->with('[client]' . PHP_EOL .
                 'user={{USER}}' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}');
+                'host={{HOST}}')
+            ->once();
     }
 
     /**
@@ -122,13 +125,9 @@ class MysqlExecutorTest extends TestCase
     #[TestWith([['mariadb', 'mysql'], OperationType::Import])]
     public function testGetBinaryName(array $expectedBinaryNames, OperationType $OperationType): void
     {
-        $MysqlExecutor = new MysqlExecutor(
-            /** @phpstan-ignore-next-line */
-            Connection: Mockery::spy('Connection', ConnectionInterface::class),
-            OperationType: $OperationType
-        );
+        $Executor = new MysqlExecutor(Connection: $this->Connection, OperationType: $OperationType);
 
-        $this->assertSame($expectedBinaryNames, $MysqlExecutor->getBinaryName());
+        $this->assertSame($expectedBinaryNames, $Executor->getBinaryName());
     }
 
     #[Test]
@@ -140,25 +139,24 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem
             ->shouldReceive('dumpFile')
-            ->once()
-            ->with('/path/to/my/auth/file', 'my-content');
+            ->with('/path/to/my/auth/file', 'my-content')
+            ->once();
 
         $Filesystem
             ->shouldReceive('exists')
-            ->once()
             ->with('/path/to/my/auth/file')
-            ->andReturnTrue();
+            ->andReturnTrue()
+            ->once();
 
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
         $MysqlExecutor = Mockery::mock(MysqlExecutor::class)
+            ->shouldAllowMockingProtectedMethods()
             ->makePartial();
-
-        $MysqlExecutor->shouldAllowMockingProtectedMethods();
 
         $MysqlExecutor
             ->shouldReceive('getAuthFilePath')
-            ->once()
-            ->andReturn('/path/to/my/auth/file');
+            ->andReturn('/path/to/my/auth/file')
+            ->once();
 
         $MysqlExecutor
             ->shouldReceive('getConfig')
@@ -177,19 +175,18 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem
             ->shouldReceive('remove')
-            ->once()
-            ->with('/path/to/my/auth/file');
+            ->with('/path/to/my/auth/file')
+            ->once();
 
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
         $MysqlExecutor = Mockery::mock(MysqlExecutor::class)
+            ->shouldAllowMockingProtectedMethods()
             ->makePartial();
-
-        $MysqlExecutor->shouldAllowMockingProtectedMethods();
 
         $MysqlExecutor
             ->shouldReceive('getAuthFilePath')
-            ->once()
-            ->andReturn('/path/to/my/auth/file');
+            ->andReturn('/path/to/my/auth/file')
+            ->once();
 
         $MysqlExecutor->deleteAuthFile();
     }

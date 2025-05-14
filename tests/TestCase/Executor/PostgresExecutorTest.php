@@ -15,12 +15,14 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use App\Database\FakeConnection;
 use Cake\Database\Connection;
 use Cake\Database\Driver\Postgres;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -36,8 +38,10 @@ class PostgresExecutorTest extends TestCase
     #[TestWith(['pg_restore', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
+        $Connection = Mockery::mock(Connection::class)->shouldIgnoreMissing();
+
         $Executor = new PostgresExecutor(
-            Connection: new Connection(['driver' => Postgres::class]),
+            Connection: $Connection,
             OperationType: $OperationType,
         );
 
