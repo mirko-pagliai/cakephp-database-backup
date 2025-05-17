@@ -12,6 +12,7 @@ use ${TESTED_NAME};
 #elseif (${TESTED_NAME} && ${TESTED_NAMESPACE} && ${NAMESPACE} != ${TESTED_NAMESPACE})
 use ${TESTED_NAMESPACE}\\${TESTED_NAME};
 #end
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ${NAME}
