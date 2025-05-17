@@ -1,0 +1,13 @@
+includes:
+    - vendor/cakedc/cakephp-phpstan/extension.neon
+
+parameters:
+    level: 8
+
+    paths:
+        - config
+        - src
+        - tests
+
+    bootstrapFiles:
+        - tests/bootstrap.php
