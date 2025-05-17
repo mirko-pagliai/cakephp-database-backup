@@ -54,6 +54,33 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  cs-stan:
+    name: Coding Standard & Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v4
+
+        - name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: '8.4'
+            coverage: none
+            tools: cs2pr
+
+        - name: Install dependencies
+          run: composer install --no-progress
+
+        - name: Run PHP CodeSniffer
+          continue-on-error: true
+          run: vendor/bin/phpcs --report-full --report-checkstyle=./phpcs-report.xml
+
+        - name: Show PHPCS results in PR
+          run: cs2pr ./phpcs-report.xml
+
+        - name: Run phpstan
+          run: vendor/bin/phpstan analyse --error-format=github
+
   testsuite-windows:
     runs-on: windows-2019
     name: Windows - PHP 8.4
