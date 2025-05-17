@@ -1,8 +1,11 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.0
-* it requires at least PHP 8.4;
-* the abstract class `AbstractBackupUtility` has become simply `Utility`.
+* it requires at least PHP 8.4.
+
+#### Minor changes:
+* the abstract class `AbstractBackupUtility` has become simply `Utility`;
+* the abstract class `Command` has been moved from `DatabaseBackup\Console` to `DatabaseBackup\Command`.
 
 # 2.x branch
 ## 2.14 branch
