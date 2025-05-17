@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use Cake\Datasource\ConnectionInterface;
+
 /**
  * Abstract utility.
  *
@@ -22,4 +24,5 @@ namespace DatabaseBackup\Utility;
  */
 abstract class Utility
 {
+    public ConnectionInterface $Connection;
 }

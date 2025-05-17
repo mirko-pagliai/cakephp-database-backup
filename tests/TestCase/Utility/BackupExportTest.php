@@ -15,10 +15,10 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use App\Database\FakeConnection;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 
@@ -28,25 +28,30 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(BackupExport::class)]
 class BackupExportTest extends TestCase
 {
-    public static function replaceFilenamePatternsDataProvider(): array
-    {
-        return [
-            ['my_file_' . date('YmdHis') . '.sql', 'my_file_{$DATETIME}.sql'],
-            ['/^my_file_\d{10}\.sql$/', 'my_file_{$TIMESTAMP}.sql'],
-        ];
-    }
-
     #[Test]
-    #[DataProvider('replaceFilenamePatternsDataProvider')]
+    #[TestWith(['my_file_my_hostname.sql', 'my_file_{$HOSTNAME}.sql'])]
+    #[TestWith(['my_file_my_database.sql', 'my_file_{$DATABASE}.sql'])]
     public function testReplaceFilenamePatterns(string $expectedFilename, string $filename): void
     {
         $BackupExport = new BackupExport();
-        $result = $BackupExport->replaceFilenamePatterns(filename: $filename);
+        $BackupExport->Connection = new FakeConnection();
 
-        if (str_starts_with($expectedFilename, '/') && str_ends_with($expectedFilename, '/')) {
-            $this->assertMatchesRegularExpression($expectedFilename, $result);
-        } else {
-            $this->assertSame($expectedFilename, $result);
-        }
+        $result = $BackupExport->replaceFilenamePatterns(filename: $filename);
+        $this->assertSame($expectedFilename, $result);
+    }
+
+    /**
+     * Like the previous test, but using patterns that require a regular expression to match
+     */
+    #[Test]
+    #[TestWith(['/^my_file_\d{14}\.sql$/', 'my_file_{$DATETIME}.sql'])]
+    #[TestWith(['/^my_file_\d{10}\.sql$/', 'my_file_{$TIMESTAMP}.sql'])]
+    public function testReplaceFilenamePatternsMatchesRegularExpression(string $expectedFilename, string $filename): void
+    {
+        $BackupExport = new BackupExport();
+        $BackupExport->Connection = new FakeConnection();
+
+        $result = $BackupExport->replaceFilenamePatterns(filename: $filename);
+        $this->assertMatchesRegularExpression($expectedFilename, $result);
     }
 }

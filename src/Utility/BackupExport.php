@@ -29,12 +29,14 @@ class BackupExport extends Utility
     public function replaceFilenamePatterns(string $filename): string
     {
         return str_replace(
-            search: ['{$DATETIME}', '{$TIMESTAMP}'],
+            search: ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
             replace: [
+                $this->Connection->config()['database'],
                 date('YmdHis'),
+                str_replace(['127.0.0.1', '::1'], 'localhost', $this->Connection->config()['host'] ?? 'localhost'),
                 (string)time(),
             ],
-            subject: $filename
+            subject: $filename,
         );
     }
 }
