@@ -21,6 +21,8 @@ use function Cake\I18n\__d;
 
 /**
  * Base class for console commands.
+ *
+ * @since 2.6.0
  */
 class Command extends CakeCommand
 {
