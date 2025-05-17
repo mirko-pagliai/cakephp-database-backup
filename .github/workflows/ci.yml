@@ -41,7 +41,18 @@ jobs:
       run: composer install --no-progress
 
     - name: Run test suite
-      run: composer run-script test
+      run: |
+        if [[ ${{ matrix.php-version }} == '8.4' ]]; then
+            export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-clover=coverage.xml
+        else
+            composer run-script test
+        fi
+
+    - name: Submit code coverage
+      if: matrix.php-version == '8.4'
+      uses: codecov/codecov-action@v5
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   testsuite-windows:
     runs-on: windows-2019
