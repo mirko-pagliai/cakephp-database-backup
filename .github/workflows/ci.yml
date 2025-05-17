@@ -10,9 +10,11 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  testsuite:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.4']
 
     steps:
     - uses: actions/checkout@v4
