@@ -7,29 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2147b6f5-4f6c-4c42-ba44-a87b4ce60ff4" name="Changes" comment="fixed for phpcs/phpstan">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/code/PHPUnit SetUp Method.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/code/PHPUnit TearDown Method.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/code/PHPUnit Test Method.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/includes/PHP File Header.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/internal/PHP Class.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/internal/PHP Enum.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/internal/PHP File.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/internal/PHP Interface.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/internal/PHP Trait.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/fileTemplates/internal/PHPUnit Test.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LICENSE.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/bootstrap.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/boostrap.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_app/TestApp/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/version" afterDir="false" />
+    <list default="true" id="2147b6f5-4f6c-4c42-ba44-a87b4ce60ff4" name="Changes" comment="added for phpcs">
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,7 +125,8 @@
     </include_path>
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
+    <option name="showPreview" value="true" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
@@ -155,164 +136,170 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testConstruct.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testGetDriver.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testGetDriverIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testGetExecutor.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testGetExecutorNoExistingExecutor.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testMagicCallMethod.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testMagicCallMethodWithNoExistingMethod.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testMagicGetMethod.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testMagicGetMethodNoExistingProperty.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractBackupUtilityTest.testMakeAbsoluteFilename.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractDriverTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractDriverTest.testGetBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractDriverTest.testGetBinaryNoExistingBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractDriverTest.testGetBinaryNoExistingBynary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testCallMagicMethod.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testCallMagicMethodNoExistingMethod.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testFindBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testFindBinaryA.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testFindBinaryFromConfiguration.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testFindBinaryWithCompressionNone.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testFindBinaryWithNoExistingBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetCommand.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetConfig.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetExportCommand.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetExportExecutable.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetImportCommand.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetImportExecutable.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testGetRawCommand.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testImplementedEvents.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testRunProcess.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AbstractExecutorTest.testRunProcess2.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AliasesTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.AliasesTest.testAliases.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportAndImportTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportAndImportTest.testExportAndImport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportAndImportTest.testGetMagicMethod.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testExport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testExportOnFailure.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testExportProcessExceedingTimeout.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testExportStoppedByBeforeExport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testExportTargetFileAlreadyExists.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testExportWithDifferentChmod.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testFilenameWithFileAlreadyExists.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupExportTest.testRotate.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupImportTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupImportTest.testFilenameWithInvalidFileExtension.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupImportTest.testImport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupImportTest.testImportExceedingTimeout.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupImportTest.testImportOnFailure.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupImportTest.testImportOnMissingFilename.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupImportTest.testImportStoppedByBeforeImport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupManagerTest.testDeleteAll.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupManagerTest.testDeleteWithNoExistingFile.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupManagerTest.testIndex.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupManagerTest.testRotate.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupManagerTest.testSendIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetAbsolutePath.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetAbsolutePathIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetCompression.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetCompressionIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetConnection.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetConnectionIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetConnectionWithNoExistingConnection.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetDriverNameIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetExtension.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.BackupTraitTest.testGetExtensionIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.CommandTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.CommandTest.testExecute.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.CommandTest.testExecuteNoExistingConnection.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.DeleteAllCommandTest.testExecuteIsDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExampleTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExampleTest.testExampleWithMock.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExampleTest.testExampleWithSpy.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExportCommandTest.testExecute.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExportCommandTest.testExecute2.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExportCommandTest.testExecuteOnStoppedEvent (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExportCommandTest.testExecuteOnStoppedEvent.executor&quot;: &quot;Debug&quot;,
-    &quot;PHPUnit.ExportCommandTest.testExecuteRotateOption.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ExportCommandTest.testExecuteRotateOptionWithNoFileToDelete.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ImportCommandTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ImportCommandTest.testExecute.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ImportCommandTest.testExecuteNoExistingFile.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ImportCommandTest.testExecuteNoExistingFilename.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ImportCommandTest.testExecuteOnStoppedEvent.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.ImportCommandTest.testMakeAbsoluteFilename.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.IndexCommandTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.IndexCommandTest.testExecute.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.testAA.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.testAfterExport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.testBeforeExport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.testBeforeImport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.testGetBinaryName.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.testGetExportBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.MysqlExecutorTest.testWriteAuthFile.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.PostgresExecutorTest.testGetBinaryName.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.PostgresTest.testGetExportExecutable.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.SendCommandTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.SendCommandTest.testExecute.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.SendCommandTest.testisDeprecated.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.SqliteExecutorTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.SqliteExecutorTest.testBeforeImport.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.SqliteExecutorTest.testDropAllTables.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.SqliteExecutorTest.testGetBinaryName.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.TestCaseTest.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.TestCaseTest.testCreateBackup.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.TestCaseTest.testCreateSomeBackups.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testConstruct (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testConstruct.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinary (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinary (2).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinaryFromConfiguration (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinaryFromConfiguration.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinaryWithNoExistingBinary (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinaryWithNoExistingBinary (2).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testFindBinaryWithNoExistingBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetBinaryNoExistingBinary (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetBinaryNoExistingBinary.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetConfig.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetConnection (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetConnection.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetExportExecutable and 2 more.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetExportExecutable.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetImportExecutable (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetImportExecutable (2).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetImportExecutable and 2 more.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testGetImportExecutable.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testRunProcess (1).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testRunProcess (2).executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testRunProcess.executor&quot;: &quot;Run&quot;,
-    &quot;PHPUnit.testRunProcess2.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;3.0.x&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/mirko/Libs/Plugins/cakephp-database-backup-copy&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;php.override.implement.member.chooser.php.doc&quot;: &quot;NONE&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "PHPUnit.AbstractBackupUtilityTest.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testConstruct.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testGetDriver.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testGetDriverIsDeprecated.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testGetExecutor.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testGetExecutorNoExistingExecutor.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testMagicCallMethod.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testMagicCallMethodWithNoExistingMethod.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testMagicGetMethod.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testMagicGetMethodNoExistingProperty.executor": "Run",
+    "PHPUnit.AbstractBackupUtilityTest.testMakeAbsoluteFilename.executor": "Run",
+    "PHPUnit.AbstractDriverTest.executor": "Run",
+    "PHPUnit.AbstractDriverTest.testGetBinary.executor": "Run",
+    "PHPUnit.AbstractDriverTest.testGetBinaryNoExistingBinary.executor": "Run",
+    "PHPUnit.AbstractDriverTest.testGetBinaryNoExistingBynary.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testCallMagicMethod.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testCallMagicMethodNoExistingMethod.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testFindBinary.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testFindBinaryA.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testFindBinaryFromConfiguration.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testFindBinaryWithCompressionNone.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testFindBinaryWithNoExistingBinary.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetBinary.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetCommand.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetConfig.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetExportCommand.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetExportExecutable.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetImportCommand.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetImportExecutable.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testGetRawCommand.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testImplementedEvents.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testRunProcess.executor": "Run",
+    "PHPUnit.AbstractExecutorTest.testRunProcess2.executor": "Run",
+    "PHPUnit.AliasesTest.executor": "Run",
+    "PHPUnit.AliasesTest.testAliases.executor": "Run",
+    "PHPUnit.BackupExportAndImportTest.executor": "Run",
+    "PHPUnit.BackupExportAndImportTest.testExportAndImport.executor": "Run",
+    "PHPUnit.BackupExportAndImportTest.testGetMagicMethod.executor": "Run",
+    "PHPUnit.BackupExportTest.executor": "Run",
+    "PHPUnit.BackupExportTest.testExport.executor": "Run",
+    "PHPUnit.BackupExportTest.testExportOnFailure.executor": "Run",
+    "PHPUnit.BackupExportTest.testExportProcessExceedingTimeout.executor": "Run",
+    "PHPUnit.BackupExportTest.testExportStoppedByBeforeExport.executor": "Run",
+    "PHPUnit.BackupExportTest.testExportTargetFileAlreadyExists.executor": "Run",
+    "PHPUnit.BackupExportTest.testExportWithDifferentChmod.executor": "Run",
+    "PHPUnit.BackupExportTest.testFilenameWithFileAlreadyExists.executor": "Run",
+    "PHPUnit.BackupExportTest.testRotate.executor": "Run",
+    "PHPUnit.BackupImportTest.executor": "Run",
+    "PHPUnit.BackupImportTest.testFilenameWithInvalidFileExtension.executor": "Run",
+    "PHPUnit.BackupImportTest.testImport.executor": "Run",
+    "PHPUnit.BackupImportTest.testImportExceedingTimeout.executor": "Run",
+    "PHPUnit.BackupImportTest.testImportOnFailure.executor": "Run",
+    "PHPUnit.BackupImportTest.testImportOnMissingFilename.executor": "Run",
+    "PHPUnit.BackupImportTest.testImportStoppedByBeforeImport.executor": "Run",
+    "PHPUnit.BackupManagerTest.executor": "Run",
+    "PHPUnit.BackupManagerTest.testDeleteAll.executor": "Run",
+    "PHPUnit.BackupManagerTest.testDeleteWithNoExistingFile.executor": "Run",
+    "PHPUnit.BackupManagerTest.testIndex.executor": "Run",
+    "PHPUnit.BackupManagerTest.testRotate.executor": "Run",
+    "PHPUnit.BackupManagerTest.testSendIsDeprecated.executor": "Run",
+    "PHPUnit.BackupTraitTest.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetAbsolutePath.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetAbsolutePathIsDeprecated.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetCompression.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetCompressionIsDeprecated.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetConnection.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetConnectionIsDeprecated.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetConnectionWithNoExistingConnection.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetDriverNameIsDeprecated.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetExtension.executor": "Run",
+    "PHPUnit.BackupTraitTest.testGetExtensionIsDeprecated.executor": "Run",
+    "PHPUnit.CommandTest.executor": "Run",
+    "PHPUnit.CommandTest.testExecute.executor": "Run",
+    "PHPUnit.CommandTest.testExecuteNoExistingConnection.executor": "Run",
+    "PHPUnit.CompressionTest (1).executor": "Run",
+    "PHPUnit.CompressionTest.executor": "Run",
+    "PHPUnit.CompressionTest.testIsValid.executor": "Run",
+    "PHPUnit.CompressionTest.testValidCases.executor": "Run",
+    "PHPUnit.DeleteAllCommandTest.testExecuteIsDeprecated.executor": "Run",
+    "PHPUnit.ExampleTest.executor": "Run",
+    "PHPUnit.ExampleTest.testExampleWithMock.executor": "Run",
+    "PHPUnit.ExampleTest.testExampleWithSpy.executor": "Run",
+    "PHPUnit.ExportCommandTest.testExecute.executor": "Run",
+    "PHPUnit.ExportCommandTest.testExecute2.executor": "Run",
+    "PHPUnit.ExportCommandTest.testExecuteOnStoppedEvent (1).executor": "Run",
+    "PHPUnit.ExportCommandTest.testExecuteOnStoppedEvent.executor": "Debug",
+    "PHPUnit.ExportCommandTest.testExecuteRotateOption.executor": "Run",
+    "PHPUnit.ExportCommandTest.testExecuteRotateOptionWithNoFileToDelete.executor": "Run",
+    "PHPUnit.ImportCommandTest.executor": "Run",
+    "PHPUnit.ImportCommandTest.testExecute.executor": "Run",
+    "PHPUnit.ImportCommandTest.testExecuteNoExistingFile.executor": "Run",
+    "PHPUnit.ImportCommandTest.testExecuteNoExistingFilename.executor": "Run",
+    "PHPUnit.ImportCommandTest.testExecuteOnStoppedEvent.executor": "Run",
+    "PHPUnit.ImportCommandTest.testMakeAbsoluteFilename.executor": "Run",
+    "PHPUnit.IndexCommandTest.executor": "Run",
+    "PHPUnit.IndexCommandTest.testExecute.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.testAA.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.testAfterExport.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.testBeforeExport.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.testBeforeImport.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.testGetBinaryName.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.testGetExportBinary.executor": "Run",
+    "PHPUnit.MysqlExecutorTest.testWriteAuthFile.executor": "Run",
+    "PHPUnit.PostgresExecutorTest.testGetBinaryName.executor": "Run",
+    "PHPUnit.PostgresTest.testGetExportExecutable.executor": "Run",
+    "PHPUnit.SendCommandTest.executor": "Run",
+    "PHPUnit.SendCommandTest.testExecute.executor": "Run",
+    "PHPUnit.SendCommandTest.testisDeprecated.executor": "Run",
+    "PHPUnit.SqliteExecutorTest.executor": "Run",
+    "PHPUnit.SqliteExecutorTest.testBeforeImport.executor": "Run",
+    "PHPUnit.SqliteExecutorTest.testDropAllTables.executor": "Run",
+    "PHPUnit.SqliteExecutorTest.testGetBinaryName.executor": "Run",
+    "PHPUnit.TestCaseTest.executor": "Run",
+    "PHPUnit.TestCaseTest.testCreateBackup.executor": "Run",
+    "PHPUnit.TestCaseTest.testCreateSomeBackups.executor": "Run",
+    "PHPUnit.testConstruct (1).executor": "Run",
+    "PHPUnit.testConstruct.executor": "Run",
+    "PHPUnit.testFindBinary (1).executor": "Run",
+    "PHPUnit.testFindBinary (2).executor": "Run",
+    "PHPUnit.testFindBinary.executor": "Run",
+    "PHPUnit.testFindBinaryFromConfiguration (1).executor": "Run",
+    "PHPUnit.testFindBinaryFromConfiguration.executor": "Run",
+    "PHPUnit.testFindBinaryWithNoExistingBinary (1).executor": "Run",
+    "PHPUnit.testFindBinaryWithNoExistingBinary (2).executor": "Run",
+    "PHPUnit.testFindBinaryWithNoExistingBinary.executor": "Run",
+    "PHPUnit.testGetBinaryNoExistingBinary (1).executor": "Run",
+    "PHPUnit.testGetBinaryNoExistingBinary.executor": "Run",
+    "PHPUnit.testGetConfig.executor": "Run",
+    "PHPUnit.testGetConnection (1).executor": "Run",
+    "PHPUnit.testGetConnection.executor": "Run",
+    "PHPUnit.testGetExportExecutable and 2 more.executor": "Run",
+    "PHPUnit.testGetExportExecutable.executor": "Run",
+    "PHPUnit.testGetImportExecutable (1).executor": "Run",
+    "PHPUnit.testGetImportExecutable (2).executor": "Run",
+    "PHPUnit.testGetImportExecutable and 2 more.executor": "Run",
+    "PHPUnit.testGetImportExecutable.executor": "Run",
+    "PHPUnit.testRunProcess (1).executor": "Run",
+    "PHPUnit.testRunProcess (2).executor": "Run",
+    "PHPUnit.testRunProcess.executor": "Run",
+    "PHPUnit.testRunProcess2.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.jetbrains.php.phpunit.codeGeneration.PhpNewTestDialog.defaultLibrary": "PHPUnit",
+    "git-widget-placeholder": "3.0.x",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/mirko/Libs/Plugins/cakephp-database-backup",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "php.override.implement.member.chooser.php.doc": "NONE",
+    "run.code.analysis.last.selected.profile": "aDefault",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/tests/test_app/TestApp" />
       <recent name="$PROJECT_DIR$/resources/locales/it" />
     </key>
@@ -320,42 +307,38 @@
       <recent name="$PROJECT_DIR$/tests/test_app/TestApp" />
     </key>
   </component>
-  <component name="RunManager" selected="PHPUnit.ExportCommandTest.testExecuteOnStoppedEvent (1)">
-    <configuration name="ExportCommandTest.testExecuteOnStoppedEvent (1)" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
-      <TestRunner class="DatabaseBackup\Test\TestCase\Command\ExportCommandTest" configuration_file="$PROJECT_DIR$/phpunit.xml.dist" file="$PROJECT_DIR$/tests/TestCase/Command/ExportCommandTest.php" method="testExecuteOnStoppedEvent" scope="Method" />
+  <component name="RunManager" selected="PHPUnit.CompressionTest">
+    <configuration name="CompressionTest (1)" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="DatabaseBackup\Test\TestCase\CompressionTest" file="$PROJECT_DIR$/tests/CompressionTest.php" scope="Class" />
       <method v="2" />
     </configuration>
-    <configuration name="ExportCommandTest.testExecuteOnStoppedEvent" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
-      <TestRunner class="DatabaseBackup\Test\TestCase\Command\ExportCommandTest" configuration_file="$PROJECT_DIR$/phpunit.xml.dist" file="$PROJECT_DIR$/tests/TestCase/Command/ExportCommandTest.php" method="testExecuteOnStoppedEvent" scope="Pattern">
-        <test_patterns>
-          <composite_test_pattern class_fqn="DatabaseBackup\Test\TestCase\Command\ExportCommandTest" file_path="$PROJECT_DIR$/tests/TestCase/Command/ExportCommandTest.php" method_name="testExecuteOnStoppedEvent" />
-        </test_patterns>
-      </TestRunner>
+    <configuration name="CompressionTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="DatabaseBackup\Test\TestCase\CompressionTest" file="$PROJECT_DIR$/tests/TestCase/CompressionTest.php" scope="Class" />
+      <method v="2" />
+    </configuration>
+    <configuration name="CompressionTest.testIsValid" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="DatabaseBackup\Test\TestCase\CompressionTest" file="$PROJECT_DIR$/tests/TestCase/CompressionTest.php" method="testIsValid" scope="Method" />
+      <method v="2" />
+    </configuration>
+    <configuration name="CompressionTest.testValidCases" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="DatabaseBackup\Test\TestCase\CompressionTest" file="$PROJECT_DIR$/tests/TestCase/CompressionTest.php" method="testValidCases" scope="Method" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ExportCommandTest.testExecuteOnStoppedEvent (1)" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="DatabaseBackup\Test\TestCase\Command\ExportCommandTest" configuration_file="$PROJECT_DIR$/phpunit.xml.dist" file="$PROJECT_DIR$/tests/TestCase/Command/ExportCommandTest.php" method="testExecuteOnStoppedEvent" scope="Method" />
       <method v="2" />
     </configuration>
     <configuration name="Main" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
       <TestRunner configuration_file="$PROJECT_DIR$/phpunit.xml.dist" scope="XML" use_alternative_configuration_file="true" />
       <method v="2" />
     </configuration>
-    <configuration name="MysqlExecutorTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
-      <TestRunner class="DatabaseBackup\Test\TestCase\Executor\MysqlExecutorTest" configuration_file="$PROJECT_DIR$/phpunit.xml.dist" file="$PROJECT_DIR$/tests/TestCase/Executor/MysqlExecutorTest.php" scope="Class" />
-      <method v="2" />
-    </configuration>
-    <configuration name="MysqlExecutorTest.testGetBinaryName" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
-      <TestRunner class="DatabaseBackup\Test\TestCase\Executor\MysqlExecutorTest" configuration_file="$PROJECT_DIR$/phpunit.xml.dist" file="$PROJECT_DIR$/tests/TestCase/Executor/MysqlExecutorTest.php" method="testGetBinaryName" scope="Method" />
-      <method v="2" />
-    </configuration>
-    <configuration name="SqliteExecutorTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
-      <TestRunner class="DatabaseBackup\Test\TestCase\Executor\SqliteExecutorTest" configuration_file="$PROJECT_DIR$/phpunit.xml.dist" file="$PROJECT_DIR$/tests/TestCase/Executor/SqliteExecutorTest.php" scope="Class" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="PHPUnit.ExportCommandTest.testExecuteOnStoppedEvent (1)" />
-        <item itemvalue="PHPUnit.ExportCommandTest.testExecuteOnStoppedEvent" />
-        <item itemvalue="PHPUnit.SqliteExecutorTest" />
-        <item itemvalue="PHPUnit.MysqlExecutorTest.testGetBinaryName" />
-        <item itemvalue="PHPUnit.MysqlExecutorTest" />
+        <item itemvalue="PHPUnit.CompressionTest.testValidCases" />
+        <item itemvalue="PHPUnit.CompressionTest.testIsValid" />
+        <item itemvalue="PHPUnit.CompressionTest" />
+        <item itemvalue="PHPUnit.CompressionTest (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -436,54 +419,8 @@
       <workItem from="1747415433455" duration="2000" />
       <workItem from="1747423369281" duration="428000" />
       <workItem from="1747478060659" duration="281000" />
-    </task>
-    <task id="LOCAL-00116" summary="fixed for phpcs">
-      <option name="closed" value="true" />
-      <created>1744652830283</created>
-      <option name="number" value="00116" />
-      <option name="presentableId" value="LOCAL-00116" />
-      <option name="project" value="LOCAL" />
-      <updated>1744652830283</updated>
-    </task>
-    <task id="LOCAL-00117" summary="the `DriverTestCase` abstract class, used in particular for old, no longer existing &quot;Driver&quot; classes, has been removed.&#10;  Tests involving &quot;Executor&quot; classes do not use this class, as they have no need for it. The `PostgresExecutorTest` test&#10;  class has also been removed, since the class it covers, by default, does not implement anything that the parent class&#10;  does not">
-      <option name="closed" value="true" />
-      <created>1744653145309</created>
-      <option name="number" value="00117" />
-      <option name="presentableId" value="LOCAL-00117" />
-      <option name="project" value="LOCAL" />
-      <updated>1744653145309</updated>
-    </task>
-    <task id="LOCAL-00118" summary="added `Override` attributes">
-      <option name="closed" value="true" />
-      <created>1744794121102</created>
-      <option name="number" value="00118" />
-      <option name="presentableId" value="LOCAL-00118" />
-      <option name="project" value="LOCAL" />
-      <updated>1744794121102</updated>
-    </task>
-    <task id="LOCAL-00119" summary="fixed for phpcs">
-      <option name="closed" value="true" />
-      <created>1744794145230</created>
-      <option name="number" value="00119" />
-      <option name="presentableId" value="LOCAL-00119" />
-      <option name="project" value="LOCAL" />
-      <updated>1744794145230</updated>
-    </task>
-    <task id="LOCAL-00120" summary="same code here">
-      <option name="closed" value="true" />
-      <created>1744796962979</created>
-      <option name="number" value="00120" />
-      <option name="presentableId" value="LOCAL-00120" />
-      <option name="project" value="LOCAL" />
-      <updated>1744796962979</updated>
-    </task>
-    <task id="LOCAL-00121" summary="same code here">
-      <option name="closed" value="true" />
-      <created>1744797164979</created>
-      <option name="number" value="00121" />
-      <option name="presentableId" value="LOCAL-00121" />
-      <option name="project" value="LOCAL" />
-      <updated>1744797164979</updated>
+      <workItem from="1747478356656" duration="3615000" />
+      <workItem from="1747482112581" duration="542000" />
     </task>
     <task id="LOCAL-00122" summary="fixed code, added tests">
       <option name="closed" value="true" />
@@ -829,7 +766,55 @@
       <option name="project" value="LOCAL" />
       <updated>1747235118936</updated>
     </task>
-    <option name="localTasksCounter" value="165" />
+    <task id="LOCAL-00165" summary="added phpunit empty config">
+      <option name="closed" value="true" />
+      <created>1747480598590</created>
+      <option name="number" value="00165" />
+      <option name="presentableId" value="LOCAL-00165" />
+      <option name="project" value="LOCAL" />
+      <updated>1747480598590</updated>
+    </task>
+    <task id="LOCAL-00166" summary="updated idea config">
+      <option name="closed" value="true" />
+      <created>1747481795996</created>
+      <option name="number" value="00166" />
+      <option name="presentableId" value="LOCAL-00166" />
+      <option name="project" value="LOCAL" />
+      <updated>1747481795996</updated>
+    </task>
+    <task id="LOCAL-00167" summary="updated">
+      <option name="closed" value="true" />
+      <created>1747481811380</created>
+      <option name="number" value="00167" />
+      <option name="presentableId" value="LOCAL-00167" />
+      <option name="project" value="LOCAL" />
+      <updated>1747481811380</updated>
+    </task>
+    <task id="LOCAL-00168" summary="added for phpunit">
+      <option name="closed" value="true" />
+      <created>1747481827600</created>
+      <option name="number" value="00168" />
+      <option name="presentableId" value="LOCAL-00168" />
+      <option name="project" value="LOCAL" />
+      <updated>1747481827600</updated>
+    </task>
+    <task id="LOCAL-00169" summary="added for phpstan">
+      <option name="closed" value="true" />
+      <created>1747481931636</created>
+      <option name="number" value="00169" />
+      <option name="presentableId" value="LOCAL-00169" />
+      <option name="project" value="LOCAL" />
+      <updated>1747481931636</updated>
+    </task>
+    <task id="LOCAL-00170" summary="added for phpcs">
+      <option name="closed" value="true" />
+      <created>1747482018054</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1747482018054</updated>
+    </task>
+    <option name="localTasksCounter" value="171" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -884,11 +869,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="same code here" />
-    <MESSAGE value="fixed code, added tests" />
-    <MESSAGE value="fixed code, updated CHANGELOG.md" />
-    <MESSAGE value="removed `DATABASE_BACKUP_EXECUTABLES`, updated CHANGELOG.md" />
-    <MESSAGE value="removed `require_once CAKE . 'functions.php'`" />
     <MESSAGE value="configuration names `DatabaseBackup.mysql`, `DatabaseBackup.postgres` and `DatabaseBackup.sqlite` are now deprecated&#10;  and will be removed in a future release (backwards compatibility will be maintained up to branch `2.15.x`). Use the&#10;  `DatabaseBackup.Mysql`, `DatabaseBackup.Postgres` and `DatabaseBackup.Sqlite` names instead in your bootstrap (the &#10;  driver name begins with a capital letter)" />
     <MESSAGE value="merged" />
     <MESSAGE value="the constructor method `AbstractBackupUtility` now accepts `$Connection` as an optional argument. This means that by&#10;  instantiating `BackupExport` or `BackupImport` (which extend `AbstractBackupUtility`) it is possible to set a&#10;  connection beyond the default one" />
@@ -898,7 +878,6 @@
     <MESSAGE value="fixed for phpstan" />
     <MESSAGE value="added test" />
     <MESSAGE value="added some `@codeCoverageIgnore` tags" />
-    <MESSAGE value="updated" />
     <MESSAGE value="BackupImport and BackupExport use `runProcess()`" />
     <MESSAGE value="fixed deprecations" />
     <MESSAGE value="starting with CakePHP 5.2, [returning values from event listeners/callbacks is deprecated](https://book.cakephp.org/5/en/appendices/5-2-migration-guide.html#event).&#10;  For this reason, the `beforeExport()` and `beforeImport()` event methods provided by `AbstractExecutor`,&#10;  `MysqlExecutor` and `SqliteExecutor` no longer return a boolean. Optionally these methods can use the&#10;  `$Event-&gt;setResult()` method to set a result. Currently, the `void` return type is not explicit to ensure backwards&#10;  compatibility, it will be made explicit in a future release" />
@@ -909,7 +888,13 @@
     <MESSAGE value="fixed with `FakeConnection`" />
     <MESSAGE value="fixed" />
     <MESSAGE value="fixed for phpcs/phpstan" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed for phpcs/phpstan" />
+    <MESSAGE value="added phpunit empty config" />
+    <MESSAGE value="updated idea config" />
+    <MESSAGE value="updated" />
+    <MESSAGE value="added for phpunit" />
+    <MESSAGE value="added for phpstan" />
+    <MESSAGE value="added for phpcs" />
+    <option name="LAST_COMMIT_MESSAGE" value="added for phpcs" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
