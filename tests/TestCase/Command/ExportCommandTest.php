@@ -35,5 +35,6 @@ class ExportCommandTest extends TestCase
         $this->exec('database_backup.export -h');
         $this->assertExitSuccess();
         $this->assertOutputContains('Exports a database backup');
+        $this->assertOutputContains('cake database_backup.export [--connection default] [-h] [-q] [-t] [-v]');
     }
 }

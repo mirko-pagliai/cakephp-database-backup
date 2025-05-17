@@ -34,6 +34,7 @@ class ImportCommandTest extends TestCase
     {
         $this->exec('database_backup.import -h');
         $this->assertExitSuccess();
+        $this->assertOutputContains('cake database_backup.import [--connection default] [-h] [-q] [-t] [-v]');
         $this->assertOutputContains('Imports a database backup');
     }
 }
