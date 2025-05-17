@@ -13,24 +13,17 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace App\Database;
+namespace App\Database\Driver;
 
-use App\Database\Driver\FakeDriver;
-use Cake\Database\Connection;
+use Cake\Database\Driver\Sqlite;
 
 /**
- * A fake connection for tests.
+ * A fake driver for tests.
  */
-class FakeConnection extends Connection
+class FakeDriver extends Sqlite
 {
-    public function __construct(array $config = [])
+    public function enabled(): bool
     {
-        $config += [
-            'driver' => FakeDriver::class,
-            'database' => 'my_database',
-            'host' => 'my_hostname',
-        ];
-
-        parent::__construct($config);
+        return true;
     }
 }
