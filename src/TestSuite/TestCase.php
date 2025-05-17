@@ -13,12 +13,16 @@ declare(strict_types=1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-use Cake\Core\Configure;
+namespace DatabaseBackup\TestSuite;
 
-define('ROOT', dirname(__DIR__) . DS);
-const CORE_PATH = ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS;
+use Cake\TestSuite\TestCase as CakeTestCase;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
-require_once CORE_PATH . 'config' . DS . 'bootstrap.php';
+/**
+ * TestCase class.
+ *
+ * @since 2.0.0
+ */
+class TestCase extends CakeTestCase
+{
 
-Configure::write('debug', true);
+}
