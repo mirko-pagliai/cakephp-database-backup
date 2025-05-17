@@ -13,4 +13,11 @@
             <directory>./tests/TestCase</directory>
         </testsuite>
     </testsuites>
+
+    <!-- configure code coverage -->
+    <source>
+        <include>
+            <directory suffix=".php">./src/</directory>
+        </include>
+    </source>
 </phpunit>
