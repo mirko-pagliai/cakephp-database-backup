@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Command;
 
 use Cake\Command\Command;
+use Cake\Console\ConsoleOptionParser;
+use function Cake\I18n\__d;
 
 /**
  * Command to import a database backup.
@@ -24,4 +26,16 @@ use Cake\Command\Command;
  */
 class ImportCommand extends Command
 {
+    /**
+     * Configures and returns the console option parser for a command.
+     *
+     * @param \Cake\Console\ConsoleOptionParser $parser The console option parser instance to configure.
+     * @return \Cake\Console\ConsoleOptionParser The configured console option parser.
+     */
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
+    {
+        $parser->setDescription(__d('database_backup', 'Imports a database backup'));
+
+        return $parser;
+    }
 }
