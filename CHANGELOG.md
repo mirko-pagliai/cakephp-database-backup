@@ -1,7 +1,8 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.0
-* it requires at least PHP 8.4.
+* it requires at least PHP 8.4;
+* the abstract class `AbstractBackupUtility` has become simply `Utility`.
 
 # 2.x branch
 ## 2.14 branch
