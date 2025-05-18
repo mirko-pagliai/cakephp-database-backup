@@ -57,12 +57,14 @@ class UtilityTest extends TestCase
     }
 
     #[Test]
-    public function testTimeOutProperty(): void
+    #[TestWith([0])]
+    #[TestWith([10])]
+    public function testTimeOutProperty(int $timeOut): void
     {
         $this->assertSame(60, $this->Utility->timeOut);
 
-        $this->Utility->timeOut = 10;
-        $this->assertSame(10, $this->Utility->timeOut);
+        $this->Utility->timeOut = $timeOut;
+        $this->assertSame($timeOut, $this->Utility->timeOut);
     }
 
     #[Test]
