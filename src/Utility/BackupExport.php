@@ -15,11 +15,24 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use DatabaseBackup\Compression;
+
 /**
  * Utility to export databases.
  */
 class BackupExport extends Utility
 {
+    public Compression $Compression {
+        set (Compression|string|false|null $Compression) {
+            if (!$Compression instanceof Compression) {
+                $Compression = $Compression ? Compression::{ucfirst($Compression)} : Compression::None;
+            }
+
+            $this->Compression = $Compression;
+        }
+        get => $this->Compression;
+    }
+
     /**
      * Replaces filename patterns.
      *

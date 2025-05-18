@@ -16,8 +16,10 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
+use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use Error;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -30,12 +32,40 @@ class BackupExportTest extends TestCase
 {
     protected BackupExport $BackupExport;
 
+    /**
+     * @inheritDoc
+     */
     public function setUp(): void
     {
         parent::setUp();
 
         $this->BackupExport = new BackupExport();
         $this->BackupExport->Connection = new FakeConnection();
+    }
+
+    #[Test]
+    #[TestWith([Compression::None, Compression::None])]
+    #[TestWith([Compression::Gzip, Compression::Gzip])]
+    #[TestWith([Compression::Gzip, 'Gzip'])]
+    #[TestWith([Compression::Gzip, 'gzip'])]
+    #[TestWith([Compression::None, null])]
+    #[TestWith([Compression::None, false])]
+    public function testCompressionProperty(Compression $ExpectedCompression, mixed $Compression): void
+    {
+        $this->BackupExport->Compression = $Compression;
+
+        $result = $this->BackupExport->Compression;
+        $this->assertInstanceOf(Compression::class, $result);
+        $this->assertSame($ExpectedCompression, $result);
+    }
+
+    #[Test]
+    #[TestWith([true])]
+    #[TestWith(['invalidCompression'])]
+    public function testCompressionPropertyWithInvalidValue(mixed $invalidCompression): void
+    {
+        $this->expectException(Error::class);
+        $this->BackupExport->Compression = $invalidCompression;
     }
 
     #[Test]
