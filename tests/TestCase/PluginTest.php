@@ -27,7 +27,7 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * PluginTest.
  */
-#[CoversClass(Plugin::class)]
+#[CoversClass(DatabaseBackup::class)]
 class PluginTest extends TestCase
 {
     /**
