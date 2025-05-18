@@ -52,6 +52,8 @@ class BackupExportTest extends TestCase
     #[TestWith([Compression::None, false])]
     public function testCompressionProperty(Compression $ExpectedCompression, mixed $Compression): void
     {
+        $this->assertSame(Compression::None, $this->BackupExport->Compression);
+
         $this->BackupExport->Compression = $Compression;
 
         $result = $this->BackupExport->Compression;

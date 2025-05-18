@@ -22,7 +22,7 @@ use DatabaseBackup\Compression;
  */
 class BackupExport extends Utility
 {
-    public Compression $Compression {
+    public Compression $Compression = Compression::None {
         set (Compression|string|false|null $Compression) {
             if (!$Compression instanceof Compression) {
                 $Compression = $Compression ? Compression::{ucfirst($Compression)} : Compression::None;
