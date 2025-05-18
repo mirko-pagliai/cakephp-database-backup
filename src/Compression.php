@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup;
 
 use ValueError;
+use function Cake\I18n\__d;
 
 /**
  * Compression.
@@ -70,7 +71,7 @@ enum Compression: string
     {
         $Compression = self::tryFromFilename($filename);
         if (!$Compression) {
-            throw new ValueError(sprintf('No valid `%s` value was found for filename `%s`', self::class, $filename));
+            throw new ValueError(__d('database_backup', 'No valid `{0}` value was found for filename `{1}`', self::class, $filename));
         }
 
         return $Compression;
