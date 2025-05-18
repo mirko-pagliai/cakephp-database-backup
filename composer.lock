@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "02f1301eb9ac516a124c2c2734a101bc",
+    "content-hash": "1eef7ec16a3a5fd59a179f7259783d31",
     "packages": [
         {
             "name": "cakephp/cakephp",
@@ -1321,137 +1321,6 @@
             "time": "2024-11-11T15:58:58+00:00"
         },
         {
-            "name": "cakephp/cakephp-codesniffer",
-            "version": "5.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cakephp/cakephp-codesniffer.git",
-                "reference": "017b827f2814827cd09734319dfc1120f2262317"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/cakephp-codesniffer/zipball/017b827f2814827cd09734319dfc1120f2262317",
-                "reference": "017b827f2814827cd09734319dfc1120f2262317",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.1.0",
-                "phpstan/phpdoc-parser": "^2.1.0",
-                "slevomat/coding-standard": "^8.16",
-                "squizlabs/php_codesniffer": "^3.9"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9.3.4"
-            },
-            "type": "phpcodesniffer-standard",
-            "autoload": {
-                "psr-4": {
-                    "CakePHP\\": "CakePHP/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "CakePHP Community",
-                    "homepage": "https://github.com/cakephp/cakephp-codesniffer/graphs/contributors"
-                }
-            ],
-            "description": "CakePHP CodeSniffer Standards",
-            "homepage": "https://cakephp.org",
-            "keywords": [
-                "codesniffer",
-                "framework"
-            ],
-            "support": {
-                "forum": "https://stackoverflow.com/tags/cakephp",
-                "irc": "irc://irc.freenode.org/cakephp",
-                "issues": "https://github.com/cakephp/cakephp-codesniffer/issues",
-                "source": "https://github.com/cakephp/cakephp-codesniffer"
-            },
-            "time": "2025-05-12T17:04:08+00:00"
-        },
-        {
-            "name": "dealerdirect/phpcodesniffer-composer-installer",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PHPCSStandards/composer-installer.git",
-                "reference": "4be43904336affa5c2f70744a348312336afd0da"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/composer-installer/zipball/4be43904336affa5c2f70744a348312336afd0da",
-                "reference": "4be43904336affa5c2f70744a348312336afd0da",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0 || ^2.0",
-                "php": ">=5.4",
-                "squizlabs/php_codesniffer": "^2.0 || ^3.1.0 || ^4.0"
-            },
-            "require-dev": {
-                "composer/composer": "*",
-                "ext-json": "*",
-                "ext-zip": "*",
-                "php-parallel-lint/php-parallel-lint": "^1.3.1",
-                "phpcompatibility/php-compatibility": "^9.0",
-                "yoast/phpunit-polyfills": "^1.0"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin"
-            },
-            "autoload": {
-                "psr-4": {
-                    "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Franck Nijhof",
-                    "email": "franck.nijhof@dealerdirect.com",
-                    "homepage": "http://www.frenck.nl",
-                    "role": "Developer / IT Manager"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/PHPCSStandards/composer-installer/graphs/contributors"
-                }
-            ],
-            "description": "PHP_CodeSniffer Standards Composer Installer Plugin",
-            "homepage": "http://www.dealerdirect.com",
-            "keywords": [
-                "PHPCodeSniffer",
-                "PHP_CodeSniffer",
-                "code quality",
-                "codesniffer",
-                "composer",
-                "installer",
-                "phpcbf",
-                "phpcs",
-                "plugin",
-                "qa",
-                "quality",
-                "standard",
-                "standards",
-                "style guide",
-                "stylecheck",
-                "tests"
-            ],
-            "support": {
-                "issues": "https://github.com/PHPCSStandards/composer-installer/issues",
-                "source": "https://github.com/PHPCSStandards/composer-installer"
-            },
-            "time": "2023-01-05T11:28:13+00:00"
-        },
-        {
             "name": "myclabs/deep-copy",
             "version": "1.13.1",
             "source": {
@@ -1686,53 +1555,6 @@
                 "source": "https://github.com/phar-io/version/tree/3.2.1"
             },
             "time": "2022-02-21T01:04:05+00:00"
-        },
-        {
-            "name": "phpstan/phpdoc-parser",
-            "version": "2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "9b30d6fd026b2c132b3985ce6b23bec09ab3aa68"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/9b30d6fd026b2c132b3985ce6b23bec09ab3aa68",
-                "reference": "9b30d6fd026b2c132b3985ce6b23bec09ab3aa68",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4 || ^8.0"
-            },
-            "require-dev": {
-                "doctrine/annotations": "^2.0",
-                "nikic/php-parser": "^5.3.0",
-                "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "^2.0",
-                "phpstan/phpstan-phpunit": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^9.6",
-                "symfony/process": "^5.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "PHPStan\\PhpDocParser\\": [
-                        "src/"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHPDoc parser with support for nullable, intersection and generic types",
-            "support": {
-                "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.1.0"
-            },
-            "time": "2025-02-19T13:28:12+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -3045,92 +2867,27 @@
             "time": "2025-02-07T05:00:38+00:00"
         },
         {
-            "name": "slevomat/coding-standard",
-            "version": "8.18.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/slevomat/coding-standard.git",
-                "reference": "f3b23cb9b26301b8c3c7bb03035a1bee23974593"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/slevomat/coding-standard/zipball/f3b23cb9b26301b8c3c7bb03035a1bee23974593",
-                "reference": "f3b23cb9b26301b8c3c7bb03035a1bee23974593",
-                "shasum": ""
-            },
-            "require": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.6.2 || ^0.7 || ^1.0",
-                "php": "^7.4 || ^8.0",
-                "phpstan/phpdoc-parser": "^2.1.0",
-                "squizlabs/php_codesniffer": "^3.12.2"
-            },
-            "require-dev": {
-                "phing/phing": "3.0.1",
-                "php-parallel-lint/php-parallel-lint": "1.4.0",
-                "phpstan/phpstan": "2.1.13",
-                "phpstan/phpstan-deprecation-rules": "2.0.2",
-                "phpstan/phpstan-phpunit": "2.0.6",
-                "phpstan/phpstan-strict-rules": "2.0.4",
-                "phpunit/phpunit": "9.6.8|10.5.45|11.4.4|11.5.17|12.1.3"
-            },
-            "type": "phpcodesniffer-standard",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "8.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "SlevomatCodingStandard\\": "SlevomatCodingStandard/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Slevomat Coding Standard for PHP_CodeSniffer complements Consistence Coding Standard by providing sniffs with additional checks.",
-            "keywords": [
-                "dev",
-                "phpcs"
-            ],
-            "support": {
-                "issues": "https://github.com/slevomat/coding-standard/issues",
-                "source": "https://github.com/slevomat/coding-standard/tree/8.18.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/kukulich",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/slevomat/coding-standard",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-05-01T09:40:50+00:00"
-        },
-        {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.13.0",
+            "version": "4.0.0beta1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "65ff2489553b83b4597e89c3b8b721487011d186"
+                "reference": "b37066133dc2d2d0291187f3120035ef33032caf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/65ff2489553b83b4597e89c3b8b721487011d186",
-                "reference": "65ff2489553b83b4597e89c3b8b721487011d186",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/b37066133dc2d2d0291187f3120035ef33032caf",
+                "reference": "b37066133dc2d2d0291187f3120035ef33032caf",
                 "shasum": ""
             },
             "require": {
                 "ext-simplexml": "*",
                 "ext-tokenizer": "*",
                 "ext-xmlwriter": "*",
-                "php": ">=5.4.0"
+                "php": ">=7.2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
+                "phpunit/phpunit": "^8.0 || ^9.3.4 || ^10.5.32 || ^11.3.3"
             },
             "bin": [
                 "bin/phpcbf",
@@ -3160,7 +2917,7 @@
                     "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer/graphs/contributors"
                 }
             ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+            "description": "PHP_CodeSniffer tokenizes PHP files and detects violations of a defined set of coding standards.",
             "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
             "keywords": [
                 "phpcs",
@@ -3191,7 +2948,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-05-11T03:36:00+00:00"
+            "time": "2025-05-11T04:14:19+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
@@ -3362,7 +3119,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "squizlabs/php_codesniffer": 10
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
