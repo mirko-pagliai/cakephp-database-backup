@@ -5,8 +5,6 @@
 
     <file>.</file>
 
-    <rule ref="./vendor/cakephp/cakephp-codesniffer/CakePHP/ruleset.xml"/>
-
     <rule ref="Generic.Files.LineLength.TooLong">
         <severity>0</severity>
     </rule>
