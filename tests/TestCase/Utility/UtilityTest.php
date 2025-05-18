@@ -15,9 +15,13 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use App\Database\FakeConnection;
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * UtilityTest class.
@@ -36,5 +40,18 @@ class UtilityTest extends TestCase
 
         $this->Utility = new class extends Utility {
         };
+    }
+
+    #[Test]
+    #[TestWith([new FakeConnection()])]
+    #[TestWith(['test'])]
+    #[TestWith([null])]
+    public function testConnectionProperty(mixed $connection): void
+    {
+        $this->Utility->Connection = $connection;
+
+        $result = $this->Utility->Connection;
+        $this->assertInstanceOf(ConnectionInterface::class, $result);
+        $this->assertSame('test', $result->config()['name']);
     }
 }

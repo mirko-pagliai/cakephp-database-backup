@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Datasource\ConnectionInterface;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Abstract utility.
@@ -24,5 +25,14 @@ use Cake\Datasource\ConnectionInterface;
  */
 abstract class Utility
 {
-    public ConnectionInterface $Connection;
+    public ConnectionInterface $Connection {
+        set (ConnectionInterface|string|null $Connection) {
+            if (!$Connection instanceof ConnectionInterface) {
+                $Connection = ConnectionManager::get($Connection ?: 'default');
+            }
+
+            $this->Connection = $Connection;
+        }
+        get => $this->Connection;
+    }
 }
