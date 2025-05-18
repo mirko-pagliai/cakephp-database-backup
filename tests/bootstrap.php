@@ -15,11 +15,13 @@ declare(strict_types=1);
 
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 
 define('ROOT', dirname(__DIR__) . DS);
 const CORE_PATH = ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS;
 const APP = ROOT . 'tests' . DS . 'test_app' . DS;
 const CONFIG = APP . 'config' . DS;
+define('TMP', sys_get_temp_dir() . DS . 'cakephp-database-backup' . DS);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 require_once CORE_PATH . 'config' . DS . 'bootstrap.php';
@@ -36,3 +38,7 @@ Cache::setConfig([
         'serialize' => true,
     ],
 ]);
+
+putenv('db_dsn=sqlite:///' . TMP . 'test.sq3');
+ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
+ConnectionManager::alias('test', 'default');

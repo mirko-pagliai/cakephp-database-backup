@@ -26,6 +26,7 @@ class FakeConnection extends Connection
     public function __construct(array $config = [])
     {
         $config += [
+            'name' => 'test',
             'driver' => FakeDriver::class,
             'database' => 'my_database',
             'host' => 'my_hostname',
