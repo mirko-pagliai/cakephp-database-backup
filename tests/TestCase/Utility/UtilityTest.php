@@ -19,6 +19,7 @@ use App\Database\FakeConnection;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -53,5 +54,22 @@ class UtilityTest extends TestCase
         $result = $this->Utility->Connection;
         $this->assertInstanceOf(ConnectionInterface::class, $result);
         $this->assertSame('test', $result->config()['name']);
+    }
+
+    #[Test]
+    public function testTimeOutProperty(): void
+    {
+        $this->assertSame(60, $this->Utility->timeOut);
+
+        $this->Utility->timeOut = 10;
+        $this->assertSame(10, $this->Utility->timeOut);
+    }
+
+    #[Test]
+    public function testTimeOutPropertyWithInvalidValue(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The `timeOut` property must be greater than or equal to 0');
+        $this->Utility->timeOut = -1;
     }
 }

@@ -17,6 +17,8 @@ namespace DatabaseBackup\Utility;
 
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use InvalidArgumentException;
+use function Cake\I18n\__d;
 
 /**
  * Abstract utility.
@@ -34,5 +36,15 @@ abstract class Utility
             $this->Connection = $Connection;
         }
         get => $this->Connection;
+    }
+
+    public int $timeOut = 60 {
+        set (int $timeOut) {
+            if ($timeOut < 0) {
+                throw new InvalidArgumentException(__d('database_backup', 'The `timeOut` property must be greater than or equal to 0'));
+            }
+            $this->timeOut = $timeOut;
+        }
+        get => $this->timeOut;
     }
 }
