@@ -11,3 +11,8 @@ parameters:
 
     bootstrapFiles:
         - tests/bootstrap.php
+
+    ignoreErrors:
+        -
+            message: '#Call to an undefined method Mockery\\[\w\|\\]+::\w+\(\)\.#'
+            path: tests/TestCase
