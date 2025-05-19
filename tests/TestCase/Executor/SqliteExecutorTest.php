@@ -15,12 +15,10 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
-use App\Database\Driver\FakeDriver;
-use Cake\Database\Connection;
+use App\Database\FakeConnection;
 use Cake\Database\Schema\Collection;
 use Cake\Database\Schema\TableSchema;
 use Cake\Database\Schema\TableSchemaInterface;
-use Cake\Database\StatementInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
@@ -37,7 +35,7 @@ class SqliteExecutorTest extends TestCase
     public function testGetAllTableSchema(): void
     {
         /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
-        $Connection = Mockery::mock(Connection::class, [['driver' => FakeDriver::class]])->makePartial();
+        $Connection = Mockery::mock(FakeConnection::class)->makePartial();
 
         $SchemaCollection = new class ($Connection) extends Collection
         {
