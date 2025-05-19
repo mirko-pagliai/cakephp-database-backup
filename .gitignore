@@ -1,4 +1,5 @@
 .idea
+!.idea/fileTemplates/
 .phpunit.cache
 coverage/
 vendor/
