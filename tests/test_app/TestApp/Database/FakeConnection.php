@@ -35,6 +35,8 @@ class FakeConnection extends Connection
             'driver' => FakeDriver::class,
             'database' => 'my_database',
             'host' => 'my_hostname',
+            'username' => 'my_username',
+            'password' => 'my_password',
         ];
 
         parent::__construct($config);
