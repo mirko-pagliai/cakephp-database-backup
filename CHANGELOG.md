@@ -5,8 +5,9 @@
 * it requires at least PHP 8.4.
 
 #### Minor changes:
-* the abstract class `AbstractBackupUtility` has become simply `Utility`. It uses property hooks to set `$Connection`
-    and `$timeOut`, rather than the homonymous methods. The `makeAbsoluteFilename()` method has become `makeAbsolutePath()`;
+* the abstract class `AbstractBackupUtility` has become simply `Utility`. It uses property hooks to set and get `$Connection`,
+  `Executor`, and `$timeOut`, rather than the homonymous methods. The `makeAbsoluteFilename()` method has become
+  `makeAbsolutePath()`;
 * the abstract class `Command` has been moved from `DatabaseBackup\Console` to `DatabaseBackup\Command`;
 * the `@since` tag has been kept for the usual methods that remained unchanged (at least in logic).
 

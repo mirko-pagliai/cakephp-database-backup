@@ -16,7 +16,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
+use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
+use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
 use InvalidArgumentException;
@@ -46,9 +48,11 @@ class UtilityTest extends TestCase
     #[Test]
     #[TestWith([new FakeConnection()])]
     #[TestWith(['test'])]
-    #[TestWith([null])]
     public function testConnectionProperty(mixed $connection): void
     {
+        //Default value, without calling the setter
+        $this->assertSame('test', $this->Utility->Connection->config()['name']);
+
         $this->Utility->Connection = $connection;
 
         $result = $this->Utility->Connection;
@@ -57,10 +61,30 @@ class UtilityTest extends TestCase
     }
 
     #[Test]
+    public function testExecutorProperty(): void
+    {
+        $this->Utility->Connection = new FakeConnection(['driver' => Sqlite::class]);
+
+        $result = $this->Utility->Executor;
+        $this->assertInstanceOf(SqliteExecutor::class, $result);
+    }
+
+    #[Test]
+    public function testExecutorPropertyNoExistingExecutor(): void
+    {
+        $this->Utility->Connection = new FakeConnection();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
+        $this->Utility->Executor;
+    }
+
+    #[Test]
     #[TestWith([0])]
     #[TestWith([10])]
     public function testTimeOutProperty(int $timeOut): void
     {
+        //Default value, without calling the setter
         $this->assertSame(60, $this->Utility->timeOut);
 
         $this->Utility->timeOut = $timeOut;
