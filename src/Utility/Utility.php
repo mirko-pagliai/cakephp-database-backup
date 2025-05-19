@@ -18,6 +18,7 @@ namespace DatabaseBackup\Utility;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use InvalidArgumentException;
+use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
 /**
@@ -46,5 +47,17 @@ abstract class Utility
             $this->timeOut = $timeOut;
         }
         get => $this->timeOut;
+    }
+
+    /**
+     * Converts a relative file path to an absolute path based on the specified target directory.
+     *
+     * @param string $filename
+     * @return string
+     * @since 2.13.5
+     */
+    public function makeAbsolutePath(string $filename): string
+    {
+        return Path::makeAbsolute($filename, rtrim(ROOT, DS) . DS);
     }
 }

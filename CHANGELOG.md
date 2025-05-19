@@ -1,10 +1,12 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.0
+* the `DatabaseBackup.target` configuration value no longer exists. Relative paths will be understood as relative to the `ROOT`;
 * it requires at least PHP 8.4.
 
 #### Minor changes:
-* the abstract class `AbstractBackupUtility` has become simply `Utility`;
+* the abstract class `AbstractBackupUtility` has become simply `Utility`. It uses property hooks to set `$Connection`
+    and `$timeOut`, rather than the homonymous methods. The `makeAbsoluteFilename()` method has become `makeAbsolutePath()`;
 * the abstract class `Command` has been moved from `DatabaseBackup\Console` to `DatabaseBackup\Command`;
 * the `@since` tag has been kept for the usual methods that remained unchanged (at least in logic).
 

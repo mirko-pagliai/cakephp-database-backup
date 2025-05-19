@@ -74,4 +74,15 @@ class UtilityTest extends TestCase
         $this->expectExceptionMessage('The `timeOut` property must be greater than or equal to 0');
         $this->Utility->timeOut = -1;
     }
+
+    #[Test]
+    #[TestWith([ROOT . 'file.txt', 'file.txt'])]
+    #[TestWith([ROOT . 'file.txt', ROOT . 'file.txt'])]
+    #[TestWith([TMP . 'tmp_file', TMP . 'tmp_file'])]
+    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
+    {
+        $result = $this->Utility->makeAbsolutePath($path);
+
+        $this->assertSame($expectedAbsolutePath, $result);
+    }
 }
