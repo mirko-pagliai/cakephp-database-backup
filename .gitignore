@@ -1,5 +1,4 @@
-.idea/php.xml
-.idea/workspace.xml
+.idea
 .phpunit.cache
 coverage/
 vendor/
