@@ -77,6 +77,6 @@ abstract class Utility
      */
     public function makeAbsolutePath(string $filename): string
     {
-        return Path::makeAbsolute($filename, rtrim(ROOT, DS) . DS);
+        return Path::makeAbsolute($filename, rtrim(ROOT, DS));
     }
 }
