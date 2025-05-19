@@ -20,7 +20,7 @@ use Override;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * MysqlExecutor
+ * MysqlExecutor to export/import database backups.
  */
 class MysqlExecutor extends Executor
 {

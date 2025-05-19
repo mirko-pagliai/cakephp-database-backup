@@ -20,7 +20,7 @@ use Cake\Event\EventInterface;
 use Override;
 
 /**
- * SqliteExecutor.
+ * SqliteExecutor to export/import database backups.
  */
 class SqliteExecutor extends Executor
 {
