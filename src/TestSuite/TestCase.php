@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\TestSuite;
 
 use Cake\TestSuite\TestCase as CakeTestCase;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
  * TestCase class.
@@ -24,4 +25,5 @@ use Cake\TestSuite\TestCase as CakeTestCase;
  */
 class TestCase extends CakeTestCase
 {
+    use MockeryPHPUnitIntegration;
 }
