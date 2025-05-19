@@ -16,16 +16,29 @@ declare(strict_types=1);
 namespace DatabaseBackup\Executor;
 
 use Cake\Datasource\ConnectionInterface;
+use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventInterface;
+use Cake\Event\EventListenerInterface;
 
 /**
  * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.
  *
  * @since 2.0.0
  */
-abstract class Executor
+abstract class Executor implements EventListenerInterface
 {
+    /**
+     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Executor\Executor>
+     */
+    use EventDispatcherTrait;
+
     public ConnectionInterface $Connection;
+
+    public function __construct()
+    {
+        //Attaches the object to the event manager
+        $this->getEventManager()->on($this);
+    }
 
     /**
      * List of events this object is implementing. When the class is registered in an event manager, each individual
