@@ -76,6 +76,7 @@ class UtilityTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
+        /** @phpstan-ignore-next-line */
         $this->Utility->Executor;
     }
 
