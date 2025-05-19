@@ -18,7 +18,6 @@ namespace DatabaseBackup\Executor;
 use Cake\Database\Schema\TableSchema;
 use Cake\Event\EventInterface;
 use Override;
-use function PHPUnit\Framework\callback;
 
 /**
  * SqliteExecutor.
