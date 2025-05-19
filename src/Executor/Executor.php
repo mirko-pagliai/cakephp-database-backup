@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
-use Cake\Datasource\ConnectionInterface;
+use Cake\Database\Connection;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
@@ -32,7 +32,7 @@ abstract class Executor implements EventListenerInterface
      */
     use EventDispatcherTrait;
 
-    public ConnectionInterface $Connection;
+    public Connection $Connection;
 
     public function __construct()
     {

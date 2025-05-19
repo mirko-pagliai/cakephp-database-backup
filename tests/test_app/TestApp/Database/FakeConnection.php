@@ -42,7 +42,10 @@ class FakeConnection extends Connection
 
     public function getDriver(string $role = self::ROLE_WRITE): Driver
     {
-        return new $this->_config['driver']();
+        /** @var \Cake\Database\Driver $Driver */
+        $Driver = new $this->_config['driver']();
+
+        return $Driver;
     }
 
     public function getSchemaCollection(): SchemaCollectionInterface
@@ -57,6 +60,10 @@ class FakeConnection extends Connection
             public function describe(string $name, array $options = []): TableSchemaInterface
             {
                 return new class ($name) extends TableSchema {
+                    /**
+                     * @param \Cake\Database\Connection $connection
+                     * @return array<string>
+                     */
                     public function dropSql(Connection $connection): array
                     {
                         return ['DROP TABLE "' . $this->name() . '"'];

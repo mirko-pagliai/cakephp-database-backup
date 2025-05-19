@@ -16,9 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Database\Connection;
 use Cake\Database\Driver;
-use Cake\Database\Schema\TableSchema;
-use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
@@ -38,7 +37,6 @@ class SqliteExecutorTest extends TestCase
         $SqliteExecutor->Connection = new FakeConnection();
         $result = $SqliteExecutor->getAllTableSchemas();
 
-        $this->assertContainsOnlyInstancesOf(TableSchema::class, $result);
         $this->assertCount(2, $result);
         $this->assertSame('articles', $result[0]->name());
         $this->assertSame('comments', $result[1]->name());
@@ -62,9 +60,11 @@ class SqliteExecutorTest extends TestCase
     {
         $Driver = Mockery::spy(Driver::class);
 
-        $Connection = Mockery::mock(ConnectionInterface::class);
+        /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
+        $Connection = Mockery::mock(Connection::class);
         $Connection->shouldReceive('getDriver')->andReturn($Driver);
 
+        /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
         $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]');
         $SqliteExecutor->Connection = $Connection;
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');

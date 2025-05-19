@@ -17,6 +17,8 @@ namespace DatabaseBackup\Executor;
 
 use Cake\Database\Schema\TableSchema;
 use Cake\Event\EventInterface;
+use Override;
+use function PHPUnit\Framework\callback;
 
 /**
  * SqliteExecutor.
@@ -32,7 +34,12 @@ class SqliteExecutor extends Executor
     public function getAllTableSchemas(): array
     {
         return array_map(
-            callback: fn(string $tableName): TableSchema => $this->Connection->getSchemaCollection()->describe($tableName),
+            callback: function (string $tableName): TableSchema {
+                /** @var \Cake\Database\Schema\TableSchema $TableSchema */
+                $TableSchema = $this->Connection->getSchemaCollection()->describe($tableName);
+
+                return $TableSchema;
+            },
             array: $this->Connection->getSchemaCollection()->listTables(),
         );
     }
