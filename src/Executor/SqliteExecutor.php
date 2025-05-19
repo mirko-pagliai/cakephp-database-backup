@@ -15,8 +15,11 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use Cake\Database\Schema\TableSchema;
+use Cake\Event\EventInterface;
+
 /**
- *
+ * SqliteExecutor.
  */
 class SqliteExecutor extends Executor
 {
@@ -29,20 +32,42 @@ class SqliteExecutor extends Executor
     public function dropAllTables(): array
     {
         $statements = [];
+        $tableSchemas = $this->getTableSchemas();
 
-        /** @var \Cake\Database\Connection $Connection */
-        $Connection = $this->Connection;
-
-        $SchemaCollection = $Connection->getSchemaCollection();
-        foreach ($SchemaCollection->listTables() as $tableName) {
-            /** @var \Cake\Database\Schema\TableSchema $TableSchema */
-            $TableSchema = $SchemaCollection->describe($tableName);
-
-            foreach ($TableSchema->dropSql($Connection) as $dropSql) {
-                $statements[] = $Connection->execute($dropSql);
+        foreach ($tableSchemas as $TableSchema) {
+            foreach ($TableSchema->dropSql($this->Connection) as $dropSql) {
+                $statements[] = $this->Connection->execute($dropSql);
             }
         }
 
         return $statements;
+    }
+
+    /**
+     * Gets all tables schemas
+     *
+     * @return array<\Cake\Database\Schema\TableSchema>
+     * @since 3.0.0
+     */
+    public function getTableSchemas(): array
+    {
+        return array_map(
+            callback: fn(string $tableName): TableSchema => $this->Connection->getSchemaCollection()->describe($tableName),
+            array: $this->Connection->getSchemaCollection()->listTables(),
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    public function beforeImport(EventInterface $Event): void
+    {
+        //For each table, drops the table
+        $this->dropAllTables();
+
+        //Needs to disconnect and re-connect because the database schema has changed
+        $this->Connection->getDriver()->disconnect();
+        $this->Connection->getDriver()->connect();
     }
 }

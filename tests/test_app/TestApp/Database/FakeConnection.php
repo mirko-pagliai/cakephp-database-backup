@@ -38,6 +38,6 @@ class FakeConnection extends Connection
 
     public function getDriver(string $role = self::ROLE_WRITE): Driver
     {
-        return new FakeDriver();
+        return new $this->_config['driver']();
     }
 }

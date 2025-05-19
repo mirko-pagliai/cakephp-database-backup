@@ -16,9 +16,12 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Database\Driver;
+use Cake\Database\Connection;
 use Cake\Database\Schema\Collection;
 use Cake\Database\Schema\TableSchema;
 use Cake\Database\Schema\TableSchemaInterface;
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
@@ -32,11 +35,9 @@ use PHPUnit\Framework\Attributes\Test;
 class SqliteExecutorTest extends TestCase
 {
     #[Test]
-    public function testGetAllTableSchema(): void
+    public function testGetTableSchemas(): void
     {
-        /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
-        $Connection = Mockery::mock(FakeConnection::class)->makePartial();
-
+        $Connection = new FakeConnection();
         $SchemaCollection = new class ($Connection) extends Collection
         {
             public function listTables(): array
@@ -51,13 +52,63 @@ class SqliteExecutorTest extends TestCase
         };
         $Connection->setSchemaCollection($SchemaCollection);
 
-        $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
-        $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
-
         $SqliteExecutor = new SqliteExecutor();
         $SqliteExecutor->Connection = $Connection;
-        $result = $SqliteExecutor->dropAllTables();
+        $result = $SqliteExecutor->getTableSchemas();
 
+        $this->assertContainsOnlyInstancesOf(TableSchema::class, $result);
         $this->assertCount(2, $result);
+        $this->assertSame('articles', $result[0]->name());
+        $this->assertSame('comments', $result[1]->name());
+    }
+
+    #[Test]
+    public function testDropAllTables(): void
+    {
+        $SqliteExecutor = new class extends SqliteExecutor
+        {
+            public function getTableSchemas(): array
+            {
+                $fnTableSchema = function (string $name): TableSchema {
+                    return new class ($name) extends TableSchema {
+                        public function dropSql(Connection $connection): array
+                        {
+                            return ['DROP TABLE "' . $this->name() . '"'];
+                        }
+                    };
+                };
+
+                return [
+                    $fnTableSchema('articles'),
+                    $fnTableSchema('comments'),
+                ];
+            }
+        };
+
+        /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
+        $Connection = Mockery::spy(FakeConnection::class);
+
+        $SqliteExecutor->Connection = $Connection;
+        $SqliteExecutor->dropAllTables();
+
+        $Connection->shouldHaveReceived('execute')->with('DROP TABLE "articles"')->once();
+        $Connection->shouldHaveReceived('execute')->with('DROP TABLE "comments"')->once();
+    }
+
+    #[Test]
+    public function testBeforeImport(): void
+    {
+        $Driver = Mockery::spy(Driver::class);
+
+        $Connection = Mockery::mock(ConnectionInterface::class);
+        $Connection->shouldReceive('getDriver')->andReturn($Driver);
+
+        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]');
+        $SqliteExecutor->Connection = $Connection;
+        $SqliteExecutor->dispatchEvent('Backup.beforeImport');
+
+        $SqliteExecutor->shouldHaveReceived('dropAllTables')->once();
+        $Driver->shouldHaveReceived('connect')->once();
+        $Driver->shouldHaveReceived('disconnect')->once();
     }
 }
