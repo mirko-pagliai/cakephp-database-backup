@@ -24,6 +24,20 @@ use Cake\Event\EventInterface;
 class SqliteExecutor extends Executor
 {
     /**
+     * Gets all tables schemas
+     *
+     * @return array<\Cake\Database\Schema\TableSchema>
+     * @since 3.0.0
+     */
+    public function getAllTableSchemas(): array
+    {
+        return array_map(
+            callback: fn(string $tableName): TableSchema => $this->Connection->getSchemaCollection()->describe($tableName),
+            array: $this->Connection->getSchemaCollection()->listTables(),
+        );
+    }
+
+    /**
      * Drops all tables.
      *
      * @return array<\Cake\Database\StatementInterface>
@@ -32,7 +46,7 @@ class SqliteExecutor extends Executor
     public function dropAllTables(): array
     {
         $statements = [];
-        $tableSchemas = $this->getTableSchemas();
+        $tableSchemas = $this->getAllTableSchemas();
 
         foreach ($tableSchemas as $TableSchema) {
             foreach ($TableSchema->dropSql($this->Connection) as $dropSql) {
@@ -41,20 +55,6 @@ class SqliteExecutor extends Executor
         }
 
         return $statements;
-    }
-
-    /**
-     * Gets all tables schemas
-     *
-     * @return array<\Cake\Database\Schema\TableSchema>
-     * @since 3.0.0
-     */
-    public function getTableSchemas(): array
-    {
-        return array_map(
-            callback: fn(string $tableName): TableSchema => $this->Connection->getSchemaCollection()->describe($tableName),
-            array: $this->Connection->getSchemaCollection()->listTables(),
-        );
     }
 
     /**

@@ -18,6 +18,10 @@ namespace App\Database;
 use App\Database\Driver\FakeDriver;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
+use Cake\Database\Schema\Collection;
+use Cake\Database\Schema\CollectionInterface as SchemaCollectionInterface;
+use Cake\Database\Schema\TableSchema;
+use Cake\Database\Schema\TableSchemaInterface;
 
 /**
  * A fake connection for tests.
@@ -39,5 +43,26 @@ class FakeConnection extends Connection
     public function getDriver(string $role = self::ROLE_WRITE): Driver
     {
         return new $this->_config['driver']();
+    }
+
+    public function getSchemaCollection(): SchemaCollectionInterface
+    {
+        return new class ($this) extends Collection
+        {
+            public function listTables(): array
+            {
+                return ['articles', 'comments'];
+            }
+
+            public function describe(string $name, array $options = []): TableSchemaInterface
+            {
+                return new class ($name) extends TableSchema {
+                    public function dropSql(Connection $connection): array
+                    {
+                        return ['DROP TABLE "' . $this->name() . '"'];
+                    }
+                };
+            }
+        };
     }
 }
