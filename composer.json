@@ -12,7 +12,7 @@
   ],
   "require": {
     "php": ">=8.4",
-    "cakephp/cakephp": "^5.0",
+    "cakephp/cakephp": "^5.1",
     "symfony/filesystem": "^6.0|^7.2",
     "symfony/process": "^6.0|^7.1.7"
   },
