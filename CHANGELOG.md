@@ -2,7 +2,7 @@
 ## 3.0 branch
 ### 3.0.0
 * the `DatabaseBackup.target` configuration value no longer exists. Relative paths will be understood as relative to the `ROOT`;
-* it requires at least PHP 8.4.
+* it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:
 * the abstract class `AbstractBackupUtility` has become simply `Utility`. It uses property hooks to set and get `$Connection`,
