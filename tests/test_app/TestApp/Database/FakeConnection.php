@@ -54,10 +54,7 @@ class FakeConnection extends Connection
 
     public function getDriver(string $role = self::ROLE_WRITE): Driver
     {
-        /** @var \Cake\Database\Driver $Driver */
-        $Driver = new $this->_config['driver']();
-
-        return $Driver;
+        return new FakeDriver();
     }
 
     public function getSchemaCollection(): SchemaCollectionInterface
