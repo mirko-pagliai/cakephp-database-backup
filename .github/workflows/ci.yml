@@ -15,6 +15,8 @@ jobs:
     strategy:
       matrix:
         php-version: ['8.4']
+        include:
+          - prefer-lowest: 'prefer-lowest'
 
     steps:
     - uses: actions/checkout@v4
@@ -38,7 +40,12 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: Install dependencies
-      run: composer install --no-progress
+      run: |
+       if ${{ matrix.prefer-lowest == 'prefer-lowest' }}; then
+         composer install --no-progress --prefer-lowest --prefer-stable
+       else
+         composer install --no-progress
+       fi
 
     - name: Run test suite
       run: |
