@@ -71,12 +71,12 @@ abstract class Utility
     /**
      * Converts a relative file path to an absolute path based on the specified target directory.
      *
-     * @param string $filename
+     * @param string $path
      * @return string
      * @since 2.13.5
      */
-    public function makeAbsolutePath(string $filename): string
+    public function makeAbsolutePath(string $path): string
     {
-        return Path::makeAbsolute($filename, rtrim(ROOT, DS) . DS);
+        return Path::makeAbsolute($path, rtrim(ROOT, DS) . DS);
     }
 }
