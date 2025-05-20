@@ -16,27 +16,11 @@ declare(strict_types=1);
 
 namespace DatabaseBackup;
 
-use Cake\Console\CommandCollection;
 use Cake\Core\BasePlugin;
-use DatabaseBackup\Command\ExportCommand;
-use DatabaseBackup\Command\ImportCommand;
-use DatabaseBackup\Command\IndexCommand;
-use Override;
 
 /**
  * Plugin class.
  */
 class Plugin extends BasePlugin
 {
-    /**
-     * @inheritDoc
-     */
-    #[Override]
-    public function console(CommandCollection $commands): CommandCollection
-    {
-        return $commands
-            ->add('database_backup.export', ExportCommand::class)
-            ->add('database_backup.import', ImportCommand::class)
-            ->add('database_backup.index', IndexCommand::class);
-    }
 }
