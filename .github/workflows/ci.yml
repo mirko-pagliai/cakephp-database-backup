@@ -17,7 +17,8 @@ jobs:
         php-version: ['8.4']
         prefer-lowest: ['']
         include:
-          - prefer-lowest: 'prefer-lowest'
+          - php-version: '8.4'
+            prefer-lowest: 'prefer-lowest'
 
     steps:
     - uses: actions/checkout@v4
