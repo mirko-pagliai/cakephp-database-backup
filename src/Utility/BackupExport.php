@@ -30,7 +30,6 @@ class BackupExport extends Utility
 
             $this->Compression = $Compression;
         }
-        get => $this->Compression;
     }
 
     /**
