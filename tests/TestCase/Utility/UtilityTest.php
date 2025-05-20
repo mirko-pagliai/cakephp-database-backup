@@ -101,9 +101,9 @@ class UtilityTest extends TestCase
     }
 
     #[Test]
-    #[TestWith([ROOT . 'file.txt', 'file.txt'])]
-    #[TestWith([ROOT . 'file.txt', ROOT . 'file.txt'])]
-    #[TestWith([TMP . 'tmp_file', TMP . 'tmp_file'])]
+    #[TestWith([ROOT . 'relative_file_to_root.txt', 'relative_file_to_root.txt'])]
+    #[TestWith([ROOT . 'absolute_file_to_root.txt', ROOT . 'absolute_file_to_root.txt'])]
+    #[TestWith([TMP . 'absolute_tmp_file', TMP . 'absolute_tmp_file'])]
     public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
     {
         $result = $this->Utility->makeAbsolutePath($path);
