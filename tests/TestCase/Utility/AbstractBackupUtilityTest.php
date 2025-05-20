@@ -131,7 +131,7 @@ class AbstractBackupUtilityTest extends TestCase
     /**
      * @return array<array{non-empty-string, non-empty-string}>
      */
-    public static function makeAbsolutePathProvider(): array
+    public static function makeAbsoluteFilenameProvider(): array
     {
         return [
             [
