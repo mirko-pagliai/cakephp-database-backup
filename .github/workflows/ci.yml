@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         php-version: ['8.4']
+        prefer-lowest: ['']
         include:
           - prefer-lowest: 'prefer-lowest'
 
