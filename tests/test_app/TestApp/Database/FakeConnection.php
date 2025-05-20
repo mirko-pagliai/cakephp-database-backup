@@ -25,6 +25,8 @@ use Cake\Database\Schema\TableSchemaInterface;
 
 /**
  * A fake connection for tests.
+ *
+ * This fake connection tries to simulate a connection with Sqlite, but without actually using its driver.
  */
 class FakeConnection extends Connection
 {
@@ -32,7 +34,7 @@ class FakeConnection extends Connection
     {
         $config += [
             'name' => 'test',
-            'driver' => FakeDriver::class,
+            'driver' => 'Cake\Database\Driver\Sqlite',
             'database' => 'my_database',
             'host' => 'my_hostname',
             'username' => 'my_username',
@@ -40,6 +42,14 @@ class FakeConnection extends Connection
         ];
 
         parent::__construct($config);
+    }
+
+    public function createDrivers(array $config): array
+    {
+        return [
+            'read' => new FakeDriver(),
+            'write' => new FakeDriver(),
+        ];
     }
 
     public function getDriver(string $role = self::ROLE_WRITE): Driver

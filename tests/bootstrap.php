@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
@@ -42,7 +41,3 @@ Cache::setConfig([
         'serialize' => true,
     ],
 ]);
-
-putenv('db_dsn=sqlite:///' . TMP . 'test.sq3');
-ConnectionManager::setConfig('test', ['url' => getenv('db_dsn')]);
-ConnectionManager::alias('test', 'default');
