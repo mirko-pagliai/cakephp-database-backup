@@ -121,15 +121,15 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Makes the absolute path for a filename.
+     * Makes the absolute path.
      *
-     * @param string $filename
+     * @param string $path
      * @return string
      * @since 2.13.5
      */
-    public function makeAbsoluteFilename(string $filename): string
+    public function makeAbsolutePath(string $path): string
     {
-        return Path::makeAbsolute($filename, Configure::readOrFail('DatabaseBackup.target'));
+        return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
     }
 
     /**

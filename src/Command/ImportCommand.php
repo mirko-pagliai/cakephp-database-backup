@@ -109,7 +109,7 @@ class ImportCommand extends Command
                     __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport')
                 );
             }
-            $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativeFilename($filename)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativePath($filename)));
         } catch (Exception $e) {
             $io->abort($e->getMessage());
         }

@@ -3,6 +3,8 @@
 ### 2.14.3
 * the `AbstractBackupUtility::__call()` method now also supports uppercase named properties (bug fixed). This provides
   the `getConnection()` magic method;
+* `AbstractBackupUtility::makeAbsoluteFilename()` has become  `makeAbsolutePath()` and `Command::makeRelativeFilename()`
+  has become `makeRelativePath()`;
 * the signature of `AbstractBackupUtility::__call()` method has changed (from 
   `__call(string $name, array $arguments = []): mixed` to `__call(string $method, array $args): mixed`);
 * increased use of fake backup files for testing, where there is no need to use real backups for testing.

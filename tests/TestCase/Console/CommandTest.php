@@ -44,10 +44,10 @@ class CommandTest extends TestCase
     #[TestWith(['backups/backup.sql', ROOT . 'backups/backup.sql'])]
     #[TestWith([TMP . 'backup.sql', TMP . 'backup.sql'])]
     #[TestWith(['/anotherDir/backup.sql', '/anotherDir/backup.sql'])]
-    public function testMakeRelativeFilename(string $expectedRelativeFilename, string $filename): void
+    public function testMakeRelativePath(string $expectedRelativePath, string $path): void
     {
-        $result = $this->Command->makeRelativeFilename($filename);
-        $this->assertSame($expectedRelativeFilename, $result);
+        $result = $this->Command->makeRelativePath($path);
+        $this->assertSame($expectedRelativePath, $result);
     }
 
     #[Test]
