@@ -192,17 +192,4 @@ class AbstractBackupUtilityTest extends TestCase
         $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
         $Utility->getExecutor();
     }
-
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testGetDriver(): void
-    {
-        $Utility = $this->getBackupExportMock(methods: ['getExecutor']);
-
-        $Utility
-            ->expects($this->once())
-            ->method('getExecutor');
-
-        $this->deprecated(fn () => $Utility->getDriver());
-    }
 }

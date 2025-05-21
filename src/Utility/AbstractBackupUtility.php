@@ -179,23 +179,6 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Gets the driver instance.
-     *
-     * @return \DatabaseBackup\Executor\AbstractExecutor A driver instance
-     * @since 2.0.0
-     * @deprecated 2.14.0 the `AbstractExecutor::getDriver()` method is deprecated and will be removed in a future release. Use instead `getExecutor()`
-     */
-    public function getDriver(): AbstractExecutor
-    {
-        deprecationWarning(
-            '2.14.0',
-            'The `AbstractExecutor::getDriver()` method is deprecated and will be removed in a future release. Use instead `getExecutor()`'
-        );
-
-        return $this->getExecutor();
-    }
-
-    /**
      * Internal method to run and get a `Process` instance as a command-line to be run in a shell wrapper.
      *
      * @param string $command The command line to pass to the shell of the OS
