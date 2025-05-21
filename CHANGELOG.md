@@ -1,4 +1,8 @@
 # 2.x branch
+## 2.15 branch
+### 2.15.0
+* `BackupTrait` had been deprecated and has been removed.
+
 ## 2.14 branch
 ### 2.14.3
 * the `Plugin` class no longer implements the `console()` method (which described the available commands), leaving the
