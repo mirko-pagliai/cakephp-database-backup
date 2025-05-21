@@ -98,29 +98,6 @@ abstract class AbstractBackupUtility
     }
 
     /**
-     * Magic method for reading data from inaccessible (protected or private).
-     *
-     * @param string $name Property name
-     * @return mixed
-     * @since 2.12.0
-     * @throw \InvalidArgumentException With an undefined property.
-     * @deprecated 2.14.0 accessing properties via the `__get()` method is deprecated. Will be removed in a future release
-     */
-    public function __get(string $name): mixed
-    {
-        deprecationWarning(
-            '2.14.0',
-            'Accessing properties via the `__get()` method is deprecated. Will be removed in a future release'
-        );
-
-        if (!property_exists($this, $name)) {
-            throw new InvalidArgumentException('Undefined property: ' . $this::class . '::$' . $name);
-        }
-
-        return $this->{$name};
-    }
-
-    /**
      * Makes the absolute path.
      *
      * @param string $path

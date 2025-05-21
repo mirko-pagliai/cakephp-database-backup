@@ -35,7 +35,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * AbstractBackupUtilityTest.
@@ -107,25 +106,6 @@ class AbstractBackupUtilityTest extends TestCase
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Method `' . $this->Utility::class . '::' . $noExistingMethod . '()` does not exist.');
         $this->Utility->{$noExistingMethod}();
-    }
-
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testMagicGetMethod(): void
-    {
-        $this->Utility->timeout(3);
-
-        // @phpstan-ignore property.protected
-        $this->deprecated(fn () => $this->Utility->timeout);
-    }
-
-    #[Test]
-    public function testMagicGetMethodNoExistingProperty(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Undefined property: ' . $this->Utility::class . '::$noExistingProperty');
-        // @phpstan-ignore property.notFound,expr.resultUnused
-        $this->Utility->noExistingProperty;
     }
 
     /**
