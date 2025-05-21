@@ -41,3 +41,5 @@ Cache::setConfig([
         'serialize' => true,
     ],
 ]);
+
+require_once ROOT . 'config' . DS . 'bootstrap.php';
