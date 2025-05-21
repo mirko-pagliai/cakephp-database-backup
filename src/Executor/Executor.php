@@ -70,7 +70,7 @@ abstract class Executor implements EventListenerInterface
     }
 
     /**
-     * Returns the binary names to export/import, related to the respective driver.
+     * Gets the binary name to export/import for the driver.
      *
      * @return string
      */
@@ -98,7 +98,6 @@ abstract class Executor implements EventListenerInterface
     {
         if ($binaryName instanceof Compression) {
             if (!$binaryName->isValid()) {
-                //If it is a `Compression`, it checks if it is a valid `Compression`
                 throw new InvalidArgumentException('Unable to search for binary for "none" Compression');
             }
 
