@@ -1,3 +1,5 @@
+# How to use commands
+
 This plugin provides several commands for database management:
 
 ```
