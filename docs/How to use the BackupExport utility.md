@@ -73,7 +73,7 @@ Patterns are `{$DATABASE}` (database name), `{$DATETIME}` (datetime), `{$HOSTNAM
 rotate(int $rotate)
 ```
 Sets the number of backups you want to keep. So, it will delete all backups that are older.  
-See also [BackupManager::rotate()](How-to-use-the-BackupManager-utility#send.md).
+See also [BackupManager::rotate()](How%20to%20use%20the%20BackupManager%20utility.md#rotate).
 
 **Parameters for `rotate()`**
 *int $rotate*  
