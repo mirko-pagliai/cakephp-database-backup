@@ -152,13 +152,32 @@ class ExecutorTest extends TestCase
     #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', 'filename.sql', OperationType::Import])]
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', 'filename.sql.gz', OperationType::Import])]
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', 'filename.sql.bz2', OperationType::Import])]
+    #[RunInSeparateProcess]
     public function testRunProcess(string $expectedCommand, string $filename, OperationType $OperationType): void
     {
-        Mockery::mock('overload:' . ExecutableFinder::class)
+        $Compression = Compression::fromFilename($filename);
+
+        $ExecutableFinder = Mockery::mock('overload:' . ExecutableFinder::class);
+
+        /**
+         * `ExecutableFinder::find()` expects `export-binary`/`import-binary` argument and returns
+         *  `/usr/bin/export-binary`/`/usr/bin/import-binary`
+         */
+        $ExecutableFinder
             ->shouldReceive('find')
-            ->atLeast()
-            ->once()
+            ->withSomeOfArgs($OperationType->value . '-binary')
             ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
+
+        /**
+         * With a valid compression, `ExecutableFinder::find()` expects the lowercase name of the compression (e.g.
+         *  `gzip`) and returns and returns that name with the prefix `/usr/bin` (e.g. `/usr/bin/gzip`)
+         */
+        if ($Compression->isValid()) {
+            $ExecutableFinder
+                ->shouldReceive('find')
+                ->withSomeOfArgs(lcfirst($Compression->name))
+                ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
+        }
 
         $Process = Mockery::mock('overload:' . Process::class);
 
@@ -178,12 +197,14 @@ class ExecutorTest extends TestCase
 
         /**
          * `Process::run()` expects an argument built from the previous context variables.
+         *
+         * In particular, the value of `BINARY` is variable based on the type of operation.
+         * Instead, the value of `COMPRESSION_BINARY` is variable based on the type of compression (in this case
+         *  derived from `$filename`). It is `null` without compression.
          */
         $Process
             ->shouldReceive('run')
-            ->withArgs(function ($env) use ($filename, $OperationType): bool {
-                $Compression = Compression::fromFilename($filename);
-
+            ->withArgs(function ($env) use ($Compression, $filename, $OperationType): bool {
                 $expectedEnv = [
                     'AUTH_FILE' => '',
                     'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
