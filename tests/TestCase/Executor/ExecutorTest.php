@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use App\Database\FakeConnection;
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\Executor;
@@ -50,6 +51,7 @@ class ExecutorTest extends TestCase
                 return 'binary-name';
             }
         };
+        $this->Executor->Connection = new FakeConnection();
     }
 
     #[Test]
@@ -124,5 +126,20 @@ class ExecutorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to search for binary for "none" Compression');
         $this->Executor->findBinary(...$name);
+    }
+
+    #[Test]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export, Compression::None])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Gzip])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Bzip2])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import, Compression::None])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Gzip])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
+    public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
+    {
+        $this->Executor->OperationType = $OperationType;
+
+        $result = $this->Executor->getCommand(Compression: $Compression);
+        $this->assertSame($expectedCommand, $result);
     }
 }

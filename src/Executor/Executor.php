@@ -128,6 +128,39 @@ abstract class Executor implements EventListenerInterface
     }
 
     /**
+     * Gets the properly formatted "raw" command, based on the type of operation and the compression required.
+     *
+     * @param \DatabaseBackup\Compression $Compression
+     * @return string
+     * @since 3.0.0
+     */
+    public function getCommand(Compression $Compression): string
+    {
+        $isExport = $this->OperationType == OperationType::Export;
+
+        /**
+         * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
+         */
+        $name = substr(strrchr($this->Connection->config()['driver'], '\\') ?: '', 1);
+
+        /**
+         * This is the base command.
+         * It still needs to be properly articulated.
+         */
+        $command = Configure::readOrFail('DatabaseBackup.' . $name . '.' . $this->OperationType->value);
+
+        if (!$Compression->isValid()) {
+            return $command . ' ' . ($isExport ? '>' : '<') . ' "${:FILENAME}"';
+        }
+
+        if ($isExport) {
+            return $command . ' | "${:COMPRESSION_BINARY}" > "${:FILENAME}"';
+        }
+
+        return '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | ' . $command;
+    }
+
+    /**
      * Called after export.
      *
      * @return void
