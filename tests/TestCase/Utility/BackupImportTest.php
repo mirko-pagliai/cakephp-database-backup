@@ -28,6 +28,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\UsesClass;
 use RuntimeException;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use ValueError;
@@ -81,7 +82,7 @@ class BackupImportTest extends TestCase
     public function testFilenameNoReadableFile(): void
     {
         $filename = TMP . 'noExistingDir/backup.sql';
-        $this->expectException(RuntimeException::class);
+        $this->expectException(IOException::class);
         $this->expectExceptionMessage('File or directory `' . $filename . '` is not readable');
         $this->BackupImport->filename($filename);
     }
