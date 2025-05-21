@@ -161,6 +161,7 @@ abstract class Executor implements EventListenerInterface
      * @param string $filename The name of the file to process
      * @param int $timeout Maximum execution time in seconds
      * @return \Symfony\Component\Process\Process The executed process instance
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException If an error occurs during the execution of the process
      * @since 3.0.0
      */
     public function runProcess(string $filename, int $timeout = 60): Process
