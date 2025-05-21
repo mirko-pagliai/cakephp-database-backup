@@ -146,19 +146,17 @@ class ExecutorTest extends TestCase
     }
 
     #[Test]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import])]
-    public function testRunProcess(string $expectedCommand, OperationType $OperationType): void
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', 'filename.sql', OperationType::Export])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', 'filename.sql.gz', OperationType::Export])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', 'filename.sql.bz2', OperationType::Export])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', 'filename.sql', OperationType::Import])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', 'filename.sql.gz', OperationType::Import])]
+    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', 'filename.sql.bz2', OperationType::Import])]
+    public function testRunProcess(string $expectedCommand, string $filename, OperationType $OperationType): void
     {
-        $filename = 'filename.sql';
-
-        /**
-         * `ExecutableFinder::find()` expects `export-binary`/`import-binary` argument and returns
-         *  `/usr/bin/export-binary` or `/usr/bin/import-binary`.
-         */
         Mockery::mock('overload:' . ExecutableFinder::class)
             ->shouldReceive('find')
-            ->withSomeOfArgs($OperationType->value . '-binary')
+            ->atLeast()
             ->once()
             ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
 
@@ -184,10 +182,12 @@ class ExecutorTest extends TestCase
         $Process
             ->shouldReceive('run')
             ->withArgs(function ($env) use ($filename, $OperationType): bool {
+                $Compression = Compression::fromFilename($filename);
+
                 $expectedEnv = [
                     'AUTH_FILE' => '',
                     'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
-                    'COMPRESSION_BINARY' => null,
+                    'COMPRESSION_BINARY' => $Compression->isValid() ? '/usr/bin/' . lcfirst($Compression->name) : null,
                     'DB_HOST' => 'my_hostname',
                     'DB_NAME' => 'my_database',
                     'DB_PASSWORD' => 'my_password',
