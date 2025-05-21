@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
-use App\Database\FakeConnection;
+use App\Executor\FakeExecutor;
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\Executor;
@@ -23,7 +23,6 @@ use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 use Mockery;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
@@ -38,31 +37,10 @@ use Symfony\Component\Process\Process;
 #[CoversClass(Executor::class)]
 class ExecutorTest extends TestCase
 {
-    protected Executor $Executor;
-
-    /**
-     * @inheritDoc
-     */
-    #[Override]
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->Executor = new class (
-            Connection: new FakeConnection(),
-            OperationType: OperationType::Export
-        ) extends Executor {
-            public function getBinaryName(): string
-            {
-                return $this->OperationType->value . '-binary';
-            }
-        };
-    }
-
     #[Test]
     public function testImplementedEvents(): void
     {
-        $result = $this->Executor->implementedEvents();
+        $result = new FakeExecutor()->implementedEvents();
 
         $this->assertContains('beforeExport', $result);
         $this->assertContains('afterExport', $result);
@@ -82,8 +60,9 @@ class ExecutorTest extends TestCase
             ->once()
             ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
 
-        $binary = $this->Executor->findBinary($name);
-        $this->assertSame($expectedBinary, $binary);
+        $result = new FakeExecutor()->findBinary($name);
+
+        $this->assertSame($expectedBinary, $result);
     }
 
     #[Test]
@@ -95,10 +74,10 @@ class ExecutorTest extends TestCase
         $binaryName = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
         Configure::write(config: 'DatabaseBackup.binaries.' . $binaryName, value: '/customPath/' . $binaryName);
 
-        $binary = $this->Executor->findBinary($binaryName);
-        $this->assertSame($expectedBinary, $binary);
-
+        $result = new FakeExecutor()->findBinary($binaryName);
         Configure::delete('DatabaseBackup.binaries.' . $binaryName);
+
+        $this->assertSame($expectedBinary, $result);
     }
 
     #[Test]
@@ -109,7 +88,7 @@ class ExecutorTest extends TestCase
             'Binary for `noExisting` not found. Set path manually: `%s`',
             'Configure::write(\'DatabaseBackup.binaries.noExisting\', \'/path/to/noExisting\')'
         ));
-        $this->Executor->findBinary('noExisting');
+        new FakeExecutor()->findBinary('noExisting');
     }
 
     #[Test]
@@ -117,7 +96,7 @@ class ExecutorTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to search for binary for "none" Compression');
-        $this->Executor->findBinary(Compression::None);
+        new FakeExecutor()->findBinary(Compression::None);
     }
 
     #[Test]
@@ -129,14 +108,8 @@ class ExecutorTest extends TestCase
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
-        $Executor = new class (Connection: new FakeConnection(), OperationType: $OperationType) extends Executor {
-            public function getBinaryName(): string
-            {
-                return $this->OperationType->value . '-binary';
-            }
-        };
+        $result = new FakeExecutor(OperationType: $OperationType)->getCommand(Compression: $Compression);
 
-        $result = $Executor->getCommand(Compression: $Compression);
         $this->assertSame($expectedCommand, $result);
     }
 
@@ -218,14 +191,8 @@ class ExecutorTest extends TestCase
             })
             ->once();
 
-
-        $Executor = new class (Connection: new FakeConnection(), OperationType: $OperationType) extends Executor {
+        $Executor = new class (OperationType: $OperationType) extends FakeExecutor {
             public string $authFile = 'path/to/auth_file';
-
-            public function getBinaryName(): string
-            {
-                return $this->OperationType->value . '-binary';
-            }
         };
 
         $result = $Executor->runProcess($filename);
@@ -248,6 +215,6 @@ class ExecutorTest extends TestCase
 
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessage('The command "failureCommand" failed.');
-        $this->Executor->runProcess('backup.sql');
+        new FakeExecutor()->runProcess('backup.sql');
     }
 }

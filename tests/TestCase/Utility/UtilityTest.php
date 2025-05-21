@@ -16,10 +16,10 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
+use App\Executor\FakeExecutor;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -93,14 +93,9 @@ class UtilityTest extends TestCase
     #[Test]
     public function testExecutorPropertySetExecutor(): void
     {
-        $Executor = new class (new FakeConnection(), OperationType::Import) extends Executor {
-            public function getBinaryName(): string
-            {
-            }
-        };
+        $Executor = new FakeExecutor();
 
         $this->Utility->Executor = $Executor;
-
         $this->assertSame($Executor, $this->Utility->Executor);
     }
 
