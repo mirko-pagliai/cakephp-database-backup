@@ -64,15 +64,15 @@ abstract class Command extends BaseCommand
     }
 
     /**
-     * Makes the relative path for a filename (relative to `ROOT`).
+     * Makes the relative path (relative to `ROOT`).
      *
-     * @param string $filename
+     * @param string $path
      * @return string
      * @since 2.13.5
      */
-    public function makeRelativeFilename(string $filename): string
+    public function makeRelativePath(string $path): string
     {
-        return Path::isBasePath(ROOT, $filename) ? Path::makeRelative($filename, ROOT) : $filename;
+        return Path::isBasePath(ROOT, $path) ? Path::makeRelative($path, ROOT) : $path;
     }
 
     /**

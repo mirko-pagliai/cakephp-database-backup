@@ -125,7 +125,7 @@ class ExportCommand extends Command
                     __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport')
                 );
             }
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativeFilename($filename)));
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
 
             if ($args->getOption('rotate')) {
                 $rotatedFiles = BackupManager::rotate((int)$args->getOption('rotate'));

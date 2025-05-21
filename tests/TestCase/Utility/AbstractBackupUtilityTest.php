@@ -151,9 +151,9 @@ class AbstractBackupUtilityTest extends TestCase
 
     #[Test]
     #[DataProvider('makeAbsoluteFilenameProvider')]
-    public function testMakeAbsoluteFilename(string $expectedAbsolutePath, string $path): void
+    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
     {
-        $result = $this->Utility->makeAbsoluteFilename($path);
+        $result = $this->Utility->makeAbsolutePath($path);
 
         $this->assertSame($expectedAbsolutePath, $result);
     }
