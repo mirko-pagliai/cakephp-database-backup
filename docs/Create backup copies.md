@@ -1,3 +1,5 @@
+# Create backup copies
+
 As we should know, it is never enough to just create a local backup (as this plugin does).  
 Instead, **it is necessary to also create a copy of the backup, to be stored elsewhere**.
 
@@ -19,6 +21,7 @@ It will also use the `DatabaseBackup.copyDirTarget` configuration, which must be
 ```php
 Configure::write('DatabaseBackup.copyDirTarget', 'ftp://username:password@example.com:21/my/target/copy/dir');
 ```
+
 It can also be the path of a simple directory (for example an external disk), but if it contains the authentication data to an FTP server as plain text (as in my case), **it is best to set this configuration in a safe place**.
 
 ## ExportBackupCommand
@@ -83,7 +86,7 @@ class ExportBackupCommand extends Command
 
 Now let's understand what this command does.
 
-First of all it exports a database backup using the `BackupExport` utility ([as explained here](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility)), setting only the compression I want.  
+First of all it exports a database backup using the `BackupExport` utility ([as explained here](How-to-use-the-BackupExport-utility.md)), setting only the compression I want.  
 This will export the backup to the `backups/` directory of my own app by default.  
 Thanks to the `try`/`catch` block, I can catch any exceptions during the backup export, properly stop the command and report the eventual error in the console.
 
