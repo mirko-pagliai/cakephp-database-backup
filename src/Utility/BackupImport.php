@@ -51,6 +51,17 @@ class BackupImport extends Utility
         parent::__construct(OperationType: OperationType::Import);
     }
 
+    /**
+     * Imports the database.
+     *
+     * When importing, this method will trigger these events (implemented by the `Executor` class):
+     *  - `Backup.beforeImport`: will be triggered before import;
+     *  - `Backup.afterImport`: will be triggered after import.
+     *
+     * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
+     * @see \DatabaseBackup\Executor\Executor::afterImport()
+     * @see \DatabaseBackup\Executor\Executor::beforeImport()
+     */
     public function import(): string|false
     {
         //Dispatches the `Backup.beforeImport` event implemented by the `Executor` class
@@ -59,7 +70,7 @@ class BackupImport extends Utility
             return false;
         }
 
-        //Imports...
+        $this->Executor->runProcess($this->filename);
 
         //Dispatches the `Backup.afterImport` event implemented by the `Executor` class
         $this->Executor->dispatchEvent('Backup.afterImport');

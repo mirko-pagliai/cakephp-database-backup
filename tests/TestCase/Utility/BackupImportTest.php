@@ -19,13 +19,14 @@ use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
 use Cake\Event\EventInterface;
 use Cake\Event\EventList;
-use DatabaseBackup\Executor\Executor;
-use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Process\Process;
 
 /**
  * BackupImportTest.
@@ -83,7 +84,12 @@ class BackupImportTest extends TestCase
         $filename = TMP . 'backup.sql';
         file_put_contents($filename, '');
 
-        $this->BackupImport->Executor = new FakeExecutor();
+        $this->BackupImport->Executor = new class extends FakeExecutor {
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
         $this->BackupImport->Executor->getEventManager()->setEventList(new EventList());
         $this->BackupImport->filename = $filename;
 
@@ -91,8 +97,6 @@ class BackupImportTest extends TestCase
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterImport', $this->BackupImport->Executor->getEventManager());
-
-        $this->markTestIncomplete();
     }
 
     /**
