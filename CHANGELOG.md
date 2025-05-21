@@ -9,7 +9,8 @@
   has become `makeRelativePath()`;
 * the signature of `AbstractBackupUtility::__call()` method has changed (from 
   `__call(string $name, array $arguments = []): mixed` to `__call(string $method, array $args): mixed`);
-* increased use of fake backup files for testing, where there is no need to use real backups for testing.
+* increased use of fake backup files for testing, where there is no need to use real backups for testing;
+* the entire wiki has been copied to the [docs/](docs) directory. This choice was made to allow the maintenance of information related to old versions (i.e. the branch you are viewing/using).
 
 ### 2.14.2
 * the constructor method `AbstractBackupUtility` now accepts `$Connection` as an optional argument, as string (e.g.
