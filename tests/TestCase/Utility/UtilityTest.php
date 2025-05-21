@@ -43,8 +43,7 @@ class UtilityTest extends TestCase
     {
         parent::setUp();
 
-        $this->Utility = new class (OperationType: OperationType::Export) extends Utility {
-        };
+        $this->Utility = new class (OperationType: OperationType::Export) extends Utility {};
     }
 
     /**
