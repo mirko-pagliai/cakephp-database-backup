@@ -42,6 +42,14 @@ class FakeConnection extends Connection
         parent::__construct($config);
     }
 
+    public function createDrivers(array $config): array
+    {
+        return [
+            'read' => new FakeDriver(),
+            'write' => new FakeDriver(),
+        ];
+    }
+
     public function getDriver(string $role = self::ROLE_WRITE): Driver
     {
         /** @var \Cake\Database\Driver $Driver */

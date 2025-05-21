@@ -19,6 +19,7 @@ use App\Database\FakeConnection;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
 use InvalidArgumentException;
@@ -41,7 +42,7 @@ class UtilityTest extends TestCase
     {
         parent::setUp();
 
-        $this->Utility = new class extends Utility {
+        $this->Utility = new class (OperationType: OperationType::Export) extends Utility {
         };
     }
 

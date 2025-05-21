@@ -19,6 +19,7 @@ use Cake\Core\App;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\Executor;
+use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
@@ -66,6 +67,13 @@ abstract class Utility
             $this->timeOut = $timeOut;
         }
         get => $this->timeOut;
+    }
+
+    /**
+     * @param \DatabaseBackup\OperationType $OperationType
+     */
+    public function __construct(protected OperationType $OperationType)
+    {
     }
 
     /**
