@@ -1,7 +1,7 @@
 # cakephp-database-backup
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
-[![CI](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml/badge.svg)](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml)
+[![CI](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml/badge.svg?branch=2.14.x)](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup/graph/badge.svg?token=nkaJk4nvus)](https://codecov.io/gh/mirko-pagliai/cakephp-database-backup)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/cd12284c1047431c8149e09fa56536bf)](https://app.codacy.com/gh/mirko-pagliai/cakephp-database-backup/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup/badge)](https://www.codefactor.io/repository/github/mirko-pagliai/cakephp-database-backup)
@@ -52,7 +52,7 @@ files. So you have to create the directory and make it writable:
 $ mkdir backups/ && chmod 775 backups/
 ```
 
-If you want to use a different directory, read the [Configuration](#configuration) section.
+If you want to use a different directory, read the [Configuration](docs/Configuration.md) page.
 
 ### Installation on older CakePHP and PHP versions
 
@@ -69,26 +69,11 @@ least PHP `>=5.6 <7.4` and CakePHP `^3.5.1`.
 You can freely use these tags, even by downloading the source codes from the attached assets, but their functioning is
 no longer guaranteed, especially regarding old dependencies that may no longer be available.
 
-## Configuration
-The plugin uses some configuration parameters. See our wiki:
-* [Configuration](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration)
+## Configuration and How to use
 
-If you want to send backup files by email, remember to set up your application
-correctly so that it can send emails. For more information on how to configure
-your application, see the [CakePHP documentation](https://book.cakephp.org/5/en/core-libraries/email.html#configuring-transports).
+See [our wiki](/docs).
 
-## How to use
-
-See our wiki:
-* [How to use commands](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands)
-* [Export backups as cron jobs](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Export-backups-as-cron-jobs)
-* [How to use the BackupExport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility)
-* [How to use the BackupImport utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility)
-* [How to use the BackupManager utility](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility)
-* [Create backup copies](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Create-backup-copies)
-* [Send backups via email](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Send-backups-via-email)
-
-Before opening an issue, check this list of [common issues](https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Common-issues).
+Before opening an issue, check this list of [common issues](docs/Common%20issues.md).
 
 ## Testing
 
