@@ -3,6 +3,8 @@
 ### 3.0.0
 * the `DatabaseBackup.target` configuration value no longer exists. Relative paths will be understood as relative to the `ROOT`;
 * the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`);
+* since there are no aliases defined for binaries anymore (and it would be possible to override the configuration anyway), the
+  `Executor::findBinary()` method takes only one argument;
 * it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:

@@ -71,43 +71,33 @@ class ExecutorTest extends TestCase
 
     #[Test]
     #[TestWith(['/usr/bin/mariadb', 'mariadb'])]
-    #[TestWith(['/usr/bin/mariadb', 'mariadb', 'mysql'])]
-    #[TestWith(['/usr/bin/mariadb', 'mariadb', 'noExisting'])]
-    #[TestWith(['/usr/bin/mariadb', 'noExisting', 'mariadb'])]
     #[TestWith(['/usr/bin/mysql', 'mysql'])]
     #[TestWith(['/usr/bin/gzip', Compression::Gzip])]
     #[RunInSeparateProcess]
-    public function testFindBinary(string $expectedBinary, string|Compression ...$name): void
+    public function testFindBinary(string $expectedBinary, string|Compression $name): void
     {
-        /** @var \Symfony\Component\Process\ExecutableFinder&\Mockery\MockInterface $ExecutableFinder */
-        $ExecutableFinder = Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder');
-        $ExecutableFinder
+        Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder')
             ->shouldReceive('find')
-            ->between(1, 2)
-            ->andReturnUsing(fn (string $name): ?string => match ($name) {
-                'noExisting' => null,
-                default => '/usr/bin/' . $name,
-            });
+            ->once()
+            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
 
-        $binary = $this->Executor->findBinary(...$name);
+        $binary = $this->Executor->findBinary($name);
         $this->assertSame($expectedBinary, $binary);
     }
 
     #[Test]
     #[TestWith(['/customPath/mariadb', 'mariadb'])]
-    #[TestWith(['/customPath/mariadb', 'mariadb', 'mysql'])]
-    #[TestWith(['/customPath/mariadb', 'mariadb', 'noExisting'])]
-    #[TestWith(['/customPath/mariadb', 'noExisting', 'mariadb'])]
     #[TestWith(['/customPath/mysql', 'mysql'])]
     #[TestWith(['/customPath/gzip', Compression::Gzip])]
-    public function testFindBinaryFromConfiguration(string $expectedBinary, string|Compression ...$name): void
+    public function testFindBinaryFromConfiguration(string $expectedBinary, string|Compression $binaryName): void
     {
-        Configure::write('DatabaseBackup.binaries.mariadb', '/customPath/mariadb');
-        Configure::write('DatabaseBackup.binaries.mysql', '/customPath/mysql');
-        Configure::write('DatabaseBackup.binaries.gzip', '/customPath/gzip');
+        $binaryName = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
+        Configure::write(config: 'DatabaseBackup.binaries.' . $binaryName, value: '/customPath/' . $binaryName);
 
-        $binary = $this->Executor->findBinary(...$name);
+        $binary = $this->Executor->findBinary($binaryName);
         $this->assertSame($expectedBinary, $binary);
+
+        Configure::delete('DatabaseBackup.binaries.' . $binaryName);
     }
 
     #[Test]
@@ -122,14 +112,11 @@ class ExecutorTest extends TestCase
     }
 
     #[Test]
-    #[TestWith([Compression::None])]
-    #[TestWith([Compression::None, 'gzip'])]
-    #[TestWith(['gzip', Compression::None])]
-    public function testFindBinaryWithCompressionNone(string|Compression ...$name): void
+    public function testFindBinaryWithCompressionNone(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to search for binary for "none" Compression');
-        $this->Executor->findBinary(...$name);
+        $this->Executor->findBinary(Compression::None);
     }
 
     #[Test]
