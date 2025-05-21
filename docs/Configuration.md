@@ -1,3 +1,4 @@
+# Configuration
 
 The plugin uses some configuration parameters and you can set them using the  `\Cake\Core\Configure` class, **before** loading the plugin.
 
@@ -87,7 +88,7 @@ _(from 2.10.0 version)_
 By default, commands (to export/imports backups) are executed with generic options that are valid for almost all environments.
 However, in some particular environments or conditions it may be necessary to execute commands with particular options.
 
-The default commands are defined in the [bootstrap file](https://github.com/mirko-pagliai/cakephp-database-backup/blob/master/config/bootstrap.php) and placeholders (such as `{{BINARY}}` or `{{DB_HOST}}`) are replaced and escaped before the command is executed.
+The default commands are defined in the `config/bootstrap.php` file and placeholders (such as `{{BINARY}}` or `{{DB_HOST}}`) are replaced and escaped before the command is executed.
 
 It is therefore possible to use custom commands by acting on the configuration, before loading the plugin.
 
