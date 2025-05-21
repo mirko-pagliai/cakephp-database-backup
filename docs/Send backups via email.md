@@ -1,3 +1,5 @@
+# Send backups via email
+
 Up until version `2.13.3`, the plugin offered various possibilities to send the created backup files via email.  
 All of these (classes, methods, options) **have been deprecated** with version `2.13.4` and **removed** with version `2.14.0`.
 
@@ -21,7 +23,6 @@ public function sendBackupWithMail(): void
     /**
      * First I create a backup normally.
      * `$filename` will be the full path to the created backup.
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility
      */
     $BackupExport = new BackupExport();
     $BackupExport->compression('gzip');
@@ -73,7 +74,6 @@ class ExportAndSendBackupCommand extends Command
             /**
              * First I create a backup normally.
              * `$filename` will be the full path to the created backup.
-             * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility
              */
             $BackupExport = new BackupExport();
             $BackupExport->compression('gzip');
