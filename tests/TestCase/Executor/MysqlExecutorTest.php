@@ -115,8 +115,6 @@ class MysqlExecutorTest extends TestCase
         $content = '{{USER}}_{{PASSWORD}}_{{HOST}}';
         $expectedContent = 'my_username_my_password_my_hostname';
 
-        $this->MysqlExecutor->Connection = new FakeConnection();
-
         $result = $this->MysqlExecutor->writeAuthFile($content);
         $this->assertTrue($result);
 

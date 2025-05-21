@@ -56,7 +56,6 @@ class SqliteExecutorTest extends TestCase
     #[Test]
     public function testGetAllTableSchemas(): void
     {
-        $this->SqliteExecutor->Connection = new FakeConnection();
         $result = $this->SqliteExecutor->getAllTableSchemas();
 
         $this->assertCount(2, $result);
@@ -72,8 +71,8 @@ class SqliteExecutorTest extends TestCase
         $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
         $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
 
-        $this->SqliteExecutor->Connection = $Connection;
-        $this->SqliteExecutor->dropAllTables();
+        $SqliteExecutor = new SqliteExecutor(Connection: $Connection, OperationType: OperationType::Export);
+        $SqliteExecutor->dropAllTables();
     }
 
     #[Test]
@@ -86,8 +85,7 @@ class SqliteExecutorTest extends TestCase
         $Connection->shouldReceive('getDriver')->andReturn($Driver);
 
         /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
-        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [new FakeConnection(), OperationType::Export]);
-        $SqliteExecutor->Connection = $Connection;
+        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [$Connection, OperationType::Export]);
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
 
         $SqliteExecutor->shouldHaveReceived('dropAllTables')->once();
