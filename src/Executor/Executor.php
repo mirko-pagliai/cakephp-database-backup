@@ -176,7 +176,7 @@ abstract class Executor implements EventListenerInterface
 
         $Process->run(env: [
             'AUTH_FILE' => property_exists($this, 'authFile') ? $this->authFile : '',
-            'BINARY' => $this->findBinary(...(array)$this->getBinaryName()),
+            'BINARY' => $this->findBinary($this->getBinaryName()),
             'COMPRESSION_BINARY' => $Compression->isValid() ? $this->findBinary($Compression) : null,
             'DB_HOST' => $config['host'],
             'DB_NAME' => $config['database'],

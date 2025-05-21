@@ -46,6 +46,6 @@ class PostgresExecutorTest extends TestCase
     public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
     {
         $this->PostgresExecutor->OperationType = $OperationType;
-        $this->assertSame($expectedBinarName, $this->PostgresExecutor->getBinaryName());;
+        $this->assertSame($expectedBinarName, $this->PostgresExecutor->getBinaryName());
     }
 }

@@ -48,7 +48,7 @@ class MysqlExecutorTest extends TestCase
     public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
     {
         $this->MysqlExecutor->OperationType = $OperationType;
-        $this->assertSame($expectedBinarName, $this->MysqlExecutor->getBinaryName());;
+        $this->assertSame($expectedBinarName, $this->MysqlExecutor->getBinaryName());
     }
 
     #[Test]

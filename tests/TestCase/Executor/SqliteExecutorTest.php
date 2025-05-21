@@ -50,7 +50,7 @@ class SqliteExecutorTest extends TestCase
     public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
     {
         $this->SqliteExecutor->OperationType = $OperationType;
-        $this->assertSame($expectedBinarName, $this->SqliteExecutor->getBinaryName());;
+        $this->assertSame($expectedBinarName, $this->SqliteExecutor->getBinaryName());
     }
 
     #[Test]
