@@ -86,7 +86,7 @@ class ExportBackupCommand extends Command
 
 Now let's understand what this command does.
 
-First of all it exports a database backup using the `BackupExport` utility ([as explained here](How-to-use-the-BackupExport-utility.md)), setting only the compression I want.  
+First of all it exports a database backup using the `BackupExport` utility ([as explained here](How%20to%20use%20the%20BackupExport%20utility.md)), setting only the compression I want.  
 This will export the backup to the `backups/` directory of my own app by default.  
 Thanks to the `try`/`catch` block, I can catch any exceptions during the backup export, properly stop the command and report the eventual error in the console.
 
