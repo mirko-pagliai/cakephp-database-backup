@@ -19,6 +19,7 @@ use App\Database\FakeConnection;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -87,6 +88,20 @@ class UtilityTest extends TestCase
 
         $result = $this->Utility->Executor;
         $this->assertInstanceOf(SqliteExecutor::class, $result);
+    }
+
+    #[Test]
+    public function testExecutorPropertySetExecutor(): void
+    {
+        $Executor = new class (new FakeConnection(), OperationType::Import) extends Executor {
+            public function getBinaryName(): string
+            {
+            }
+        };
+
+        $this->Utility->Executor = $Executor;
+
+        $this->assertSame($Executor, $this->Utility->Executor);
     }
 
     #[Test]

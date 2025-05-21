@@ -44,20 +44,25 @@ abstract class Utility
 
     public Executor $Executor {
         get {
-            /**
-             * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
-             */
-            $name = substr(strrchr($this->Connection->config()['driver'], '\\') ?: '', 1);
+            if (empty($this->Executor)) {
+                /**
+                 * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
+                 */
+                $name = substr(strrchr($this->Connection->config()['driver'], '\\') ?: '', 1);
 
-            /** @var class-string<\DatabaseBackup\Executor\Executor> $className */
-            $className = App::classname('DatabaseBackup.' . $name . 'Executor', 'Executor');
-            if (!$className) {
-                throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
+                /** @var class-string<\DatabaseBackup\Executor\Executor> $className */
+                $className = App::classname('DatabaseBackup.' . $name . 'Executor', 'Executor');
+                if (!$className) {
+                    throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
+                }
+
+                $this->Executor = new $className(Connection: $this->Connection, OperationType: $this->OperationType);
             }
 
-            return new $className(Connection: $this->Connection, OperationType: $this->OperationType);
+            return $this->Executor;
         }
     }
+
     public int $timeOut = 60 {
         set (int $timeOut) {
             if ($timeOut < 0) {
