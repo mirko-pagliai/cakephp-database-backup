@@ -24,6 +24,7 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 use function Cake\I18n\__d;
 
 /**
@@ -158,6 +159,41 @@ abstract class Executor implements EventListenerInterface
         }
 
         return '"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | ' . $command;
+    }
+
+    /**
+     * Gets and runs a `Process` instance, based on the given file.
+     *
+     * @param string $filename The name of the file to be processed
+     * @return \Symfony\Component\Process\Process The executed process instance.
+     * @since 3.0.0
+     */
+    public function runProcess(string $filename, int $timeout = 60): Process
+    {
+        $Compression = Compression::fromFilename($filename);
+
+        $config = $this->Connection->config();
+
+        /**
+         * @see https://symfony.com/doc/current/components/process.html
+         */
+        $Process = Process::fromShellCommandline(
+            command: $this->getCommand(Compression: $Compression),
+            timeout: $timeout,
+        );
+
+        $Process->run(env: [
+            'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
+            'BINARY' => $this->findBinary(...(array)$this->getBinaryName()),
+            'COMPRESSION_BINARY' => $Compression->isValid() ? $this->findBinary($Compression) : null,
+            'DB_HOST' => $config['host'],
+            'DB_NAME' => $config['database'],
+            'DB_PASSWORD' => $config['password'],
+            'DB_USER' => $config['username'],
+            'FILENAME' => $filename,
+        ]);
+
+        return $Process;
     }
 
     /**

@@ -28,6 +28,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * ExecutorTest.
@@ -48,7 +50,7 @@ class ExecutorTest extends TestCase
         $this->Executor = new class (OperationType: OperationType::Export) extends Executor {
             public function getBinaryName(): string
             {
-                return 'binary-name';
+                return $this->OperationType->value . '-binary';
             }
         };
         $this->Executor->Connection = new FakeConnection();
@@ -141,5 +143,67 @@ class ExecutorTest extends TestCase
 
         $result = $this->Executor->getCommand(Compression: $Compression);
         $this->assertSame($expectedCommand, $result);
+    }
+
+    #[Test]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import])]
+    public function testRunProcess(string $expectedCommand, OperationType $OperationType): void
+    {
+        $filename = 'filename.sql';
+
+        /**
+         * `ExecutableFinder::find()` expects `export-binary`/`import-binary` argument and returns
+         *  `/usr/bin/export-binary` or `/usr/bin/import-binary`.
+         */
+        Mockery::mock('overload:' . ExecutableFinder::class)
+            ->shouldReceive('find')
+            ->withSomeOfArgs($OperationType->value . '-binary')
+            ->once()
+            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
+
+        $Process = Mockery::mock('overload:' . Process::class);
+
+        /**
+         * `Process::fromShellCommandline()` expects `$expectedCommand` argument.
+         */
+        $Process
+            ->shouldReceive('fromShellCommandline')
+            ->withArgs(function ($command, $timeout) use ($expectedCommand): bool {
+                $this->assertSame($expectedCommand, $command);
+                $this->assertSame(60, $timeout);
+
+                return true;
+            })
+            ->once()
+            ->andReturnSelf();
+
+        /**
+         * `Process::run()` expects an argument built from the previous context variables.
+         */
+        $Process
+            ->shouldReceive('run')
+            ->withArgs(function ($env) use ($filename, $OperationType): bool {
+                $expectedEnv = [
+                    'AUTH_FILE' => '',
+                    'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
+                    'COMPRESSION_BINARY' => null,
+                    'DB_HOST' => 'my_hostname',
+                    'DB_NAME' => 'my_database',
+                    'DB_PASSWORD' => 'my_password',
+                    'DB_USER' => 'my_username',
+                    'FILENAME' => $filename,
+                ];
+                $this->assertSame($expectedEnv, $env);
+
+                return true;
+            })
+            ->once();
+
+        $this->Executor->OperationType = $OperationType;
+
+        $result = $this->Executor->runProcess($filename);
+
+        $this->assertSame($Process, $result);
     }
 }
