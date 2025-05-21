@@ -17,6 +17,7 @@ namespace DatabaseBackup\Utility;
 
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
+use LogicException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use function Cake\I18n\__d;
 
@@ -39,6 +40,7 @@ class BackupImport extends Utility
 
             $this->filename = $filename;
         }
+        get => $this->filename ?? throw new LogicException(__d('database_backup', 'You must first set the filename'));
     }
 
     /**

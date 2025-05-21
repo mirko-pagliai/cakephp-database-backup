@@ -62,4 +62,12 @@ class BackupImportTest extends TestCase
         $this->expectExceptionMessage('File or directory `' . $filename . '` is not readable');
         $this->BackupImport->filename = $filename;
     }
+
+    #[Test]
+    public function testFilenamePropertyNotSetted(): void
+    {
+        $this->expectExceptionMessage('You must first set the filename');
+        /** @phpstan-ignore-next-line */
+        $this->BackupImport->filename;
+    }
 }
