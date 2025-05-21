@@ -40,6 +40,9 @@ abstract class Executor implements EventListenerInterface
 
     public Connection $Connection;
 
+    /**
+     * @param \DatabaseBackup\OperationType $OperationType
+     */
     public function __construct(public OperationType $OperationType)
     {
         //Attaches the object to the event manager
