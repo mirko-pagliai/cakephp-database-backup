@@ -9,7 +9,6 @@
   has become `makeRelativePath()`;
 * the signature of `AbstractBackupUtility::__call()` method has changed (from 
   `__call(string $name, array $arguments = []): mixed` to `__call(string $method, array $args): mixed`);
-* 
 * increased use of fake backup files for testing, where there is no need to use real backups for testing.
 
 ### 2.14.2
