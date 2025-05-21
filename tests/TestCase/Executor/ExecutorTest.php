@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 use Cake\Core\Configure;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\Executor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 use Mockery;
@@ -43,7 +44,7 @@ class ExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->Executor = new class extends Executor {};
+        $this->Executor = new class (OperationType: OperationType::Export) extends Executor {};
     }
 
     #[Test]

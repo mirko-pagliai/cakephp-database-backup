@@ -21,6 +21,7 @@ use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
 use DatabaseBackup\Compression;
+use DatabaseBackup\OperationType;
 use InvalidArgumentException;
 use Symfony\Component\Process\ExecutableFinder;
 use function Cake\I18n\__d;
@@ -39,7 +40,7 @@ abstract class Executor implements EventListenerInterface
 
     public Connection $Connection;
 
-    public function __construct()
+    public function __construct(protected OperationType $OperationType)
     {
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);

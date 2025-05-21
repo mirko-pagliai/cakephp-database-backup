@@ -19,6 +19,7 @@ use App\Database\FakeConnection;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
 use DatabaseBackup\Executor\SqliteExecutor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,12 +31,23 @@ use PHPUnit\Framework\Attributes\Test;
 #[CoversClass(SqliteExecutor::class)]
 class SqliteExecutorTest extends TestCase
 {
+    protected SqliteExecutor $SqliteExecutor;
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->SqliteExecutor = new SqliteExecutor(OperationType::Export);
+    }
+
     #[Test]
     public function testGetAllTableSchemas(): void
     {
-        $SqliteExecutor = new SqliteExecutor();
-        $SqliteExecutor->Connection = new FakeConnection();
-        $result = $SqliteExecutor->getAllTableSchemas();
+        $this->SqliteExecutor->Connection = new FakeConnection();
+        $result = $this->SqliteExecutor->getAllTableSchemas();
 
         $this->assertCount(2, $result);
         $this->assertSame('articles', $result[0]->name());
@@ -50,9 +62,8 @@ class SqliteExecutorTest extends TestCase
         $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
         $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
 
-        $SqliteExecutor = new SqliteExecutor();
-        $SqliteExecutor->Connection = $Connection;
-        $SqliteExecutor->dropAllTables();
+        $this->SqliteExecutor->Connection = $Connection;
+        $this->SqliteExecutor->dropAllTables();
     }
 
     #[Test]
@@ -65,7 +76,7 @@ class SqliteExecutorTest extends TestCase
         $Connection->shouldReceive('getDriver')->andReturn($Driver);
 
         /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
-        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]');
+        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [OperationType::Export]);
         $SqliteExecutor->Connection = $Connection;
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
 

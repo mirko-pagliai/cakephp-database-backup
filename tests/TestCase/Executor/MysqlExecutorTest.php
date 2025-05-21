@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
 use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,11 +29,23 @@ use PHPUnit\Framework\Attributes\Test;
 #[CoversClass(MysqlExecutor::class)]
 class MysqlExecutorTest extends TestCase
 {
+    protected MysqlExecutor $MysqlExecutor;
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->MysqlExecutor = new MysqlExecutor(OperationType::Export);
+    }
+
     #[Test]
     public function testAfterExport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]');
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.afterExport');
 
         $MysqlExecutor
@@ -45,7 +58,7 @@ class MysqlExecutorTest extends TestCase
     public function testAfterImport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]');
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.afterImport');
 
         $MysqlExecutor
@@ -58,7 +71,7 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeExport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]');
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.beforeExport');
 
         $MysqlExecutor
@@ -74,7 +87,7 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeImport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]');
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.beforeImport');
 
         $MysqlExecutor
@@ -92,29 +105,27 @@ class MysqlExecutorTest extends TestCase
         $content = '{{USER}}_{{PASSWORD}}_{{HOST}}';
         $expectedContent = 'my_username_my_password_my_hostname';
 
-        $MysqlExecutor = new MysqlExecutor();
-        $MysqlExecutor->Connection = new FakeConnection();
+        $this->MysqlExecutor->Connection = new FakeConnection();
 
-        $result = $MysqlExecutor->writeAuthFile($content);
+        $result = $this->MysqlExecutor->writeAuthFile($content);
         $this->assertTrue($result);
 
-        $this->assertStringEqualsFile($MysqlExecutor->authFile, $expectedContent);
-        unlink($MysqlExecutor->authFile);
+        $this->assertStringEqualsFile($this->MysqlExecutor->authFile, $expectedContent);
+        unlink($this->MysqlExecutor->authFile);
     }
 
     #[Test]
     public function testDeleteAuthFile(): void
     {
-        $MysqlExecutor = new MysqlExecutor();
-        $authFile = $MysqlExecutor->authFile;
+        $authFile = $this->MysqlExecutor->authFile;
         touch($authFile);
 
         $this->assertFileExists($authFile);
 
-        $MysqlExecutor->deleteAuthFile();
+        $this->MysqlExecutor->deleteAuthFile();
 
         $this->assertFileDoesNotExist($authFile);
 
-        $this->assertNotEquals($MysqlExecutor->authFile, $authFile);
+        $this->assertNotEquals($this->MysqlExecutor->authFile, $authFile);
     }
 }
