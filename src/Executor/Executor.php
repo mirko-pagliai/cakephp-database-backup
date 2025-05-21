@@ -40,7 +40,7 @@ abstract class Executor implements EventListenerInterface
 
     public Connection $Connection;
 
-    public function __construct(protected OperationType $OperationType)
+    public function __construct(public OperationType $OperationType)
     {
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
@@ -63,6 +63,13 @@ abstract class Executor implements EventListenerInterface
             'Backup.beforeImport' => 'beforeImport',
         ];
     }
+
+    /**
+     * Returns the binary names to export/import, related to the respective driver.
+     *
+     * @return string
+     */
+    abstract public function getBinaryName(): string;
 
     /**
      * Finds and returns an executable binary by name.

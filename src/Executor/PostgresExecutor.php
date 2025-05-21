@@ -15,9 +15,20 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use DatabaseBackup\OperationType;
+use Override;
+
 /**
  * PostgresExecutor to export/import database backups.
  */
 class PostgresExecutor extends Executor
 {
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    public function getBinaryName(): string
+    {
+        return $this->OperationType == OperationType::Export ? 'pg_dump' : 'pg_restore';
+    }
 }

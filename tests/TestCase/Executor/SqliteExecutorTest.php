@@ -24,6 +24,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * SqliteExecutorTest.
@@ -41,6 +42,15 @@ class SqliteExecutorTest extends TestCase
         parent::setUp();
 
         $this->SqliteExecutor = new SqliteExecutor(OperationType::Export);
+    }
+
+    #[Test]
+    #[TestWith(['sqlite3', OperationType::Export])]
+    #[TestWith(['sqlite3', OperationType::Import])]
+    public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
+    {
+        $this->SqliteExecutor->OperationType = $OperationType;
+        $this->assertSame($expectedBinarName, $this->SqliteExecutor->getBinaryName());;
     }
 
     #[Test]

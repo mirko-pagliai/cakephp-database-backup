@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Executor;
 
 use Cake\Event\EventInterface;
+use DatabaseBackup\OperationType;
 use Override;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -32,6 +33,15 @@ class MysqlExecutor extends Executor
 
             return $this->authFile;
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    public function getBinaryName(): string
+    {
+        return $this->OperationType == OperationType::Export ? 'mariadb-dump' : 'mariadb';
     }
 
     /**

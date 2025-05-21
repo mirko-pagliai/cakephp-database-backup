@@ -25,6 +25,15 @@ use Override;
 class SqliteExecutor extends Executor
 {
     /**
+     * @inheritDoc
+     */
+    #[Override]
+    public function getBinaryName(): string
+    {
+        return 'sqlite3';
+    }
+
+    /**
      * Gets all tables schemas
      *
      * @return array<\Cake\Database\Schema\TableSchema>

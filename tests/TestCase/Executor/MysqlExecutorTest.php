@@ -22,6 +22,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * MysqlExecutorTest.
@@ -39,6 +40,15 @@ class MysqlExecutorTest extends TestCase
         parent::setUp();
 
         $this->MysqlExecutor = new MysqlExecutor(OperationType::Export);
+    }
+
+    #[Test]
+    #[TestWith(['mariadb-dump', OperationType::Export])]
+    #[TestWith(['mariadb', OperationType::Import])]
+    public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
+    {
+        $this->MysqlExecutor->OperationType = $OperationType;
+        $this->assertSame($expectedBinarName, $this->MysqlExecutor->getBinaryName());;
     }
 
     #[Test]

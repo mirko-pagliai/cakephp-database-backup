@@ -2,6 +2,7 @@
 ## 3.0 branch
 ### 3.0.0
 * the `DatabaseBackup.target` configuration value no longer exists. Relative paths will be understood as relative to the `ROOT`;
+* the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`);
 * it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:
