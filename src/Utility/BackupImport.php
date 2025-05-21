@@ -50,4 +50,20 @@ class BackupImport extends Utility
     {
         parent::__construct(OperationType: OperationType::Import);
     }
+
+    public function import(): string|false
+    {
+        //Dispatches the `Backup.beforeImport` event implemented by the `Executor` class
+        $BeforeImport = $this->Executor->dispatchEvent('Backup.beforeImport');
+        if ($BeforeImport->isStopped()) {
+            return false;
+        }
+
+        //Imports...
+
+        //Dispatches the `Backup.afterImport` event implemented by the `Executor` class
+        $this->Executor->dispatchEvent('Backup.afterImport');
+
+        return $this->filename;
+    }
 }
