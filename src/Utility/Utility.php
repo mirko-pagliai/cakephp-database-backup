@@ -58,7 +58,6 @@ abstract class Utility
             return new $className(Connection: $this->Connection, OperationType: $this->OperationType);
         }
     }
-
     public int $timeOut = 60 {
         set (int $timeOut) {
             if ($timeOut < 0) {
@@ -69,11 +68,11 @@ abstract class Utility
     }
 
     /**
+     * Construct.
+     *
      * @param \DatabaseBackup\OperationType $OperationType
      */
-    public function __construct(protected OperationType $OperationType)
-    {
-    }
+    public function __construct(readonly protected OperationType $OperationType) {}
 
     /**
      * Converts a relative file path to an absolute path based on the specified target directory.

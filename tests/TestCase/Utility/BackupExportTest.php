@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
 use DatabaseBackup\Compression;
-use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Error;
@@ -40,7 +39,7 @@ class BackupExportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport(OperationType: OperationType::Export);
+        $this->BackupExport = new BackupExport();
         $this->BackupExport->Connection = new FakeConnection();
     }
 

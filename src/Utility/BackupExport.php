@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use DatabaseBackup\Compression;
+use DatabaseBackup\OperationType;
+use Override;
 
 /**
  * Utility to export databases.
@@ -30,6 +32,14 @@ class BackupExport extends Utility
 
             $this->Compression = $Compression;
         }
+    }
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(OperationType: OperationType::Import);
     }
 
     /**
