@@ -23,6 +23,7 @@ use Cake\Event\EventListenerInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use InvalidArgumentException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use function Cake\I18n\__d;
@@ -88,9 +89,9 @@ abstract class Executor implements EventListenerInterface
      * $this->findBinary($this->getBinaryName())
      * ```
      *
-     * @param \DatabaseBackup\Compression|string $binaryName
-     * @return string
-     * @throws \InvalidArgumentException
+     * @param \DatabaseBackup\Compression|string $binaryName Name of the binary or `Compression` instance
+     * @return string Full path to the binary
+     * @throws \InvalidArgumentException If binary cannot be found or `Compression` is invalid
      * @since 3.0.0
      */
     public function findBinary(Compression|string $binaryName): string
@@ -104,20 +105,23 @@ abstract class Executor implements EventListenerInterface
             $binaryName = lcfirst($binaryName->name);
         }
 
+        /** @var string $binary */
         $binary = Configure::read(
             var: 'DatabaseBackup.binaries.' . $binaryName,
             default: new ExecutableFinder()->find(name: $binaryName)
         );
-        if ($binary) {
-            return $binary;
+
+        if (!$binary) {
+            throw new InvalidArgumentException(__d(
+                'database_backup',
+                'Binary for `{0}` not found. Set path manually: `{1}`',
+                $binary,
+                sprintf("Configure::write('DatabaseBackup.binaries.%s', '/path/to/%s')", $binary, $binary)
+            ));
+
         }
 
-        throw new InvalidArgumentException(__d(
-            'database_backup',
-            'Binary for `{0}` could not be found. You have to set its path manually on your bootstrap with: `{1}`',
-            $binaryName,
-            'Configure::write(\'DatabaseBackup.binaries.' . $binaryName . '\', \'/your/full/path/to/' . $binaryName . '\')'
-        ));
+        return $binary;
     }
 
     /**
@@ -154,16 +158,16 @@ abstract class Executor implements EventListenerInterface
     }
 
     /**
-     * Gets and runs a `Process` instance, based on the given file.
+     * Executes a backup process with the given parameters.
      *
-     * @param string $filename The name of the file to be processed
-     * @return \Symfony\Component\Process\Process The executed process instance.
+     * @param string $filename The name of the file to process
+     * @param int $timeout Maximum execution time in seconds
+     * @return \Symfony\Component\Process\Process The executed process instance
      * @since 3.0.0
      */
     public function runProcess(string $filename, int $timeout = 60): Process
     {
         $Compression = Compression::fromFilename($filename);
-
         $config = $this->Connection->config();
 
         /**
@@ -185,6 +189,10 @@ abstract class Executor implements EventListenerInterface
             'FILENAME' => $filename,
         ]);
 
+        if (!$Process->isSuccessful()) {
+            throw new ProcessFailedException($Process);
+        }
+
         return $Process;
     }
 
@@ -195,9 +203,7 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function afterExport(): void
-    {
-    }
+    public function afterExport(): void {}
 
     /**
      * Called after import.
@@ -206,9 +212,7 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function afterImport(): void
-    {
-    }
+    public function afterImport(): void {}
 
     /**
      * Called before export.
@@ -218,9 +222,7 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function beforeExport(EventInterface $Event): void
-    {
-    }
+    public function beforeExport(EventInterface $Event): void {}
 
     /**
      * Called before import.
@@ -230,7 +232,5 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function beforeImport(EventInterface $Event): void
-    {
-    }
+    public function beforeImport(EventInterface $Event): void {}
 }

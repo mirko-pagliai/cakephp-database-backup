@@ -28,6 +28,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -215,5 +216,22 @@ class ExecutorTest extends TestCase
         $result = $this->Executor->runProcess($filename);
 
         $this->assertSame($Process, $result);
+    }
+
+    #[Test]
+    public function testRunProcessOnFailure(): void
+    {
+        Mockery::mock('overload:' . ExecutableFinder::class)
+            ->shouldReceive('find')
+            ->andReturn('/usr/bin/binary');
+
+        $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
+        $Process->shouldReceive('fromShellCommandline')->andReturnSelf();
+        $Process->shouldReceive('isSuccessful')->andReturn(false);
+        $Process->shouldReceive('getCommandLine')->andReturn('failureCommand');
+
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage('The command "failureCommand" failed.');
+        $this->Executor->runProcess('backup.sql');
     }
 }
