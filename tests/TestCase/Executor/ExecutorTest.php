@@ -52,8 +52,6 @@ class ExecutorTest extends TestCase
             Connection: new FakeConnection(),
             OperationType: OperationType::Export
         ) extends Executor {
-            public string $authFile = 'path/to/auth_file';
-
             public function getBinaryName(): string
             {
                 return $this->OperationType->value . '-binary';
@@ -131,9 +129,14 @@ class ExecutorTest extends TestCase
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
-        $this->Executor->OperationType = $OperationType;
+        $Executor = new class (Connection: new FakeConnection(), OperationType: $OperationType) extends Executor {
+            public function getBinaryName(): string
+            {
+                return $this->OperationType->value . '-binary';
+            }
+        };
 
-        $result = $this->Executor->getCommand(Compression: $Compression);
+        $result = $Executor->getCommand(Compression: $Compression);
         $this->assertSame($expectedCommand, $result);
     }
 
@@ -215,9 +218,17 @@ class ExecutorTest extends TestCase
             })
             ->once();
 
-        $this->Executor->OperationType = $OperationType;
 
-        $result = $this->Executor->runProcess($filename);
+        $Executor = new class (Connection: new FakeConnection(), OperationType: $OperationType) extends Executor {
+            public string $authFile = 'path/to/auth_file';
+
+            public function getBinaryName(): string
+            {
+                return $this->OperationType->value . '-binary';
+            }
+        };
+
+        $result = $Executor->runProcess($filename);
 
         $this->assertSame($Process, $result);
     }

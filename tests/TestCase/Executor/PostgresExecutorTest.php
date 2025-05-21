@@ -29,24 +29,12 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(PostgresExecutor::class)]
 class PostgresExecutorTest extends TestCase
 {
-     protected PostgresExecutor $PostgresExecutor;
-
-     /**
-      * @inheritDoc
-      */
-     public function setUp(): void
-     {
-         parent::setUp();
-
-         $this->PostgresExecutor = new PostgresExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
-     }
-
     #[Test]
     #[TestWith(['pg_dump', OperationType::Export])]
     #[TestWith(['pg_restore', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
     {
-        $this->PostgresExecutor->OperationType = $OperationType;
-        $this->assertSame($expectedBinarName, $this->PostgresExecutor->getBinaryName());
+        $PostgresExecutor = new PostgresExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $this->assertSame($expectedBinarName, $PostgresExecutor->getBinaryName());
     }
 }

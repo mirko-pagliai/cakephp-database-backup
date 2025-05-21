@@ -47,8 +47,8 @@ class MysqlExecutorTest extends TestCase
     #[TestWith(['mariadb', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
     {
-        $this->MysqlExecutor->OperationType = $OperationType;
-        $this->assertSame($expectedBinarName, $this->MysqlExecutor->getBinaryName());
+        $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $this->assertSame($expectedBinarName, $MysqlExecutor->getBinaryName());
     }
 
     #[Test]

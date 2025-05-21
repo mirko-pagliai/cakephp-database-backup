@@ -49,8 +49,8 @@ class SqliteExecutorTest extends TestCase
     #[TestWith(['sqlite3', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
     {
-        $this->SqliteExecutor->OperationType = $OperationType;
-        $this->assertSame($expectedBinarName, $this->SqliteExecutor->getBinaryName());
+        $SqliteExecutor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $this->assertSame($expectedBinarName, $SqliteExecutor->getBinaryName());
     }
 
     #[Test]
