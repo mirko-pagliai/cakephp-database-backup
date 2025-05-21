@@ -44,7 +44,12 @@ class ExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->Executor = new class (OperationType: OperationType::Export) extends Executor {};
+        $this->Executor = new class (OperationType: OperationType::Export) extends Executor {
+            public function getBinaryName(): string
+            {
+                return 'binary-name';
+            }
+        };
     }
 
     #[Test]
