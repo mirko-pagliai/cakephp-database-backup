@@ -64,7 +64,7 @@ class BackupImportTest extends TestCase
     }
 
     #[Test]
-    public function testFilenamePropertyNotSetted(): void
+    public function testFilenamePropertyNotSet(): void
     {
         $this->expectExceptionMessage('You must first set the filename');
         /** @phpstan-ignore-next-line */
