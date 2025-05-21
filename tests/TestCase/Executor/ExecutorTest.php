@@ -48,7 +48,10 @@ class ExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->Executor = new class (OperationType: OperationType::Export) extends Executor {
+        $this->Executor = new class (
+            Connection: new FakeConnection(),
+            OperationType: OperationType::Export
+        ) extends Executor {
             public string $authFile = 'path/to/auth_file';
 
             public function getBinaryName(): string
@@ -56,7 +59,6 @@ class ExecutorTest extends TestCase
                 return $this->OperationType->value . '-binary';
             }
         };
-        $this->Executor->Connection = new FakeConnection();
     }
 
     #[Test]
@@ -106,8 +108,8 @@ class ExecutorTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
-            'Binary for `noExisting` could not be found. You have to set its path manually on your bootstrap with: `%s`',
-            'Configure::write(\'DatabaseBackup.binaries.noExisting\', \'/your/full/path/to/noExisting\')'
+            'Binary for `noExisting` not found. Set path manually: `%s`',
+            'Configure::write(\'DatabaseBackup.binaries.noExisting\', \'/path/to/noExisting\')'
         ));
         $this->Executor->findBinary('noExisting');
     }
@@ -171,6 +173,8 @@ class ExecutorTest extends TestCase
 
         $Process = Mockery::mock('overload:' . Process::class);
 
+        $Process->shouldReceive('isSuccessful')->andReturnTrue();
+
         /**
          * `Process::fromShellCommandline()` expects `$expectedCommand` argument.
          */
@@ -189,7 +193,7 @@ class ExecutorTest extends TestCase
          * `Process::run()` expects an argument built from the previous context variables.
          *
          * In particular, the value of `BINARY` is variable based on the type of operation.
-         * Instead, the value of `COMPRESSION_BINARY` is variable based on the type of compression (in this case
+         * Instead, the value of `COMPRESSION_BINARY` is a variable based on the type of compression (in this case
          *  derived from `$filename`). It is `null` without compression.
          */
         $Process
@@ -219,6 +223,7 @@ class ExecutorTest extends TestCase
     }
 
     #[Test]
+    #[RunInSeparateProcess]
     public function testRunProcessOnFailure(): void
     {
         Mockery::mock('overload:' . ExecutableFinder::class)
@@ -227,7 +232,7 @@ class ExecutorTest extends TestCase
 
         $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
         $Process->shouldReceive('fromShellCommandline')->andReturnSelf();
-        $Process->shouldReceive('isSuccessful')->andReturn(false);
+        $Process->shouldReceive('isSuccessful')->andReturnFalse();
         $Process->shouldReceive('getCommandLine')->andReturn('failureCommand');
 
         $this->expectException(ProcessFailedException::class);

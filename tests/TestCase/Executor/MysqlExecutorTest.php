@@ -39,7 +39,7 @@ class MysqlExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->MysqlExecutor = new MysqlExecutor(OperationType::Export);
+        $this->MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
     }
 
     #[Test]
@@ -55,7 +55,7 @@ class MysqlExecutorTest extends TestCase
     public function testAfterExport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [new FakeConnection(), OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.afterExport');
 
         $MysqlExecutor
@@ -68,7 +68,7 @@ class MysqlExecutorTest extends TestCase
     public function testAfterImport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [new FakeConnection(), OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.afterImport');
 
         $MysqlExecutor
@@ -81,7 +81,7 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeExport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [new FakeConnection(), OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.beforeExport');
 
         $MysqlExecutor
@@ -97,7 +97,7 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeImport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [new FakeConnection(), OperationType::Export]);
         $MysqlExecutor->dispatchEvent('Backup.beforeImport');
 
         $MysqlExecutor

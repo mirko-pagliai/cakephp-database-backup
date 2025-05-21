@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use App\Database\FakeConnection;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -37,7 +38,7 @@ class PostgresExecutorTest extends TestCase
      {
          parent::setUp();
 
-         $this->PostgresExecutor = new PostgresExecutor(OperationType: OperationType::Export);
+         $this->PostgresExecutor = new PostgresExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
      }
 
     #[Test]

@@ -55,7 +55,7 @@ abstract class Utility
                 throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
             }
 
-            return new $className(OperationType: $this->OperationType);
+            return new $className(Connection: $this->Connection, OperationType: $this->OperationType);
         }
     }
 

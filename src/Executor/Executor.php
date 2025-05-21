@@ -40,13 +40,10 @@ abstract class Executor implements EventListenerInterface
      */
     use EventDispatcherTrait;
 
-    public Connection $Connection;
-
     /**
      * @param \DatabaseBackup\OperationType $OperationType
      */
-    public function __construct(public OperationType $OperationType)
-    {
+    public function __construct(public Connection $Connection, public OperationType $OperationType) {
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
@@ -114,8 +111,8 @@ abstract class Executor implements EventListenerInterface
             throw new InvalidArgumentException(__d(
                 'database_backup',
                 'Binary for `{0}` not found. Set path manually: `{1}`',
-                $binary,
-                sprintf("Configure::write('DatabaseBackup.binaries.%s', '/path/to/%s')", $binary, $binary)
+                $binaryName,
+                sprintf("Configure::write('DatabaseBackup.binaries.%s', '/path/to/%s')", $binaryName, $binaryName)
             ));
 
         }

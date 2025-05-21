@@ -41,7 +41,7 @@ class SqliteExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->SqliteExecutor = new SqliteExecutor(OperationType::Export);
+        $this->SqliteExecutor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
     }
 
     #[Test]
@@ -86,7 +86,7 @@ class SqliteExecutorTest extends TestCase
         $Connection->shouldReceive('getDriver')->andReturn($Driver);
 
         /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
-        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [OperationType::Export]);
+        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [new FakeConnection(), OperationType::Export]);
         $SqliteExecutor->Connection = $Connection;
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
 
