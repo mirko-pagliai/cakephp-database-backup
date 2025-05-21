@@ -183,7 +183,7 @@ abstract class Executor implements EventListenerInterface
         );
 
         $Process->run(env: [
-            'AUTH_FILE' => method_exists($this, 'getAuthFilePath') && $this->getAuthFilePath() ? $this->getAuthFilePath() : '',
+            'AUTH_FILE' => property_exists($this, 'authFile') ? $this->authFile : '',
             'BINARY' => $this->findBinary(...(array)$this->getBinaryName()),
             'COMPRESSION_BINARY' => $Compression->isValid() ? $this->findBinary($Compression) : null,
             'DB_HOST' => $config['host'],

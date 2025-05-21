@@ -48,6 +48,8 @@ class ExecutorTest extends TestCase
         parent::setUp();
 
         $this->Executor = new class (OperationType: OperationType::Export) extends Executor {
+            public string $authFile = 'path/to/auth_file';
+
             public function getBinaryName(): string
             {
                 return $this->OperationType->value . '-binary';
@@ -206,7 +208,7 @@ class ExecutorTest extends TestCase
             ->shouldReceive('run')
             ->withArgs(function ($env) use ($Compression, $filename, $OperationType): bool {
                 $expectedEnv = [
-                    'AUTH_FILE' => '',
+                    'AUTH_FILE' => 'path/to/auth_file',
                     'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
                     'COMPRESSION_BINARY' => $Compression->isValid() ? '/usr/bin/' . lcfirst($Compression->name) : null,
                     'DB_HOST' => 'my_hostname',
