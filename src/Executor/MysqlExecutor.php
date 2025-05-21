@@ -25,7 +25,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MysqlExecutor extends Executor
 {
-    public string $authFile {
+    protected(set) string $authFile {
         get {
             if (empty($this->authFile)) {
                 $this->authFile = TMP . uniqid('auth');

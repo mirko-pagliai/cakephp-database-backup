@@ -43,7 +43,7 @@ abstract class Executor implements EventListenerInterface
     /**
      * @param \DatabaseBackup\OperationType $OperationType
      */
-    public function __construct(readonly public Connection $Connection, readonly public OperationType $OperationType)
+    public function __construct(readonly protected Connection $Connection, readonly protected OperationType $OperationType)
     {
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
