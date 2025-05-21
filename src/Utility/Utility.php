@@ -66,7 +66,6 @@ abstract class Utility
             }
             $this->timeOut = $timeOut;
         }
-        get => $this->timeOut;
     }
 
     /**

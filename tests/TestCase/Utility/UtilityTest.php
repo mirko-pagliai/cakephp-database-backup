@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 use App\Database\FakeConnection;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -46,6 +47,25 @@ class UtilityTest extends TestCase
         };
     }
 
+    /**
+     * @inheritDoc
+     */
+    public static function setUpBeforeClass(): void
+    {
+        ConnectionManager::setConfig('default', new FakeConnection());
+        ConnectionManager::alias(source: 'default', alias: 'test');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function tearDownAfterClass(): void
+    {
+        //Drops the connections set by `setUpBeforeClass()`
+        ConnectionManager::dropAlias('test');
+        ConnectionManager::drop('default');
+    }
+
     #[Test]
     #[TestWith([new FakeConnection()])]
     #[TestWith(['test'])]
@@ -71,12 +91,18 @@ class UtilityTest extends TestCase
     }
 
     #[Test]
+    public function testExecutorPropertyWithRealDrivers(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    #[Test]
     public function testExecutorPropertyNoExistingExecutor(): void
     {
-        $this->Utility->Connection = new FakeConnection();
+        $this->Utility->Connection = new FakeConnection(['driver' => 'Cake\Driver\NoExistingDriver']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The Executor class for the `FakeDriver` driver does not exist');
+        $this->expectExceptionMessage('The Executor class for the `NoExistingDriver` driver does not exist');
         /** @phpstan-ignore-next-line */
         $this->Utility->Executor;
     }
