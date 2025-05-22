@@ -52,8 +52,7 @@ class UtilityTest extends TestCase
      */
     public static function setUpBeforeClass(): void
     {
-        ConnectionManager::setConfig('default', new FakeConnection());
-        ConnectionManager::alias(source: 'default', alias: 'test');
+        ConnectionManager::setConfig('test', new FakeConnection());
     }
 
     /**
@@ -61,9 +60,8 @@ class UtilityTest extends TestCase
      */
     public static function tearDownAfterClass(): void
     {
-        //Drops the connections set by `setUpBeforeClass()`
-        ConnectionManager::dropAlias('test');
-        ConnectionManager::drop('default');
+        //Drops the connection set by `setUpBeforeClass()`
+        ConnectionManager::drop('test');
     }
 
     #[Test]
