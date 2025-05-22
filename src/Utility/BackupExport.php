@@ -87,4 +87,24 @@ class BackupExport extends Utility
     {
         parent::__construct(OperationType: OperationType::Import);
     }
+
+    public function export()
+    {
+        if (empty($this->filename)) {
+            $this->filename = 'backup_{$DATABASE}_{$DATETIME}.sql';
+        }
+
+        //Dispatches the `Backup.beforeExport` event implemented by the `Executor` class
+        $BeforeExport = $this->Executor->dispatchEvent('Backup.beforeExport');
+        if ($BeforeExport->isStopped()) {
+            return false;
+        }
+
+        $this->Executor->runProcess($this->filename);
+
+        //Dispatches the `Backup.afterExport` event implemented by the `Executor` class
+        $this->Executor->dispatchEvent('Backup.afterExport');
+
+        return $this->filename;
+    }
 }

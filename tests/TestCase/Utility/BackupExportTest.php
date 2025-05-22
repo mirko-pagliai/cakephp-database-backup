@@ -16,6 +16,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
+use App\Executor\FakeExecutor;
+use Cake\Event\EventInterface;
+use Cake\Event\EventList;
 use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -25,8 +28,10 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use ReflectionClass;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 use ValueError;
 
 /**
@@ -142,5 +147,43 @@ class BackupExportTest extends TestCase
         $this->expectException(ValueError::class);
         $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . $filename . '`');
         $this->BackupExport->filename = $filename;
+    }
+
+    public function testExport(): void
+    {
+        $filename = TMP . 'backup.sql';
+
+        $this->BackupExport->Executor = new class extends FakeExecutor {
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
+        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
+        $this->BackupExport->filename = $filename;
+
+        $result = $this->BackupExport->export();
+
+        $this->assertSame($filename, $result);
+        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+    }
+
+    /**
+     * `export()` is stopped by the `Backup.beforeExport` event (implemented by the `Executor` class)
+     */
+    #[Test]
+    public function testExportStoppedByBeforeExport(): void
+    {
+        $this->BackupExport->Executor = new class extends FakeExecutor
+        {
+            public function beforeExport(EventInterface $Event): void
+            {
+                $Event->stopPropagation();
+            }
+        };
+
+        $result = $this->BackupExport->export();
+        $this->assertFalse($result);
     }
 }
