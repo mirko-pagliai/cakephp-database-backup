@@ -2,6 +2,8 @@
 ## 3.0 branch
 ### 3.0.0
 * the `DatabaseBackup.target` configuration value no longer exists. Relative paths will be understood as relative to the `ROOT`;
+* `BackupExport` no longer takes care of rotating (`rotate()` method) files and (for now) setting chmods of files after export,
+  because these functions are not essential and (like others already removed) can be implemented by the user;
 * the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`);
 * since there are no aliases defined for binaries anymore (and it would be possible to override the configuration anyway), the
   `Executor::findBinary()` method takes only one argument;
