@@ -70,7 +70,7 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testFilenamePropertyNoReadableFile(): void
     {
-        $filename = TMP . 'noExistingDir/backup.sql';
+        $filename = TMP . 'noExistingDir' . DS . 'backup.sql';
 
         $this->expectException(IOException::class);
         $this->expectExceptionMessage('File `' . $filename . '` does not exist');
