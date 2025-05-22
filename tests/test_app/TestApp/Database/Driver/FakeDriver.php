@@ -16,6 +16,12 @@ declare(strict_types=1);
 namespace App\Database\Driver;
 
 use Cake\Database\Driver\Sqlite;
+use Cake\Database\Schema\SchemaDialect;
+use Cake\Database\Schema\SqliteSchemaDialect;
+use Cake\Database\Schema\TableSchema;
+use Mockery;
+use PHPUnit\Framework\MockObject\MockBuilder;
+use ReflectionClass;
 
 /**
  * A fake driver for tests.
@@ -25,5 +31,13 @@ class FakeDriver extends Sqlite
     public function enabled(): bool
     {
         return true;
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function schemaDialect(): SchemaDialect
+    {
+        return new ReflectionClass(SqliteSchemaDialect::class)->newInstanceWithoutConstructor();
     }
 }
