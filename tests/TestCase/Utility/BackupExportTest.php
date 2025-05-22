@@ -61,6 +61,7 @@ class BackupExportTest extends TestCase
     #[TestWith([Compression::None, null])]
     public function testCompressionProperty(Compression $ExpectedCompression, mixed $Compression): void
     {
+        //This is the expected default value
         $this->assertSame(Compression::None, $this->BackupExport->compression);
 
         $this->BackupExport->compression = $Compression;
@@ -86,30 +87,25 @@ class BackupExportTest extends TestCase
         $this->BackupExport->filename = $filename;
 
         $this->assertSame($expectedFilename, $this->BackupExport->filename);
+
+        //By setting the filename, the compression is also set
         $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
     }
 
     #[Test]
     #[TestWith([TMP . 'my_file_my_hostname.sql', TMP . 'my_file_{$HOSTNAME}.sql'])]
     #[TestWith([TMP . 'my_file_my_database.sql', TMP . 'my_file_{$DATABASE}.sql'])]
+    #[TestWith(['/my_file_\d{14}\.sql$/', TMP . 'my_file_{$DATETIME}.sql'])]
+    #[TestWith(['/my_file_\d{10}\.sql$/', TMP . 'my_file_{$TIMESTAMP}.sql'])]
     public function testFilenamePropertyWithPatterns(string $expectedFilename, string $filename): void
     {
         $this->BackupExport->filename = $filename;
 
-        $this->assertSame($expectedFilename, $this->BackupExport->filename);
-    }
-
-    /**
-     * Like the previous test, but using patterns that require a regular expression to match
-     */
-    #[Test]
-    #[TestWith(['/my_file_\d{14}\.sql$/', TMP . 'my_file_{$DATETIME}.sql'])]
-    #[TestWith(['/my_file_\d{10}\.sql$/', TMP . 'my_file_{$TIMESTAMP}.sql'])]
-    public function testFilenamePropertyWithPatternsMatchesRegularExpression(string $expectedFilename, string $filename): void
-    {
-        $this->BackupExport->filename = $filename;
-
-        $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
+        if (str_starts_with($expectedFilename,'/') && str_ends_with($expectedFilename, '/')) {
+            $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
+        } else {
+            $this->assertSame($expectedFilename, $this->BackupExport->filename);
+        }
     }
 
     #[Test]

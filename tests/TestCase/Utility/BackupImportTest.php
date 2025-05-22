@@ -47,7 +47,6 @@ class BackupImportTest extends TestCase
 
         $this->BackupImport = new BackupImport();
         $this->BackupImport->Connection = new FakeConnection();
-        $this->BackupImport->Executor = new FakeExecutor();
     }
 
     #[Test]
@@ -152,6 +151,8 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportWithFilenamePropertyNotSet(): void
     {
+        $this->BackupImport->Executor = new FakeExecutor();
+
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
     }
