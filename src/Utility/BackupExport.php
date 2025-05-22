@@ -45,15 +45,12 @@ class BackupExport extends Utility
             $filename = $this->replaceFilenamePatterns($filename);
             $filename = $this->makeAbsolutePath($filename);
 
-            if (!is_writable(dirname($filename))) {
-                throw new IOException(
-                    __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))
-                );
-            }
             if (new Filesystem()->exists($filename)) {
-                throw new IOException(
-                    __d('database_backup', 'File `{0}` already exists', $filename)
-                );
+                throw new IOException(__d('database_backup', 'File `{0}` already exists', $filename));
+            }
+            $targetDir = dirname($filename);
+            if (!is_writable($targetDir)) {
+                throw new IOException(__d('database_backup', 'File or directory `{0}` is not writable', $targetDir));
             }
 
             //Sets the compression
