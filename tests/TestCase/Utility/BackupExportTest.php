@@ -71,11 +71,14 @@ class BackupExportTest extends TestCase
     }
 
     #[Test]
-    #[TestWith(['my_file_my_hostname.sql', 'my_file_{$HOSTNAME}.sql'])]
-    #[TestWith(['my_file_my_database.sql', 'my_file_{$DATABASE}.sql'])]
+    #[TestWith([TMP . 'my_file_my_hostname.sql', TMP . 'my_file_{$HOSTNAME}.sql'])]
+    #[TestWith([TMP . 'my_file_my_database.sql', TMP . 'my_file_{$DATABASE}.sql'])]
     public function testReplaceFilenamePatterns(string $expectedFilename, string $filename): void
     {
-        $result = $this->BackupExport->replaceFilenamePatterns(filename: $filename);
+        $this->BackupExport->filename = $filename;
+
+        $result = $this->BackupExport->filename;
+
         $this->assertSame($expectedFilename, $result);
     }
 
@@ -83,11 +86,14 @@ class BackupExportTest extends TestCase
      * Like the previous test, but using patterns that require a regular expression to match
      */
     #[Test]
-    #[TestWith(['/^my_file_\d{14}\.sql$/', 'my_file_{$DATETIME}.sql'])]
-    #[TestWith(['/^my_file_\d{10}\.sql$/', 'my_file_{$TIMESTAMP}.sql'])]
+    #[TestWith(['/my_file_\d{14}\.sql$/', TMP . 'my_file_{$DATETIME}.sql'])]
+    #[TestWith(['/my_file_\d{10}\.sql$/', TMP . 'my_file_{$TIMESTAMP}.sql'])]
     public function testReplaceFilenamePatternsMatchesRegularExpression(string $expectedFilename, string $filename): void
     {
-        $result = $this->BackupExport->replaceFilenamePatterns(filename: $filename);
+        $this->BackupExport->filename = $filename;
+
+        $result = $this->BackupExport->filename;
+
         $this->assertMatchesRegularExpression($expectedFilename, $result);
     }
 }

@@ -34,6 +34,15 @@ class BackupExport extends Utility
         }
     }
 
+    public string $filename {
+        set(string $filename) {
+            $filename = $this->replaceFilenamePatterns($filename);
+            $filename = $this->makeAbsolutePath($filename);
+
+            $this->filename = $filename;
+        }
+    }
+
     /**
      * Constructor.
      */
@@ -43,12 +52,12 @@ class BackupExport extends Utility
     }
 
     /**
-     * Replaces filename patterns.
+     * Internal method to replace filename patterns.
      *
      * @param string $filename
      * @return string
      */
-    public function replaceFilenamePatterns(string $filename): string
+    protected function replaceFilenamePatterns(string $filename): string
     {
         return str_replace(
             search: ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
