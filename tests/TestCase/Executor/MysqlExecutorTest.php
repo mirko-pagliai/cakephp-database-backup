@@ -23,6 +23,7 @@ use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * MysqlExecutorTest.
@@ -112,27 +113,44 @@ class MysqlExecutorTest extends TestCase
     #[Test]
     public function testWriteAuthFile(): void
     {
-        $content = '{{USER}}_{{PASSWORD}}_{{HOST}}';
-        $expectedContent = 'my_username_my_password_my_hostname';
+        $Filesystem = Mockery::mock('overload:' . Filesystem::class);
 
-        $result = $this->MysqlExecutor->writeAuthFile($content);
+        $Filesystem
+            ->shouldReceive('dumpFile')
+            ->withArgs(function ($filename, $content): bool {
+                $this->assertStringStartsWith(TMP . 'auth', $filename);
+                $this->assertSame('my_username_my_password_my_hostname', $content);
+
+                return true;
+            })
+            ->once();
+
+        $Filesystem
+            ->shouldReceive('exists')
+            ->withArgs(function ($filename): bool {
+                $this->assertStringStartsWith(TMP . 'auth', $filename);
+
+                return true;
+            })
+            ->once()
+            ->andReturnTrue();
+
+        $result = $this->MysqlExecutor->writeAuthFile('{{USER}}_{{PASSWORD}}_{{HOST}}');
+
         $this->assertTrue($result);
-
-        $this->assertStringEqualsFile($this->MysqlExecutor->authFile, $expectedContent);
-        unlink($this->MysqlExecutor->authFile);
     }
 
     #[Test]
     public function testDeleteAuthFile(): void
     {
         $authFile = $this->MysqlExecutor->authFile;
-        touch($authFile);
 
-        $this->assertFileExists($authFile);
+        Mockery::mock('overload:' . Filesystem::class)
+            ->shouldReceive('remove')
+            ->with($authFile)
+            ->once();
 
         $this->MysqlExecutor->deleteAuthFile();
-
-        $this->assertFileDoesNotExist($authFile);
 
         $this->assertNotEquals($this->MysqlExecutor->authFile, $authFile);
     }
