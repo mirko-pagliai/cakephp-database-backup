@@ -85,7 +85,7 @@ class BackupExport extends Utility
      */
     public function __construct()
     {
-        parent::__construct(OperationType: OperationType::Import);
+        parent::__construct(OperationType: OperationType::Export);
     }
 
     /**
