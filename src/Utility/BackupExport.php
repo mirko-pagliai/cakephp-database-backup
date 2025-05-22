@@ -17,7 +17,6 @@ namespace DatabaseBackup\Utility;
 
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
-use Override;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use function Cake\I18n\__d;
@@ -88,7 +87,18 @@ class BackupExport extends Utility
         parent::__construct(OperationType: OperationType::Import);
     }
 
-    public function export()
+    /**
+     * Exports the database.
+     *
+     * When exporting, this method will trigger these events (implemented by the `Executor` class):
+     * - `Backup.beforeExport`: will be triggered before export;
+     * - `Backup.afterExport`: will be triggered after export.
+     *
+     * @return string|false Filename path on success or `false` if the `Backup.beforeExport` event is stopped
+     * @see \DatabaseBackup\Executor\Executor::beforeExport()
+     * @see \DatabaseBackup\Executor\Executor::afterExport()
+     */
+    public function export(): string|false
     {
         if (empty($this->filename)) {
             $this->filename = 'backup_{$DATABASE}_{$DATETIME}.sql';
