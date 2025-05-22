@@ -178,14 +178,16 @@ class ExecutorTest extends TestCase
                 $expectedEnv = [
                     'AUTH_FILE' => 'path/to/auth_file',
                     'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
-                    'COMPRESSION_BINARY' => $Compression->isValid() ? '/usr/bin/' . lcfirst($Compression->name) : null,
                     'DB_HOST' => 'my_hostname',
                     'DB_NAME' => 'my_database',
                     'DB_PASSWORD' => 'my_password',
-                    'DB_USER' => 'my_username',
+                    'DB_USERNAME' => 'my_username',
                     'FILENAME' => $filename,
                 ];
-                $this->assertSame($expectedEnv, $env);
+                if ($Compression->isValid()) {
+                    $expectedEnv['COMPRESSION_BINARY'] = '/usr/bin/' . lcfirst($Compression->name);
+                }
+                $this->assertEquals($expectedEnv, $env);
 
                 return true;
             })

@@ -169,6 +169,7 @@ abstract class Executor implements EventListenerInterface
     {
         $Compression = Compression::fromFilename($filename);
         $config = $this->Connection->config();
+        $env = [];
 
         /**
          * @see https://symfony.com/doc/current/components/process.html
@@ -178,16 +179,23 @@ abstract class Executor implements EventListenerInterface
             timeout: $timeout,
         );
 
+        if (property_exists($this, 'authFile')) {
+            $env['AUTH_FILE'] = $this->authFile;
+        }
+        if ($Compression->isValid()) {
+            $env['COMPRESSION_BINARY'] = $this->findBinary($Compression);
+        }
+        foreach (['host', 'password', 'username'] as $key) {
+            if (isset($config[$key])) {
+                $env['DB_' . strtoupper($key)] = $config[$key];
+            }
+        }
+
         $Process->run(env: [
-            'AUTH_FILE' => property_exists($this, 'authFile') ? $this->authFile : '',
             'BINARY' => $this->findBinary($this->getBinaryName()),
-            'COMPRESSION_BINARY' => $Compression->isValid() ? $this->findBinary($Compression) : null,
-            'DB_HOST' => $config['host'],
-            'DB_NAME' => $config['database'],
-            'DB_PASSWORD' => $config['password'],
-            'DB_USER' => $config['username'],
             'FILENAME' => $filename,
-        ]);
+            'DB_NAME' => $config['database'],
+        ] + $env);
 
         if (!$Process->isSuccessful()) {
             throw new ProcessFailedException($Process);
