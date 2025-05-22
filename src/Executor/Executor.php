@@ -42,6 +42,7 @@ abstract class Executor implements EventListenerInterface
     use EventDispatcherTrait;
 
     /**
+     * @param \Cake\Database\Connection $Connection
      * @param \DatabaseBackup\OperationType $OperationType
      */
     public function __construct(readonly protected Connection $Connection, readonly protected OperationType $OperationType)
