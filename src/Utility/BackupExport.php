@@ -19,6 +19,7 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use Override;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use function Cake\I18n\__d;
 
 /**
@@ -46,7 +47,7 @@ class BackupExport extends Utility
                     __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))
                 );
             }
-            if (file_exists($filename)) {
+            if (new Filesystem()->exists($filename)) {
                 throw new IOException(
                     __d('database_backup', 'File `{0}` already exists', $filename)
                 );

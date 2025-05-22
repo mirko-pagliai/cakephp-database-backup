@@ -20,10 +20,13 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Error;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use ValueError;
 
 /**
@@ -58,9 +61,7 @@ class BackupExportTest extends TestCase
 
         $this->BackupExport->Compression = $Compression;
 
-        $result = $this->BackupExport->Compression;
-        $this->assertInstanceOf(Compression::class, $result);
-        $this->assertSame($ExpectedCompression, $result);
+        $this->assertSame($ExpectedCompression, $this->BackupExport->Compression);
     }
 
     #[Test]
@@ -91,9 +92,7 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename = $filename;
 
-        $result = $this->BackupExport->filename;
-
-        $this->assertSame($expectedFilename, $result);
+        $this->assertSame($expectedFilename, $this->BackupExport->filename);
     }
 
     /**
@@ -106,9 +105,7 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename = $filename;
 
-        $result = $this->BackupExport->filename;
-
-        $this->assertMatchesRegularExpression($expectedFilename, $result);
+        $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
     }
 
     #[Test]
@@ -122,15 +119,19 @@ class BackupExportTest extends TestCase
     }
 
     #[Test]
+    #[RunInSeparateProcess]
     public function testFilenamePropertyWithFileAlreadyExists(): void
     {
         $filename = TMP . 'backup.sql';
-        file_put_contents($filename, '');
+
+        Mockery::mock('overload:' . Filesystem::class)
+            ->shouldReceive('exists')
+            ->with($filename)
+            ->andReturnTrue();
 
         $this->expectException(IOException::class);
         $this->expectExceptionMessage('File `' . $filename . '` already exists');
         $this->BackupExport->filename = $filename;
-        unlink($filename);
     }
 
     #[Test]
