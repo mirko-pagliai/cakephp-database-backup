@@ -19,8 +19,6 @@ use Cake\Database\Connection;
 use Cake\Database\Driver;
 use Cake\Database\Schema\Collection;
 use Cake\Database\Schema\CollectionInterface as SchemaCollectionInterface;
-use Cake\Database\Schema\SchemaDialect;
-use Cake\Database\Schema\SqliteSchemaDialect;
 use Cake\Database\Schema\TableSchema;
 use Cake\Database\Schema\TableSchemaInterface;
 
@@ -39,11 +37,6 @@ class FakeConnection extends Connection
             public function enabled(): bool
             {
                 return true;
-            }
-
-            public function schemaDialect(): SchemaDialect
-            {
-                return new ReflectionClass(SqliteSchemaDialect::class)->newInstanceWithoutConstructor();
             }
         };
 
