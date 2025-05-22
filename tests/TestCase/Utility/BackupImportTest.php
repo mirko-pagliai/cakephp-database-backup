@@ -23,6 +23,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -49,13 +50,17 @@ class BackupImportTest extends TestCase
     }
 
     #[Test]
+    #[RunInSeparateProcess]
     public function testFilenameProperty(): void
     {
         $filename = TMP . 'backup.sql';
-        file_put_contents($filename, '');
+
+        Mockery::mock('overload:' . Filesystem::class)
+            ->shouldReceive('exists')
+            ->with($filename)
+            ->andReturnTrue();
 
         $this->BackupImport->filename = $filename;
-        unlink($filename);
 
         $result = $this->BackupImport->filename;
         $this->assertSame($filename, $result);
@@ -67,15 +72,20 @@ class BackupImportTest extends TestCase
         $filename = TMP . 'noExistingDir/backup.sql';
 
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File or directory `' . $filename . '` is not readable');
+        $this->expectExceptionMessage('File `' . $filename . '` does not exist');
         $this->BackupImport->filename = $filename;
     }
 
     #[Test]
+    #[RunInSeparateProcess]
     public function testImport(): void
     {
         $filename = TMP . 'backup.sql';
-        file_put_contents($filename, '');
+
+        Mockery::mock('overload:' . Filesystem::class)
+            ->shouldReceive('exists')
+            ->with($filename)
+            ->andReturnTrue();
 
         $this->BackupImport->Executor = new class extends FakeExecutor {
             public function runProcess(string $filename, int $timeout = 60): Process
@@ -87,7 +97,6 @@ class BackupImportTest extends TestCase
         $this->BackupImport->filename = $filename;
 
         $result = $this->BackupImport->import();
-        unlink($filename);
 
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Executor->getEventManager());

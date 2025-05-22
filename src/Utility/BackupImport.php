@@ -18,7 +18,9 @@ namespace DatabaseBackup\Utility;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use LogicException;
+use PHP_CodeSniffer\Files\File;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use function Cake\I18n\__d;
 
 /**
@@ -29,9 +31,9 @@ class BackupImport extends Utility
     public string $filename {
         set(string $filename) {
             $filename = $this->makeAbsolutePath(path: $filename);
-            if (!is_readable($filename)) {
+            if (!new Filesystem()->exists($filename)) {
                 throw new IOException(
-                    __d('database_backup', 'File or directory `{0}` is not readable', $filename)
+                    __d('database_backup', 'File `{0}` does not exist', $filename)
                 );
             }
 
