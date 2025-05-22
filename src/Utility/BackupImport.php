@@ -75,7 +75,7 @@ class BackupImport extends Utility
             return false;
         }
 
-        $this->Executor->runProcess($this->filename);
+        $this->Executor->runProcess(filename: $this->filename, timeout: $this->timeout);
 
         //Dispatches the `Backup.afterImport` event implemented by the `Executor` class
         $this->Executor->dispatchEvent('Backup.afterImport');

@@ -59,6 +59,7 @@ class BackupImportTest extends TestCase
         Mockery::mock('overload:' . Filesystem::class)
             ->shouldReceive('exists')
             ->with($filename)
+            ->once()
             ->andReturnTrue();
 
         $this->BackupImport->filename = $filename;
@@ -82,8 +83,8 @@ class BackupImportTest extends TestCase
     {
         Mockery::mock('overload:' . Filesystem::class)
             ->shouldReceive('exists')
-            ->andReturnTrue()
-            ->once();
+            ->once()
+            ->andReturnTrue();
 
         $result = $this->BackupImport->filename(TMP . 'backup.sql');
         $this->assertInstanceOf(BackupImport::class, $result);
@@ -94,6 +95,9 @@ class BackupImportTest extends TestCase
         $this->assertSame(120, $this->BackupImport->timeout);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testImport(): void
@@ -103,18 +107,24 @@ class BackupImportTest extends TestCase
         Mockery::mock('overload:' . Filesystem::class)
             ->shouldReceive('exists')
             ->with($filename)
+            ->once()
             ->andReturnTrue();
 
-        $this->BackupImport->Executor = new class extends FakeExecutor {
-            public function runProcess(string $filename, int $timeout = 60): Process
-            {
-                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
-            }
-        };
-        $this->BackupImport->Executor->getEventManager()->setEventList(new EventList());
-        $this->BackupImport->filename = $filename;
+        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
+        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
+        $Executor
+            ->shouldReceive('runProcess')
+            ->with($filename, 120)
+            ->once()
+            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
 
-        $result = $this->BackupImport->import();
+        $this->BackupImport->Executor = $Executor;
+        $this->BackupImport->Executor->getEventManager()->setEventList(new EventList());
+
+        $result = $this->BackupImport
+            ->filename($filename)
+            ->timeout(120)
+            ->import();
 
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Executor->getEventManager());

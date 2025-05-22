@@ -164,21 +164,29 @@ class BackupExportTest extends TestCase
         $this->assertSame(120, $this->BackupExport->timeout);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     #[Test]
     public function testExport(): void
     {
         $filename = TMP . 'backup.sql';
 
-        $this->BackupExport->Executor = new class extends FakeExecutor {
-            public function runProcess(string $filename, int $timeout = 60): Process
-            {
-                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
-            }
-        };
-        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
-        $this->BackupExport->filename = $filename;
+        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
+        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
+        $Executor
+            ->shouldReceive('runProcess')
+            ->with($filename, 120)
+            ->once()
+            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
 
-        $result = $this->BackupExport->export();
+        $this->BackupExport->Executor = $Executor;
+        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
+
+        $result = $this->BackupExport
+            ->filename($filename)
+            ->timeout(120)
+            ->export();
 
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
