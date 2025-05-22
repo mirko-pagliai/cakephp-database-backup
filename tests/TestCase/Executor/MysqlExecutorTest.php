@@ -21,6 +21,7 @@ use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Filesystem\Filesystem;
@@ -111,6 +112,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     #[Test]
+    #[RunInSeparateProcess]
     public function testWriteAuthFile(): void
     {
         $Filesystem = Mockery::mock('overload:' . Filesystem::class);
@@ -141,6 +143,7 @@ class MysqlExecutorTest extends TestCase
     }
 
     #[Test]
+    #[RunInSeparateProcess]
     public function testDeleteAuthFile(): void
     {
         $authFile = $this->MysqlExecutor->authFile;
