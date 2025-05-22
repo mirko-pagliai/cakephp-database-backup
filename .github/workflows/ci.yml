@@ -51,7 +51,7 @@ jobs:
 
     - name: Run test suite
       run: |
-        if [[ ${{ matrix.php-version }} == '8.4' ]]; then
+        if [[ ${{ matrix.php-version && matrix.prefer-lowest != 'prefer-lowest' }} == '8.4' ]]; then
             export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-clover=coverage.xml
         else
             composer run-script test
