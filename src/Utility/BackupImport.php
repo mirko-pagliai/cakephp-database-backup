@@ -18,13 +18,15 @@ namespace DatabaseBackup\Utility;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use LogicException;
-use PHP_CodeSniffer\Files\File;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use function Cake\I18n\__d;
 
 /**
  * Utility to import databases.
+ *
+ * @method \DatabaseBackup\Utility\BackupImport filename(string $filename)
+ * @method \DatabaseBackup\Utility\BackupImport timeout(int $timeout)
  */
 class BackupImport extends Utility
 {

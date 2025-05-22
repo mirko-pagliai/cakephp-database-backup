@@ -78,6 +78,24 @@ class BackupImportTest extends TestCase
 
     #[Test]
     #[RunInSeparateProcess]
+    public function testCallMagicMethod(): void
+    {
+        Mockery::mock('overload:' . Filesystem::class)
+            ->shouldReceive('exists')
+            ->andReturnTrue()
+            ->once();
+
+        $result = $this->BackupImport->filename(TMP . 'backup.sql');
+        $this->assertInstanceOf(BackupImport::class, $result);
+        $this->assertSame(TMP . 'backup.sql', $this->BackupImport->filename);
+
+        $result = $this->BackupImport->timeout(120);
+        $this->assertInstanceOf(BackupImport::class, $result);
+        $this->assertSame(120, $this->BackupImport->timeout);
+    }
+
+    #[Test]
+    #[RunInSeparateProcess]
     public function testImport(): void
     {
         $filename = TMP . 'backup.sql';

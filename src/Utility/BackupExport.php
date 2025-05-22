@@ -23,16 +23,20 @@ use function Cake\I18n\__d;
 
 /**
  * Utility to export databases.
+ *
+ * @method \DatabaseBackup\Utility\BackupExport compression(\DatabaseBackup\Compression|string|null $compression)
+ * @method \DatabaseBackup\Utility\BackupExport filename(string $filename)
+ * @method \DatabaseBackup\Utility\BackupExport timeout(int $timeout)
  */
 class BackupExport extends Utility
 {
-    public Compression $Compression = Compression::None {
-        set (Compression|string|false|null $Compression) {
-            if (!$Compression instanceof Compression) {
-                $Compression = $Compression ? Compression::{ucfirst($Compression)} : Compression::None;
+    public Compression $compression = Compression::None {
+        set (Compression|string|null $compression) {
+            if (!$compression instanceof Compression) {
+                $compression = $compression ? Compression::{ucfirst($compression)} : Compression::None;
             }
 
-            $this->Compression = $Compression;
+            $this->compression = $compression;
         }
     }
 
@@ -53,7 +57,7 @@ class BackupExport extends Utility
             }
 
             //Sets the compression
-            $this->Compression = Compression::fromFilename($filename);
+            $this->compression = Compression::fromFilename($filename);
 
             $this->filename = $filename;
         }

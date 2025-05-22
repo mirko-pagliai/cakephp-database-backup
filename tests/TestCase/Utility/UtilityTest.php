@@ -119,21 +119,30 @@ class UtilityTest extends TestCase
     #[Test]
     #[TestWith([0])]
     #[TestWith([10])]
-    public function testTimeOutProperty(int $timeOut): void
+    public function testTimeoutProperty(int $timeOut): void
     {
         //Default value, without calling the setter
-        $this->assertSame(60, $this->Utility->timeOut);
+        $this->assertSame(60, $this->Utility->timeout);
 
-        $this->Utility->timeOut = $timeOut;
-        $this->assertSame($timeOut, $this->Utility->timeOut);
+        $this->Utility->timeout = $timeOut;
+        $this->assertSame($timeOut, $this->Utility->timeout);
     }
 
     #[Test]
-    public function testTimeOutPropertyWithInvalidValue(): void
+    public function testTimeoutPropertyWithInvalidValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The `timeOut` property must be greater than or equal to 0');
-        $this->Utility->timeOut = -1;
+        $this->expectExceptionMessage('The `timeout` property must be greater than or equal to 0');
+        $this->Utility->timeout = -1;
+    }
+
+    #[Test]
+    public function testCallMagicMethodWithNoExistingMethod(): void
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/^Method `DatabaseBackup\\\\Utility\\\\.+noExistingMethod\(\)` does not exist$/');
+        /** @phpstan-ignore-next-line */
+        $this->Utility->noExistingMethod();
     }
 
     #[Test]

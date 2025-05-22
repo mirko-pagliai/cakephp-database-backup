@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
@@ -63,12 +64,12 @@ abstract class Utility
         }
     }
 
-    public int $timeOut = 60 {
-        set (int $timeOut) {
-            if ($timeOut < 0) {
-                throw new InvalidArgumentException(__d('database_backup', 'The `timeOut` property must be greater than or equal to 0'));
+    public int $timeout = 60 {
+        set (int $timeout) {
+            if ($timeout < 0) {
+                throw new InvalidArgumentException(__d('database_backup', 'The `timeout` property must be greater than or equal to 0'));
             }
-            $this->timeOut = $timeOut;
+            $this->timeout = $timeout;
         }
     }
 
@@ -78,6 +79,30 @@ abstract class Utility
      * @param \DatabaseBackup\OperationType $OperationType
      */
     public function __construct(readonly protected OperationType $OperationType) {}
+
+    /**
+     * Magic method. It provides the ability to set properties using methods.
+     *
+     * For example, `filename(string $filename)` will set the property `$filename`.
+     * It also allows you to chain method calls and make the class fluent.
+     *
+     * These magic methods must be described in child classes, using the `@method` tag.
+     *
+     * @param string $name
+     * @param array<array-key, mixed> $arguments
+     * @return $this
+     * @throws \BadMethodCallException
+     */
+    public function __call(string $name, array $arguments)
+    {
+        if (!property_exists($this, $name)) {
+            throw new BadMethodCallException(sprintf('Method `%s::%s()` does not exist', $this::class, $name));
+        }
+
+        $this->{$name} = $arguments[0];
+
+        return $this;
+    }
 
     /**
      * Converts a relative file path to an absolute path based on the specified target directory.

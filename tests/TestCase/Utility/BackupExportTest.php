@@ -59,14 +59,13 @@ class BackupExportTest extends TestCase
     #[TestWith([Compression::Gzip, 'Gzip'])]
     #[TestWith([Compression::Gzip, 'gzip'])]
     #[TestWith([Compression::None, null])]
-    #[TestWith([Compression::None, false])]
     public function testCompressionProperty(Compression $ExpectedCompression, mixed $Compression): void
     {
-        $this->assertSame(Compression::None, $this->BackupExport->Compression);
+        $this->assertSame(Compression::None, $this->BackupExport->compression);
 
-        $this->BackupExport->Compression = $Compression;
+        $this->BackupExport->compression = $Compression;
 
-        $this->assertSame($ExpectedCompression, $this->BackupExport->Compression);
+        $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
     }
 
     #[Test]
@@ -75,7 +74,7 @@ class BackupExportTest extends TestCase
     public function testCompressionPropertyWithInvalidValue(mixed $invalidCompression): void
     {
         $this->expectException(Error::class);
-        $this->BackupExport->Compression = $invalidCompression;
+        $this->BackupExport->compression = $invalidCompression;
     }
 
     #[Test]
@@ -87,7 +86,7 @@ class BackupExportTest extends TestCase
         $this->BackupExport->filename = $filename;
 
         $this->assertSame($expectedFilename, $this->BackupExport->filename);
-        $this->assertSame($ExpectedCompression, $this->BackupExport->Compression);
+        $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
     }
 
     #[Test]
@@ -149,6 +148,23 @@ class BackupExportTest extends TestCase
         $this->BackupExport->filename = $filename;
     }
 
+    #[Test]
+    public function testCallMagicMethod(): void
+    {
+        $result = $this->BackupExport->filename(TMP . 'backup.sql');
+        $this->assertInstanceOf(BackupExport::class, $result);
+        $this->assertSame(TMP . 'backup.sql', $this->BackupExport->filename);
+
+        $result = $this->BackupExport->compression(Compression::Gzip);
+        $this->assertInstanceOf(BackupExport::class, $result);
+        $this->assertSame(Compression::Gzip, $this->BackupExport->compression);
+
+        $result = $this->BackupExport->timeout(120);
+        $this->assertInstanceOf(BackupExport::class, $result);
+        $this->assertSame(120, $this->BackupExport->timeout);
+    }
+
+    #[Test]
     public function testExport(): void
     {
         $filename = TMP . 'backup.sql';
