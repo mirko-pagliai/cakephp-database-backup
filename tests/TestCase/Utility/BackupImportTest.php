@@ -62,8 +62,7 @@ class BackupImportTest extends TestCase
 
         $this->BackupImport->filename = $filename;
 
-        $result = $this->BackupImport->filename;
-        $this->assertSame($filename, $result);
+        $this->assertSame($filename, $this->BackupImport->filename);
     }
 
     #[Test]
