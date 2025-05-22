@@ -45,10 +45,11 @@ class BackupImportTest extends TestCase
 
         $this->BackupImport = new BackupImport();
         $this->BackupImport->Connection = new FakeConnection();
+        $this->BackupImport->Executor = new FakeExecutor();
     }
 
     #[Test]
-    public function testFilename(): void
+    public function testFilenameProperty(): void
     {
         $filename = TMP . 'backup.sql';
         file_put_contents($filename, '');
@@ -71,14 +72,6 @@ class BackupImportTest extends TestCase
     }
 
     #[Test]
-    public function testFilenamePropertyNotSetted(): void
-    {
-        $this->expectExceptionMessage('You must first set the filename');
-        /** @phpstan-ignore-next-line */
-        $this->BackupImport->filename;
-    }
-
-    #[Test]
     public function testImport(): void
     {
         $filename = TMP . 'backup.sql';
@@ -94,6 +87,8 @@ class BackupImportTest extends TestCase
         $this->BackupImport->filename = $filename;
 
         $result = $this->BackupImport->import();
+        unlink($filename);
+
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterImport', $this->BackupImport->Executor->getEventManager());
@@ -115,5 +110,12 @@ class BackupImportTest extends TestCase
 
         $result = $this->BackupImport->import();
         $this->assertFalse($result);
+    }
+
+    #[Test]
+    public function testImportWithFilenamePropertyNotSet(): void
+    {
+        $this->expectExceptionMessage('You must first set the filename');
+        $this->BackupImport->import();
     }
 }

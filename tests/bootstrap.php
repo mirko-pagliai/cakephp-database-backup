@@ -26,6 +26,10 @@ const APP = ROOT . 'tests' . DS . 'test_app' . DS;
 const CONFIG = APP . 'config' . DS;
 define('TMP', sys_get_temp_dir() . DS . 'cakephp-database-backup' . DS);
 
+if (!is_readable(TMP)) {
+    mkdir(TMP, 0777, true);
+}
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 require_once CORE_PATH . 'config' . DS . 'bootstrap.php';
 
