@@ -44,14 +44,6 @@ class BackupExport extends Utility
     }
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct(OperationType: OperationType::Import);
-    }
-
-    /**
      * Internal method to replace filename patterns.
      *
      * @param string $filename
@@ -69,5 +61,13 @@ class BackupExport extends Utility
             ],
             subject: $filename,
         );
+    }
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(OperationType: OperationType::Import);
     }
 }
