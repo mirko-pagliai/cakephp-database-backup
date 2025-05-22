@@ -113,6 +113,12 @@ abstract class Utility
      */
     public function makeAbsolutePath(string $path): string
     {
-        return Path::makeAbsolute($path, rtrim(ROOT, DS) . DS);
+        if (Path::isAbsolute($path)) {
+            return $path;
+        }
+
+        $absolutePath = Path::makeAbsolute($path, rtrim(ROOT, DS) . DS);
+
+        return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
 }
