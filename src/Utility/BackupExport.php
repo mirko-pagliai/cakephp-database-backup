@@ -18,6 +18,8 @@ namespace DatabaseBackup\Utility;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use Override;
+use Symfony\Component\Filesystem\Exception\IOException;
+use function Cake\I18n\__d;
 
 /**
  * Utility to export databases.
@@ -38,6 +40,20 @@ class BackupExport extends Utility
         set(string $filename) {
             $filename = $this->replaceFilenamePatterns($filename);
             $filename = $this->makeAbsolutePath($filename);
+
+            if (!is_writable(dirname($filename))) {
+                throw new IOException(
+                    __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))
+                );
+            }
+            if (file_exists($filename)) {
+                throw new IOException(
+                    __d('database_backup', 'File `{0}` already exists', $filename)
+                );
+            }
+
+            //Sets the compression
+            $this->Compression = Compression::fromFilename($filename);
 
             $this->filename = $filename;
         }
