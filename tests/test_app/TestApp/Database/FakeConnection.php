@@ -15,11 +15,12 @@ declare(strict_types=1);
 
 namespace App\Database;
 
-use App\Database\Driver\FakeDriver;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
 use Cake\Database\Schema\Collection;
 use Cake\Database\Schema\CollectionInterface as SchemaCollectionInterface;
+use Cake\Database\Schema\SchemaDialect;
+use Cake\Database\Schema\SqliteSchemaDialect;
 use Cake\Database\Schema\TableSchema;
 use Cake\Database\Schema\TableSchemaInterface;
 
@@ -30,8 +31,22 @@ use Cake\Database\Schema\TableSchemaInterface;
  */
 class FakeConnection extends Connection
 {
+    protected Driver $Driver;
+
     public function __construct(array $config = [])
     {
+        $this->Driver = new class extends Driver\Sqlite {
+            public function enabled(): bool
+            {
+                return true;
+            }
+
+            public function schemaDialect(): SchemaDialect
+            {
+                return new ReflectionClass(SqliteSchemaDialect::class)->newInstanceWithoutConstructor();
+            }
+        };
+
         $config += [
             'name' => 'test',
             'driver' => 'Cake\Database\Driver\Sqlite',
@@ -47,14 +62,14 @@ class FakeConnection extends Connection
     public function createDrivers(array $config): array
     {
         return [
-            'read' => new FakeDriver(),
-            'write' => new FakeDriver(),
+            'read' => $this->Driver,
+            'write' => $this->Driver,
         ];
     }
 
     public function getDriver(string $role = self::ROLE_WRITE): Driver
     {
-        return new FakeDriver();
+        return $this->Driver;
     }
 
     public function getSchemaCollection(): SchemaCollectionInterface
