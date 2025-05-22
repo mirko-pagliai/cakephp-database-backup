@@ -1,6 +1,9 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.0
+* `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for
+  significant code optimization. Thanks to the magic `__call()` method provided by `Utility`, they still support the use
+  of already known methods (`filename()`, `compression()`, `timeout()`, etc.) to set properties;
 * the `DatabaseBackup.target` configuration value no longer exists. Relative paths will be understood as relative to the `ROOT`;
 * `BackupExport` no longer takes care of rotating (`rotate()` method) files and (for now) setting chmods of files after export,
   because these functions are not essential and (like others already removed) can be implemented by the user;
