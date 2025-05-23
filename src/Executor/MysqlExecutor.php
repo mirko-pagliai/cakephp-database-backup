@@ -125,7 +125,7 @@ class MysqlExecutor extends Executor
      */
     public function writeAuthFile(string $content): bool
     {
-        $config = $this->Connection->config();
+        $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null,];
 
         $content = str_replace(
             search: ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
