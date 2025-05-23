@@ -24,6 +24,7 @@ use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * BackupExportAndImportTest.
@@ -34,17 +35,6 @@ use PHPUnit\Framework\Attributes\Test;
 #[CoversNothing]
 class BackupExportAndImportTest extends TestCase
 {
-    /**
-     * @inheritDoc
-     */
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        //Drops the connection set by `setUpBeforeClass()`
-        ConnectionManager::drop('test');
-    }
-
     /**
      * Internal method.
      *
@@ -66,20 +56,33 @@ class BackupExportAndImportTest extends TestCase
             ->toArray();
     }
 
-    #[Test]
-    public function testExportAndImport(): void
+    /**
+     * @inheritDoc
+     */
+    public function tearDown(): void
     {
-        if (!extension_loaded('sqlite3')) {
-            $this->markTestSkipped('The `sqlite3` extension is not available');
+        parent::tearDown();
+
+        //Drops the connection set by `setUpBeforeClass()`
+        ConnectionManager::drop('test');
+    }
+
+    #[Test]
+    #[TestWith(['sqlite3', 'sqlite:///' . TMP . 'test.sq3'])]
+    #[TestWith(['mysqli', 'mysql://travis@localhost/test'])]
+    public function testExportAndImport(string $extension, string $urlConfig): void
+    {
+        if (!extension_loaded($extension)) {
+            $this->markTestSkipped('The `' . $extension . '` extension is not available');
         }
 
         //Sets the connection and load the schema
-        ConnectionManager::setConfig('test', ['url' => 'sqlite:///' . TMP . 'test.sq3']);
+        ConnectionManager::setConfig('test', ['url' => $urlConfig]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
 
-        //Sets the fixtures and fetchs tables
+        //Sets the fixtures and fetches tables
         $this->fixtures = ['core.Articles', 'core.Comments'];
         $this->setupFixtures();
         $Articles = $this->fetchTable('Articles');
