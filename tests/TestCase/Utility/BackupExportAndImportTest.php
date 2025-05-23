@@ -69,6 +69,12 @@ class BackupExportAndImportTest extends TestCase
         ConnectionManager::drop('test');
     }
 
+    /**
+     * @param string $extension
+     * @param string $urlConfig
+     * @param class-string $expectedExecutor
+     * @return void
+     */
     #[Test]
     #[TestWith(['sqlite3', 'sqlite:///' . TMP . 'test.sq3', SqliteExecutor::class])]
     #[TestWith(['mysqli', 'mysql://travis@localhost/test', MysqlExecutor::class])]
