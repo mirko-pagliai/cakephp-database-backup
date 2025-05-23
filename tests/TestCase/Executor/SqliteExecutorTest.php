@@ -67,7 +67,7 @@ class SqliteExecutorTest extends TestCase
     public function testDropAllTables(): void
     {
         /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
-        $Connection = Mockery::mock(FakeConnection::class)->makePartial();
+        $Connection = Mockery::mock(FakeConnection::class . '[execute]');
         $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
         $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
 
