@@ -56,12 +56,12 @@ jobs:
 
     - name: Run test suite
       run: |
-        if [[ ${{ matrix.php-version && matrix.prefer-lowest != 'prefer-lowest' }} == '8.4' ]]; then
+        if [[ ${{ matrix.php-version  == '8.4' && matrix.prefer-lowest != 'prefer-lowest' }} ]]; then
             export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-clover=coverage.xml
         else
             export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
             export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
-            composer run-script test
+            vendor/bin/phpunit --display-skipped
         fi
 
     - name: Submit code coverage

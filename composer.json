@@ -38,7 +38,7 @@
     }
   },
   "scripts": {
-    "test": "phpunit",
+    "test": "phpunit --display-skipped",
     "test-coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage"
   },
   "config": {
