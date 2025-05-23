@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Datasource\ConnectionManager;
+use Cake\I18n\DateTime;
+use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -44,8 +46,26 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * @requires extension sqlite3
+     * Internal method.
+     *
+     * Gets all the records in a table and makes the values stringable (to simplify comparisons)
+     *
+     * @param \Cake\ORM\Table $Table
+     * @return array<array<array-key, string>>
      */
+    protected function getAllRecords(Table $Table): array
+    {
+        return $Table
+            ->find()
+            ->enableHydration(false)
+            ->all()
+            ->map(fn (array $record): array => array_map(
+                callback: fn (mixed $value): mixed => (string)$value,
+                array: $record,
+            ))
+            ->toArray();
+    }
+
     #[Test]
     public function testExportAndImport(): void
     {
@@ -59,15 +79,15 @@ class BackupExportAndImportTest extends TestCase
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
 
-        //Sets the fixtures
+        //Sets the fixtures and fetchs tables
         $this->fixtures = ['core.Articles', 'core.Comments'];
         $this->setupFixtures();
-
-        //Gets the initial data
         $Articles = $this->fetchTable('Articles');
         $Comments = $this->fetchTable('Comments');
-        $initialArticles = $Articles->find()->enableHydration(false)->all()->toArray();
-        $initialComments = $Comments->find()->enableHydration(false)->all()->toArray();
+
+        //Gets the initial data
+        $initialArticles = $this->getAllRecords($Articles);
+        $initialComments = $this->getAllRecords($Comments);
 
         /**
          * Exports
@@ -101,10 +121,10 @@ class BackupExportAndImportTest extends TestCase
          *
          * Asserts the initial data and the final data are equal.
          */
-        $finalArticles = $Articles->find()->enableHydration(false)->all()->toArray();
-        $finalComments = $Comments->find()->enableHydration(false)->all()->toArray();
+        $finalArticles = $this->getAllRecords($Articles);
+        $finalComments = $this->getAllRecords($Comments);
 
-        $this->assertEquals($initialArticles, $finalArticles);
-        $this->assertEquals($initialComments, $finalComments);
+        $this->assertSame($initialArticles, $finalArticles);
+        $this->assertSame($initialComments, $finalComments);
     }
 }
