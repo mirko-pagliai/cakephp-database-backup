@@ -21,6 +21,12 @@ jobs:
             prefer-lowest: 'prefer-lowest'
 
     steps:
+    - name: Setup MySQL 8.0
+      if: matrix.db-type == 'mysql'
+      run: |
+        sudo service mysql start
+        mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
+
     - uses: actions/checkout@v4
 
     - name: Validate composer.json and composer.lock
