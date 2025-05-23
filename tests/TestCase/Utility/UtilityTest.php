@@ -98,12 +98,6 @@ class UtilityTest extends TestCase
     }
 
     #[Test]
-    public function testExecutorPropertyWithRealDrivers(): void
-    {
-        $this->markTestIncomplete();
-    }
-
-    #[Test]
     public function testExecutorPropertyNoExistingExecutor(): void
     {
         $this->Utility->Connection = new FakeConnection(['driver' => 'Cake\Driver\NoExistingDriver']);

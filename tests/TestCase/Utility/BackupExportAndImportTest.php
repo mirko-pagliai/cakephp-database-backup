@@ -19,6 +19,8 @@ use Cake\Datasource\ConnectionManager;
 use Cake\I18n\DateTime;
 use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
+use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
@@ -68,9 +70,9 @@ class BackupExportAndImportTest extends TestCase
     }
 
     #[Test]
-    #[TestWith(['sqlite3', 'sqlite:///' . TMP . 'test.sq3'])]
-    #[TestWith(['mysqli', 'mysql://travis@localhost/test'])]
-    public function testExportAndImport(string $extension, string $urlConfig): void
+    #[TestWith(['sqlite3', 'sqlite:///' . TMP . 'test.sq3', SqliteExecutor::class])]
+    #[TestWith(['mysqli', 'mysql://travis@localhost/test', MysqlExecutor::class])]
+    public function testExportAndImport(string $extension, string $urlConfig, string $expectedExecutor): void
     {
         if (!extension_loaded($extension)) {
             $this->markTestSkipped('The `' . $extension . '` extension is not available');
@@ -102,6 +104,7 @@ class BackupExportAndImportTest extends TestCase
             ->filename(TMP . 'test.sql')
             ->export();
 
+        $this->assertInstanceOf($expectedExecutor, $BackupExport->Executor);
         $this->assertSame(TMP . 'test.sql', $result);
         $this->assertFileExists($result);
 
@@ -115,6 +118,7 @@ class BackupExportAndImportTest extends TestCase
             ->filename($result)
             ->import();
 
+        $this->assertInstanceOf($expectedExecutor, $BackupImport->Executor);
         $this->assertSame(TMP . 'test.sql', $result);
 
         unlink($result);
