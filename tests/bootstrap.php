@@ -43,3 +43,13 @@ Cache::setConfig([
 ]);
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
+
+foreach ([
+    'db_dsn_sqlite' => 'sqlite:///' . TMP . 'test.sq3',
+    'db_dsn_mysql' => 'mysql://travis@localhost/test',
+    'db_dsn_postgres' => 'postgres://postgres@localhost/test',
+] as $key => $value) {
+    if (!getenv($key)) {
+        putenv("$key=$value");
+    }
+}
