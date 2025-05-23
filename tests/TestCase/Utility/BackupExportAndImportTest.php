@@ -70,11 +70,18 @@ class BackupExportAndImportTest extends TestCase
         if (!$ExecutableFinder->find('mariadb-dump')) {
             Configure::write('DatabaseBackup.binaries.mariadb-dump', $ExecutableFinder->find('mysqldump'));
         }
+        if (!$ExecutableFinder->find('mariadb')) {
+            Configure::write('DatabaseBackup.binaries.mariadb', $ExecutableFinder->find('mysql'));
+        }
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function tearDownAfterClass(): void
     {
         Configure::delete('DatabaseBackup.binaries.mariadb-dump');
+        Configure::delete('DatabaseBackup.binaries.mariadb');
     }
 
     /**
