@@ -15,8 +15,8 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\I18n\DateTime;
 use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use DatabaseBackup\Executor\MysqlExecutor;
@@ -27,6 +27,7 @@ use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Process\ExecutableFinder;
 
 /**
  * BackupExportAndImportTest.
@@ -52,10 +53,33 @@ class BackupExportAndImportTest extends TestCase
             ->enableHydration(false)
             ->all()
             ->map(fn (array $record): array => array_map(
-                callback: fn (mixed $value): mixed => (string)$value,
+                callback: fn (mixed $value): string => (string)$value,
                 array: $record,
             ))
             ->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function setUpBeforeClass(): void
+    {
+        //If some binaries are missing, sets the old aliases
+        $ExecutableFinder = new ExecutableFinder();
+        foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
+            if (!$ExecutableFinder->find($binary)) {
+                Configure::write('DatabaseBackup.binaries.' . $binary, $ExecutableFinder->find($oldAlias));
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function tearDownAfterClass(): void
+    {
+        //Deletes any custom and previously set binaries by `setUpBeforeClass()`
+        Configure::delete('DatabaseBackup.binaries');
     }
 
     /**
@@ -71,21 +95,27 @@ class BackupExportAndImportTest extends TestCase
 
     /**
      * @param string $extension
-     * @param string $urlConfig
      * @param class-string $expectedExecutor
      * @return void
      */
     #[Test]
-    #[TestWith(['sqlite3', 'sqlite:///' . TMP . 'test.sq3', SqliteExecutor::class])]
-    #[TestWith(['mysqli', 'mysql://travis@localhost/test', MysqlExecutor::class])]
-    public function testExportAndImport(string $extension, string $urlConfig, string $expectedExecutor): void
+    #[TestWith(['sqlite3', SqliteExecutor::class])]
+    #[TestWith(['mysqli', MysqlExecutor::class])]
+    public function testExportAndImport(string $extension, string $expectedExecutor): void
     {
         if (!extension_loaded($extension)) {
             $this->markTestSkipped('The `' . $extension . '` extension is not available');
         }
 
-        //Sets the connection and load the schema
-        ConnectionManager::setConfig('test', ['url' => $urlConfig]);
+        /**
+         * Sets the connection and load the schema.
+         *
+         * The settings for database connections are defined in the bootstrap file and may have been overridden before
+         *  testing by exporting the affected variable.
+         *
+         * @see tests/bootstrap.php
+         */
+        ConnectionManager::setConfig('test', ['url' => getenv('db_dsn_' . $extension)]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
