@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\I18n\DateTime;
 use Cake\ORM\Table;
@@ -27,6 +28,7 @@ use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Process\ExecutableFinder;
 
 /**
  * BackupExportAndImportTest.
@@ -56,6 +58,23 @@ class BackupExportAndImportTest extends TestCase
                 array: $record,
             ))
             ->toArray();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function setUpBeforeClass(): void
+    {
+        $ExecutableFinder = new ExecutableFinder();
+
+        if (!$ExecutableFinder->find('mariadb-dump')) {
+            Configure::write('DatabaseBackup.binaries.mariadb-dump', $ExecutableFinder->find('mysqldump'));
+        }
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        Configure::delete('DatabaseBackup.binaries.mariadb-dump');
     }
 
     /**
