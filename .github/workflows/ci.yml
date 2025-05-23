@@ -59,6 +59,8 @@ jobs:
         if [[ ${{ matrix.php-version && matrix.prefer-lowest != 'prefer-lowest' }} == '8.4' ]]; then
             export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-clover=coverage.xml
         else
+            export db_dsn_mysql='mysql://root:root@127.0.0.1/test?encoding=utf8'
+            export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
             composer run-script test
         fi
 
