@@ -77,7 +77,7 @@ class BackupExportAndImportTest extends TestCase
      */
     #[Test]
     #[TestWith(['sqlite3', 'sqlite:///' . TMP . 'test.sq3', SqliteExecutor::class])]
-    #[TestWith(['mysqli', 'mysql://travis@localhost/test', MysqlExecutor::class])]
+    #[TestWith(['mysqli', 'mysql://root:root@127.0.0.1/test?encoding=utf8', MysqlExecutor::class])]
     public function testExportAndImport(string $extension, string $urlConfig, string $expectedExecutor): void
     {
         if (!extension_loaded($extension)) {
