@@ -95,14 +95,13 @@ class BackupExportAndImportTest extends TestCase
 
     /**
      * @param string $extension
-     * @param string $dbEnv
      * @param class-string $expectedExecutor
      * @return void
      */
     #[Test]
-    #[TestWith(['sqlite3', 'db_dsn_sqlite', SqliteExecutor::class])]
-    #[TestWith(['mysqli', 'db_dsn_mysql', MysqlExecutor::class])]
-    public function testExportAndImport(string $extension, string $dbEnv, string $expectedExecutor): void
+    #[TestWith(['sqlite3', SqliteExecutor::class])]
+    #[TestWith(['mysqli', MysqlExecutor::class])]
+    public function testExportAndImport(string $extension, string $expectedExecutor): void
     {
         if (!extension_loaded($extension)) {
             $this->markTestSkipped('The `' . $extension . '` extension is not available');
@@ -116,7 +115,7 @@ class BackupExportAndImportTest extends TestCase
          *
          * @see tests/bootstrap.php
          */
-        ConnectionManager::setConfig('test', ['url' => getenv($dbEnv)]);
+        ConnectionManager::setConfig('test', ['url' => getenv('db_dsn_' . $extension)]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
