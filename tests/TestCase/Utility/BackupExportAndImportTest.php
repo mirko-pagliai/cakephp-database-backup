@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\I18n\DateTime;
 use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use DatabaseBackup\Executor\MysqlExecutor;
@@ -65,13 +64,12 @@ class BackupExportAndImportTest extends TestCase
      */
     public static function setUpBeforeClass(): void
     {
+        //If some binaries are missing, sets the old aliases
         $ExecutableFinder = new ExecutableFinder();
-
-        if (!$ExecutableFinder->find('mariadb-dump')) {
-            Configure::write('DatabaseBackup.binaries.mariadb-dump', $ExecutableFinder->find('mysqldump'));
-        }
-        if (!$ExecutableFinder->find('mariadb')) {
-            Configure::write('DatabaseBackup.binaries.mariadb', $ExecutableFinder->find('mysql'));
+        foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
+            if (!$ExecutableFinder->find($binary)) {
+                Configure::write('DatabaseBackup.binaries.' . $binary, $ExecutableFinder->find($oldAlias));
+            }
         }
     }
 
@@ -80,8 +78,8 @@ class BackupExportAndImportTest extends TestCase
      */
     public static function tearDownAfterClass(): void
     {
-        Configure::delete('DatabaseBackup.binaries.mariadb-dump');
-        Configure::delete('DatabaseBackup.binaries.mariadb');
+        //Deletes any custom and previously set binaries by `setUpBeforeClass()`
+        Configure::delete('DatabaseBackup.binaries');
     }
 
     /**
