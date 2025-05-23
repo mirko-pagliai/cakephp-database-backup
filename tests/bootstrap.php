@@ -44,6 +44,14 @@ Cache::setConfig([
 
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 
+/**
+ * Database connection settings, for each driver.
+ *
+ * They can be overridden before running tests, by exporting the affected variable. Ex.:
+ * ```
+ * export db_dsn_mysql='mysql://root:root@127.0.0.1/test?encoding=utf8'; vendor/bin/phpunit
+ * ```
+ */
 foreach ([
     'db_dsn_sqlite' => 'sqlite:///' . TMP . 'test.sq3',
     'db_dsn_mysql' => 'mysql://travis@localhost/test',

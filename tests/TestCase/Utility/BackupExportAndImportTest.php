@@ -95,7 +95,7 @@ class BackupExportAndImportTest extends TestCase
 
     /**
      * @param string $extension
-     * @param string $urlConfig
+     * @param string $dbEnv
      * @param class-string $expectedExecutor
      * @return void
      */
@@ -108,7 +108,14 @@ class BackupExportAndImportTest extends TestCase
             $this->markTestSkipped('The `' . $extension . '` extension is not available');
         }
 
-        //Sets the connection and load the schema
+        /**
+         * Sets the connection and load the schema.
+         *
+         * The settings for database connections are defined in the bootstrap file and may have been overridden before
+         *  testing by exporting the affected variable.
+         *
+         * @see tests/bootstrap.php
+         */
         ConnectionManager::setConfig('test', ['url' => getenv($dbEnv)]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
