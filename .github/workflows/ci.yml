@@ -54,7 +54,7 @@ jobs:
           if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
               export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings --coverage-clover=coverage.xml
           else
-              vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings
+              vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings
           fi
 
       - name: Code Coverage Report
