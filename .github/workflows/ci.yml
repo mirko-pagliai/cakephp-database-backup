@@ -51,7 +51,7 @@ jobs:
         export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
         export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
 
-        if [[ ${{ matrix.php-version  == '8.4' && matrix.prefer-lowest != 'prefer-lowest' }} ]]; then
+        if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
             export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-clover=coverage.xml
         else
             vendor/bin/phpunit --display-skipped
