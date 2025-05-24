@@ -27,6 +27,9 @@ jobs:
           sudo service mysql start
           mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
 
+      - name: Setup PostgreSQL latest
+        run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.6
+
       - uses: actions/checkout@v4
 
       - name: Validate composer.json and composer.lock
@@ -49,8 +52,7 @@ jobs:
       - name: Run test suite
         run: |
           export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
-          export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
-  
+
           if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
               export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings --coverage-clover=coverage.xml
           else
