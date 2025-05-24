@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use LogicException;
@@ -50,10 +51,12 @@ class BackupImport extends Utility
 
     /**
      * Constructor.
+     *
+     * @param \Cake\Datasource\ConnectionInterface|string $Connection
      */
-    public function __construct()
+    public function __construct(ConnectionInterface|string $Connection = '')
     {
-        parent::__construct(OperationType: OperationType::Import);
+        parent::__construct(OperationType: OperationType::Import, Connection: $Connection);
     }
 
     /**

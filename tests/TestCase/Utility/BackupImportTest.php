@@ -45,8 +45,7 @@ class BackupImportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupImport = new BackupImport();
-        $this->BackupImport->Connection = new FakeConnection();
+        $this->BackupImport = new BackupImport(Connection: new FakeConnection());
     }
 
     #[Test]

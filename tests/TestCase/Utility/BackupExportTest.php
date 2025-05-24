@@ -49,8 +49,7 @@ class BackupExportTest extends TestCase
     {
         parent::setUp();
 
-        $this->BackupExport = new BackupExport();
-        $this->BackupExport->Connection = new FakeConnection();
+        $this->BackupExport = new BackupExport(Connection: new FakeConnection());
     }
 
     #[Test]

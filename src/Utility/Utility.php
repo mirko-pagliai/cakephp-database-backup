@@ -78,7 +78,12 @@ abstract class Utility
      *
      * @param \DatabaseBackup\OperationType $OperationType
      */
-    public function __construct(readonly protected OperationType $OperationType) {}
+    public function __construct(readonly protected OperationType $OperationType, ConnectionInterface|string $Connection = '')
+    {
+        if ($Connection) {
+            $this->Connection = $Connection;
+        }
+    }
 
     /**
      * Magic method. It provides the ability to set properties using methods.

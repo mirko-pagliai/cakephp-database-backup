@@ -17,10 +17,9 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
-use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\Executor\SqliteExecutor;
+use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
@@ -82,10 +81,10 @@ class UtilityTest extends TestCase
     #[Test]
     public function testExecutorProperty(): void
     {
-        $this->Utility->Connection = new FakeConnection(['driver' => Sqlite::class]);
+        $this->Utility->Connection = new FakeConnection();
 
         $result = $this->Utility->Executor;
-        $this->assertInstanceOf(SqliteExecutor::class, $result);
+        $this->assertInstanceOf(Executor::class, $result);
     }
 
     #[Test]

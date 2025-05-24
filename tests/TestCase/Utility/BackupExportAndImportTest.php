@@ -135,8 +135,7 @@ class BackupExportAndImportTest extends TestCase
         /**
          * Exports
          */
-        $BackupExport = new BackupExport();
-        $BackupExport->Connection = ConnectionManager::get('test');
+        $BackupExport = new BackupExport(Connection: ConnectionManager::get('test'));
 
         $result = $BackupExport
             ->filename(TMP . 'test.sql')
@@ -149,8 +148,7 @@ class BackupExportAndImportTest extends TestCase
         /**
          * Imports
          */
-        $BackupImport = new BackupImport();
-        $BackupImport->Connection = ConnectionManager::get('test');
+        $BackupImport = new BackupImport(Connection: ConnectionManager::get('test'));
 
         $result = $BackupImport
             ->filename($result)

@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -82,10 +83,12 @@ class BackupExport extends Utility
 
     /**
      * Constructor.
+     *
+     * @param \Cake\Datasource\ConnectionInterface|string $Connection
      */
-    public function __construct()
+    public function __construct(ConnectionInterface|string $Connection = '')
     {
-        parent::__construct(OperationType: OperationType::Export);
+        parent::__construct(OperationType: OperationType::Export, Connection: $Connection);
     }
 
     /**
