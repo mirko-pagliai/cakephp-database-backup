@@ -16,10 +16,10 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ['8.4']
-        prefer-lowest: ['']
+        dependencies: ['highest']
         include:
           - php-version: '8.4'
-            prefer-lowest: 'prefer-lowest'
+            dependencies: 'lowest'
 
     steps:
     - name: Setup MySQL 8.0
@@ -37,23 +37,14 @@ jobs:
       with:
         php-version: ${{ matrix.php-version }}
         extensions: mbstring, intl
+        ini-values: zend.assertions=1
+        coverage: pcov
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v4
+    - name: Composer install
+      uses: ramsey/composer-install@v3
       with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-
-    - name: Install dependencies
-      run: |
-       if ${{ matrix.prefer-lowest == 'prefer-lowest' }}; then
-         composer update --no-progress --prefer-lowest --prefer-stable
-       else
-         composer update --no-progress
-       fi
+        dependency-versions: ${{ matrix.dependencies }}
+        composer-options: ${{ matrix.composer-options }}
 
     - name: Run test suite
       run: |
