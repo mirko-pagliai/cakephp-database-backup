@@ -22,46 +22,46 @@ jobs:
             dependencies: 'lowest'
 
     steps:
-    - name: Setup MySQL 8.0
-      run: |
-        sudo service mysql start
-        mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
+      - name: Setup MySQL 8.0
+        run: |
+          sudo service mysql start
+          mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-version }}
-        extensions: mbstring, intl
-        ini-values: zend.assertions=1
-        coverage: pcov
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl
+          ini-values: zend.assertions=1
+          coverage: pcov
 
-    - name: Composer install
-      uses: ramsey/composer-install@v3
-      with:
-        dependency-versions: ${{ matrix.dependencies }}
-        composer-options: ${{ matrix.composer-options }}
+      - name: Composer install
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
+          composer-options: ${{ matrix.composer-options }}
 
-    - name: Run test suite
-      run: |
-        export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
-        export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
+      - name: Run test suite
+        run: |
+          export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
+          export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
+  
+          if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
+              export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings --coverage-clover=coverage.xml
+          else
+              vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings
+          fi
 
-        if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
-            export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-clover=coverage.xml
-        else
-            vendor/bin/phpunit --display-skipped
-        fi
-
-    - name: Code Coverage Report
-      if: success() && matrix.dependencies == 'highest'
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Code Coverage Report
+        if: success() && matrix.dependencies == 'highest'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   cs-stan:
     name: Coding Standard & Static Analysis
