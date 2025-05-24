@@ -20,6 +20,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -101,6 +102,7 @@ class BackupExportAndImportTest extends TestCase
     #[Test]
     #[TestWith(['sqlite3', SqliteExecutor::class])]
     #[TestWith(['mysqli', MysqlExecutor::class])]
+    #[TestWith(['pgsql', PostgresExecutor::class])]
     public function testExportAndImport(string $extension, string $expectedExecutor): void
     {
         if (!extension_loaded($extension)) {
