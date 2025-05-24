@@ -16,60 +16,52 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ['8.4']
-        prefer-lowest: ['']
+        dependencies: ['highest']
         include:
           - php-version: '8.4'
-            prefer-lowest: 'prefer-lowest'
+            dependencies: 'lowest'
 
     steps:
-    - name: Setup MySQL 8.0
-      run: |
-        sudo service mysql start
-        mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
+      - name: Setup MySQL 8.0
+        run: |
+          sudo service mysql start
+          mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-version }}
-        extensions: mbstring, intl
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl
+          ini-values: zend.assertions=1
+          coverage: pcov
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v4
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+      - name: Composer install
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
+          composer-options: ${{ matrix.composer-options }}
 
-    - name: Install dependencies
-      run: |
-       if ${{ matrix.prefer-lowest == 'prefer-lowest' }}; then
-         composer update --no-progress --prefer-lowest --prefer-stable
-       else
-         composer update --no-progress
-       fi
+      - name: Run test suite
+        run: |
+          export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
+          export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
+  
+          if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
+              export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings --coverage-clover=coverage.xml
+          else
+              vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings
+          fi
 
-    - name: Run test suite
-      run: |
-        if [[ ${{ matrix.php-version  == '8.4' && matrix.prefer-lowest != 'prefer-lowest' }} ]]; then
-            export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-clover=coverage.xml
-        else
-            export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
-            export db_dsn_postgres='postgres://postgres:postgres@127.0.0.1/test'
-            vendor/bin/phpunit --display-skipped
-        fi
-
-    - name: Submit code coverage
-      if: matrix.php-version == '8.4'
-      uses: codecov/codecov-action@v5
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Code Coverage Report
+        if: success() && matrix.dependencies == 'highest'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   cs-stan:
     name: Coding Standard & Static Analysis
