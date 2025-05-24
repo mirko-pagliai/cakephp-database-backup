@@ -56,11 +56,11 @@ jobs:
             vendor/bin/phpunit --display-skipped
         fi
 
-    - name: Submit code coverage
-      if: matrix.php-version == '8.4'
+    - name: Code Coverage Report
+      if: success() && matrix.dependencies == 'highest'
       uses: codecov/codecov-action@v5
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   cs-stan:
     name: Coding Standard & Static Analysis
