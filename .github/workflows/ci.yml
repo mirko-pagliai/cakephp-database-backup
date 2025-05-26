@@ -56,13 +56,16 @@ jobs:
           dependency-versions: ${{ matrix.dependencies }}
           composer-options: ${{ matrix.composer-options }}
 
+      - name: Run "real driver" test suite
+        if: matrix.dependencies == 'real-drivers'
+        run:
+          composer run-script test-real-drivers
+
       - name: Run test suite
         run: |
           export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
             
-          if [[ ${{ matrix.real-drivers }} == 'real-drivers' ]]; then
-              composer run-script test-real-drivers
-          elif [[ ${{ matrix.dependencies }} == 'highest' ]]; then
+          if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
               export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
           else
               composer run-script test
