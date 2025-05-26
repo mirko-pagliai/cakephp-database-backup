@@ -36,6 +36,11 @@ class ImportCommand extends Command
 
         $parser->setDescription(__d('database_backup', 'Imports a database backup'));
 
+        $parser->addArgument('filename', [
+            'help' => __d('database_backup', 'Filename. It can be an absolute path'),
+            'required' => true,
+        ]);
+
         return $parser;
     }
 }

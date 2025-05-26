@@ -60,8 +60,9 @@ cake database_backup.export [options]
 --quiet, -q        Enable quiet output.
 --timeout, -t      Timeout for shell commands
 --verbose, -v      Enable verbose output.
+
 txt;
-        $this->assertOutputContains($expected);
+        $this->assertSame($expected, $this->_out->messages()[0]);
     }
 
     #[Test]
