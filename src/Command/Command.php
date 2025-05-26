@@ -36,7 +36,6 @@ abstract class Command extends CakeCommand
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         $parser->addOption(name: 'connection', options: [
-            'default' => 'default',
             'help' => __d(
                 'database_backup',
                 'Name of the alternative connection to use, for example if you are not using the default connection',

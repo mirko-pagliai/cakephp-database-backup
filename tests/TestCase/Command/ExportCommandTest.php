@@ -48,8 +48,7 @@ cake database_backup.export [options]');
         $this->assertOutputContains('--compression, -c  Compression type. By default, no compression will be
                    used <comment>(choices: gzip|bzip2)</comment>');
         $this->assertOutputContains('--connection       Name of the alternative connection to use, for
-                   example if you are not using the default connection
-                   <comment>(default: default)</comment>');
+                   example if you are not using the default connection');
         $this->assertOutputContains('--filename, -f     Filename. It can be an absolute path and may contain
                    patterns. The compression type will be automatically
                    set');
@@ -61,7 +60,7 @@ cake database_backup.export [options]');
     public function testExecute(): void
     {
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('default')->once();
+        $BackupExport->shouldReceive('__construct')->with('')->once();
         $BackupExport->shouldNotReceive('timeout');
         $BackupExport->shouldNotReceive('filename');
         $BackupExport->shouldNotReceive('compression');
@@ -98,7 +97,7 @@ cake database_backup.export [options]');
     public function testExecuteWithCompressionOption(): void
     {
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('default')->once();
+        $BackupExport->shouldReceive('__construct')->with('')->once();
         $BackupExport->shouldNotReceive('timeout');
         $BackupExport->shouldNotReceive('filename');
         $BackupExport->shouldReceive('compression')->with('gzip')->once();
