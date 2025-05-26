@@ -17,8 +17,15 @@ jobs:
       matrix:
         php-version: ['8.4']
         dependencies: ['highest']
+        real-drivers: ['']
         include:
           - php-version: '8.4'
+            real-drivers: 'real-drivers'
+            dependencies: 'highest'
+          - php-version: '8.4'
+            dependencies: 'lowest'
+          - php-version: '8.4'
+            real-drivers: 'real-drivers'
             dependencies: 'lowest'
 
     steps:
@@ -50,14 +57,19 @@ jobs:
           composer-options: ${{ matrix.composer-options }}
 
       - name: Run test suite
+        if: matrix.real-drivers == ''
+        run: |
+          if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
+            export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
+          else
+            composer run-script test
+          fi
+
+      - name: Run "real driver" test suite
+        if: matrix.real-drivers == 'real-drivers'
         run: |
           export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
-
-          if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
-              export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings --coverage-clover=coverage.xml
-          else
-              vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings
-          fi
+          composer run-script test-real-drivers
 
       - name: Code Coverage Report
         if: success() && matrix.dependencies == 'highest'
