@@ -15,8 +15,12 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Command;
 
+use Cake\Console\Arguments;
+use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Exception;
 use Override;
+use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
 /**
@@ -26,6 +30,29 @@ use function Cake\I18n\__d;
  */
 class ImportCommand extends Command
 {
+    /**
+     * Makes the absolute path for a filename.
+     *
+     * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
+     *
+     * For example,
+     * ```
+     * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
+     * ```
+     *
+     * @param string $path
+     * @return string
+     * @since 2.13.5
+     */
+    public static function makeAbsolutePath(string $path): string
+    {
+        if (Path::isRelative($path) && is_readable(Path::makeAbsolute($path, ROOT))) {
+            $path = Path::makeAbsolute($path, ROOT);
+        }
+
+        return $path;
+    }
+
     /**
      * @inheritDoc
      */
@@ -42,5 +69,23 @@ class ImportCommand extends Command
         ]);
 
         return $parser;
+    }
+
+    /**
+     * Imports a database backup.
+     *
+     * @param \Cake\Console\Arguments $args The command arguments
+     * @param \Cake\Console\ConsoleIo $io The console io
+     * @return void
+     */
+    public function execute(Arguments $args, ConsoleIo $io): int
+    {
+        try {
+
+        } catch (Exception $e) {
+            $io->abort($e->getMessage());
+        }
+
+        return static::CODE_SUCCESS;
     }
 }

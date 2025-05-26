@@ -21,6 +21,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * ImportCommandTest.
@@ -31,6 +32,16 @@ use PHPUnit\Framework\Attributes\Test;
 class ImportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
+
+    #[Test]
+    #[TestWith(['file.sql', 'file.sql'])]
+    #[TestWith([TMP . 'backups' . DS . 'file.sql', TMP . 'backups' . DS . 'file.sql'])]
+    #[TestWith([ROOT . 'version', 'version'])]
+    public function testMakeAbsolutePath(string $expectedPath, string $path): void
+    {
+        $result = ImportCommand::makeAbsolutePath($path);
+        $this->assertSame($expectedPath, $result);
+    }
 
     #[Test]
     #[RequiresOperatingSystemFamily('Linux')]
@@ -60,5 +71,17 @@ filename  Filename. It can be an absolute path
 
 txt;
         $this->assertSame($expected, $this->_out->messages()[0]);
+    }
+
+    /**
+     * Tests the execution of the database_backup.import command without providing the required filename argument
+     */
+    #[Test]
+    public function testExecuteWithNoFilename(): void
+    {
+        $this->exec('database_backup.import');
+
+        $this->assertExitError();
+        $this->assertErrorContains('Error: Missing required argument. The `filename` argument is required.');
     }
 }
