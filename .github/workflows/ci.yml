@@ -60,9 +60,9 @@ jobs:
           export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
 
           if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
-              export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-phpunit-deprecations --display-deprecations --display-warnings --coverage-clover=coverage.xml
+              export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
           else
-              vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings
+              composer run-script test
           fi
 
       - name: Code Coverage Report
