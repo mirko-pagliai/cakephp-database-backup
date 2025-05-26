@@ -21,6 +21,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
 use Mockery;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,23 +35,33 @@ class ExportCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     #[Test]
+    #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
         $this->exec('database_backup.export -h');
         $this->assertExitSuccess();
 
-        $this->assertOutputContains('Exports a database backup');
-        $this->assertOutputContains('<info>Usage:</info>
-cake database_backup.export [options]');
+        $expected = <<<txt
+Exports a database backup
 
-        $this->assertOutputContains('--compression, -c  Compression type. By default, no compression will be
-                   used <comment>(choices: gzip|bzip2)</comment>');
-        $this->assertOutputContains('--connection       Name of the alternative connection to use, for
-                   example if you are not using the default connection');
-        $this->assertOutputContains('--filename, -f     Filename. It can be an absolute path and may contain
+<info>Usage:</info>
+cake database_backup.export [options]
+
+<info>Options:</info>
+
+--compression, -c  Compression type. By default, no compression will be
+                   used <comment>(choices: gzip|bzip2)</comment>
+--connection       Name of the alternative connection to use, for
+                   example if you are not using the default connection
+--filename, -f     Filename. It can be an absolute path and may contain
                    patterns. The compression type will be automatically
-                   set');
-        $this->assertOutputContains('--timeout, -t      Timeout for shell commands');
+                   set
+--help, -h         Display this help.
+--quiet, -q        Enable quiet output.
+--timeout, -t      Timeout for shell commands
+--verbose, -v      Enable verbose output.
+txt;
+        $this->assertOutputContains($expected);
     }
 
     #[Test]
