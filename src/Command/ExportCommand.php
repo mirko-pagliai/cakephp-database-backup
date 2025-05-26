@@ -15,7 +15,13 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Command;
 
+use Cake\Console\Arguments;
+use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Console\Exception\StopException;
+use DatabaseBackup\Compression;
+use DatabaseBackup\Utility\BackupExport;
+use Exception;
 use Override;
 use function Cake\I18n\__d;
 
@@ -36,6 +42,61 @@ class ExportCommand extends Command
 
         $parser->setDescription(__d('database_backup', 'Exports a database backup'));
 
+        $parser->addOption('compression',  [
+            'choices' => array_map(callback: 'lcfirst', array: array_column(
+                array: array_filter(
+                    array: Compression::cases(),
+                    callback: fn (Compression $Compression): bool => $Compression != Compression::None,
+                ),
+                column_key: 'name',
+            )),
+            'help' => __d('database_backup', 'Compression type. By default, no compression will be used'),
+            'short' => 'c',
+        ]);
+
+        $parser->addOption('filename', [
+            'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
+                'patterns. The compression type will be automatically set'),
+            'short' => 'f',
+        ]);
+
         return $parser;
+    }
+
+    /**
+     * Executes the database backup export process.
+     *
+     * @param \Cake\Console\Arguments $args
+     * @param \Cake\Console\ConsoleIo $io
+     * @return int Returns the status code of the operation. `static::CODE_SUCCESS` indicates success.
+     */
+    public function execute(Arguments $args, ConsoleIo $io): int
+    {
+        try {
+            $BackupExport = new BackupExport($args->getOption('connection') ?: '');
+
+            if ($args->getOption('timeout')) {
+                $BackupExport->timeout((int)$args->getOption('timeout'));
+            }
+
+            if ($args->getOption('filename')) {
+                $BackupExport->filename($args->getOption('filename'));
+            } elseif ($args->getOption('compression')) {
+                $BackupExport->compression($args->getOption('compression'));
+            }
+
+            $filename = $BackupExport->export();
+
+            if (!$filename) {
+                throw new StopException(
+                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport')
+                );
+            }
+            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
+        } catch (Exception $e) {
+            $io->abort($e->getMessage());
+        }
+
+        return static::CODE_SUCCESS;
     }
 }
