@@ -36,7 +36,7 @@ The only exception is given by the class `DatabaseBackup\Test\TestCase\Utility\B
 
 This test class, when executed, will test a real database export and import, using the PHP extensions `sqlite3`, `mysqli` and `pgsql`, that is all the drivers and databases supported by the plugin.
 
-You can test the class directly or the configured `real-drivers` testsuite ([see available testsuites](phpunit.xml.dist):
+You can test the class directly or the configured `real-drivers` testsuite ([see available testsuites](phpunit.xml.dist)):
 ```bash
 $ vendor/bin/phpunit --testsuite=real-drivers
 ```
