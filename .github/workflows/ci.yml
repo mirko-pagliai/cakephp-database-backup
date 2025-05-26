@@ -21,7 +21,7 @@ jobs:
           - php-version: '8.4'
             dependencies: 'lowest'
           - php-version: '8.4'
-            real-drivers: true
+            real-drivers: false
             dependencies: 'highest'
           - php-version: '8.4'
             real-drivers: true
