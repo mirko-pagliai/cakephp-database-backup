@@ -17,6 +17,7 @@ namespace DatabaseBackup\Command;
 
 use Cake\Command\Command as CakeCommand;
 use Cake\Console\ConsoleOptionParser;
+use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
 /**
@@ -24,7 +25,7 @@ use function Cake\I18n\__d;
  *
  * @since 2.6.0
  */
-class Command extends CakeCommand
+abstract class Command extends CakeCommand
 {
     /**
      * Configures and returns the console option parser for a command.
@@ -48,5 +49,17 @@ class Command extends CakeCommand
         ]);
 
         return $parser;
+    }
+
+    /**
+     * Makes the relative path (relative to `ROOT`).
+     *
+     * @param string $path
+     * @return string
+     * @since 2.13.5
+     */
+    public function makeRelativePath(string $path): string
+    {
+        return Path::isBasePath(ROOT, $path) ? Path::makeRelative($path, ROOT) : $path;
     }
 }
