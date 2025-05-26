@@ -21,6 +21,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
 use Mockery;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,6 +35,7 @@ class ExportCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     #[Test]
+    #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
         $this->exec('database_backup.export -h');
