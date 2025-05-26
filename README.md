@@ -41,6 +41,8 @@ You can test the class directly or the configured `real-drivers` testsuite ([see
 $ vendor/bin/phpunit --testsuite=real-drivers
 ```
 
+[Continuous integration (CI) workflows](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml) must be run with `highest`/`lowest` dependencies and "without"/"only with" real drivers and databases.
+
 ## Versioning
 
 For transparency and insight into our release cycle and to maintain backward
