@@ -33,29 +33,6 @@ use function Cake\I18n\__d;
 class ImportCommand extends Command
 {
     /**
-     * Makes the absolute path for a filename.
-     *
-     * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
-     *
-     * For example,
-     * ```
-     * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
-     * ```
-     *
-     * @param string $path
-     * @return string
-     * @since 2.13.5
-     */
-    public static function makeAbsolutePath(string $path): string
-    {
-        if (Path::isRelative($path) && is_readable(Path::makeAbsolute($path, ROOT))) {
-            $path = Path::makeAbsolute($path, ROOT);
-        }
-
-        return $path;
-    }
-
-    /**
      * @inheritDoc
      */
     #[Override]
@@ -89,7 +66,7 @@ class ImportCommand extends Command
                 $BackupImport->timeout((int)$args->getOption('timeout'));
             }
 
-            $BackupImport->filename($this->makeRelativePath((string)$args->getArgument('filename')));
+            $BackupImport->filename((string)$args->getArgument('filename'));
 
             $filename = $BackupImport->import();
 

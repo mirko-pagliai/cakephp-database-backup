@@ -18,7 +18,6 @@ namespace DatabaseBackup\Test\TestCase\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\TestSuite\TestCase;
-use DatabaseBackup\Utility\BackupExport;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Mockery;
@@ -26,7 +25,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * ImportCommandTest.
@@ -37,16 +35,6 @@ use PHPUnit\Framework\Attributes\TestWith;
 class ImportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
-
-    #[Test]
-    #[TestWith(['file.sql', 'file.sql'])]
-    #[TestWith([TMP . 'backups' . DS . 'file.sql', TMP . 'backups' . DS . 'file.sql'])]
-    #[TestWith([ROOT . 'version', 'version'])]
-    public function testMakeAbsolutePath(string $expectedPath, string $path): void
-    {
-        $result = ImportCommand::makeAbsolutePath($path);
-        $this->assertSame($expectedPath, $result);
-    }
 
     #[Test]
     #[RequiresOperatingSystemFamily('Linux')]
