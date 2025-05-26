@@ -6,38 +6,21 @@ Also, make sure [you have configured the plugin correctly](Configuration.md)
 
 ## Transition from `mysql` and `mysqldump` to `mariadb` and `mariadb-dump`
 
+Before version `2.13.4`, for MySql databases the plugin used the `mysql` and `mysqldump` executables to export/import databases.
+
 As reported in [issue #111](https://github.com/mirko-pagliai/cakephp-database-backup/issues/111) and already reported in [issue #110](https://github.com/mirko-pagliai/cakephp-database-backup/issues/110), the `mysql` and `mysql-dump` binaries have been deprecated and will be replaced with `mariadb` and `mariadb-dump`.
 
-The deprecation and subsequent replacement may vary from operating system to operating system, but as of today (_February 8, 2025_) the old binaries are generally still present, which simply link to the new ones:
+Note that on many systems `mysql` and `mysqldump` are still present, but they are just links to the newer `mariadb` and `mariadb-dump` (issuing a warning to abandon the deprecated executables).
 
-```bash
-$ whereis mysqldump
-mysqldump: /usr/bin/mysqldump /usr/share/man/man1/mysqldump.1.gz
-$ ls -l /usr/bin/mysqldump
-lrwxrwxrwx 1 root root 12 30 nov  2023 /usr/bin/mysqldump -> mariadb-dump
-$ whereis mariadb-dump
-mariadb-dump: /usr/bin/mariadb-dump /usr/share/man/man1/mariadb-dump.1.gz
-$ whereis mysql
-mysql: /usr/bin/mysql /usr/lib/mysql /etc/mysql /usr/share/mysql /usr/share/man/man1/mysql.1.gz
-$ whereis mysql^C
-$ ls -l /usr/bin/mysql
-lrwxrwxrwx 1 root root 7 30 nov  2023 /usr/bin/mysql -> mariadb
-```
+So, starting with version `2.13.4`, the plugin prefers to use `mariadb` and `mariadb-dump`, but it also recognizes (as aliases) `mysql` and `mysqldump`.
 
-This, still today, makes it possible to use any pair of these binaries, without any particular problems. At most, some systems may issue a warning about the deprecation:
-```bash
- `/usr/bin/mysqldump: Deprecated program name. It will be removed in a future release, use '/usr/bin/mariadb-dump' instead
-```
+Starting with the `3.0.x` branch, however, the plugin directly and exclusively uses `mariadb` and `mariadb-dump`.
 
-This warns the user that the binaries have already been deprecated and will be replaced in the future, but export and import still work without problems.
-
-Starting from version `2.13.4`, by default `cakephp-database-backup` will first look for the presence of `mariadb` and `mariadb-dump`, then for `mysql` and `mysqldump` as backwards compatibility.
-
-Before this version, except that deprecation should not cause problems, it is possible to solve by [manually setting the executables](Configuration.md#binaries), making sure that they point to `mariadb` and `mariadb-dump`:
+However, if for some reason you are using the newer version of the plugin, but still have only the old executables available, you should configure the plugin like this:
 
 ```php
-Configure::write('DatabaseBackup.binaries.mysql', '/usr/bin/mariadb');
-Configure::write('DatabaseBackup.binaries.mysqldump', '/usr/bin/mariadb-dump');
+Configure::write('DatabaseBackup.binaries.mariadb', '/full/path/to/mysql');
+Configure::write('DatabaseBackup.binaries.mariadb-dump', '/full/path/to/mysqldump');
 ```
 
 ## Errors about certificate verification
@@ -57,7 +40,7 @@ So, the error occurs because MariaDB by default wants to use the TLS protocol to
 In any case, it is possible to make the plugin ignore this function when exporting databases, as explained [here](Configuration.md#customize-exportimport-commands) and making the export command use the `--skip-ssl` option. So, before the plugin is loaded:
 
 ```php
-Configure::write('DatabaseBackup.mysql.export', '{{BINARY}} --defaults-file={{AUTH_FILE}} --skip-ssl {{DB_NAME}}');
+Configure::write('DatabaseBackup.Mysql.export', '"${:BINARY}" --defaults-file="${:AUTH_FILE}" --skip-ssl "${:DB_NAME}"');
 ```
 
 However, it is important to note that **this can expose your system to malicious attacks if used incorrectly**.
