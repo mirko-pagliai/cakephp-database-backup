@@ -40,7 +40,7 @@
   "scripts": {
     "test": "phpunit --display-skipped --display-deprecations --display-warnings",
     "test-coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
-    "test-real-drivers": "vendor/bin/phpunit --testsuite=real-drivers --display-skipped"
+    "test-real-drivers": "phpunit --testsuite=real-drivers --display-skipped --display-deprecations --display-warnings"
   },
   "config": {
     "allow-plugins": {
