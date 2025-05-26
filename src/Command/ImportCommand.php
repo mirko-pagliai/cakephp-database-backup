@@ -18,6 +18,8 @@ namespace DatabaseBackup\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Console\Exception\StopException;
+use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Override;
 use Symfony\Component\Filesystem\Path;
@@ -76,12 +78,27 @@ class ImportCommand extends Command
      *
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
-     * @return void
+     * @return int Returns the status code of the operation. `static::CODE_SUCCESS` indicates success.
      */
     public function execute(Arguments $args, ConsoleIo $io): int
     {
         try {
+            $BackupImport = new BackupImport((string)$args->getOption('connection') ?: '');
 
+            if ($args->getOption('timeout')) {
+                $BackupImport->timeout((int)$args->getOption('timeout'));
+            }
+
+            $BackupImport->filename($this->makeRelativePath((string)$args->getArgument('filename')));
+
+            $filename = $BackupImport->import();
+
+            if (!$filename) {
+                throw new StopException(
+                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport')
+                );
+            }
+            $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativePath($filename)));
         } catch (Exception $e) {
             $io->abort($e->getMessage());
         }
