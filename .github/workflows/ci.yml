@@ -20,6 +20,12 @@ jobs:
         include:
           - php-version: '8.4'
             dependencies: 'lowest'
+          - php-version: '8.4'
+            real-database: true
+            dependencies: 'highest'
+          - php-version: '8.4'
+            real-database: true
+            dependencies: 'lowest'
 
     steps:
       - name: Setup MySQL 8.0
