@@ -6,11 +6,17 @@
     failOnDeprecation="true"
     displayDetailsOnTestsThatTriggerDeprecations="true"
     cacheDirectory=".phpunit.cache"
+    defaultTestSuite="default"
     >
 
     <testsuites>
-        <testsuite name="cakephp-database-backup Test Cases">
+        <testsuite name="default">
             <directory>./tests/TestCase</directory>
+            <exclude>./tests/TestCase/Utility/BackupExportAndImportTest.php</exclude>
+        </testsuite>
+
+        <testsuite name="real-drivers">
+            <file>./tests/TestCase/Utility/BackupExportAndImportTest.php</file>
         </testsuite>
     </testsuites>
 

@@ -111,7 +111,7 @@ class BackupExportAndImportTest extends TestCase
     public function testExportAndImport(string $extension, string $expectedExecutor): void
     {
         if (!extension_loaded($extension)) {
-            $this->markTestSkipped('The `' . $extension . '` extension is not available');
+            $this->fail('The `' . $extension . '` extension is not available');
         }
 
         /**
@@ -130,12 +130,12 @@ class BackupExportAndImportTest extends TestCase
         //Sets the fixtures and fetches tables
         $this->fixtures = ['core.Articles', 'core.Comments'];
         $this->setupFixtures();
-        $Articles = $this->fetchTable('Articles');
-        $Comments = $this->fetchTable('Comments');
+        $ArticlesTable = $this->fetchTable('Articles');
+        $CommentsTable = $this->fetchTable('Comments');
 
         //Gets the initial data
-        $initialArticles = $this->getAllRecords($Articles);
-        $initialComments = $this->getAllRecords($Comments);
+        $initialArticles = $this->getAllRecords($ArticlesTable);
+        $initialComments = $this->getAllRecords($CommentsTable);
 
         /**
          * Exports
@@ -149,6 +149,16 @@ class BackupExportAndImportTest extends TestCase
         $this->assertInstanceOf($expectedExecutor, $BackupExport->Executor);
         $this->assertSame(TMP . 'test.sql', $result);
         $this->assertFileExists($result);
+
+        /**
+         * Deletes all records and asserts both tables are now empty.
+         *
+         * This allows us to exclude a possible false positive.
+         */
+        $ArticlesTable->deleteAll(conditions: ['id >=' => 1]);
+        $CommentsTable->deleteAll(conditions: ['id >=' => 1]);
+        $this->assertEmpty($this->getAllRecords($ArticlesTable));
+        $this->assertEmpty($this->getAllRecords($CommentsTable));
 
         /**
          * Imports
@@ -169,8 +179,8 @@ class BackupExportAndImportTest extends TestCase
          *
          * Asserts the initial data and the final data are equal.
          */
-        $finalArticles = $this->getAllRecords($Articles);
-        $finalComments = $this->getAllRecords($Comments);
+        $finalArticles = $this->getAllRecords($ArticlesTable);
+        $finalComments = $this->getAllRecords($CommentsTable);
 
         $this->assertSame($initialArticles, $finalArticles);
         $this->assertSame($initialComments, $finalComments);

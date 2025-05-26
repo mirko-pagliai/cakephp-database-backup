@@ -14,3 +14,35 @@ Please consider the possibility of making [a donation](//paypal.me/mirkopagliai)
 even a coffee is enough! Thank you.
 
 [![Make a donation](https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_carte.jpg)](//paypal.me/mirkopagliai)
+
+## Requirements
+
+*DatabaseBackup* requires:
+
+*   `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (previously `mysql` and `mysqldump`);
+*   `pg_dump` and `pg_restore` for *Postgres* databases;
+*   `sqlite3` for *Sqlite* databases.
+
+**Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are
+also required.
+
+The installation of these binaries may vary depending on your operating system.
+
+## Testing
+
+Unlike previous versions, with the 3.x branch, thanks to the Mockery's overloading and the (external) component `Process` that actually takes care of executing the commands to export/import the databases, normally the tests do not really use the database drivers and do not actually write or read files on the filesystem (i.e. everything is simulated).
+
+The only exception is given by the class `DatabaseBackup\Test\TestCase\Utility\BackupExportAndImportTest`, which however does not belong to the testsuite executed by default (it is therefore an optional test) and is marked with the attribute `#[CoversNothing]`.
+
+This test class, when executed, will test a real database export and import, using the PHP extensions `sqlite3`, `mysqli` and `pgsql`, that is all the drivers and databases supported by the plugin.
+
+You can test the class directly or the configured `real-drivers` testsuite ([see available testsuites](phpunit.xml.dist):
+```bash
+$ vendor/bin/phpunit --testsuite=real-drivers
+```
+
+## Versioning
+
+For transparency and insight into our release cycle and to maintain backward
+compatibility, *DatabaseBackup* will be maintained under the
+[Semantic Versioning guidelines](http://semver.org).
