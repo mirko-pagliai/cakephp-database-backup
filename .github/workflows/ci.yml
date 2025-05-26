@@ -17,15 +17,15 @@ jobs:
       matrix:
         php-version: ['8.4']
         dependencies: ['highest']
-        real-drivers: [false]
+        real-drivers: ['']
         include:
           - php-version: '8.4'
-            real-drivers: true
+            real-drivers: 'real-drivers'
             dependencies: 'highest'
           - php-version: '8.4'
             dependencies: 'lowest'
           - php-version: '8.4'
-            real-drivers: true
+            real-drivers: 'real-drivers'
             dependencies: 'lowest'
 
     steps:
