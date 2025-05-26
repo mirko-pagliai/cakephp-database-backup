@@ -21,10 +21,10 @@ jobs:
           - php-version: '8.4'
             dependencies: 'lowest'
           - php-version: '8.4'
-            real-database: true
+            real-drivers: true
             dependencies: 'highest'
           - php-version: '8.4'
-            real-database: true
+            real-drivers: true
             dependencies: 'lowest'
 
     steps:
@@ -58,7 +58,10 @@ jobs:
       - name: Run test suite
         run: |
           export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
-
+  
+          echo ${{ matrix.real-drivers }}
+          echo ${{ matrix.real-drivers == true }}
+        
           if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
               export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
           else
