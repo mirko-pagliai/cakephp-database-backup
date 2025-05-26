@@ -19,10 +19,13 @@ jobs:
         dependencies: ['highest']
         include:
           - php-version: '8.4'
-            dependencies: 'lowest'
+            real-drivers: true
+            dependencies: 'highest'
           - php-version: '8.4'
             real-drivers: false
             dependencies: 'highest'
+          - php-version: '8.4'
+            dependencies: 'lowest'
           - php-version: '8.4'
             real-drivers: true
             dependencies: 'lowest'
