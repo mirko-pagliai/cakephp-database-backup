@@ -46,34 +46,22 @@ class UtilityTest extends TestCase
         $this->Utility = new class (OperationType: OperationType::Export) extends Utility {};
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function setUpBeforeClass(): void
-    {
-        ConnectionManager::setConfig('test', new FakeConnection());
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function tearDownAfterClass(): void
-    {
-        //Drops the connection set by `setUpBeforeClass()`
-        ConnectionManager::drop('test');
-    }
-
     #[Test]
     #[TestWith([new FakeConnection()])]
     #[TestWith(['test'])]
     public function testConnectionProperty(mixed $connection): void
     {
+        ConnectionManager::setConfig('test', new FakeConnection());
+
         //Default value, without calling the setter
         $this->assertSame('test', $this->Utility->Connection->config()['name']);
 
         $this->Utility->Connection = $connection;
 
         $result = $this->Utility->Connection;
+
+        ConnectionManager::drop('test');
+
         $this->assertInstanceOf(ConnectionInterface::class, $result);
         $this->assertSame('test', $result->config()['name']);
     }
