@@ -81,27 +81,27 @@ txt;
         $this->exec('database_backup.export');
 
         $this->assertExitSuccess();
-        $this->assertOutputContains('Backup `backups/my_backup.sql` has been exported');
+        $this->assertOutputContains('<success>Backup `backups/my_backup.sql` has been exported</success>');
     }
 
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
     {
-        $customFilename = 'custom_filename.sql';
+        $filename = 'custom_filename.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
         $BackupExport->shouldReceive('__construct')->with('custom_connection')->once();
         $BackupExport->shouldReceive('timeout')->with(120)->once();
-        $BackupExport->shouldReceive('filename')->with($customFilename)->once();
+        $BackupExport->shouldReceive('filename')->with($filename)->once();
         //Note that in this case the `--compression` option was passed, but is ignored
         $BackupExport->shouldNotReceive('compression');
-        $BackupExport->shouldReceive('export')->once()->andReturn($customFilename);
+        $BackupExport->shouldReceive('export')->once()->andReturn($filename);
 
-        $this->exec('database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename ' . $customFilename);
+        $this->exec('database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename ' . $filename);
 
         $this->assertExitSuccess();
-        $this->assertOutputContains('Backup `' . $customFilename . '` has been exported');
+        $this->assertOutputContains('<success>Backup `' . $filename . '` has been exported</success>');
     }
 
     #[Test]
@@ -118,7 +118,7 @@ txt;
         $this->exec('database_backup.export --compression gzip');
 
         $this->assertExitSuccess();
-        $this->assertOutputContains('Backup `my_backup.sql.gz` has been exported');
+        $this->assertOutputContains('<success>Backup `my_backup.sql.gz` has been exported</success>');
     }
 
     #[Test]
