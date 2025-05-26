@@ -15,17 +15,15 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Command;
 
-use App\Database\FakeConnection;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
-use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
+use Exception;
 use Mockery;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\Process\Process;
 
 /**
  * ExportCommandTest.
@@ -111,6 +109,18 @@ cake database_backup.export [options]');
 
     #[Test]
     #[RunInSeparateProcess]
+    public function testExecuteOnException(): void
+    {
+        $BackupExport = Mockery::mock('overload:' . BackupExport::class);
+        $BackupExport->shouldReceive('export')->once()->andThrow(new Exception('Exception message'));
+
+        $this->exec('database_backup.export --connection test');
+        $this->assertExitError();
+        $this->assertErrorContains('<error>Exception message</error>');
+    }
+
+    #[Test]
+    #[RunInSeparateProcess]
     public function testExecuteOnStoppedEvent(): void
     {
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
@@ -120,23 +130,5 @@ cake database_backup.export [options]');
 
         $this->assertExitError();
         $this->assertErrorContains('<error>The `Backup.beforeExport` event stopped the operation</error>');
-    }
-
-    #[Test]
-    #[RunInSeparateProcess]
-    public function testExecuteWithProcessOnFailure(): void
-    {
-        ConnectionManager::setConfig('test', new FakeConnection());
-
-        $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
-        $Process->shouldReceive('fromShellCommandline')->andReturnSelf();
-        $Process->shouldReceive('isSuccessful')->andReturnFalse();
-        $Process->shouldReceive('getCommandLine')->andReturn('failureCommand');
-
-        $this->exec('database_backup.export --connection test');
-        $this->assertExitError();
-        $this->assertErrorContains('The command "failureCommand" failed.');
-
-        ConnectionManager::drop('test');
     }
 }

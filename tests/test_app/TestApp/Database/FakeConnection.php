@@ -17,6 +17,7 @@ namespace App\Database;
 
 use Cake\Database\Connection;
 use Cake\Database\Driver;
+use Cake\Database\Driver\Sqlite;
 use Cake\Database\Schema\Collection;
 use Cake\Database\Schema\CollectionInterface as SchemaCollectionInterface;
 use Cake\Database\Schema\TableSchema;
@@ -33,7 +34,7 @@ class FakeConnection extends Connection
 
     public function __construct(array $config = [])
     {
-        $this->Driver = new class extends Driver\Sqlite {
+        $this->Driver = new class extends Sqlite {
             public function enabled(): bool
             {
                 return true;
