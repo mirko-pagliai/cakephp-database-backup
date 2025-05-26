@@ -128,7 +128,7 @@ txt;
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
         $BackupExport->shouldReceive('export')->once()->andThrow(new Exception('Exception message'));
 
-        $this->exec('database_backup.export --connection test');
+        $this->exec('database_backup.export');
         $this->assertExitError();
         $this->assertErrorContains('<error>Exception message</error>');
     }
