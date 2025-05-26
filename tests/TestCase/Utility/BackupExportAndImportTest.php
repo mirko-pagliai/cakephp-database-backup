@@ -81,6 +81,11 @@ class BackupExportAndImportTest extends TestCase
     {
         //Deletes any custom and previously set binaries by `setUpBeforeClass()`
         Configure::delete('DatabaseBackup.binaries');
+
+        //Removes sqlite database
+        if (file_exists(TMP . 'test.sq3')) {
+            unlink(TMP . 'test.sq3');
+        }
     }
 
     /**
