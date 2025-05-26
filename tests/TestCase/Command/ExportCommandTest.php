@@ -28,6 +28,8 @@ use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ExportCommandTest.
+ *
+ * @property \Cake\Console\TestSuite\StubConsoleOutput $_out
  */
 #[CoversClass(ExportCommand::class)]
 class ExportCommandTest extends TestCase

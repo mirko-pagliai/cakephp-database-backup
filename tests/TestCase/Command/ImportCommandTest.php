@@ -24,6 +24,8 @@ use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ImportCommandTest.
+ *
+ * @property \Cake\Console\TestSuite\StubConsoleOutput $_out
  */
 #[CoversClass(ImportCommand::class)]
 class ImportCommandTest extends TestCase
