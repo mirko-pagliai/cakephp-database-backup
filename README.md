@@ -19,7 +19,7 @@ even a coffee is enough! Thank you.
 
 *DatabaseBackup* requires:
 
-*   `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (previously `mysql` and `mysqldump`);
+*   `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (if you still use `mysql`/`mysqldump`, [see here](https://github.com/mirko-pagliai/cakephp-database-backup/blob/3.0.x/docs/Common%20issues.md#transition-from-mysql-and-mysqldump-to-mariadb-and-mariadb-dump));
 *   `pg_dump` and `pg_restore` for *Postgres* databases;
 *   `sqlite3` for *Sqlite* databases.
 
