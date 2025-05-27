@@ -23,6 +23,7 @@ use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Override;
 use Symfony\Component\Filesystem\Path;
+use ValueError;
 use function Cake\I18n\__d;
 
 /**
@@ -51,6 +52,29 @@ class ImportCommand extends Command
     }
 
     /**
+     * Makes the absolute path for a filename.
+     *
+     * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
+     *
+     * For example:
+     * ```
+     * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
+     * ```
+     *
+     * @param string $path
+     * @return string
+     * @since 2.13.5
+     */
+    public function makeAbsolutePath(string $path): string
+    {
+        if (Path::isRelative($path) && is_readable(Path::makeAbsolute($path, ROOT))) {
+            $path = Path::makeAbsolute($path, ROOT);
+        }
+
+        return $path;
+    }
+
+    /**
      * Imports a database backup.
      *
      * @param \Cake\Console\Arguments $args The command arguments
@@ -66,7 +90,7 @@ class ImportCommand extends Command
                 $BackupImport->timeout((int)$args->getOption('timeout'));
             }
 
-            $BackupImport->filename((string)$args->getArgument('filename'));
+            $BackupImport->filename($this->makeAbsolutePath((string)$args->getArgument('filename')));
 
             $filename = $BackupImport->import();
 
@@ -76,7 +100,7 @@ class ImportCommand extends Command
                 );
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativePath($filename)));
-        } catch (Exception $e) {
+        } catch (Exception|ValueError $e) {
             $io->abort($e->getMessage());
         }
 

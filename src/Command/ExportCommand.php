@@ -23,6 +23,7 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
 use Override;
+use ValueError;
 use function Cake\I18n\__d;
 
 /**
@@ -93,7 +94,7 @@ class ExportCommand extends Command
                 );
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
-        } catch (Exception $e) {
+        } catch (Exception|ValueError $e) {
             $io->abort($e->getMessage());
         }
 
