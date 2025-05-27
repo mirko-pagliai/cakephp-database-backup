@@ -68,12 +68,13 @@ class ImportCommand extends Command
      */
     public function makeAbsolutePath(string $path): string
     {
-        $absoluteToRoot = Path::makeAbsolute($path, ROOT);
-        if (Path::isRelative($path) && new Filesystem()->exists($absoluteToRoot)) {
-            return $absoluteToRoot;
+        if (Path::isAbsolute($path)) {
+            return $path;
         }
 
-        return $path;
+        $absoluteToRoot = Path::makeAbsolute($path, ROOT);
+
+        return new Filesystem()->exists($absoluteToRoot) ? $absoluteToRoot : $path;
     }
 
     /**
