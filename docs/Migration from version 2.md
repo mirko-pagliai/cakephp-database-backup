@@ -61,7 +61,7 @@ If, however, for some particular need, you have overridden them, then you need t
 
 ### Other configuration values
 
-First of all, the `DatabaseBackup.chmod` and `DatabaseBackup.target` configuration values are no more.
+First of all, the `DatabaseBackup.chmod` and `DatabaseBackup.target` configuration values no longer exist.
 
 For chmods of exported backups, you can implement this yourself in your code, if you need to.
 

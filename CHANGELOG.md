@@ -4,16 +4,16 @@
 * `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for
   significant code optimization. Thanks to the magic `__call()` method provided by `Utility`, they still support the use
   of already known methods (`filename()`, `compression()`, `timeout()`, etc.) to set properties;
-* the `DatabaseBackup.target` configuration value no longer exists. Relative paths will be understood as relative to the `ROOT`;
+* the `DatabaseBackup.chmod` and `DatabaseBackup.target` configuration values no longer exist ([see here](docs/Migration%20from%20version%202.md#other-configuration-values));
 * `BackupExport` no longer takes care of rotating (`rotate()` method) files and (for now) setting chmods of files after export,
   because these functions are not essential and (like others already removed) can be implemented by the user;
-* the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`);
+* the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`, [see here](docs/Migration%20from%20version%202.md#from-mysqlmysql-dump-to-mariadbmariadb-dump));
 * since there are no aliases defined for binaries anymore (and it would be possible to override the configuration anyway), the
   `Executor::findBinary()` method takes only one argument;
 * it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:
-* thanks to `Mockery` and overloading, tests no longer need to write real files to the filesystem;
+* thanks to the Mockery's overloading and the (external) component Process that actually takes care of executing the commands to export/import the databases, normally the tests do not really use the database drivers and do not actually write or read files on the filesystem (i.e. everything is simulated, [see here](README.md#testing)).
 * the abstract class `AbstractBackupUtility` has become simply `Utility`. It uses property hooks to set and get `$Connection`,
   `Executor`, and `$timeOut`, rather than the homonymous methods. The `makeAbsoluteFilename()` method has become
   `makeAbsolutePath()`;
