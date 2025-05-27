@@ -101,23 +101,13 @@ class UtilityTest extends TestCase
     #[TestWith([10])]
     public function testTimeoutProperty(int $timeOut): void
     {
-        //Default value, without calling the setter
-        $this->assertSame(60, $this->Utility->timeout);
-
-        $this->Utility->timeout = $timeOut;
-        $this->assertSame($timeOut, $this->Utility->timeout);
-    }
-
-    #[Test]
-    public function testTimeoutPropertyFromConfiguration(): void
-    {
-        Configure::write('DatabaseBackup.timeout', 45);
-
+        //The default value of the property is obtained from the configuration
+        Configure::write('DatabaseBackup.processTimeout', 45);
         $this->assertSame(45, $this->Utility->timeout);
 
         //The value set via the setter will take precedence over the general configuration
-        $this->Utility->timeout = 55;
-        $this->assertSame(55, $this->Utility->timeout);
+        $this->Utility->timeout = $timeOut;
+        $this->assertSame($timeOut, $this->Utility->timeout);
     }
 
     #[Test]

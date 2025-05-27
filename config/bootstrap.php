@@ -16,6 +16,7 @@ declare(strict_types=1);
 use Cake\Core\Configure;
 
 $defaults = [
+    'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.Mysql.export' => '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}"',
     'DatabaseBackup.Mysql.import' => '"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" "${:DB_NAME}"',
     'DatabaseBackup.Postgres.export' => '"${:BINARY}" --format=c -b --dbname=\'postgresql://"${:DB_USERNAME}":"${:DB_PASSWORD}"@"${:DB_HOST}"/"${:DB_NAME}"\'',

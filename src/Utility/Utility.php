@@ -72,7 +72,7 @@ abstract class Utility
             }
             $this->timeout = $timeout;
         }
-        get => $this->timeout ?? Configure::read(var: 'DatabaseBackup.timeout', default: 60);
+        get => $this->timeout ?? Configure::readOrFail(var: 'DatabaseBackup.processTimeout');
     }
 
     /**

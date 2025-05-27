@@ -195,7 +195,7 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportWithTimeoutFromConfiguration(): void
     {
-        Configure::write('DatabaseBackup.timeout', 45);
+        Configure::write('DatabaseBackup.processTimeout', 45);
 
         $filename = TMP . 'backup.sql';
 
