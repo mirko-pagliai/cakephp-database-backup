@@ -5,10 +5,19 @@ These instructions allow you to migrate from the `2.14.x`/`2.15.x` branch to the
 In particular and more precisely, they are intended to be valid when moving from the `2.14.x` or `2.15.x` branch to the `3.0.x` branch.
 Therefore, make sure you have first updated, preferably, to one of the latest versions of the `2.14.x` or `2.15.x` branches.
 
+- [Can databases already exported with `2.x` branch versions be imported with `3.x` branch versions?](#can-databases-already-exported-with--2x--branch-versions-be-imported-with--3x--branch-versions-)
 - [From `mysql`/`mysql-dump` to `mariadb`/`mariadb-dump`](#from--mysql---mysql-dump--to--mariadb---mariadb-dump-)
 - [Configuration](#configuration)
-    * [Configuring export/import commands](#configuring-export-import-commands)
-    * [Other configuration values](#other-configuration-values)
+  * [Configuring export/import commands](#configuring-export-import-commands)
+  * [Other configuration values](#other-configuration-values)
+
+## Can databases already exported with `2.x` branch versions be imported with `3.x` branch versions?
+
+Presumably yes.
+
+It is not possible to write concrete unit tests to verify this.
+
+However, there is nothing to suggest otherwise (provided that the plugin has been correctly reconfigured if necessary, as explained below) and empirical tests performed on real databases have given positive results.
 
 ## From `mysql`/`mysql-dump` to `mariadb`/`mariadb-dump`
 
