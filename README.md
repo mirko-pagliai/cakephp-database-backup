@@ -28,6 +28,23 @@ also required.
 
 The installation of these binaries may vary depending on your operating system.
 
+## Installation
+
+You can install the plugin via composer:
+
+```bash
+$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
+```
+
+Then you have to load the plugin. For more information on how to load the plugin,
+please refer to the [CakePHP documentation](https://book.cakephp.org/5/en/plugins.html#loading-a-plugin).
+
+Simply, you can execute the shell command to enable the plugin:
+```bash
+$ bin/cake plugin load DatabaseBackup
+```
+This would update your application's bootstrap method.
+
 ## Configuration and How to use
 
 See [our wiki](/docs).
