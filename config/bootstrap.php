@@ -16,6 +16,7 @@ declare(strict_types=1);
 use Cake\Core\Configure;
 
 $defaults = [
+    'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
     'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.Mysql.export' => '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}"',
     'DatabaseBackup.Mysql.import' => '"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" "${:DB_NAME}"',
@@ -29,4 +30,13 @@ foreach ($defaults as $key => $value) {
     if (!Configure::check($key)) {
         Configure::write($key, $value);
     }
+}
+
+//Checks for the target directory
+$target = Configure::read('DatabaseBackup.target');
+if (!file_exists($target)) {
+    mkdir($target, 0777, true);
+}
+if (!is_dir($target) || !is_writeable($target)) {
+    trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target), E_USER_ERROR);
 }

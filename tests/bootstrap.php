@@ -42,6 +42,8 @@ Cache::setConfig([
     ],
 ]);
 
+Configure::write('DatabaseBackup.target', TMP . 'backups' . DS);
+
 require_once ROOT . 'config' . DS . 'bootstrap.php';
 
 /**

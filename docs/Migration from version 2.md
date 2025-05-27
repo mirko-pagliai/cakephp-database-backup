@@ -70,12 +70,9 @@ If, however, for some particular need, you have overridden them, then you need t
 
 ### Other configuration values
 
-First of all, the `DatabaseBackup.chmod` and `DatabaseBackup.target` configuration values no longer exist.
-
+First of all, the `DatabaseBackup.chmod` configuration value no longer exist.
 For chmods of exported backups, you can implement this yourself in your code, if you need to.
-
-As for the default directory used by default for export/import, starting from the `3.0.x` branch all relative paths will be understood as relative to the `ROOT` of your app, otherwise you have to use absolute paths.
 
 The `DatabaseBackup.connection` configuration had already been deprecated starting from version `2.14.2` and other "mechanics" had already been implemented to use connections other than the `default` one.
 
-The `DatabaseBackup.processTimeout` configuration is the only one that has remained unchanged, although there are various ways to set a different value in runtime.
+Instead, the `DatabaseBackup.processTimeout` and `DatabaseBackup.target` values remain unchanged.
