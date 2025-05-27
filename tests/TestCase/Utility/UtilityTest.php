@@ -128,6 +128,9 @@ class UtilityTest extends TestCase
         $this->Utility->noExistingMethod();
     }
 
+    /**
+     * @return array<array{string, string}>
+     */
     public static function testMakeAbsolutePathDataProvider(): array
     {
         $basePath = Configure::readOrFail('DatabaseBackup.target');
