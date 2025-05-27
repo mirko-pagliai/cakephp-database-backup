@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -71,17 +72,19 @@ txt;
     #[RunInSeparateProcess]
     public function testExecute(): void
     {
+        $expectedFilename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
+
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
         $BackupExport->shouldReceive('__construct')->with('')->once();
         $BackupExport->shouldNotReceive('timeout');
         $BackupExport->shouldNotReceive('filename');
         $BackupExport->shouldNotReceive('compression');
-        $BackupExport->shouldReceive('export')->once()->andReturn(ROOT . 'backups' . DS . 'my_backup.sql');
+        $BackupExport->shouldReceive('export')->once()->andReturn($expectedFilename);
 
         $this->exec('database_backup.export');
 
         $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `backups/my_backup.sql` has been exported</success>');
+        $this->assertOutputContains('<success>Backup `' . $expectedFilename . '` has been exported</success>');
     }
 
     #[Test]

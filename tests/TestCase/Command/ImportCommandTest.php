@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Core\Configure;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
@@ -88,7 +89,7 @@ txt;
     #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
     {
-        $filename = 'custom_filename.sql';
+        $filename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
 
         $BackupImport = Mockery::mock('overload:' . BackupImport::class);
         $BackupImport->shouldReceive('__construct')->with('custom_connection')->once();

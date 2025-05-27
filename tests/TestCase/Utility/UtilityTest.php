@@ -26,6 +26,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 
@@ -127,10 +128,19 @@ class UtilityTest extends TestCase
         $this->Utility->noExistingMethod();
     }
 
+    public static function testMakeAbsolutePathDataProvider(): array
+    {
+        $basePath = Configure::readOrFail('DatabaseBackup.target');
+
+        return [
+            [$basePath . 'relative_file_to_root.txt', 'relative_file_to_root.txt'],
+            [$basePath . 'absolute_file_to_root.txt', $basePath . 'absolute_file_to_root.txt'],
+            [TMP . 'absolute_tmp_file', TMP . 'absolute_tmp_file'],
+        ];
+    }
+
     #[Test]
-    #[TestWith([ROOT . 'relative_file_to_root.txt', 'relative_file_to_root.txt'])]
-    #[TestWith([ROOT . 'absolute_file_to_root.txt', ROOT . 'absolute_file_to_root.txt'])]
-    #[TestWith([TMP . 'absolute_tmp_file', TMP . 'absolute_tmp_file'])]
+    #[DataProvider('testMakeAbsolutePathDataProvider')]
     public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
     {
         $result = $this->Utility->makeAbsolutePath($path);
