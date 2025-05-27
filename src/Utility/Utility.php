@@ -125,6 +125,8 @@ abstract class Utility
             return $path;
         }
 
-        return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+        $absolutePath = Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+
+        return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
 }
