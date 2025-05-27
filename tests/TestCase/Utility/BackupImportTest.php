@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Event\EventList;
 use DatabaseBackup\TestSuite\TestCase;
@@ -102,11 +103,7 @@ class BackupImportTest extends TestCase
     {
         $filename = TMP . 'backup.sql';
 
-        Mockery::mock('overload:' . Filesystem::class)
-            ->shouldReceive('exists')
-            ->with($filename)
-            ->once()
-            ->andReturnTrue();
+        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
 
         /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
         $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
@@ -127,6 +124,34 @@ class BackupImportTest extends TestCase
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterImport', $this->BackupImport->Executor->getEventManager());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    #[Test]
+    #[RunInSeparateProcess]
+    public function testImportWithTimeoutFromConfiguration(): void
+    {
+        Configure::write('DatabaseBackup.timeout', 45);
+
+        $filename = TMP . 'backup.sql';
+
+        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
+
+        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
+        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
+        $Executor
+            ->shouldReceive('runProcess')
+            ->with($filename, 45)
+            ->once()
+            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
+
+        $this->BackupImport->Executor = $Executor;
+
+        $this->BackupImport
+            ->filename($filename)
+            ->import();
     }
 
     /**

@@ -17,6 +17,7 @@ namespace DatabaseBackup\Utility;
 
 use BadMethodCallException;
 use Cake\Core\App;
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\Executor;
@@ -64,19 +65,21 @@ abstract class Utility
         }
     }
 
-    public int $timeout = 60 {
+    public int $timeout {
         set (int $timeout) {
             if ($timeout < 0) {
                 throw new InvalidArgumentException(__d('database_backup', 'The `timeout` property must be greater than or equal to 0'));
             }
             $this->timeout = $timeout;
         }
+        get => $this->timeout ?? Configure::read(var: 'DatabaseBackup.timeout', default: 60);
     }
 
     /**
      * Construct.
      *
      * @param \DatabaseBackup\OperationType $OperationType
+     * @param \Cake\Datasource\ConnectionInterface|string $Connection
      */
     public function __construct(readonly protected OperationType $OperationType, ConnectionInterface|string $Connection = '')
     {

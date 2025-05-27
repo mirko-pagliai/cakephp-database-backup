@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Event\EventList;
 use DatabaseBackup\Compression;
@@ -186,6 +187,31 @@ class BackupExportTest extends TestCase
         $this->assertSame($filename, $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    #[Test]
+    public function testExportWithTimeoutFromConfiguration(): void
+    {
+        Configure::write('DatabaseBackup.timeout', 45);
+
+        $filename = TMP . 'backup.sql';
+
+        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
+        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
+        $Executor
+            ->shouldReceive('runProcess')
+            ->with($filename, 45)
+            ->once()
+            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
+
+        $this->BackupExport->Executor = $Executor;
+
+        $this->BackupExport
+            ->filename($filename)
+            ->export();
     }
 
     /**

@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\Executor;
@@ -105,6 +106,18 @@ class UtilityTest extends TestCase
 
         $this->Utility->timeout = $timeOut;
         $this->assertSame($timeOut, $this->Utility->timeout);
+    }
+
+    #[Test]
+    public function testTimeoutPropertyFromConfiguration(): void
+    {
+        Configure::write('DatabaseBackup.timeout', 45);
+
+        $this->assertSame(45, $this->Utility->timeout);
+
+        //The value set via the setter will take precedence over the general configuration
+        $this->Utility->timeout = 55;
+        $this->assertSame(55, $this->Utility->timeout);
     }
 
     #[Test]
