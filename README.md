@@ -28,6 +28,12 @@ also required.
 
 The installation of these binaries may vary depending on your operating system.
 
+## Configuration and How to use
+
+See [our wiki](/docs).
+
+Before opening an issue, check this list of [common issues](docs/Common%20issues.md).
+
 ## Testing
 
 Unlike previous versions, with the 3.x branch, thanks to the Mockery's overloading and the (external) component `Process` that actually takes care of executing the commands to export/import the databases, normally the tests do not really use the database drivers and do not actually write or read files on the filesystem (i.e. everything is simulated).
