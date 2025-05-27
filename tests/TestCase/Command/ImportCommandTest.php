@@ -26,6 +26,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * ImportCommandTest.
@@ -65,6 +67,28 @@ filename  Filename. It can be an absolute path
 
 txt;
         $this->assertSame($expected, $this->_out->messages()[0]);
+    }
+
+    #[Test]
+    #[TestWith([ROOT . 'file_exists_in_root.sql', 'file_exists_in_root.sql'])]
+    #[TestWith(['file_does_not_exist_in_root.sql', 'file_does_not_exist_in_root.sql'])]
+    #[TestWith([ROOT . 'absolute_root_file.sql', ROOT . 'absolute_root_file.sql'])]
+    #[TestWith([TMP . 'absolute_tmp_file.sql', TMP . 'absolute_tmp_file.sql'])]
+    #[RunInSeparateProcess]
+    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
+    {
+        $Filesystem = Mockery::mock('overload:' . Filesystem::class);
+
+        /**
+         * `Filesystem::exists()` returns `true` only when the argument is `file_exists_in_root.sql`.
+         *
+         * So it will return `false` when the argument is `file_does_not_exist_in_root.sql`.
+         */
+        $Filesystem->shouldReceive('exists')->andReturn($path == 'file_exists_in_root.sql');
+
+        $result = new ImportCommand()->makeAbsolutePath($path);
+
+        $this->assertSame($expectedAbsolutePath, $result);
     }
 
     #[Test]

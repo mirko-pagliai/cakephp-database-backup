@@ -22,6 +22,7 @@ use Cake\Console\Exception\StopException;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Override;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use ValueError;
 use function Cake\I18n\__d;
@@ -52,7 +53,7 @@ class ImportCommand extends Command
     }
 
     /**
-     * Makes the absolute path for a filename.
+     * Converts a relative file path to an absolute path based on the specified target directory.
      *
      * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
      *
@@ -67,8 +68,9 @@ class ImportCommand extends Command
      */
     public function makeAbsolutePath(string $path): string
     {
-        if (Path::isRelative($path) && is_readable(Path::makeAbsolute($path, ROOT))) {
-            $path = Path::makeAbsolute($path, ROOT);
+        $absoluteToRoot = Path::makeAbsolute($path, ROOT);
+        if (Path::isRelative($path) && new Filesystem()->exists($absoluteToRoot)) {
+            return $absoluteToRoot;
         }
 
         return $path;
