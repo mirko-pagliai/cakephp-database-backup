@@ -13,6 +13,7 @@
 * it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:
+* `ExportCommand` now also accepts paths relative to your app's root, in addition to the default target directory, as `ImportCommand` already did. This allows for proper shell autocompletion;
 * thanks to the Mockery's overloading and the (external) component Process that actually takes care of executing the commands to export/import the databases, normally the tests do not really use the database drivers and do not actually write or read files on the filesystem (i.e. everything is simulated, [see here](README.md#testing)).
 * the abstract class `AbstractBackupUtility` has become simply `Utility`. It uses property hooks to set and get `$Connection`,
   `Executor`, and `$timeOut`, rather than the homonymous methods. The `makeAbsoluteFilename()` method has become

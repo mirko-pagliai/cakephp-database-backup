@@ -17,6 +17,7 @@ namespace DatabaseBackup\Command;
 
 use Cake\Command\Command as CakeCommand;
 use Cake\Console\ConsoleOptionParser;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
@@ -48,6 +49,31 @@ abstract class Command extends CakeCommand
         ]);
 
         return $parser;
+    }
+
+    /**
+     * Converts a relative file path to an absolute path.
+     *
+     * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
+     *
+     * For example:
+     * ```
+     * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
+     * ```
+     *
+     * @param string $path
+     * @return string
+     * @since 2.13.5
+     */
+    public function makeAbsolutePath(string $path): string
+    {
+        if (Path::isAbsolute($path)) {
+            return $path;
+        }
+
+        $absoluteToRoot = Path::makeAbsolute($path, ROOT);
+
+        return new Filesystem()->exists($absoluteToRoot) ? $absoluteToRoot : $path;
     }
 
     /**

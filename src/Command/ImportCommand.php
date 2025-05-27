@@ -19,11 +19,10 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
+use Cake\Core\Configure;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Override;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 use ValueError;
 use function Cake\I18n\__d;
 
@@ -45,36 +44,19 @@ class ImportCommand extends Command
         $parser->setDescription(__d('database_backup', 'Imports a database backup'));
 
         $parser->addArgument('filename', [
-            'help' => __d('database_backup', 'Filename. It can be an absolute path'),
+            'help' => implode(' ', [
+                __d('database_backup', 'Filename. It can be an absolute path.'),
+                __d(
+                    'database_backup',
+                    'Filenames can be relative to {0} (root of your app) or {1} (default target directory).',
+                    '<comment>' . ROOT . '</comment>',
+                    '<comment>' . Configure::readOrFail('DatabaseBackup.target'). '</comment>',
+                ),
+            ]),
             'required' => true,
         ]);
 
         return $parser;
-    }
-
-    /**
-     * Converts a relative file path to an absolute path based on the specified target directory.
-     *
-     * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
-     *
-     * For example:
-     * ```
-     * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
-     * ```
-     *
-     * @param string $path
-     * @return string
-     * @since 2.13.5
-     */
-    public function makeAbsolutePath(string $path): string
-    {
-        if (Path::isAbsolute($path)) {
-            return $path;
-        }
-
-        $absoluteToRoot = Path::makeAbsolute($path, ROOT);
-
-        return new Filesystem()->exists($absoluteToRoot) ? $absoluteToRoot : $path;
     }
 
     /**

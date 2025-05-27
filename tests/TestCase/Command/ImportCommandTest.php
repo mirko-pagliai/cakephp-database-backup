@@ -26,8 +26,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\TestWith;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * ImportCommandTest.
@@ -43,10 +41,13 @@ class ImportCommandTest extends TestCase
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
+        $root = ROOT;
+        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
+
         $this->exec('database_backup.import -h');
         $this->assertExitSuccess();
 
-$expected = <<<txt
+        $expected = <<<txt
 Imports a database backup
 
 <info>Usage:</info>
@@ -63,32 +64,15 @@ cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>
 
 <info>Arguments:</info>
 
-filename  Filename. It can be an absolute path
+filename  Filename. It can be an absolute path. Filenames can be
+          relative to
+          <comment>$root</comment>
+          (root of your app) or
+          <comment>$defaultTarget</comment>
+          (default target directory).
 
 txt;
         $this->assertSame($expected, $this->_out->messages()[0]);
-    }
-
-    #[Test]
-    #[TestWith([ROOT . 'file_exists_in_root.sql', 'file_exists_in_root.sql'])]
-    #[TestWith(['file_does_not_exist_in_root.sql', 'file_does_not_exist_in_root.sql'])]
-    #[TestWith([ROOT . 'absolute_root_file.sql', ROOT . 'absolute_root_file.sql'])]
-    #[TestWith([TMP . 'absolute_tmp_file.sql', TMP . 'absolute_tmp_file.sql'])]
-    #[RunInSeparateProcess]
-    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
-    {
-        $Filesystem = Mockery::mock('overload:' . Filesystem::class);
-
-        /**
-         * `Filesystem::exists()` returns `true` only when the argument is `file_exists_in_root.sql`.
-         *
-         * So it will return `false` when the argument is `file_does_not_exist_in_root.sql`.
-         */
-        $Filesystem->shouldReceive('exists')->andReturn($path == 'file_exists_in_root.sql');
-
-        $result = new ImportCommand()->makeAbsolutePath($path);
-
-        $this->assertSame($expectedAbsolutePath, $result);
     }
 
     #[Test]

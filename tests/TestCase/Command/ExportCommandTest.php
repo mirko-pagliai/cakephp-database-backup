@@ -41,6 +41,9 @@ class ExportCommandTest extends TestCase
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
+        $root = ROOT;
+        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
+
         $this->exec('database_backup.export -h');
         $this->assertExitSuccess();
 
@@ -58,7 +61,11 @@ cake database_backup.export [options]
                    example if you are not using the default connection
 --filename, -f     Filename. It can be an absolute path and may contain
                    patterns. The compression type will be automatically
-                   set
+                   set. Filenames can be relative to
+                   <comment>$root</comment>
+                   (root of your app) or
+                   <comment>$defaultTarget</comment>
+                   (default target directory).
 --help, -h         Display this help.
 --quiet, -q        Enable quiet output.
 --timeout, -t      Timeout for shell commands

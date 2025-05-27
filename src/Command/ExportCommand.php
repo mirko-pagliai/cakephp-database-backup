@@ -19,6 +19,8 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
+use Cake\Core\Configure;
+use Cake\Utility\Text;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
@@ -47,7 +49,7 @@ class ExportCommand extends Command
             'choices' => array_map(callback: 'lcfirst', array: array_column(
                 array: array_filter(
                     array: Compression::cases(),
-                    callback: fn (Compression $Compression): bool => $Compression != Compression::None,
+                    callback: fn (Compression $Compression): bool => $Compression->isValid(),
                 ),
                 column_key: 'name',
             )),
@@ -56,8 +58,18 @@ class ExportCommand extends Command
         ]);
 
         $parser->addOption('filename', [
-            'help' => __d('database_backup', 'Filename. It can be an absolute path and may contain ' .
-                'patterns. The compression type will be automatically set'),
+            'help' => implode(' ', [
+                __d(
+                    'database_backup',
+                    'Filename. It can be an absolute path and may contain patterns. The compression type will be automatically set.'
+                ),
+                __d(
+                    'database_backup',
+                    'Filenames can be relative to {0} (root of your app) or {1} (default target directory).',
+                    '<comment>' . ROOT . '</comment>',
+                    '<comment>' . Configure::readOrFail('DatabaseBackup.target'). '</comment>',
+                ),
+            ]),
             'short' => 'f',
         ]);
 
