@@ -1,4 +1,4 @@
-# How to use the BackupExport utility
+# How to use the `BackupExport` utility
 
 - [Basic operation](#basic-operation)
 - [Optional methods](#optional-methods)
