@@ -71,12 +71,10 @@ With the values `Compression::none` or `null` no compression will be used (so a 
 filename(string $filename)
 ```
 
-Sets the filename.
-
+Sets the filename of the backup you want to export.  
 Note that using this method, the compression type will be automatically setted by the filename.
 
-The filename can accept some patterns that will make it dynamic.
-
+The filename can accept some patterns that will make it dynamic.  
 Patterns are: `{$DATABASE}` (database name), `{$DATETIME}` (datetime), `{$HOSTNAME}` (hostname) and `{$TIMESTAMP}` (timestamp).
 
 For example, with (database name is `my_database`):
@@ -92,8 +90,7 @@ The filename can be an absolute path or a relative path. Relative paths will be 
 timeout(int $timeout)
 ```
 
-It sets the timeout (in seconds) to use for the export process.
-
+It sets the timeout (in seconds) to use for the export process.  
 If not set, the default timeout value defined by the `DatabaseBackup.processTimeout` configuration value will be used by default. By calling this method, you can override the value for the current instance.
 
 This is useful when working with very large databases that take a long time to export and import.
