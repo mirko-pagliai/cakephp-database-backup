@@ -131,7 +131,7 @@ class UtilityTest extends TestCase
     /**
      * @return array<array{string, string}>
      */
-    public static function testMakeAbsolutePathDataProvider(): array
+    public static function makeAbsolutePathDataProvider(): array
     {
         $basePath = Configure::readOrFail('DatabaseBackup.target');
 
@@ -143,7 +143,7 @@ class UtilityTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('testMakeAbsolutePathDataProvider')]
+    #[DataProvider('makeAbsolutePathDataProvider')]
     public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
     {
         $result = $this->Utility->makeAbsolutePath($path);
