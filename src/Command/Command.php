@@ -56,7 +56,7 @@ abstract class Command extends CakeCommand
      *
      * This allows you to use a path relative to ROOT, thus taking advantage of the shell's autocompletion.
      *
-     * For example:
+     * For example,
      * ```
      * $ bin/cake database_backup.import backups/backup_myapp_20250305160001.sql.gz
      * ```
@@ -71,9 +71,10 @@ abstract class Command extends CakeCommand
             return $path;
         }
 
-        $absoluteToRoot = Path::makeAbsolute($path, ROOT);
+        $absolutePath = Path::makeAbsolute($path, ROOT);
+        $absolutePath = DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
 
-        return new Filesystem()->exists($absoluteToRoot) ? $absoluteToRoot : $path;
+        return new Filesystem()->exists($absolutePath) ? $absolutePath : $path;
     }
 
     /**
