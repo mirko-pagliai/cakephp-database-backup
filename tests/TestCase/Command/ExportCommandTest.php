@@ -26,6 +26,7 @@ use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * ExportCommandTest class.
@@ -67,6 +68,7 @@ class ExportCommandTest extends TestCase
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteWithRotateOption(): void
     {
         $files = $this->createSomeBackups();
@@ -81,6 +83,7 @@ class ExportCommandTest extends TestCase
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteWithRotateOptionButNoFileToDelete(): void
     {
         $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));

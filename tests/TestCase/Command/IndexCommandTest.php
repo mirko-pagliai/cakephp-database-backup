@@ -25,6 +25,7 @@ use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * IndexCommandTest class.
@@ -38,6 +39,7 @@ class IndexCommandTest extends TestCase
     protected string $command = 'database_backup.index -v';
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecute(): void
     {
         $files = $this->createSomeBackups();
@@ -90,6 +92,7 @@ class IndexCommandTest extends TestCase
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteWithReverseOption(): void
     {
         $files = array_reverse($this->createSomeBackups());
@@ -121,6 +124,7 @@ class IndexCommandTest extends TestCase
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteWithNoFiles(): void
     {
         $this->deprecated(fn() => $this->exec($this->command));
