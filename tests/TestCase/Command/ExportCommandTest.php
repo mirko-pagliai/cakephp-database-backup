@@ -26,6 +26,7 @@ use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * ExportCommandTest class.
@@ -76,11 +77,13 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `--rotate` option.
      */
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteRotateOption(): void
     {
         $files = $this->createSomeBackups();
 
-        $this->exec($this->command . ' --rotate 3');
+        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
+
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename($files[2]) . '` has been deleted');
@@ -92,9 +95,11 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `--rotate` option, but no files to rotate.
      */
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteRotateOptionWithNoFileToDelete(): void
     {
-        $this->exec($this->command . ' --rotate 3');
+        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
+
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('No backup has been deleted');
