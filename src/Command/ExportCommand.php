@@ -123,6 +123,11 @@ class ExportCommand extends Command
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
 
             if ($args->getOption('rotate')) {
+                deprecationWarning(
+                    '2.15.0',
+                    'The `--rotate` option has been deprecated and will be removed in a future release'
+                );
+
                 $rotatedFiles = BackupManager::rotate((int)$args->getOption('rotate'));
 
                 if ($rotatedFiles) {

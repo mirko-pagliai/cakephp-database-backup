@@ -48,11 +48,8 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--compression` option.
-     */
     #[Test]
-    public function testExecuteCompressionOption(): void
+    public function testExecuteWithCompressionOption(): void
     {
         $this->exec($this->command . ' --compression bzip2');
         $this->assertExitSuccess();
@@ -60,11 +57,8 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--filename` option.
-     */
     #[Test]
-    public function testExecuteFilenameOption(): void
+    public function testExecuteWithFilenameOption(): void
     {
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitSuccess();
@@ -72,15 +66,13 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--rotate` option.
-     */
     #[Test]
-    public function testExecuteRotateOption(): void
+    public function testExecuteWithRotateOption(): void
     {
         $files = $this->createSomeBackups();
 
-        $this->exec($this->command . ' --rotate 3');
+        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
+
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename($files[2]) . '` has been deleted');
@@ -88,24 +80,19 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--rotate` option, but no files to rotate.
-     */
     #[Test]
-    public function testExecuteRotateOptionWithNoFileToDelete(): void
+    public function testExecuteWithRotateOptionButNoFileToDelete(): void
     {
-        $this->exec($this->command . ' --rotate 3');
+        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
+
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--timeout` option.
-     */
     #[Test]
-    public function testExecuteTimeoutOption(): void
+    public function testExecuteWithTimeoutOption(): void
     {
         $this->exec($this->command . ' --timeout 10');
         $this->assertExitSuccess();

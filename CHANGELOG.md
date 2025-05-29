@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
+* the `--rotate` option of `ExportCommand` has been deprecated and will be removed in a future release;
 * `BackupManager` has been deprecated and will be removed in a future release. It is currently a soft deprecation, as it
     is used by other classes/methods marked as deprecated, thus avoiding nested deprecations;
 * the `IndexCommand` has been deprecated and will be removed in a future release. Instead, use the commands available to
