@@ -23,6 +23,7 @@ use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupManagerTest class.
@@ -30,9 +31,6 @@ use PHPUnit\Framework\Attributes\Test;
 #[CoversClass(BackupManager::class)]
 class BackupManagerTest extends TestCase
 {
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::index()
-     */
     #[Test]
     public function testIndex(): void
     {
@@ -54,13 +52,13 @@ class BackupManagerTest extends TestCase
         }
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::rotate()
-     */
     #[Test]
     public function testRotate(): void
     {
-        $this->assertSame([], BackupManager::rotate(1));
+        $this->deprecated(function () {
+            $this->assertSame([], BackupManager::rotate(1));
+        });
+
 
         /**
          * Creates 3 backups (`$initialFiles`) and keeps only 2 of them.
@@ -68,19 +66,18 @@ class BackupManagerTest extends TestCase
          * So only 1 backup was deleted, which was the last one created.
          */
         $initialFiles = $this->createSomeBackups();
-        $rotate = BackupManager::rotate(2);
-        $this->assertCount(1, $rotate);
-        $this->assertSame($initialFiles[2], $rotate[0]['path']);
+        $this->deprecated(function () use ($initialFiles) {
+            $rotate = BackupManager::rotate(2);
+            $this->assertCount(1, $rotate);
+            $this->assertSame($initialFiles[2], $rotate[0]['path']);
+        });
     }
 
-    /**
-     * @uses \DatabaseBackup\Utility\BackupManager::rotate()
-     */
     #[Test]
     public function testRotateWithInvalidKeepValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `$keep` value');
-        BackupManager::rotate(-1);
+        $this->deprecated(fn () => BackupManager::rotate(-1));
     }
 }

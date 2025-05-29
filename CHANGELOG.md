@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
+* `BackupManager::rotate()` method is deprecated and will be removed in a future release;
 * the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;
 * `BackupTrait` had been deprecated and has been removed;
 * `AbstractBackupUtility::getDriver()` had been deprecated and has been removed.
