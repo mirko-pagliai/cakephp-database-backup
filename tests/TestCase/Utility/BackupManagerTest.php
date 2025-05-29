@@ -23,7 +23,6 @@ use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupManagerTest class.
@@ -56,7 +55,6 @@ class BackupManagerTest extends TestCase
     public function testRotate(): void
     {
         $this->assertSame([], BackupManager::rotate(1));
-
 
         /**
          * Creates 3 backups (`$initialFiles`) and keeps only 2 of them.

@@ -23,7 +23,6 @@ use Cake\Console\Exception\StopException;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
-use DatabaseBackup\Utility\BackupManager;
 use Exception;
 use Override;
 
