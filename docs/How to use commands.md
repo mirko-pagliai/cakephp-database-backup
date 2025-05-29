@@ -5,35 +5,26 @@ This plugin provides several commands for database management:
 ```
 Available Commands:
 
-- database_backup.delete_all
 - database_backup.export
 - database_backup.import
-- database_backup.index
-- database_backup.rotate
-- database_backup.send
 ```
-
-- [Commands](#commands)
-  * [~~`delete_all`~~](#---delete-all---)
-  * [`index`](#-index-)
-  * [`export`](#-export-)
-  * [`import`](#-import-)
-  * [~~`rotate`~~](#---rotate---)
-  * [~~`send`~~](#---send---)
 
 ***
 
 # Commands
 ## ~~`delete_all`~~
 _(deprecated since 2.13.4, removed in 2.14.0)_
-~~Deletes all database backup files.~~
+
+Deletes all database backup files.
 
 **Usage:**
 ```
 cake database_backup.delete_all [-h] [-q] [-v]
 ```
 
-## `index`
+## ~~`index`~~
+_(deprecated since 2.14.4, removed in 2.15.0)_
+
 Lists database backups.
 
 **Usage:**
@@ -57,6 +48,7 @@ Backup files found: 2
 ***
 
 ## `export`
+
 Exports a database backup.
 
 **Usage:**
@@ -93,6 +85,7 @@ Backup `backups/backup_mydb_20161113165059.sql.gz` has been exported
 ***
 
 ## `import`
+
 Imports a database backup.
 
 **Usage:**
@@ -133,8 +126,10 @@ Backup `backups/backup_mydb_20161113165059.sql.gz` has been imported
 ***
 
 ## ~~`rotate`~~
+
 _(deprecated since 2.13.5, removed in 2.14.0)_
-~~Rotates backups.~~
+
+Rotates backups.
 
 **Usage:**
 ```
@@ -168,7 +163,8 @@ Deleted backup files: 2
 
 ## ~~`send`~~
 _(deprecated since 2.13.4, removed in 2.14.0)_
-~~Sends a backup file via email.~~
+
+Sends a backup file via email.
 
 **Usage:**
 ```
