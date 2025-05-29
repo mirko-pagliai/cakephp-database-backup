@@ -1,5 +1,11 @@
 # Create backup copies
 
+- [Introduction](#introduction)
+- [Create a command to export (`ExportBackupCommand`)](#create-a-command-to-export---exportbackupcommand--)
+- [Create a command to rotate backups (`RotateBackupCommand`)](#create-a-command-to-rotate-backups---rotatebackupcommand--)
+
+## Introduction
+
 As we should know, it is never enough to just create a local backup (as this plugin does).  
 Instead, **it is necessary to also create a copy of the backup, to be stored elsewhere**.
 
@@ -24,7 +30,7 @@ Configure::write('DatabaseBackup.copyDirTarget', 'ftp://username:password@exampl
 
 It can also be the path of a simple directory (for example an external disk), but if it contains the authentication data to an FTP server as plain text (as in my case), **it is best to set this configuration in a safe place**.
 
-## ExportBackupCommand
+## Create a command to export (`ExportBackupCommand`)
 
 Let's see the `src/Command/ExportBackupCommand.php` file:
 
@@ -101,7 +107,7 @@ It works as desired and with the `-v` (`--verbose`) option I can get some useful
 
 As mentioned, in my specific case this command will be executed 5 times a day, thus creating 5 backups and 5 copies.
 
-## RotateBackupCommand
+## Create a command to rotate backups (`RotateBackupCommand`)
 
 Let's see the `src/Command/RotateBackupCommand.php` file:
 
