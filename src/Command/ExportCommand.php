@@ -124,7 +124,7 @@ class ExportCommand extends Command
 
             if ($args->getOption('rotate')) {
                 deprecationWarning(
-                    '2.15.0',
+                    '2.14.4',
                     'The `--rotate` option has been deprecated and will be removed in a future release'
                 );
 

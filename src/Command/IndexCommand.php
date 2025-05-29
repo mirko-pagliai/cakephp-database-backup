@@ -58,7 +58,7 @@ class IndexCommand extends BaseCommand
     public function execute(Arguments $args, ConsoleIo $io): void
     {
         deprecationWarning(
-            '2.15.0',
+            '2.14.4',
             'The `IndexCommand` has been deprecated and will be removed in a future release'
         );
 
