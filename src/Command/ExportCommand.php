@@ -29,8 +29,6 @@ use Override;
 
 /**
  * Command to export a database backup.
- *
- * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#export
  */
 class ExportCommand extends Command
 {
@@ -106,10 +104,7 @@ class ExportCommand extends Command
             if ($args->getOption('filename')) {
                 $BackupExport->filename((string)$args->getOption('filename'));
             } elseif ($args->getOption('compression')) {
-                /**
-                 * @see https://stackoverflow.com/a/77859717/1480263
-                 * @todo optimize with PHP >= 8.3
-                 */
+                /** @see https://stackoverflow.com/a/77859717/1480263 */
                 $compression = (string)$args->getOption('compression');
 
                 $BackupExport->compression(constant(Compression::class . '::' . ucfirst($compression)));

@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/Configuration
  */
 
 use Cake\Core\Configure;

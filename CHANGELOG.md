@@ -7,7 +7,9 @@
   your system. For example, for Unix you might use `ls -g -A -t -r backups/` (and `ls --help` for any help);
 * the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;
 * `BackupTrait` had been deprecated and has been removed;
-* `AbstractBackupUtility::getDriver()` had been deprecated and has been removed.
+* `AbstractBackupUtility::getDriver()` had been deprecated and has been removed;
+* all links to the wiki have been removed (which, remember, has been replaced by the `docs/` folder inside the branch,
+  since version `2.14.3`);
 
 ## 2.14 branch
 ### 2.14.3
