@@ -1,17 +1,8 @@
 # How to use the BackupManager utility
 
-- [Methods](#methods)
-  * [~~`delete()`~~](#-delete---)
-  * [~~`deleteAll()`~~](#-deleteall---)
-  * [`index()`](#-index---)
-  * [`rotate()`](#-rotate---)
-  * [~~`send()`~~](#---send-----)
+## Methods
 
-***
-
-# Methods
-
-## ~~`delete()`~~
+### ~~`delete()`~~
 _(deprecated since 2.13.5, removed in 2.14.0)_
 ```php
 delete(string $filename)
@@ -24,7 +15,7 @@ Filename of the backup that you want to delete. The path can be relative to the 
 
 ***
 
-## ~~`deleteAll()`~~
+### ~~`deleteAll()`~~
 _(deprecated since 2.13.5, removed in 2.14.0)_
 ```php
 deleteAll()
@@ -33,7 +24,8 @@ deleteAll()
 
 ***
 
-## `index()`
+### ~~`index()`~~
+_(deprecated since 2.15.0)_
 ```php
 index()
 ```
@@ -73,7 +65,8 @@ Note that up until version `2.12.1`, it returned a collection of `Entities` (and
 
 ***
 
-## `rotate()`
+### ~~`rotate()`~~
+_(deprecated since 2.15.0)_
 ```php
 rotate(int $rotate)
 ```
@@ -86,7 +79,7 @@ Number of backups that you want to keep
 
 ***
 
-## ~~`send()`~~
+### ~~`send()`~~
 _(deprecated since 2.13.4, removed in 2.14.0)_
 ```php
 send(string $filename, string $to)
