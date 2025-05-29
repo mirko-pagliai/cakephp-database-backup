@@ -77,6 +77,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `--rotate` option.
      */
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteRotateOption(): void
     {
         $files = $this->createSomeBackups();
@@ -94,6 +95,7 @@ class ExportCommandTest extends TestCase
      * Test for `execute()` method, with `--rotate` option, but no files to rotate.
      */
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteRotateOptionWithNoFileToDelete(): void
     {
         $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
