@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility
  */
 
 namespace DatabaseBackup\Utility;
@@ -34,7 +33,6 @@ class BackupManager
      * Returns a list of database backups.
      *
      * @return \Cake\Collection\CollectionInterface
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
     {
@@ -66,7 +64,6 @@ class BackupManager
      * @param int $keep Number of backups that you want to keep
      * @return array<array{filename: string, basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
      * @throws \InvalidArgumentException With an Invalid rotate value.
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#rotate
      */
     public static function rotate(int $keep): array
     {

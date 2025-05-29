@@ -28,8 +28,6 @@ use Symfony\Component\Filesystem\Path;
 
 /**
  * Command to import a database backup.
- *
- * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#import
  */
 class ImportCommand extends Command
 {

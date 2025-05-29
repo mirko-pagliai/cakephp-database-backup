@@ -29,8 +29,6 @@ use Override;
 
 /**
  * Command to export a database backup.
- *
- * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#export
  */
 class ExportCommand extends Command
 {
