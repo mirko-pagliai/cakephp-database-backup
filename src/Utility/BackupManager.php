@@ -26,8 +26,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Utility to manage database backups.
- *
- * @deprecated `BackupManager` has been deprecated and will be removed in a future release
  */
 class BackupManager
 {

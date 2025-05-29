@@ -55,9 +55,7 @@ class BackupManagerTest extends TestCase
     #[Test]
     public function testRotate(): void
     {
-        $this->deprecated(function () {
-            $this->assertSame([], BackupManager::rotate(1));
-        });
+        $this->assertSame([], BackupManager::rotate(1));
 
 
         /**
@@ -66,11 +64,10 @@ class BackupManagerTest extends TestCase
          * So only 1 backup was deleted, which was the last one created.
          */
         $initialFiles = $this->createSomeBackups();
-        $this->deprecated(function () use ($initialFiles) {
-            $rotate = BackupManager::rotate(2);
-            $this->assertCount(1, $rotate);
-            $this->assertSame($initialFiles[2], $rotate[0]['path']);
-        });
+
+        $rotate = BackupManager::rotate(2);
+        $this->assertCount(1, $rotate);
+        $this->assertSame($initialFiles[2], $rotate[0]['path']);
     }
 
     #[Test]
@@ -78,6 +75,6 @@ class BackupManagerTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `$keep` value');
-        $this->deprecated(fn () => BackupManager::rotate(-1));
+        BackupManager::rotate(-1);
     }
 }
