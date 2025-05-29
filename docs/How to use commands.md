@@ -64,13 +64,7 @@ used (choices: bzip2|gzip)
 patterns. The compression type will be automatically  
 set  
 --help, -h Display this help.  
---quiet, -q Enable quiet output.  
---rotate, -r Rotates backups. You have to indicate the number of  
-backups you want to keep. So, it will delete all  
-backups that are older. By default, no backup will be  
-deleted  
---send, -s Sends the backup file via email. You have to indicate  
-the recipient's email address  
+--quiet, -q Enable quiet output.
 --timeout, -t Timeout for shell commands. Default value: 60 seconds  
 --verbose, -v Enable verbose output.
 ```

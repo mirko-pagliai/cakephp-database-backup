@@ -59,12 +59,6 @@ class ExportCommand extends Command
                         'patterns. The compression type will be automatically set'),
                     'short' => 'f',
                 ],
-                'rotate' => [
-                    'help' => __d('database_backup', 'Rotates backups. You have to indicate the number of backups ' .
-                        'you want to keep. So, it will delete all backups that are older. By default, no backup ' .
-                        'will be deleted'),
-                    'short' => 'r',
-                ],
             ]);
     }
 
@@ -121,25 +115,6 @@ class ExportCommand extends Command
                 );
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
-
-            if ($args->getOption('rotate')) {
-                deprecationWarning(
-                    '2.14.4',
-                    'The `--rotate` option has been deprecated and will be removed in a future release'
-                );
-
-                $rotatedFiles = BackupManager::rotate((int)$args->getOption('rotate'));
-
-                if ($rotatedFiles) {
-                    foreach ($rotatedFiles as $file) {
-                        $io->verbose(__d('database_backup', 'Backup `{0}` has been deleted', $file['basename']));
-                    }
-
-                    $io->success(__d('database_backup', 'Deleted backup files: {0}', count($rotatedFiles)));
-                } else {
-                    $io->verbose(__d('database_backup', 'No backup has been deleted'));
-                }
-            }
         } catch (Exception $e) {
             $io->abort($e->getMessage());
         }

@@ -22,18 +22,15 @@ use Cake\Console\TestSuite\StubConsoleOutput;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
-use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * ExportCommandTest class.
  */
 #[CoversClass(ExportCommand::class)]
 #[UsesClass(BackupExport::class)]
-#[UsesClass(BackupManager::class)]
 class ExportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
@@ -64,33 +61,6 @@ class ExportCommandTest extends TestCase
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup.sql` has been exported/');
-        $this->assertErrorEmpty();
-    }
-
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testExecuteWithRotateOption(): void
-    {
-        $files = $this->createSomeBackups();
-
-        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
-
-        $this->assertExitSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
-        $this->assertOutputContains('Backup `' . basename($files[2]) . '` has been deleted');
-        $this->assertOutputContains('<success>Deleted backup files: 1</success>');
-        $this->assertErrorEmpty();
-    }
-
-    #[Test]
-    #[WithoutErrorHandler]
-    public function testExecuteWithRotateOptionButNoFileToDelete(): void
-    {
-        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
-
-        $this->assertExitSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
-        $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
     }
 
