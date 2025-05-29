@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
+* the `IndexCommand` has been deprecated and will be removed in a future release. Instead, use the commands available to
+  your system. For example, for Unix you might use `ls -g -A -t -r backups/` (and `ls --help` for any help);
 * the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;
 * `BackupTrait` had been deprecated and has been removed;
 * `AbstractBackupUtility::getDriver()` had been deprecated and has been removed.

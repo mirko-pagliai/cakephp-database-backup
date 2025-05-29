@@ -28,7 +28,7 @@ use Override;
 /**
  * Command to list database backups.
  *
- * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#index
+ * @deprecated The `IndexCommand` has been deprecated and will be removed in a future release
  */
 class IndexCommand extends BaseCommand
 {
@@ -52,10 +52,16 @@ class IndexCommand extends BaseCommand
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
+     * @deprecated The `IndexCommand` has been deprecated and will be removed in a future release
      */
     #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
     {
+        deprecationWarning(
+            '2.15.0',
+            'The `IndexCommand` has been deprecated and will be removed in a future release'
+        );
+
         $backups = BackupManager::index();
         $io->out(__d('database_backup', 'Backup files found: {0}', $backups->count()));
 
