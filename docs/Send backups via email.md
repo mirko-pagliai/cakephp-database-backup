@@ -3,7 +3,11 @@
 Up until version `2.13.3`, the plugin offered various possibilities to send the created backup files via email.  
 All of these (classes, methods, options) **have been deprecated** with version `2.13.4` and **removed** with version `2.14.0`.
 
-## Why were they deprecated?
+- [Why were they deprecated](#why-were-they-deprecated)
+- [Send backups via email](#send-backups-via-email)
+- [Create a command to export and send backups via email](#create-a-command-to-export-and-send-backups-via-email)
+
+## Why were they deprecated
 
 This plugin was born to allow me to quickly perform and manage my MySql database backups.  
 Over time the plugin has expanded, offering both universal functions always related to backups (for example supporting Postgres and Sqlite, which I do not use), and extra functions such as sending by sending.  
