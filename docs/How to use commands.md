@@ -14,12 +14,12 @@ Available Commands:
 ```
 
 - [Commands](#commands)
-    * [~~`delete_all`~~](#---delete-all---)
-    * [`index`](#-index-)
-    * [`export`](#-export-)
-    * [`import`](#-import-)
-    * [~~`rotate`~~](#-rotate-)
-    * [~~`send`~~](#---send---)
+  * [~~`delete_all`~~](#---delete-all---)
+  * [`index`](#-index-)
+  * [`export`](#-export-)
+  * [`import`](#-import-)
+  * [~~`rotate`~~](#---rotate---)
+  * [~~`send`~~](#---send---)
 
 ***
 
