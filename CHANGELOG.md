@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.14 branch
+### 2.14.4
+* the `--rotate` option of `ExportCommand` has been deprecated and will be removed in a future release.
+
 ### 2.14.3
 * the `Plugin` class no longer implements the `console()` method (which described the available commands), leaving the
     application to take care of auto-discovering them;
