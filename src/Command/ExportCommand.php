@@ -20,7 +20,6 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
-use Cake\Core\Configure;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
@@ -30,8 +29,6 @@ use Override;
 
 /**
  * Command to export a database backup.
- *
- * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-commands#export
  */
 class ExportCommand extends Command
 {
@@ -131,10 +128,7 @@ class ExportCommand extends Command
                     'The `--rotate` option has been deprecated and will be removed in a future release'
                 );
 
-                $prevErrorLevel = Configure::read('Error.errorLevel');
-                Configure::write('Error.errorLevel', E_ALL & ~E_USER_DEPRECATED);
                 $rotatedFiles = BackupManager::rotate((int)$args->getOption('rotate'));
-                Configure::write('Error.errorLevel', $prevErrorLevel);
 
                 if ($rotatedFiles) {
                     foreach ($rotatedFiles as $file) {

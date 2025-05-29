@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility
  */
 
 namespace DatabaseBackup\Utility;
@@ -27,6 +26,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Utility to manage database backups.
+ *
+ * @deprecated `BackupManager` has been deprecated and will be removed in a future release
  */
 class BackupManager
 {
@@ -34,7 +35,6 @@ class BackupManager
      * Returns a list of database backups.
      *
      * @return \Cake\Collection\CollectionInterface
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupManager-utility#index
      */
     public static function index(): CollectionInterface
     {
@@ -66,15 +66,9 @@ class BackupManager
      * @param int $keep Number of backups that you want to keep
      * @return array<array{filename: string, basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
      * @throws \InvalidArgumentException With an Invalid rotate value.
-     * @deprecated 2.15.0 `BackupManager::rotate()` method is deprecated and will be removed in a future release
      */
     public static function rotate(int $keep): array
     {
-        deprecationWarning(
-            '2.15.0',
-            '`BackupManager::rotate()` method is deprecated and will be removed in a future release'
-        );
-
         if ($keep < 1) {
             throw new InvalidArgumentException(__d('database_backup', 'Invalid `$keep` value'));
         }

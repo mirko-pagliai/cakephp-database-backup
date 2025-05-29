@@ -26,6 +26,7 @@ use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * ExportCommandTest class.
@@ -49,7 +50,7 @@ class ExportCommandTest extends TestCase
     }
 
     #[Test]
-    public function testExecuteCompressionOption(): void
+    public function testExecuteWithCompressionOption(): void
     {
         $this->exec($this->command . ' --compression bzip2');
         $this->assertExitSuccess();
@@ -58,7 +59,7 @@ class ExportCommandTest extends TestCase
     }
 
     #[Test]
-    public function testExecuteFilenameOption(): void
+    public function testExecuteWithFilenameOption(): void
     {
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitSuccess();
@@ -67,11 +68,12 @@ class ExportCommandTest extends TestCase
     }
 
     #[Test]
-    public function testExecuteRotateOption(): void
+    #[WithoutErrorHandler]
+    public function testExecuteWithRotateOption(): void
     {
         $files = $this->createSomeBackups();
 
-        $this->deprecated(fn() => $this->exec($this->command . ' --rotate 3'));
+        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
 
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
@@ -81,9 +83,10 @@ class ExportCommandTest extends TestCase
     }
 
     #[Test]
-    public function testExecuteRotateOptionWithNoFileToDelete(): void
+    #[WithoutErrorHandler]
+    public function testExecuteWithRotateOptionButNoFileToDelete(): void
     {
-        $this->deprecated(fn() => $this->exec($this->command . ' --rotate 3'));
+        $this->deprecated(fn () => $this->exec($this->command . ' --rotate 3'));
 
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
@@ -92,7 +95,7 @@ class ExportCommandTest extends TestCase
     }
 
     #[Test]
-    public function testExecuteTimeoutOption(): void
+    public function testExecuteWithTimeoutOption(): void
     {
         $this->exec($this->command . ' --timeout 10');
         $this->assertExitSuccess();

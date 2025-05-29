@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility
  */
 
 namespace DatabaseBackup\Utility;
@@ -57,7 +56,6 @@ class BackupExport extends AbstractBackupUtility
      *
      * @param \DatabaseBackup\Compression $Compression Compression type
      * @return self
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#compression
      */
     public function compression(Compression $Compression): self
     {
@@ -73,7 +71,6 @@ class BackupExport extends AbstractBackupUtility
      *
      * @param string $filename Filename. It can be an absolute path and may contain patterns
      * @return self
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#filename
      * @throws \Symfony\Component\Filesystem\Exception\IOException If the target (directory) is not writable or if the filename already exists.
      * @throws \ValueError With a filename that does not match any supported compression.
      */
@@ -115,7 +112,6 @@ class BackupExport extends AbstractBackupUtility
      *
      * @param int $keep Number of backups you want to keep
      * @return self
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#rotate
      */
     public function rotate(int $keep): self
     {
@@ -135,7 +131,6 @@ class BackupExport extends AbstractBackupUtility
      * @throws \RuntimeException When export fails
      * @see \DatabaseBackup\Executor\AbstractExecutor::afterExport()
      * @see \DatabaseBackup\Executor\AbstractExecutor::beforeExport()
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupExport-utility#export
      */
     public function export(): string|false
     {

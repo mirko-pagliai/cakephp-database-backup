@@ -25,6 +25,7 @@ use DatabaseBackup\Utility\BackupManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * IndexCommandTest class.
@@ -38,11 +39,13 @@ class IndexCommandTest extends TestCase
     protected string $command = 'database_backup.index -v';
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecute(): void
     {
         $files = $this->createSomeBackups();
 
-        $this->exec($this->command);
+        $this->deprecated(fn() => $this->exec($this->command));
+
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
 
@@ -88,18 +91,14 @@ class IndexCommandTest extends TestCase
         $this->assertSame(array_map(callback: 'basename', array: $files), $matches[1]);
     }
 
-    /**
-     * Test for `execute()` method, with `--reverse` option.
-     *
-     * @test
-     * @uses \DatabaseBackup\Command\IndexCommand::execute()
-     */
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteWithReverseOption(): void
     {
         $files = array_reverse($this->createSomeBackups());
 
-        $this->exec($this->command . ' --reverse');
+        $this->deprecated(fn() => $this->exec($this->command . ' --reverse'));
+
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
 
@@ -124,15 +123,12 @@ class IndexCommandTest extends TestCase
         $this->assertSame(array_map(callback: 'basename', array: $files), $matches[1]);
     }
 
-    /**
-     * Test for `execute()` method, with no backup files.
-     *
-     * @uses \DatabaseBackup\Command\IndexCommand::execute()
-     */
     #[Test]
+    #[WithoutErrorHandler]
     public function testExecuteWithNoFiles(): void
     {
-        $this->exec($this->command);
+        $this->deprecated(fn() => $this->exec($this->command));
+
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 0');
         $this->assertErrorEmpty();

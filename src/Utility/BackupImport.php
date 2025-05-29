@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @copyright   Copyright (c) Mirko Pagliai
  * @link        https://github.com/mirko-pagliai/cakephp-database-backup
  * @license     https://opensource.org/licenses/mit-license.php MIT License
- * @see         https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility
  */
 
 namespace DatabaseBackup\Utility;
@@ -32,7 +31,6 @@ class BackupImport extends AbstractBackupUtility
      *
      * @param string $filename Filename. It can be an absolute path
      * @return self
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#filename
      * @throws \Symfony\Component\Filesystem\Exception\IOException If the filename is not readable
      * @throws \ValueError With a filename that does not match any supported compression.
      */
@@ -65,7 +63,6 @@ class BackupImport extends AbstractBackupUtility
      * @throws \RuntimeException When import fails
      * @see \DatabaseBackup\Executor\AbstractExecutor::afterImport()
      * @see \DatabaseBackup\Executor\AbstractExecutor::beforeImport()
-     * @see https://github.com/mirko-pagliai/cakephp-database-backup/wiki/How-to-use-the-BackupImport-utility#import
      */
     public function import(): string|false
     {
