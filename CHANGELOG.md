@@ -1,6 +1,8 @@
 # 2.x branch
 ## 2.14 branch
 ### 2.14.4
+* the `IndexCommand` has been deprecated and will be removed in a future release. Instead, use the commands available to
+  your system. For example, for Unix you might use `ls -g -A -t -r backups/` (and `ls --help` for any help);
 * the `--rotate` option of `ExportCommand` has been deprecated and will be removed in a future release.
 
 ### 2.14.3

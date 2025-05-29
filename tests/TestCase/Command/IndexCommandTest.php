@@ -42,7 +42,8 @@ class IndexCommandTest extends TestCase
     {
         $files = $this->createSomeBackups();
 
-        $this->exec($this->command);
+        $this->deprecated(fn() => $this->exec($this->command));
+
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
 
@@ -99,7 +100,8 @@ class IndexCommandTest extends TestCase
     {
         $files = array_reverse($this->createSomeBackups());
 
-        $this->exec($this->command . ' --reverse');
+        $this->deprecated(fn() => $this->exec($this->command . ' --reverse'));
+
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 3');
 
@@ -125,14 +127,15 @@ class IndexCommandTest extends TestCase
     }
 
     /**
-     * Test for `execute()` method, with no backup files.
+     * Test for the ` execute ()` method, with no backup files.
      *
      * @uses \DatabaseBackup\Command\IndexCommand::execute()
      */
     #[Test]
     public function testExecuteWithNoFiles(): void
     {
-        $this->exec($this->command);
+        $this->deprecated(fn() => $this->exec($this->command));
+
         $this->assertExitSuccess();
         $this->assertOutputContains('Backup files found: 0');
         $this->assertErrorEmpty();
