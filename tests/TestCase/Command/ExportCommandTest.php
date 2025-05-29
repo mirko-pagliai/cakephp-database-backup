@@ -48,9 +48,6 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--compression` option.
-     */
     #[Test]
     public function testExecuteCompressionOption(): void
     {
@@ -60,9 +57,6 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--filename` option.
-     */
     #[Test]
     public function testExecuteFilenameOption(): void
     {
@@ -72,15 +66,13 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--rotate` option.
-     */
     #[Test]
     public function testExecuteRotateOption(): void
     {
         $files = $this->createSomeBackups();
 
-        $this->exec($this->command . ' --rotate 3');
+        $this->deprecated(fn() => $this->exec($this->command . ' --rotate 3'));
+
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('Backup `' . basename($files[2]) . '` has been deleted');
@@ -88,22 +80,17 @@ class ExportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--rotate` option, but no files to rotate.
-     */
     #[Test]
     public function testExecuteRotateOptionWithNoFileToDelete(): void
     {
-        $this->exec($this->command . ' --rotate 3');
+        $this->deprecated(fn() => $this->exec($this->command . ' --rotate 3'));
+
         $this->assertExitSuccess();
         $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
         $this->assertOutputContains('No backup has been deleted');
         $this->assertErrorEmpty();
     }
 
-    /**
-     * Test for `execute()` method, with `--timeout` option.
-     */
     #[Test]
     public function testExecuteTimeoutOption(): void
     {

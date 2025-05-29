@@ -20,6 +20,7 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
+use Cake\Core\Configure;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\Utility\BackupExport;
@@ -106,10 +107,7 @@ class ExportCommand extends Command
             if ($args->getOption('filename')) {
                 $BackupExport->filename((string)$args->getOption('filename'));
             } elseif ($args->getOption('compression')) {
-                /**
-                 * @see https://stackoverflow.com/a/77859717/1480263
-                 * @todo optimize with PHP >= 8.3
-                 */
+                /** @see https://stackoverflow.com/a/77859717/1480263 */
                 $compression = (string)$args->getOption('compression');
 
                 $BackupExport->compression(constant(Compression::class . '::' . ucfirst($compression)));
@@ -128,7 +126,15 @@ class ExportCommand extends Command
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
 
             if ($args->getOption('rotate')) {
+                deprecationWarning(
+                    '2.15.0',
+                    'The `--rotate` option has been deprecated and will be removed in a future release'
+                );
+
+                $prevErrorLevel = Configure::read('Error.errorLevel');
+                Configure::write('Error.errorLevel', E_ALL & ~E_USER_DEPRECATED);
                 $rotatedFiles = BackupManager::rotate((int)$args->getOption('rotate'));
+                Configure::write('Error.errorLevel', $prevErrorLevel);
 
                 if ($rotatedFiles) {
                     foreach ($rotatedFiles as $file) {
