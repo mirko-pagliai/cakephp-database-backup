@@ -5,9 +5,7 @@
     is used by other classes/methods marked as deprecated, thus avoiding nested deprecations;
 * the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;
 * `BackupTrait` had been deprecated and has been removed;
-* `AbstractBackupUtility::getDriver()` had been deprecated and has been removed;
-* all links to the wiki have been removed (which, remember, has been replaced by the `docs/` folder inside the branch,
-  since version `2.14.3`);
+* `AbstractBackupUtility::getDriver()` had been deprecated and has been removed.
 
 ## 2.14 branch
 ### 2.14.4
