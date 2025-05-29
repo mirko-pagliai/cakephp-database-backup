@@ -1,6 +1,6 @@
 # Configuration
 
-The plugin uses some configuration parameters and you can set them using the  `\Cake\Core\Configure` class, **before** loading the plugin.
+The plugin uses some configuration parameters, and you can set them using the  `\Cake\Core\Configure` class, **before** loading the plugin.
 
 For example, you can do this at the bottom of the file `APP/config/app.php` of your application.
 
@@ -8,17 +8,17 @@ If you want to send backup files by email, remember to set up your application c
 For more information on how to configure your application, see the [CakePHP documentation](https://book.cakephp.org/5/en/core-libraries/email.html#configuring-transports).
 
 - [Configuration values](#configuration-values)
-    + [`DatabaseBackup.chmod`](#-databasebackupchmod-)
-    + [`DatabaseBackup.connection`](#-databasebackupconnection-)
-    + [~~`DatabaseBackup.mailSender`~~](#---databasebackupmailsender---)
-    + [`DatabaseBackup.processTimeout`](#-databasebackupprocesstimeout-)
-    + [`DatabaseBackup.target`](#-databasebackuptarget-)
-    * [Binaries](#binaries)
-    * [Customize export/import commands](#customize-export-import-commands)
+  * [`DatabaseBackup.chmod`](#-databasebackupchmod-)
+  * [`DatabaseBackup.connection`](#-databasebackupconnection-)
+  * [~~`DatabaseBackup.mailSender`~~](#---databasebackupmailsender---)
+  * [`DatabaseBackup.processTimeout`](#-databasebackupprocesstimeout-)
+  * [`DatabaseBackup.target`](#-databasebackuptarget-)
+- [Binaries](#binaries)
+- [Customize export and import commands](#customize-export-and-import-commands)
 
 ***
 
-# Configuration values
+## Configuration values
 
 ### `DatabaseBackup.chmod`
 ```php
@@ -44,7 +44,7 @@ Configure::write('DatabaseBackup.mailSender', 'sender@example.it');
 ~~Setting `DatabaseBackup.mailSender`, you can choose the email address that will be the sender when you send the backup files via email.~~
 
 ### `DatabaseBackup.processTimeout`
-_(from 2.12.0 version)_
+_(from the 2.12.0 version)_
 ```php
 Configure::write('DatabaseBackup.processTimeout', 60);
 ```
@@ -67,7 +67,7 @@ The plugin uses several binary files:
 * `sqlite3`
 
 By default, all binaries will be detected automatically.
-If a binary is not found or if you want to set a different path for the bynary, you can use these configuration values.
+If a binary is not found or if you want to set a different path for the binary, you can use these configuration values.
 
 Just an example for UNIX:
 ```php
@@ -82,10 +82,10 @@ Configure::write('DatabaseBackup.binaries.mysqldump', 'C:\\xampp\\mysql\\bin\\my
 
 The same applies to all other binaries, just change the binary name shown in the example.
 
-## Customize export/import commands
-_(from 2.10.0 version)_
+## Customize export and import commands
+_(from the 2.10.0 version)_
 
-By default, commands (to export/imports backups) are executed with generic options that are valid for almost all environments.
+By default, commands (to export/import backups) are executed with generic options that are valid for almost all environments.
 However, in some particular environments or conditions it may be necessary to execute commands with particular options.
 
 The default commands are defined in the `config/bootstrap.php` file and placeholders (such as `{{BINARY}}` or `{{DB_HOST}}`) are replaced and escaped before the command is executed.
@@ -94,7 +94,7 @@ It is therefore possible to use custom commands by acting on the configuration, 
 
 An example: suppose you want to run the command to export mysql databases with the `--column-statistics=0` option. Then in the bootstrap of your application:
 ```php
-Configure::write('DatabaseBackup.mysql.export', '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}} --column-statistics=0');
+Configure::write('DatabaseBackup.Mysql.export', '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}} --column-statistics=0');
 ```
 
 However, remember that some values should be escaped and that incorrect customization of the commands could make the plugin unusable or otherwise cause unwanted effects.
