@@ -52,6 +52,7 @@ class IndexCommand extends BaseCommand
      * @param \Cake\Console\Arguments $args The command arguments
      * @param \Cake\Console\ConsoleIo $io The console io
      * @return void
+     * @deprecated The `IndexCommand` has been deprecated and will be removed in a future release
      */
     #[Override]
     public function execute(Arguments $args, ConsoleIo $io): void
