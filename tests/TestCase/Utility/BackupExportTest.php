@@ -22,12 +22,12 @@ use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;
-use DatabaseBackup\Utility\BackupManager;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -92,7 +92,7 @@ class BackupExportTest extends TestCase
         $this->assertSame($expectedCompression, $this->BackupExport->getCompression());
 
         /**
-         * The compression set by the `compression()` method is however overridden by the `filename()` method.
+         * The compression set by the `compression()` method is, however, overridden by the `filename()` method.
          *
          * So the result is the same as the previous one.
          */
@@ -152,9 +152,11 @@ class BackupExportTest extends TestCase
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testRotate(): void
     {
-        $this->BackupExport->rotate(10);
+        $this->deprecated(fn () => $this->BackupExport->rotate(10));
+
         $this->assertSame(10, $this->BackupExport->getRotate());
     }
 
@@ -200,15 +202,6 @@ class BackupExportTest extends TestCase
 
         $this->assertIsString($filename);
         $this->assertMatchesRegularExpression('/backup_test\.sql\.bz2$/', $filename);
-
-        //Exports with `rotate()`
-        $this->createSomeBackups();
-        $filename = $BackupExport
-            ->rotate(1)
-            ->export();
-
-        $this->assertIsString($filename);
-        $this->assertSame(1, BackupManager::index()->count());
     }
 
     /**

@@ -112,9 +112,15 @@ class BackupExport extends AbstractBackupUtility
      *
      * @param int $keep Number of backups you want to keep
      * @return self
+     * @deprecated `BackupExport::rotate()` has been deprecated and will be removed in a future release
      */
     public function rotate(int $keep): self
     {
+        deprecationWarning(
+            '2.15.0',
+            '`BackupExport::rotate()` has been deprecated and will be removed in a future release.'
+        );
+
         $this->rotate = $keep;
 
         return $this;
@@ -138,7 +144,7 @@ class BackupExport extends AbstractBackupUtility
             $this->filename('backup_{$DATABASE}_{$DATETIME}.' . $this->getCompression()->value);
         }
 
-        //This allows the filename to be set again with a next call of this method
+        //This allows the filename to be set again with the next call of this method
         $filename = $this->getFilename();
         $this->filename = '';
 
@@ -158,7 +164,7 @@ class BackupExport extends AbstractBackupUtility
             );
         }
 
-        $this->getFilesystem()->chmod($filename, Configure::read('DatabaseBackup.chmod'));
+        $this->getFilesystem()->chmod($filename, Configure::read('DatabaseBackup.chmod', 0664));
 
         //Dispatches the `Backup.afterExport` event implemented by the `Executor` class
         $Executor->dispatchEvent('Backup.afterExport');
