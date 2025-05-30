@@ -1,12 +1,10 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.0
-* `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for
-  significant code optimization. Thanks to the magic `__call()` method provided by `Utility`, they still support the use
-  of already known methods (`filename()`, `compression()`, `timeout()`, etc.) to set properties;
+* `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for significant code optimization.  
+  Thanks to the magic `__call()` method provided by `Utility`, they still support the use of already known methods (`filename()`, `compression()`, `timeout()`, etc.) to set properties;
 * the `DatabaseBackup.chmod` configuration value no longer exists ([see here](docs/Migration%20from%20version%202.md#other-configuration-values));
-* `BackupExport` no longer takes care of rotating (`rotate()` method) files and (for now) setting chmods of files after export,
-  because these functions are not essential and (like others already removed) can be implemented by the user;
+* `BackupExport` no longer takes care of rotating (`rotate()` method) files and (for now) setting chmod of files after export, because these functions are not essential and (like others already removed) can be implemented by the user;
 * the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`, [see here](docs/Migration%20from%20version%202.md#from-mysqlmysql-dump-to-mariadbmariadb-dump));
 * since there are no aliases defined for binaries anymore (and it would be possible to override the configuration anyway), the `Executor::findBinary()` method takes only one argument;
 * it requires at least PHP 8.4 and CakePHP 5.1.
