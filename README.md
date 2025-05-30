@@ -39,11 +39,27 @@ $ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 Then you have to load the plugin. For more information on how to load the plugin,
 please refer to the [CakePHP documentation](https://book.cakephp.org/5/en/plugins.html#loading-a-plugin).
 
-Simply, you can execute the shell command to enable the plugin:
+You can execute the shell command to enable the plugin:
 ```bash
 $ bin/cake plugin load DatabaseBackup
 ```
 This would update your application's bootstrap method.
+
+### Installation on older CakePHP and PHP versions
+
+Compared to the current installation requirements, some tags or branches are provided for those using older versions of
+CakePHP and PHP:
+
+- `2.15` versions, which require at least CakePHP `5.0` and PHP `8.1`;
+- tag [`cakephp4`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp4), which requires at
+  least PHP `>=7.4.0` and CakePHP `^4.0`.   
+  This tag no longer receives any updates as of January 5, 2024, and roughly coincides with what `2.12.3` version was.
+- tag [`cakephp3`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp3), which requires at
+  least PHP `>=5.6 <7.4` and CakePHP `^3.5.1`.   
+  This tag no longer receives any updates as of April 29, 2021, and roughly coincides with what `2.8.5` version was.
+
+You can freely use these, even by downloading the source codes from the attached assets, but their functioning is
+no longer guaranteed, especially regarding old dependencies that may no longer be available.
 
 ## Configuration and How to use
 
