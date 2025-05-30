@@ -1,6 +1,7 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
+* `BackupManager::rotate()` has been deprecated and will be removed in a future release;
 * the `IndexCommand` had been deprecated and was removed;
 * the `--rotate` option of `ExportCommand` had been deprecated and was removed;
 * the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;
