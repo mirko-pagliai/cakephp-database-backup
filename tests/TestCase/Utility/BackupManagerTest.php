@@ -23,6 +23,7 @@ use DatabaseBackup\Utility\BackupManager;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 /**
  * BackupManagerTest class.
@@ -31,30 +32,36 @@ use PHPUnit\Framework\Attributes\Test;
 class BackupManagerTest extends TestCase
 {
     #[Test]
+    #[WithoutErrorHandler]
     public function testIndex(): void
     {
         //Creates a text file. This file should be ignored
         file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
         $createdFiles = $this->createSomeBackups();
-        $files = BackupManager::index();
-        array_map('unlink', $createdFiles);
-        $this->assertCount(3, $files);
 
-        foreach ($files as $k => $file) {
-            $this->assertSame(['basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
-            $this->assertSame(basename($createdFiles[$k]), $file['basename']);
-            $this->assertSame($createdFiles[$k], $file['path']);
-            $this->assertInstanceOf(Compression::class, $file['compression']);
-            $this->assertIsInt($file['size']);
-            $this->assertInstanceOf(DateTime::class, $file['datetime']);
-        }
+        $this->deprecated(function () use ($createdFiles) {
+            $files = BackupManager::index();
+            $this->assertCount(3, $files);
+
+            foreach ($files as $k => $file) {
+                $this->assertSame(['basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
+                $this->assertSame(basename($createdFiles[$k]), $file['basename']);
+                $this->assertSame($createdFiles[$k], $file['path']);
+                $this->assertInstanceOf(Compression::class, $file['compression']);
+                $this->assertIsInt($file['size']);
+                $this->assertInstanceOf(DateTime::class, $file['datetime']);
+            }
+        });
+
+        array_map('unlink', $createdFiles);
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testRotate(): void
     {
-        $this->assertSame([], BackupManager::rotate(1));
+        $this->deprecated(fn () => $this->assertSame([], BackupManager::rotate(1)));
 
         /**
          * Creates 3 backups (`$initialFiles`) and keeps only 2 of them.
@@ -63,16 +70,19 @@ class BackupManagerTest extends TestCase
          */
         $initialFiles = $this->createSomeBackups();
 
-        $rotate = BackupManager::rotate(2);
-        $this->assertCount(1, $rotate);
-        $this->assertSame($initialFiles[2], $rotate[0]['path']);
+        $this->deprecated(function () use ($initialFiles) {
+            $rotate = BackupManager::rotate(2);
+            $this->assertCount(1, $rotate);
+            $this->assertSame($initialFiles[2], $rotate[0]['path']);
+        });
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function testRotateWithInvalidKeepValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `$keep` value');
-        BackupManager::rotate(-1);
+        $this->deprecated(fn () => BackupManager::rotate(-1));
     }
 }

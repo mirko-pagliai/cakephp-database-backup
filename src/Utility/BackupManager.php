@@ -26,6 +26,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Utility to manage database backups.
+ *
+ * @deprecated `BackupManager` has been deprecated and will be removed in a future release
  */
 class BackupManager
 {
@@ -33,14 +35,20 @@ class BackupManager
      * Returns a list of database backups.
      *
      * @return \Cake\Collection\CollectionInterface
+     * @deprecated `BackupManager::index()` has been deprecated and will be removed in a future release
      */
     public static function index(): CollectionInterface
     {
+        deprecationWarning(
+            '2.15.0',
+            '`BackupManager::index()` has been deprecated and will be removed in a future release'
+        );
+
         $Finder = new Finder();
         $Finder->files()
             ->in(Configure::readOrFail('DatabaseBackup.target'))
             ->name('/\.sql(\.(gz|bz2))?$/')
-            //Sorts in descending order by last modified date
+            //Sorts in descending order by the last modified date
             ->sort(fn (SplFileInfo $a, SplFileInfo $b): int => $b->getMTime() - $a->getMTime());
 
         $DateTimeZone = DateTime::now()->getTimezone();
@@ -64,9 +72,15 @@ class BackupManager
      * @param int $keep Number of backups that you want to keep
      * @return array<array{filename: string, basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
      * @throws \InvalidArgumentException With an Invalid rotate value.
+     * @deprecated `BackupManager::rotate()` has been deprecated and will be removed in a future release
      */
     public static function rotate(int $keep): array
     {
+        deprecationWarning(
+            '2.15.0',
+            '`BackupManager::rotate()` has been deprecated and will be removed in a future release'
+        );
+
         if ($keep < 1) {
             throw new InvalidArgumentException(__d('database_backup', 'Invalid `$keep` value'));
         }
