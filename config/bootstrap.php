@@ -50,6 +50,12 @@ foreach (array_keys(DATABASE_BACKUP_EXECUTABLES) as $driverKey) {
     }
 }
 
+if (Configure::check('DatabaseBackup.chmod')) {
+    deprecationWarning('2.15.0', sprintf(
+        'The configuration name `%s` is deprecated and will be removed in a future release.',
+        'DatabaseBackup.chmod'
+    ));
+}
 if (Configure::check('DatabaseBackup.connection')) {
     deprecationWarning('2.14.2', sprintf(
         'The configuration name `%s` is deprecated and will be removed in a future release. If you need to use a connection other than `default`, use the `$Connection` argument to the `BackupExport`/`BackupImport` constructor when instantiating these classes.',
@@ -102,7 +108,7 @@ if (!is_dir($target) || !is_writeable($target)) {
 /**
  * Aliases for old `Driver` classes.
  *
- * @todo to be removed in version 2.15.0
+ * @todo to be removed in version `2.15` or `2.16`
  */
 foreach (
     [
