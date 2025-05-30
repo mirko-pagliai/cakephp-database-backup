@@ -1,6 +1,6 @@
 # 3.x branch
 ## 3.0 branch
-### 3.0.0
+### 3.0.0-RC1
 * `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for significant code optimization.  
   Thanks to the magic `__call()` method provided by `Utility`, they still support the use of already known methods (`filename()`, `compression()`, `timeout()`) to set properties;
 * `ExportCommand` now also accepts paths relative to your app's root, in addition to the default target directory, as `ImportCommand` already did. This allows for proper shell autocompletion;
