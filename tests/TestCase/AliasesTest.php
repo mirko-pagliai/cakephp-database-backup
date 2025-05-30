@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\TestWith;
  * AliasesTest.
  *
  * @see config/bootstrap.php
- * @todo to be removed in version 2.15.0
+ * @todo to be removed in version `2.15` or `2.16`
  */
 class AliasesTest extends TestCase
 {
