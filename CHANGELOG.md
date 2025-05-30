@@ -22,7 +22,24 @@
 * the `@since` tag has been kept for the usual methods that remained unchanged (at least in logic).
 
 # 2.x branch
+## 2.15 branch
+### 2.15.0
+* `BackupManager::index()` and `BackupManager::rotate()` methods have been deprecated and will be removed in a future
+  release. At this point, the entire `BackupManager` class is considered deprecated and will be removed;
+* the `IndexCommand` had been deprecated and was removed;
+* the `--rotate` option of `ExportCommand` had been deprecated and was removed;
+* the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;
+* `BackupTrait` had been deprecated and has been removed;
+* `AbstractBackupUtility::getDriver()` had been deprecated and has been removed.
+
 ## 2.14 branch
+### 2.14.4
+* the `IndexCommand` has been deprecated and will be removed in a future release. Instead, use the commands available to
+  your system. For example, for Unix you might use `ls -g -A -t -r backups/` (and `ls --help` for any help);
+* the `--rotate` option of `ExportCommand` has been deprecated and will be removed in a future release;
+* all links to the wiki have been removed (which, remember, has been replaced by the `docs/` folder inside the branch,
+  since version `2.14.3`).
+
 ### 2.14.3
 * the `AbstractBackupUtility::__call()` method now also supports uppercase named properties (bug fixed). This provides
   the `getConnection()` magic method;
