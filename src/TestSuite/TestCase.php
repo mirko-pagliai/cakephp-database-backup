@@ -16,12 +16,13 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\TestSuite;
 
+use Cake\Core\Configure;
 use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
-use DatabaseBackup\Utility\BackupManager;
 use Override;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
 
 /**
  * TestCase class.
@@ -36,9 +37,14 @@ abstract class TestCase extends CakeTestCase
     {
         parent::tearDown();
 
-        BackupManager::index()
-            ->extract('path')
-            ->each(fn (string $path) => unlink($path));
+        $Finder = new Finder();
+        $Finder->files()
+            ->in(Configure::readOrFail('DatabaseBackup.target'))
+            ->name('/\.sql(\.(gz|bz2))?$/');
+
+        foreach ($Finder as $File) {
+            unlink($File->getPathname());
+        }
     }
 
     /**

@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.0
-* `BackupManager::rotate()` has been deprecated and will be removed in a future release;
+* `BackupManager::index()` and `BackupManager::rotate()` methods have been deprecated and will be removed in a future
+  release. At this point, the entire `BackupManager` class is considered deprecated and will be removed;
 * the `IndexCommand` had been deprecated and was removed;
 * the `--rotate` option of `ExportCommand` had been deprecated and was removed;
 * the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;

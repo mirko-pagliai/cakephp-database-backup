@@ -26,6 +26,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Utility to manage database backups.
+ *
+ * @deprecated `BackupManager` has been deprecated and will be removed in a future release
  */
 class BackupManager
 {
@@ -33,14 +35,20 @@ class BackupManager
      * Returns a list of database backups.
      *
      * @return \Cake\Collection\CollectionInterface
+     * @deprecated `BackupManager::index()` has been deprecated and will be removed in a future release
      */
     public static function index(): CollectionInterface
     {
+        deprecationWarning(
+            '2.15.0',
+            '`BackupManager::index()` has been deprecated and will be removed in a future release'
+        );
+
         $Finder = new Finder();
         $Finder->files()
             ->in(Configure::readOrFail('DatabaseBackup.target'))
             ->name('/\.sql(\.(gz|bz2))?$/')
-            //Sorts in descending order by last modified date
+            //Sorts in descending order by the last modified date
             ->sort(fn (SplFileInfo $a, SplFileInfo $b): int => $b->getMTime() - $a->getMTime());
 
         $DateTimeZone = DateTime::now()->getTimezone();

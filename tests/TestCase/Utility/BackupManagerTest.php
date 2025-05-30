@@ -32,24 +32,29 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 class BackupManagerTest extends TestCase
 {
     #[Test]
+    #[WithoutErrorHandler]
     public function testIndex(): void
     {
         //Creates a text file. This file should be ignored
         file_put_contents(Configure::read('DatabaseBackup.target') . DS . 'text.txt', '');
 
         $createdFiles = $this->createSomeBackups();
-        $files = BackupManager::index();
-        array_map('unlink', $createdFiles);
-        $this->assertCount(3, $files);
 
-        foreach ($files as $k => $file) {
-            $this->assertSame(['basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
-            $this->assertSame(basename($createdFiles[$k]), $file['basename']);
-            $this->assertSame($createdFiles[$k], $file['path']);
-            $this->assertInstanceOf(Compression::class, $file['compression']);
-            $this->assertIsInt($file['size']);
-            $this->assertInstanceOf(DateTime::class, $file['datetime']);
-        }
+        $this->deprecated(function () use ($createdFiles) {
+            $files = BackupManager::index();
+            $this->assertCount(3, $files);
+
+            foreach ($files as $k => $file) {
+                $this->assertSame(['basename', 'path', 'compression', 'size', 'datetime'], array_keys($file));
+                $this->assertSame(basename($createdFiles[$k]), $file['basename']);
+                $this->assertSame($createdFiles[$k], $file['path']);
+                $this->assertInstanceOf(Compression::class, $file['compression']);
+                $this->assertIsInt($file['size']);
+                $this->assertInstanceOf(DateTime::class, $file['datetime']);
+            }
+        });
+
+        array_map('unlink', $createdFiles);
     }
 
     #[Test]
