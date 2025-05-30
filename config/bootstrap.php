@@ -19,7 +19,7 @@ use Symfony\Component\Process\ExecutableFinder;
 require_once CAKE . 'functions.php';
 
 /**
- * Executables. Name of driver as keys, Then, as value, an array that contains
+ * Executables. Name of a driver as keys, Then, as value, an array that contains
  *  first the executable to export and then the executable to import backups.
  */
 if (!defined('DATABASE_BACKUP_EXECUTABLES')) {
@@ -65,7 +65,6 @@ if (Configure::check('DatabaseBackup.connection')) {
 
 //Writes default configuration values
 $defaults = [
-    'DatabaseBackup.chmod' => 0664,
     'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
     'DatabaseBackup.Mysql.export' => '{{BINARY}} --defaults-file={{AUTH_FILE}} {{DB_NAME}}',
