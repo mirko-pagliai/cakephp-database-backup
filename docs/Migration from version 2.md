@@ -49,7 +49,7 @@ As for the export/import commands, in previous versions they looked like this (s
 'DatabaseBackup.Sqlite.import' => '{{BINARY}} {{DB_NAME}}',
 ```
 
-Even earlier (i.e. up to `2.13.x`), driver names also had lowercase letters, e.g. `DatabaseBackup.mysql.export`.
+Even earlier (i.e., up to `2.13.x`), driver names also had lowercase letters, e.g. `DatabaseBackup.mysql.export`.
 
 From the `3.0.x` branch, they appear as follows (here too, if necessary, refer to the `config/bootstrap.php` file):
 ```php
@@ -70,8 +70,8 @@ If, however, for some particular need, you have overridden them, then you need t
 
 ### Other configuration values
 
-First of all, the `DatabaseBackup.chmod` configuration value no longer exist.
-For chmods of exported backups, you can implement this yourself in your code, if you need to.
+First of all, the `DatabaseBackup.chmod` configuration value no longer exists.
+For chmod of exported backups, you can implement this yourself in your code if you need to.
 
 The `DatabaseBackup.connection` configuration had already been deprecated starting from version `2.14.2` and other "mechanics" had already been implemented to use connections other than the `default` one.
 
