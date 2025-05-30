@@ -3,16 +3,16 @@
 ### 3.0.0
 * `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for significant code optimization.  
   Thanks to the magic `__call()` method provided by `Utility`, they still support the use of already known methods (`filename()`, `compression()`, `timeout()`) to set properties;
-* `BackupExport` no longer takes care of rotating (`rotate()` method) files and (for now) setting chmod of files after export, because these functions are not essential and (like others already removed) can be implemented by the user;
+* `ExportCommand` now also accepts paths relative to your app's root, in addition to the default target directory, as `ImportCommand` already did. This allows for proper shell autocompletion;
 * the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`, [see here](docs/Migration%20from%20version%202.md#from-mysqlmysql-dump-to-mariadbmariadb-dump));
 * it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:
-* `ExportCommand` now also accepts paths relative to your app's root, in addition to the default target directory, as `ImportCommand` already did. This allows for proper shell autocompletion;
 * thanks to the Mockery's overloading and the (external) component Process that actually takes care of executing the commands to export/import the databases, normally the tests do not really use the database drivers and do not actually write or read files on the filesystem (i.e. everything is simulated, [see here](README.md#testing)).
 * all methods of the `BackupManager` class had been deprecated and hence the class was removed;
 * since there are no aliases defined for binaries anymore (and it would be possible to override the configuration anyway), the `Executor::findBinary()` method takes only one argument;
-* the `DatabaseBackup.chmod` configuration value no longer exists ([see here](docs/Migration%20from%20version%202.md#other-configuration-values));
+* the `BackupExport::rotate()` method had been deprecated and was removed;
+* the `DatabaseBackup.chmod` configuration had been deprecated and was removed;
 * the abstract class `AbstractBackupUtility` has become simply `Utility`. It uses property hooks to set and get `$Connection`, `Executor`, and `$timeOut`, rather than the homonymous methods.  
   The `makeAbsoluteFilename()` method has become `makeAbsolutePath()`;
 * the abstract class `Command` has been moved from `DatabaseBackup\Console` to `DatabaseBackup\Command`;
@@ -24,6 +24,8 @@
 ### 2.15.0
 * `BackupManager::index()` and `BackupManager::rotate()` methods have been deprecated and will be removed in a future
   release. At this point, the entire `BackupManager` class is considered deprecated and will be removed;
+* the `BackupExport::rotate()` method has been deprecated and will be removed in a future release;
+* the `DatabaseBackup.chmod` configuration is deprecated and will be removed in a future release;
 * the `IndexCommand` had been deprecated and was removed;
 * the `--rotate` option of `ExportCommand` had been deprecated and was removed;
 * the magic method `AbstractBackupUtility::__get()` had been deprecated and has been removed;
