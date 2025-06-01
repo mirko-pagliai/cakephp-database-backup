@@ -91,8 +91,8 @@ jobs:
             coverage: none
             tools: cs2pr
 
-        - name: Install dependencies
-          run: composer install --no-progress
+        - name: Composer install
+          uses: ramsey/composer-install@v3
 
         - name: Run PHP CodeSniffer
           continue-on-error: true
