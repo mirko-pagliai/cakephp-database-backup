@@ -67,9 +67,9 @@ jobs:
 
       - name: Run "real driver" test suite
         if: matrix.real-drivers == 'real-drivers'
-        run: |
-          export db_dsn_mysqli='mysql://root:root@127.0.0.1/test?encoding=utf8'
-          composer run-script test-real-drivers
+        run: composer run-script test-real-drivers
+        env:
+          db_dsn_mysqli: mysql://root:root@127.0.0.1/test?encoding=utf8
 
       - name: Code Coverage Report
         if: success() && matrix.dependencies == 'highest'
