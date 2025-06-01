@@ -10,7 +10,7 @@ parameters:
         - tests
 
     bootstrapFiles:
-        - tests/bootstrap.php
+        - config/bootstrap.php
 
     ignoreErrors:
         -
