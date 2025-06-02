@@ -29,12 +29,14 @@ jobs:
             dependencies: 'lowest'
 
     steps:
-      - name: Setup MySQL 8.0
-        run: |
-          sudo service mysql start
-          mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
+      - uses: getong/mariadb-action@v1.11
+        if: matrix.real-drivers == 'real-drivers'
+        with:
+          mysql root password: 'root' # Required if "mysql user" is empty, default is empty. The root superuser password
+          mysql database: 'test' # Optional, default value is "test". The specified database which will be create
 
       - name: Setup PostgreSQL latest
+        if: matrix.real-drivers == 'real-drivers'
         run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.6
 
       - uses: actions/checkout@v4
