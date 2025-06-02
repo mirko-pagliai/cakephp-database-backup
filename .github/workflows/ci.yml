@@ -60,9 +60,10 @@ jobs:
         if: matrix.real-drivers == ''
         run: |
           if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
-            export XDEBUG_MODE=coverage; vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
+            export XDEBUG_MODE=coverage;
+            vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
           else
-            composer run-script test
+            vendor/bin/phpunit --display-deprecations --display-warnings
           fi
 
       - name: Run "real driver" test suite
