@@ -63,7 +63,7 @@ jobs:
             export XDEBUG_MODE=coverage;
             vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
           else
-            vendor/bin/phpunit --display-phpunit-deprecations --display-deprecations --display-warnings
+            vendor/bin/phpunit --display-deprecations --display-warnings
           fi
 
       - name: Run "real driver" test suite
