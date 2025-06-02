@@ -29,7 +29,8 @@ jobs:
             dependencies: 'lowest'
 
     steps:
-      - uses: getong/mariadb-action@v1.11
+      - name: Setup MariaDB
+        uses: getong/mariadb-action@v1.11
         if: matrix.real-drivers == 'real-drivers'
         with:
           mysql root password: 'root' # Required if "mysql user" is empty, default is empty. The root superuser password
