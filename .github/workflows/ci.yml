@@ -30,11 +30,13 @@ jobs:
 
     steps:
       - name: Setup MySQL 8.0
+        if: matrix.real-drivers == 'real-drivers'
         run: |
           sudo service mysql start
           mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
 
       - name: Setup PostgreSQL latest
+        if: matrix.real-drivers == 'real-drivers'
         run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:9.6
 
       - uses: actions/checkout@v4
