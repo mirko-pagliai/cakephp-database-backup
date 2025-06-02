@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Utility;
 
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
@@ -27,6 +28,7 @@ use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Process\ExecutableFinder;
 
 /**
  * BackupExportAndImportTest.
@@ -61,8 +63,25 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @inheritDoc
      */
+    public static function setUpBeforeClass(): void
+    {
+        //If some binaries are missing, sets the old aliases
+        $ExecutableFinder = new ExecutableFinder();
+        foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
+            if (!$ExecutableFinder->find($binary)) {
+                Configure::write('DatabaseBackup.binaries.' . $binary, $ExecutableFinder->find($oldAlias));
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function tearDownAfterClass(): void
     {
+        //Deletes any custom and previously set binaries by `setUpBeforeClass()`
+        Configure::delete('DatabaseBackup.binaries');
+
         //Removes sqlite database
         if (file_exists(TMP . 'test.sq3')) {
             unlink(TMP . 'test.sq3');
