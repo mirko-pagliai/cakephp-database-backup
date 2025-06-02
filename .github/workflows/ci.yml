@@ -30,8 +30,8 @@ jobs:
 
     steps:
       - name: Setup MariaDB
-        uses: getong/mariadb-action@v1.11
         if: matrix.real-drivers == 'real-drivers'
+        uses: getong/mariadb-action@v1.11
         with:
           mysql root password: 'root' # Required if "mysql user" is empty, default is empty. The root superuser password
           mysql database: 'test' # Optional, default value is "test". The specified database which will be create
