@@ -155,6 +155,8 @@ class RotateBackupCommand extends Command
         $Finder = new Finder();
         $Finder
             ->files()
+            // Only `sql`/`sql.gz`/`sql.bz2` files
+            ->name('/\.sql(\.(gz|bz2))?$/')
             ->in([$target, $copyDirTarget])
             /** @see https://symfony.com/doc/current/components/finder.html#file-date */
             ->date('< ' . $limit);
