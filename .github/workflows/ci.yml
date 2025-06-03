@@ -127,8 +127,8 @@ jobs:
 
 
   testsuite-windows:
-    runs-on: windows-2019
-    name: Windows - PHP 8.2
+    runs-on: windows-2022
+    name: Windows - PHP 8.2 & Mysql 8.0
 
     env:
       EXTENSIONS: mbstring, intl, pdo_mysql
