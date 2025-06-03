@@ -108,8 +108,8 @@ jobs:
           run: vendor/bin/phpstan analyse --error-format=github
 
   testsuite-windows:
-    runs-on: windows-2019
-    name: Windows - PHP 8.4
+    runs-on: windows-2022
+    name: Windows - PHP 8.4 & Mysql 8.0
 
     env:
       EXTENSIONS: mbstring, intl
