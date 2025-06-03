@@ -9,7 +9,8 @@ delete(string $filename)
 ```
 ~~It deletes a backup file.~~
 
-**Parameters for `delete()`**  
+**Parameters for `delete()`**
+
 *string $filename*  
 Filename of the backup that you want to delete. The path can be relative to the backup directory.
 
@@ -73,7 +74,8 @@ rotate(int $rotate)
 It rotates backups.  
 You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
 
-**Parameters for `rotate()`**  
+**Parameters for `rotate()`**
+
 *int $rotate*  
 Number of backups that you want to keep
 
@@ -86,8 +88,10 @@ send(string $filename, string $to)
 ```
 ~~It sends a backup file via email.~~
 
-**Parameters for `send()`**  
+**Parameters for `send()`**
+
 *string $filename*  
 Filename of the backup that you want to send via email. The path can be relative to the backup directory.  
+
 *string $recipient*  
 Recipient's email address

@@ -4,7 +4,7 @@
 - [Optional methods](#optional-methods)
   * [`compression()`](#-compression---)
   * [`filename()`](#-filename---)
-  * [`rotate()`](#-rotate---)
+  * [~~`rotate()`~~](#-rotate---)
   * [~~`send()`~~](#---send-----)
   * [`timeout()`](#-timeout---)
 - [Export the database](#export-the-database)
@@ -68,7 +68,8 @@ Filename. It can be an absolute path and may contain patterns.
 
 Patterns are `{$DATABASE}` (database name), `{$DATETIME}` (datetime), `{$HOSTNAME}` (hostname) and `{$TIMESTAMP}` (timestamp).
 
-## `rotate()`
+## ~~`rotate()`~~
+_(deprecated since 2.15.0)_
 ```php
 rotate(int $rotate)
 ```
