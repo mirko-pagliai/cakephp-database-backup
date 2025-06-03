@@ -127,7 +127,7 @@ jobs:
 
 
   testsuite-windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     name: Windows - PHP 8.2
 
     env:
