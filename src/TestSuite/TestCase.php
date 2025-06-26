@@ -96,7 +96,7 @@ abstract class TestCase extends CakeTestCase
 
                 return $file;
             },
-            array: Compression::cases()
+            array: Compression::cases(),
         );
     }
 }

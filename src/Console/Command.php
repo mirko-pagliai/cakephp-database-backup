@@ -49,14 +49,14 @@ abstract class Command extends BaseCommand
                     'default' => 'default',
                     'help' => __d(
                         'database_backup',
-                        'Name of the alternative connection to use, for example if you are not using the default connection'
+                        'Name of the alternative connection to use, for example if you are not using the default connection',
                     ),
                 ],
                 'timeout' => [
                     'help' => __d(
                         'database_backup',
                         'Timeout for shell commands. Default value: {0} seconds',
-                        Configure::readOrFail('DatabaseBackup.processTimeout')
+                        Configure::readOrFail('DatabaseBackup.processTimeout'),
                     ),
                     'short' => 't',
                 ],
@@ -93,9 +93,7 @@ abstract class Command extends BaseCommand
         $io->out(__d('database_backup', 'Driver: {0}', $this->Connection->config()['driver']));
 
         if ($args->getOption('timeout')) {
-            $io->verbose(
-                __d('database_backup', 'Timeout for shell commands: {0} seconds', $args->getOption('timeout'))
-            );
+            $io->verbose(__d('database_backup', 'Timeout for shell commands: {0} seconds', $args->getOption('timeout')));
         }
 
         $io->hr();

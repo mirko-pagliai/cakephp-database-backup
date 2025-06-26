@@ -103,9 +103,7 @@ class ImportCommand extends Command
 
             $filename = $BackupImport->import();
             if (!$filename) {
-                throw new StopException(
-                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport')
-                );
+                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport'));
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativePath($filename)));
         } catch (Exception $e) {

@@ -46,7 +46,7 @@ class ExportCommand extends Command
                     'choices' => array_map(callback: 'lcfirst', array: array_column(
                         array: array_filter(
                             array: Compression::cases(),
-                            callback: fn (Compression $Compression): bool => $Compression != Compression::None,
+                            callback: fn(Compression $Compression): bool => $Compression != Compression::None,
                         ),
                         column_key: 'name',
                     )),
@@ -109,9 +109,7 @@ class ExportCommand extends Command
 
             $filename = $BackupExport->export();
             if (!$filename) {
-                throw new StopException(
-                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport')
-                );
+                throw new StopException(__d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport'));
             }
             $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
         } catch (Exception $e) {

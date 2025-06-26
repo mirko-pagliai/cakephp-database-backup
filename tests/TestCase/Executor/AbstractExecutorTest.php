@@ -75,7 +75,7 @@ class AbstractExecutorTest extends TestCase
             ->method($expectedNewMethod)
             ->with($this->equalTo('filename.sql'));
 
-        $this->deprecated(fn () => $Executor->{$oldMethod}('filename.sql'));
+        $this->deprecated(fn() => $Executor->{$oldMethod}('filename.sql'));
     }
 
     #[Test]
@@ -117,7 +117,7 @@ class AbstractExecutorTest extends TestCase
         $Executor
             ->expects($this->any())
             ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
+            ->willReturnCallback(fn(string $key): string => 'my-' . $key);
 
         $result = $Executor->getExportCommand($filename);
 
@@ -148,7 +148,7 @@ class AbstractExecutorTest extends TestCase
         $Executor
             ->expects($this->any())
             ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
+            ->willReturnCallback(fn(string $key): string => 'my-' . $key);
 
         $result = $Executor->getImportCommand($filename);
 

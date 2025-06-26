@@ -148,7 +148,7 @@ class MysqlExecutorTest extends TestCase
         $MysqlExecutor
             ->expects($this->exactly(3))
             ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
+            ->willReturnCallback(fn(string $key): string => 'my-' . $key);
 
         $result = $MysqlExecutor->dispatchEvent('Backup.beforeExport');
 

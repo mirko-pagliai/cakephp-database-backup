@@ -61,7 +61,7 @@ class BackupManagerTest extends TestCase
     #[WithoutErrorHandler]
     public function testRotate(): void
     {
-        $this->deprecated(fn () => $this->assertSame([], BackupManager::rotate(1)));
+        $this->deprecated(fn() => $this->assertSame([], BackupManager::rotate(1)));
 
         /**
          * Creates 3 backups (`$initialFiles`) and keeps only 2 of them.
@@ -83,6 +83,6 @@ class BackupManagerTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid `$keep` value');
-        $this->deprecated(fn () => BackupManager::rotate(-1));
+        $this->deprecated(fn() => BackupManager::rotate(-1));
     }
 }

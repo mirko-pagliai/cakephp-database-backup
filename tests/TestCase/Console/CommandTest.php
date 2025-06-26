@@ -73,7 +73,7 @@ class CommandTest extends TestCase
         $this->expectExceptionMessage('The datasource configuration `noExisting` was not found.');
         $this->Command->run(
             argv: ['--connection=noExisting'],
-            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
+            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()),
         );
     }
 }

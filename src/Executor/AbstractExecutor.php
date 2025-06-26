@@ -78,7 +78,7 @@ abstract class AbstractExecutor implements EventListenerInterface
             deprecationWarning('2.14.1', sprintf(
                 'The `AbstractExecutor::%s()` method is deprecated and will be removed in a future release. Use instead `%s()`',
                 $name,
-                $replacement
+                $replacement,
             ));
 
             return $this->{$replacement}(...$arguments);
@@ -169,7 +169,7 @@ abstract class AbstractExecutor implements EventListenerInterface
             return sprintf(
                 '%s -dc %s | ',
                 escapeshellarg($this->getBinary($Compression)),
-                escapeshellarg($filename)
+                escapeshellarg($filename),
             ) . $exec;
         }
 
@@ -242,7 +242,7 @@ abstract class AbstractExecutor implements EventListenerInterface
             throw new InvalidArgumentException(__d(
                 'database_backup',
                 'Binary for `{0}` could not be found. You have to set its path manually',
-                $binaryName
+                $binaryName,
             ));
         }
 

@@ -39,9 +39,7 @@ class BackupImport extends AbstractBackupUtility
     {
         $filename = $this->makeAbsolutePath($filename);
         if (!is_readable($filename)) {
-            throw new IOException(
-                __d('database_backup', 'File or directory `{0}` is not readable', $filename)
-            );
+            throw new IOException(__d('database_backup', 'File or directory `{0}` is not readable', $filename));
         }
 
         Compression::fromFilename($filename);
@@ -86,7 +84,7 @@ class BackupImport extends AbstractBackupUtility
         $Process = $this->getProcess($Executor->getImportCommand($filename));
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
-                __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput()))
+                __d('database_backup', 'Import failed with error message: `{0}`', rtrim($Process->getErrorOutput())),
             );
         }
 

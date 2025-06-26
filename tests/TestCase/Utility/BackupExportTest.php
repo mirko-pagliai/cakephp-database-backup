@@ -155,7 +155,7 @@ class BackupExportTest extends TestCase
     #[WithoutErrorHandler]
     public function testRotate(): void
     {
-        $this->deprecated(fn () => $this->BackupExport->rotate(10));
+        $this->deprecated(fn() => $this->BackupExport->rotate(10));
 
         $this->assertSame(10, $this->BackupExport->getRotate());
     }
