@@ -22,7 +22,6 @@ use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupImport;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -40,9 +39,6 @@ use ValueError;
 #[UsesClass(AbstractBackupUtility::class)]
 class BackupImportTest extends TestCase
 {
-    /**
-     * @var \DatabaseBackup\Utility\BackupImport
-     */
     protected BackupImport $BackupImport;
 
     /**
@@ -59,7 +55,6 @@ class BackupImportTest extends TestCase
     /**
      * @inheritDoc
      */
-    #[Override]
     protected function setUp(): void
     {
         $this->BackupImport = new BackupImport();

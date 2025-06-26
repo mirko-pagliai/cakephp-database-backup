@@ -10,7 +10,6 @@ use Cake\Console\TestSuite\StubConsoleOutput;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Console\Command;
 use DatabaseBackup\TestSuite\TestCase;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -31,7 +30,6 @@ class CommandTest extends TestCase
     /**
      * @inheritDoc
      */
-    #[Override]
     protected function setUp(): void
     {
         $this->Command = new class extends Command {
