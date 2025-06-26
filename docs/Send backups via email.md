@@ -117,7 +117,7 @@ The command also takes care of catching any exceptions thrown by `BackupExport` 
 Now you can run the command in the console:
 
 ```bash
-$ bin/cake export_and_send_backup
+bin/cake export_and_send_backup
 ```
 
 If everything went well, the output should be:

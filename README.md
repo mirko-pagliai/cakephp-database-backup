@@ -33,7 +33,7 @@ The installation of these binaries may vary depending on your operating system.
 You can install the plugin via composer:
 
 ```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
+composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 ```
 
 Then you have to load the plugin. For more information on how to load the plugin,
@@ -41,7 +41,7 @@ please refer to the [CakePHP documentation](https://book.cakephp.org/5/en/plugin
 
 You can execute the shell command to enable the plugin:
 ```bash
-$ bin/cake plugin load DatabaseBackup
+bin/cake plugin load DatabaseBackup
 ```
 This would update your application's bootstrap method.
 
@@ -77,7 +77,7 @@ This test class, when executed, will test a real database export and import, usi
 
 You can test the class directly or the configured `real-drivers` testsuite ([see available testsuites](phpunit.xml.dist)):
 ```bash
-$ vendor/bin/phpunit --testsuite=real-drivers
+vendor/bin/phpunit --testsuite=real-drivers
 ```
 
 [Continuous integration (CI) workflows](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml) must be run with `highest`/`lowest` dependencies and "without"/"only with" real drivers and databases.
