@@ -17,10 +17,10 @@ To export a database, you have to follow three steps:
 
 **1) Instantiate the class**  
 Example:
-
 ```php
 $backup = new BackupExport();
 ```
+
 **2) Call one (or more) optional methods**  
 Example:
 ```php
