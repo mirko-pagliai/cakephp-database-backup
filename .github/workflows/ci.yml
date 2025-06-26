@@ -79,6 +79,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          slug: mirko-pagliai/cakephp-database-backup
 
   cs-stan:
     name: Coding Standard & Static Analysis
