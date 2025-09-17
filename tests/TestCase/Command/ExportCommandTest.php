@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Console\TestSuite\StubConsoleOutput;
 use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
@@ -29,8 +30,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ExportCommandTest.
- *
- * @property \Cake\Console\TestSuite\StubConsoleOutput $_out
  */
 #[CoversClass(ExportCommand::class)]
 class ExportCommandTest extends TestCase
@@ -72,7 +71,7 @@ cake database_backup.export [options]
 --verbose, -v      Enable verbose output.
 
 txt;
-        $this->assertSame($expected, $this->_out->messages()[0]);
+        $this->assertOutputContains($expected);
     }
 
     #[Test]

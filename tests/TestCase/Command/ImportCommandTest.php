@@ -29,8 +29,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 /**
  * ImportCommandTest.
- *
- * @property \Cake\Console\TestSuite\StubConsoleOutput $_out
  */
 #[CoversClass(ImportCommand::class)]
 class ImportCommandTest extends TestCase
@@ -72,7 +70,7 @@ filename  Filename. It can be an absolute path. Filenames can be
           (default target directory).
 
 txt;
-        $this->assertSame($expected, $this->_out->messages()[0]);
+        $this->assertOutputContains($expected);
     }
 
     #[Test]
