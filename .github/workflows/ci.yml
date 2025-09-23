@@ -129,11 +129,11 @@ jobs:
 
   testsuite-windows:
     runs-on: windows-2022
-    name: Windows - PHP 8.2 & Mysql 8.0
+    name: Windows - PHP 8.4 & Mysql 8.0
 
     env:
       EXTENSIONS: mbstring, intl, pdo_mysql
-      PHP_VERSION: '8.2'
+      PHP_VERSION: '8.4'
 
     steps:
     - uses: actions/checkout@v4
