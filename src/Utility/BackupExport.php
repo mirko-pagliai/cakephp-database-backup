@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Datasource\ConnectionInterface;
+use Cake\I18n\DateTime;
 use DatabaseBackup\Compression;
 use DatabaseBackup\OperationType;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -73,7 +74,7 @@ class BackupExport extends Utility
             search: ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
             replace: [
                 $this->Connection->config()['database'],
-                date('YmdHis'),
+                new DateTime()->format('YmdHis'),
                 str_replace(['127.0.0.1', '::1'], 'localhost', $this->Connection->config()['host'] ?? 'localhost'),
                 (string)time(),
             ],
