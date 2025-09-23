@@ -53,13 +53,16 @@ class BackupExportTest extends TestCase
         $this->BackupExport = new BackupExport(Connection: new FakeConnection());
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$compression
+     */
     #[Test]
     #[TestWith([Compression::None, Compression::None])]
     #[TestWith([Compression::Gzip, Compression::Gzip])]
     #[TestWith([Compression::Gzip, 'Gzip'])]
     #[TestWith([Compression::Gzip, 'gzip'])]
     #[TestWith([Compression::None, null])]
-    public function testCompressionProperty(Compression $ExpectedCompression, mixed $Compression): void
+    public function testCompressionProperty(Compression $ExpectedCompression, Compression|string|null $Compression): void
     {
         //This is the expected default value
         $this->assertSame(Compression::None, $this->BackupExport->compression);
@@ -69,6 +72,9 @@ class BackupExportTest extends TestCase
         $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$compression
+     */
     #[Test]
     #[TestWith([true])]
     #[TestWith(['invalidCompression'])]
@@ -78,6 +84,9 @@ class BackupExportTest extends TestCase
         $this->BackupExport->compression = $invalidCompression;
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
     #[Test]
     #[TestWith([TMP . 'backup.sql', Compression::None, TMP . 'backup.sql'])]
     #[TestWith([TMP . 'backup.sql.gz', Compression::Gzip, TMP . 'backup.sql.gz'])]
@@ -92,6 +101,9 @@ class BackupExportTest extends TestCase
         $this->assertSame($ExpectedCompression, $this->BackupExport->compression);
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
     #[Test]
     #[TestWith([TMP . 'my_file_my_hostname.sql', TMP . 'my_file_{$HOSTNAME}.sql'])]
     #[TestWith([TMP . 'my_file_my_database.sql', TMP . 'my_file_{$DATABASE}.sql'])]
@@ -108,40 +120,43 @@ class BackupExportTest extends TestCase
         }
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
     #[Test]
     public function testFilenamePropertyWithNoWritableTarget(): void
     {
-        $filename = '/noExistingDir/backup.sql';
-
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File or directory `' . dirname($filename) . '` is not writable');
-        $this->BackupExport->filename = $filename;
+        $this->expectExceptionMessage('File or directory `/noExistingDir` is not writable');
+        $this->BackupExport->filename = '/noExistingDir/backup.sql';
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testFilenamePropertyWithFileAlreadyExists(): void
     {
-        $filename = TMP . 'backup.sql';
-
         Mockery::mock('overload:' . Filesystem::class)
             ->shouldReceive('exists')
-            ->with($filename)
+            ->with('/backup.sql')
             ->andReturnTrue();
 
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File `' . $filename . '` already exists');
-        $this->BackupExport->filename = $filename;
+        $this->expectExceptionMessage('File `/backup.sql` already exists');
+        $this->BackupExport->filename = '/backup.sql';
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
     #[Test]
     public function testFilenamePropertyWithInvalidFilenameAndCompression(): void
     {
-        $filename = TMP . 'backup.txt';
-
         $this->expectException(ValueError::class);
-        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . $filename . '`');
-        $this->BackupExport->filename = $filename;
+        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . TMP . 'backup.txt`');
+        $this->BackupExport->filename = TMP . 'backup.txt';
     }
 
     #[Test]
@@ -161,35 +176,31 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * @throws \ReflectionException
+     * @link \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExport(): void
     {
-        $filename = TMP . 'backup.sql';
-
-        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
-        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
-        $Executor
-            ->shouldReceive('runProcess')
-            ->with($filename, 120)
-            ->once()
-            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
-
-        $this->BackupExport->Executor = $Executor;
+        $this->BackupExport->Executor = new class extends FakeExecutor {
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
         $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
 
         $result = $this->BackupExport
-            ->filename($filename)
+            ->filename(TMP . 'backup.sql')
             ->timeout(120)
             ->export();
 
-        $this->assertSame($filename, $result);
+        $this->assertSame(TMP . 'backup.sql', $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
     }
 
     /**
+     * @link \DatabaseBackup\Utility\BackupExport::export()
      * @throws \ReflectionException
      */
     #[Test]
@@ -197,25 +208,25 @@ class BackupExportTest extends TestCase
     {
         Configure::write('DatabaseBackup.processTimeout', 45);
 
-        $filename = TMP . 'backup.sql';
-
         /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
         $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
         $Executor
             ->shouldReceive('runProcess')
-            ->with($filename, 45)
+            ->with(TMP . 'backup.sql', 45)
             ->once()
             ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
 
         $this->BackupExport->Executor = $Executor;
 
         $this->BackupExport
-            ->filename($filename)
+            ->filename(TMP . 'backup.sql')
             ->export();
     }
 
     /**
-     * `export()` is stopped by the `Backup.beforeExport` event (implemented by the `Executor` class)
+     * `export()` is stopped by the `Backup.beforeExport` event (implemented by the `Executor` class).
+     *
+     * @link \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExportStoppedByBeforeExport(): void
