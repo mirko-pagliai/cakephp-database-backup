@@ -112,7 +112,6 @@ As mentioned, in my specific case this command will be executed 5 times a day, t
 Let's see the `src/Command/RotateBackupCommand.php` file:
 
 ```php
-
 declare(strict_types=1);
 
 namespace App\Command;

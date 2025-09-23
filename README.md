@@ -33,7 +33,7 @@ The installation of these binaries may vary depending on your operating system.
 You can install the plugin via composer:
 
 ```bash
-$ composer require --prefer-dist mirko-pagliai/cakephp-database-backup
+composer require --prefer-dist mirko-pagliai/cakephp-database-backup
 ```
 
 Then you have to load the plugin. For more information on how to load the plugin,
@@ -41,7 +41,7 @@ please refer to the [CakePHP documentation](https://book.cakephp.org/5/en/plugin
 
 Simply, you can execute the shell command to enable the plugin:
 ```bash
-$ bin/cake plugin load DatabaseBackup
+bin/cake plugin load DatabaseBackup
 ```
 This would update your application's bootstrap method.
 
@@ -49,7 +49,7 @@ By default, the plugin uses the `APP/backups` directory to save the backups
 files. So you have to create the directory and make it writable:
 
 ```bash
-$ mkdir backups/ && chmod 775 backups/
+mkdir backups/ && chmod 775 backups/
 ```
 
 If you want to use a different directory, read the [Configuration](docs/Configuration.md) page.
@@ -83,9 +83,13 @@ To run tests with another driver, you can use the scripts defined in `composer.j
 
 For example:
 ```bash
-$ composer test
-$ composer test-postgres
-$ composer test-sqlite
+composer test
+```
+```bash
+composer test-postgres
+```
+```bash
+composer test-sqlite
 ```
 
 Instead, to run tests with all drivers, you can use the `test-all` script (individual tests are chained together).

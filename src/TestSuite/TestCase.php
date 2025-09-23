@@ -20,7 +20,6 @@ use Cake\Core\Configure;
 use Cake\TestSuite\TestCase as CakeTestCase;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
-use Override;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 
@@ -32,7 +31,6 @@ abstract class TestCase extends CakeTestCase
     /**
      * @inheritDoc
      */
-    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -96,7 +94,7 @@ abstract class TestCase extends CakeTestCase
 
                 return $file;
             },
-            array: Compression::cases()
+            array: Compression::cases(),
         );
     }
 }

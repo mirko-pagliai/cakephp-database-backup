@@ -108,7 +108,7 @@ class ImportCommandTest extends TestCase
         $ImportCommand->executeCommand(
             $ImportCommand,
             [$this->createBackup(fakeBackup: true), '--timeout=10', '--verbose'],
-            new ConsoleIo($this->_out, $this->_err)
+            new ConsoleIo($this->_out, $this->_err),
         );
 
         $this->assertOutputContains('Timeout for shell commands: 10 seconds');
@@ -132,7 +132,7 @@ class ImportCommandTest extends TestCase
         $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
         $ImportCommand->run(
             argv: ['--filename' => $this->createBackup(fakeBackup: true)],
-            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
+            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()),
         );
     }
 }

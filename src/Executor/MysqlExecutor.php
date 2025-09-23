@@ -151,7 +151,7 @@ class MysqlExecutor extends AbstractExecutor
                 (string)$this->getConfig('password'),
                 (string)$this->getConfig('host'),
             ],
-            $content
+            $content,
         );
 
         $Filesystem = $this->getFilesystem();

@@ -22,7 +22,6 @@ use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -42,9 +41,6 @@ use ValueError;
 #[UsesClass(AbstractBackupUtility::class)]
 class BackupExportTest extends TestCase
 {
-    /**
-     * @var \DatabaseBackup\Utility\BackupExport
-     */
     protected BackupExport $BackupExport;
 
     /**
@@ -61,7 +57,6 @@ class BackupExportTest extends TestCase
     /**
      * @inheritDoc
      */
-    #[Override]
     protected function setUp(): void
     {
         $this->BackupExport = new BackupExport();
@@ -155,7 +150,7 @@ class BackupExportTest extends TestCase
     #[WithoutErrorHandler]
     public function testRotate(): void
     {
-        $this->deprecated(fn () => $this->BackupExport->rotate(10));
+        $this->deprecated(fn() => $this->BackupExport->rotate(10));
 
         $this->assertSame(10, $this->BackupExport->getRotate());
     }

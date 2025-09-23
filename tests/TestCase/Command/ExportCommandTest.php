@@ -98,7 +98,7 @@ class ExportCommandTest extends TestCase
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
         $ExportCommand->run(
             argv: [],
-            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput())
+            io: new ConsoleIo(new StubConsoleOutput(), new StubConsoleOutput()),
         );
     }
 }

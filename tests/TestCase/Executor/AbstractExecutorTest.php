@@ -21,7 +21,6 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\AbstractExecutor;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -38,9 +37,6 @@ class AbstractExecutorTest extends TestCase
      */
     protected ConnectionInterface $Connection;
 
-    /**
-     * @var \DatabaseBackup\Executor\AbstractExecutor
-     */
     protected AbstractExecutor $Executor;
 
     /**
@@ -48,7 +44,6 @@ class AbstractExecutorTest extends TestCase
      *
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    #[Override]
     protected function setUp(): void
     {
         $this->Connection = $this->createMock(ConnectionInterface::class);
@@ -75,7 +70,7 @@ class AbstractExecutorTest extends TestCase
             ->method($expectedNewMethod)
             ->with($this->equalTo('filename.sql'));
 
-        $this->deprecated(fn () => $Executor->{$oldMethod}('filename.sql'));
+        $this->deprecated(fn() => $Executor->{$oldMethod}('filename.sql'));
     }
 
     #[Test]
@@ -117,7 +112,7 @@ class AbstractExecutorTest extends TestCase
         $Executor
             ->expects($this->any())
             ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
+            ->willReturnCallback(fn(string $key): string => 'my-' . $key);
 
         $result = $Executor->getExportCommand($filename);
 
@@ -148,7 +143,7 @@ class AbstractExecutorTest extends TestCase
         $Executor
             ->expects($this->any())
             ->method('getConfig')
-            ->willReturnCallback(fn (string $key): string => 'my-' . $key);
+            ->willReturnCallback(fn(string $key): string => 'my-' . $key);
 
         $result = $Executor->getImportCommand($filename);
 

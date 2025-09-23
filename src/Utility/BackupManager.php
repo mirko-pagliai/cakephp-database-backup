@@ -41,7 +41,7 @@ class BackupManager
     {
         deprecationWarning(
             '2.15.0',
-            '`BackupManager::index()` has been deprecated and will be removed in a future release'
+            '`BackupManager::index()` has been deprecated and will be removed in a future release',
         );
 
         $Finder = new Finder();
@@ -49,12 +49,12 @@ class BackupManager
             ->in(Configure::readOrFail('DatabaseBackup.target'))
             ->name('/\.sql(\.(gz|bz2))?$/')
             //Sorts in descending order by the last modified date
-            ->sort(fn (SplFileInfo $a, SplFileInfo $b): int => $b->getMTime() - $a->getMTime());
+            ->sort(fn(SplFileInfo $a, SplFileInfo $b): int => $b->getMTime() - $a->getMTime());
 
         $DateTimeZone = DateTime::now()->getTimezone();
 
         return (new Collection($Finder))
-            ->map(fn (SplFileInfo $File): array => [
+            ->map(fn(SplFileInfo $File): array => [
                 'basename' => $File->getBasename(),
                 'path' => $File->getPathname(),
                 'compression' => Compression::fromFilename($File->getFilename()),
@@ -78,7 +78,7 @@ class BackupManager
     {
         deprecationWarning(
             '2.15.0',
-            '`BackupManager::rotate()` has been deprecated and will be removed in a future release'
+            '`BackupManager::rotate()` has been deprecated and will be removed in a future release',
         );
 
         if ($keep < 1) {
@@ -87,7 +87,7 @@ class BackupManager
 
         return self::index()
             ->skip($keep)
-            ->each(fn (array $file) => unlink($file['path']))
+            ->each(fn(array $file) => unlink($file['path']))
             ->toList();
     }
 }

@@ -89,14 +89,10 @@ class BackupExport extends AbstractBackupUtility
 
         $filename = $this->makeAbsolutePath($filename);
         if (!is_writable(dirname($filename))) {
-            throw new IOException(
-                __d('database_backup', 'File or directory `{0}` is not writable', dirname($filename))
-            );
+            throw new IOException(__d('database_backup', 'File or directory `{0}` is not writable', dirname($filename)));
         }
         if (file_exists($filename)) {
-            throw new IOException(
-                __d('database_backup', 'File `{0}` already exists', $filename)
-            );
+            throw new IOException(__d('database_backup', 'File `{0}` already exists', $filename));
         }
 
         //Sets the compression
@@ -118,7 +114,7 @@ class BackupExport extends AbstractBackupUtility
     {
         deprecationWarning(
             '2.15.0',
-            '`BackupExport::rotate()` has been deprecated and will be removed in a future release.'
+            '`BackupExport::rotate()` has been deprecated and will be removed in a future release.',
         );
 
         $this->rotate = $keep;
@@ -160,7 +156,7 @@ class BackupExport extends AbstractBackupUtility
         $Process = $this->getProcess($Executor->getExportCommand($filename));
         if (!$Process->isSuccessful()) {
             throw new RuntimeException(
-                __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput()))
+                __d('database_backup', 'Export failed with error message: `{0}`', rtrim($Process->getErrorOutput())),
             );
         }
 

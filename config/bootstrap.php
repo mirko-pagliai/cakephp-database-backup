@@ -45,7 +45,7 @@ foreach (array_keys(DATABASE_BACKUP_EXECUTABLES) as $driverKey) {
         deprecationWarning('2.14.2', sprintf(
             'The configuration name `%s` is deprecated and will be removed in a future release. Please use `%s` instead.',
             $name,
-            $expectedName
+            $expectedName,
         ));
     }
 }
@@ -53,13 +53,13 @@ foreach (array_keys(DATABASE_BACKUP_EXECUTABLES) as $driverKey) {
 if (Configure::check('DatabaseBackup.chmod')) {
     deprecationWarning('2.15.0', sprintf(
         'The configuration name `%s` is deprecated and will be removed in a future release.',
-        'DatabaseBackup.chmod'
+        'DatabaseBackup.chmod',
     ));
 }
 if (Configure::check('DatabaseBackup.connection')) {
     deprecationWarning('2.14.2', sprintf(
         'The configuration name `%s` is deprecated and will be removed in a future release. If you need to use a connection other than `default`, use the `$Connection` argument to the `BackupExport`/`BackupImport` constructor when instantiating these classes.',
-        'DatabaseBackup.connection'
+        'DatabaseBackup.connection',
     ));
 }
 
@@ -74,7 +74,7 @@ $defaults = [
     'DatabaseBackup.Sqlite.export' => '{{BINARY}} {{DB_NAME}} .dump',
     'DatabaseBackup.Sqlite.import' => '{{BINARY}} {{DB_NAME}}',
 ];
-Configure::write(array_filter($defaults, fn (string $key): bool => !Configure::check($key), ARRAY_FILTER_USE_KEY));
+Configure::write(array_filter($defaults, fn(string $key): bool => !Configure::check($key), ARRAY_FILTER_USE_KEY));
 
 /**
  * It automatically discovers executables not already set by the user in the configuration.

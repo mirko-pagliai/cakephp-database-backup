@@ -92,8 +92,9 @@ jobs:
         - name: Submit code coverage
           if: matrix.php-version == '8.3'
           uses: codecov/codecov-action@v5
-          env:
-            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            slug: mirko-pagliai/cakephp-database-backup
 
   cs-stan:
     name: Coding Standard & Static Analysis

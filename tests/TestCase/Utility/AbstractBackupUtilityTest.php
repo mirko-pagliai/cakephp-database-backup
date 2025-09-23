@@ -30,7 +30,6 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use Generator;
 use InvalidArgumentException;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -60,7 +59,6 @@ class AbstractBackupUtilityTest extends TestCase
             ->getMock();
     }
 
-    #[Override]
     protected function setUp(): void
     {
         $this->Utility = $this->getBackupExportMock();
