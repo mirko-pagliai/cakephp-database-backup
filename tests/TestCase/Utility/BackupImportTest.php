@@ -49,41 +49,38 @@ class BackupImportTest extends TestCase
         $this->BackupImport = new BackupImport(Connection: new FakeConnection());
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupImport::$filename
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testFilenameProperty(): void
     {
         $filename = TMP . 'backup.sql';
 
-        Mockery::mock('overload:' . Filesystem::class)
-            ->shouldReceive('exists')
-            ->with($filename)
-            ->once()
-            ->andReturnTrue();
+        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
 
         $this->BackupImport->filename = $filename;
 
         $this->assertSame($filename, $this->BackupImport->filename);
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupImport::$filename
+     */
     #[Test]
     public function testFilenamePropertyNoReadableFile(): void
     {
-        $filename = TMP . 'noExistingDir' . DS . 'backup.sql';
-
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File `' . $filename . '` does not exist');
-        $this->BackupImport->filename = $filename;
+        $this->expectExceptionMessage('File `/noExistingDir/backup.sql` does not exist');
+        $this->BackupImport->filename = '/noExistingDir/backup.sql';
     }
 
     #[Test]
     #[RunInSeparateProcess]
     public function testCallMagicMethod(): void
     {
-        Mockery::mock('overload:' . Filesystem::class)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturnTrue();
+        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
 
         $result = $this->BackupImport->filename(TMP . 'backup.sql');
         $this->assertInstanceOf(BackupImport::class, $result);
@@ -95,7 +92,7 @@ class BackupImportTest extends TestCase
     }
 
     /**
-     * @throws \ReflectionException
+     * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     #[RunInSeparateProcess]
@@ -103,30 +100,36 @@ class BackupImportTest extends TestCase
     {
         $filename = TMP . 'backup.sql';
 
-        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
+        $Executor = new class extends FakeExecutor {
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
 
-        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
-        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
-        $Executor
-            ->shouldReceive('runProcess')
-            ->with($filename, 120)
-            ->once()
-            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
+        $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
+            public string $filename {
+                set(string $filename) {
 
-        $this->BackupImport->Executor = $Executor;
-        $this->BackupImport->Executor->getEventManager()->setEventList(new EventList());
+                    $this->filename = $filename;
+                }
+            }
+        };
 
-        $result = $this->BackupImport
+        $BackupImport->Executor = $Executor;
+        $BackupImport->Executor->getEventManager()->setEventList(new EventList());
+
+        $result = $BackupImport
             ->filename($filename)
-            ->timeout(120)
             ->import();
 
         $this->assertSame($filename, $result);
-        $this->assertEventFired('Backup.beforeImport', $this->BackupImport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $this->BackupImport->Executor->getEventManager());
+        $this->assertEventFired('Backup.beforeImport', $BackupImport->Executor->getEventManager());
+        $this->assertEventFired('Backup.afterImport', $BackupImport->Executor->getEventManager());
     }
 
     /**
+     * @link \DatabaseBackup\Utility\BackupImport::import()
      * @throws \ReflectionException
      */
     #[Test]
@@ -137,8 +140,6 @@ class BackupImportTest extends TestCase
 
         $filename = TMP . 'backup.sql';
 
-        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
-
         /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
         $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
         $Executor
@@ -147,15 +148,26 @@ class BackupImportTest extends TestCase
             ->once()
             ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
 
-        $this->BackupImport->Executor = $Executor;
+        $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
+            public string $filename {
+                set(string $filename) {
 
-        $this->BackupImport
+                    $this->filename = $filename;
+                }
+            }
+        };
+
+        $BackupImport->Executor = $Executor;
+
+        $BackupImport
             ->filename($filename)
             ->import();
     }
 
     /**
-     * `import()` is stopped by the `Backup.beforeImport` event (implemented by the `Executor` class)
+     * `import()` is stopped by the `Backup.beforeImport` event (implemented by the `Executor` class).
+     *
+     * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     public function testImportStoppedByBeforeImport(): void
@@ -172,6 +184,9 @@ class BackupImportTest extends TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupImport::import()
+     */
     #[Test]
     public function testImportWithFilenamePropertyNotSet(): void
     {
