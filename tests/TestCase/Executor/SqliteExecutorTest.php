@@ -44,15 +44,22 @@ class SqliteExecutorTest extends TestCase
         $this->SqliteExecutor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\SqliteExecutor::getBinaryName()
+     */
     #[Test]
     #[TestWith(['sqlite3', OperationType::Export])]
     #[TestWith(['sqlite3', OperationType::Import])]
-    public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
+    public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
         $SqliteExecutor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
-        $this->assertSame($expectedBinarName, $SqliteExecutor->getBinaryName());
+
+        $this->assertSame($expectedBinaryName, $SqliteExecutor->getBinaryName());
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\SqliteExecutor::getAllTableSchemas()
+     */
     #[Test]
     public function testGetAllTableSchemas(): void
     {
@@ -63,6 +70,9 @@ class SqliteExecutorTest extends TestCase
         $this->assertSame('comments', $result[1]->name());
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\SqliteExecutor::dropAllTables()
+     */
     #[Test]
     public function testDropAllTables(): void
     {
@@ -75,6 +85,9 @@ class SqliteExecutorTest extends TestCase
         $SqliteExecutor->dropAllTables();
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\SqliteExecutor::beforeImport()
+     */
     #[Test]
     public function testBeforeImport(): void
     {

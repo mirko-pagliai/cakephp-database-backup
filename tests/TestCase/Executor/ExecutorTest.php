@@ -37,23 +37,32 @@ use Symfony\Component\Process\Process;
 #[CoversClass(Executor::class)]
 class ExecutorTest extends TestCase
 {
+    /**
+     * @link \DatabaseBackup\Executor\Executor::implementedEvents()
+     */
     #[Test]
     public function testImplementedEvents(): void
     {
+        $expected = [
+            'Backup.afterExport' => 'afterExport',
+            'Backup.afterImport' => 'afterImport',
+            'Backup.beforeExport' => 'beforeExport',
+            'Backup.beforeImport' => 'beforeImport',
+        ];
         $result = new FakeExecutor()->implementedEvents();
 
-        $this->assertContains('beforeExport', $result);
-        $this->assertContains('afterExport', $result);
-        $this->assertContains('beforeImport', $result);
-        $this->assertContains('afterImport', $result);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\Executor::findBinary()
+     */
     #[Test]
     #[TestWith(['/usr/bin/mariadb', 'mariadb'])]
     #[TestWith(['/usr/bin/mysql', 'mysql'])]
     #[TestWith(['/usr/bin/gzip', Compression::Gzip])]
     #[RunInSeparateProcess]
-    public function testFindBinary(string $expectedBinary, string|Compression $name): void
+    public function testFindBinary(string $expectedBinary, Compression|string $name): void
     {
         Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder')
             ->shouldReceive('find')
@@ -65,11 +74,14 @@ class ExecutorTest extends TestCase
         $this->assertSame($expectedBinary, $result);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\Executor::findBinary()
+     */
     #[Test]
     #[TestWith(['/customPath/mariadb', 'mariadb'])]
     #[TestWith(['/customPath/mysql', 'mysql'])]
     #[TestWith(['/customPath/gzip', Compression::Gzip])]
-    public function testFindBinaryFromConfiguration(string $expectedBinary, string|Compression $binaryName): void
+    public function testFindBinaryFromConfiguration(string $expectedBinary, Compression|string $binaryName): void
     {
         $binaryName = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
         Configure::write(config: 'DatabaseBackup.binaries.' . $binaryName, value: '/customPath/' . $binaryName);
@@ -80,17 +92,22 @@ class ExecutorTest extends TestCase
         $this->assertSame($expectedBinary, $result);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\Executor::findBinary()
+     */
     #[Test]
     public function testFindBinaryWithNoExistingBinary(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Binary for `noExisting` not found. Set path manually: `%s`',
-            'Configure::write(\'DatabaseBackup.binaries.noExisting\', \'/path/to/noExisting\')'
-        ));
+        $this->expectExceptionMessage(
+            'Binary for `noExisting` not found. Set path manually: `Configure::write(\'DatabaseBackup.binaries.noExisting\', \'/path/to/noExisting\')`',
+        );
         new FakeExecutor()->findBinary('noExisting');
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\Executor::findBinary()
+     */
     #[Test]
     public function testFindBinaryWithCompressionNone(): void
     {
@@ -99,6 +116,9 @@ class ExecutorTest extends TestCase
         new FakeExecutor()->findBinary(Compression::None);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\Executor::getCommand()
+     */
     #[Test]
     #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export, Compression::None])]
     #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', OperationType::Export, Compression::Gzip])]
@@ -113,6 +133,9 @@ class ExecutorTest extends TestCase
         $this->assertSame($expectedCommand, $result);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\Executor::runProcess()
+     */
     #[Test]
     #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', 'filename.sql', OperationType::Export])]
     #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', 'filename.sql.gz', OperationType::Export])]
@@ -202,6 +225,9 @@ class ExecutorTest extends TestCase
         $this->assertSame($Process, $result);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\Executor::runProcess()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testRunProcessOnFailure(): void

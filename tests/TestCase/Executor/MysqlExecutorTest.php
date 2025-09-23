@@ -44,15 +44,21 @@ class MysqlExecutorTest extends TestCase
         $this->MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::getBinaryName()
+     */
     #[Test]
     #[TestWith(['mariadb-dump', OperationType::Export])]
     #[TestWith(['mariadb', OperationType::Import])]
-    public function testGetBinaryName(string $expectedBinarName, OperationType $OperationType): void
+    public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
         $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
-        $this->assertSame($expectedBinarName, $MysqlExecutor->getBinaryName());
+        $this->assertSame($expectedBinaryName, $MysqlExecutor->getBinaryName());
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::afterExport()
+     */
     #[Test]
     public function testAfterExport(): void
     {
@@ -66,6 +72,9 @@ class MysqlExecutorTest extends TestCase
             ->once();
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::afterImport()
+     */
     #[Test]
     public function testAfterImport(): void
     {
@@ -79,6 +88,9 @@ class MysqlExecutorTest extends TestCase
             ->once();
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::beforeExport()
+     */
     #[Test]
     public function testBeforeExport(): void
     {
@@ -95,6 +107,9 @@ class MysqlExecutorTest extends TestCase
             ->once();
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::beforeImport()
+     */
     #[Test]
     public function testBeforeImport(): void
     {
@@ -111,6 +126,9 @@ class MysqlExecutorTest extends TestCase
             ->once();
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testWriteAuthFile(): void
@@ -142,6 +160,9 @@ class MysqlExecutorTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::deleteAuthFile()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testDeleteAuthFile(): void
