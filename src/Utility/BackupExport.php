@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Utility;
 
 use Cake\Core\Configure;
+use Cake\I18n\DateTime;
 use DatabaseBackup\Compression;
 use Override;
 use RuntimeException;
@@ -82,7 +83,7 @@ class BackupExport extends AbstractBackupUtility
         //Replaces patterns
         $filename = str_replace(['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'], [
             pathinfo($Executor->getConfig('database'), PATHINFO_FILENAME),
-            date('YmdHis'),
+            DateTime::now()->format('YmdHis'),
             str_replace(['127.0.0.1', '::1'], 'localhost', $Executor->getConfig('host') ?? 'localhost'),
             (string)time(),
         ], $filename);
