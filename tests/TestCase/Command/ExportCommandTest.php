@@ -76,6 +76,9 @@ txt;
         $this->assertOutputContains($expected);
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecute(): void
@@ -95,6 +98,9 @@ txt;
         $this->assertOutputContains('<success>Backup `' . $expectedFilename . '` has been exported</success>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
@@ -115,6 +121,9 @@ txt;
         $this->assertOutputContains('<success>Backup `' . $filename . '` has been exported</success>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteWithCompressionOption(): void
@@ -132,6 +141,9 @@ txt;
         $this->assertOutputContains('<success>Backup `my_backup.sql.gz` has been exported</success>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteOnException(): void
@@ -146,6 +158,9 @@ txt;
         $this->assertErrorContains('<error>Exception message</error>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteOnStoppedEvent(): void
