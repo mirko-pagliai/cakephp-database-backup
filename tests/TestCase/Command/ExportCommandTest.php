@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
-use Cake\Console\TestSuite\StubConsoleOutput;
 use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
@@ -36,6 +35,9 @@ class ExportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::buildOptionParser()
+     */
     #[Test]
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
@@ -134,8 +136,10 @@ txt;
     #[RunInSeparateProcess]
     public function testExecuteOnException(): void
     {
-        $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('export')->once()->andThrow(new Exception('Exception message'));
+        Mockery::mock('overload:' . BackupExport::class)
+            ->shouldReceive('export')
+            ->once()
+            ->andThrow(new Exception('Exception message'));
 
         $this->exec('database_backup.export');
         $this->assertExitError();
@@ -146,11 +150,12 @@ txt;
     #[RunInSeparateProcess]
     public function testExecuteOnStoppedEvent(): void
     {
-        $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('export')->once()->andReturnFalse();
+        Mockery::mock('overload:' . BackupExport::class)
+            ->shouldReceive('export')
+            ->once()
+            ->andReturnFalse();
 
         $this->exec('database_backup.export');
-
         $this->assertExitError();
         $this->assertErrorContains('<error>The `Backup.beforeExport` event stopped the operation</error>');
     }
