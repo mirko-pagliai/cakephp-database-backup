@@ -159,6 +159,9 @@ class BackupExportTest extends TestCase
         $this->BackupExport->filename = TMP . 'backup.txt';
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::__call()
+     */
     #[Test]
     public function testCallMagicMethod(): void
     {
@@ -209,12 +212,12 @@ class BackupExportTest extends TestCase
         Configure::write('DatabaseBackup.processTimeout', 45);
 
         /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
-        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
-        $Executor
+        $Executor = Mockery::mock(FakeExecutor::class . '[runProcess]')
             ->shouldReceive('runProcess')
             ->with(TMP . 'backup.sql', 45)
             ->once()
-            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
+            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor())
+            ->getMock();
 
         $this->BackupExport->Executor = $Executor;
 
