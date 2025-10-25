@@ -196,9 +196,11 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExport(): void
     {
-        $result = $this->BackupExport->export();
+        $result = $this->BackupExport->export() ?: '';
 
-        $this->assertStringStartsWith(Configure::read('DatabaseBackup.target'), $result);
+        /** @var non-empty-string $targetDir */
+        $targetDir = Configure::read('DatabaseBackup.target');
+        $this->assertStringStartsWith($targetDir, $result);
         $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql$/', $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
@@ -214,9 +216,11 @@ class BackupExportTest extends TestCase
     {
         $result = $this->BackupExport
             ->compression(Compression::Bzip2)
-            ->export();
+            ->export() ?: '';
 
-        $this->assertStringStartsWith(Configure::read('DatabaseBackup.target'), $result);
+        /** @var non-empty-string $targetDir */
+        $targetDir = Configure::read('DatabaseBackup.target');
+        $this->assertStringStartsWith($targetDir, $result);
         $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql\.bz2$/', $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
