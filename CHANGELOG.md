@@ -1,5 +1,8 @@
 # 3.x branch
 ## 3.0 branch
+### 3.0.1
+* Fixed a serious bug in the `BackupExport::compression()` method, which did not correctly reset the filename to use. Extended testing.
+
 ### 3.0.0
 * `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for significant code optimization.  
   Thanks to the magic `__call()` method provided by `Utility`, they still support the use of already known methods (`filename()`, `compression()`, `timeout()`) to set properties;
