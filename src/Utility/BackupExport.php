@@ -106,7 +106,7 @@ class BackupExport extends Utility
     public function export(): string|false
     {
         if (empty($this->filename)) {
-            $this->filename = 'backup_{$DATABASE}_{$DATETIME}.sql';
+            $this->filename = 'backup_{$DATABASE}_{$DATETIME}.' . $this->compression->value;
         }
 
         //Dispatches the `Backup.beforeExport` event implemented by the `Executor` class

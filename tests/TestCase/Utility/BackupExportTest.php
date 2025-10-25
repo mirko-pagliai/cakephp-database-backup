@@ -59,6 +59,7 @@ class BackupExportTest extends TestCase
     #[Test]
     #[TestWith([Compression::None, Compression::None])]
     #[TestWith([Compression::Gzip, Compression::Gzip])]
+    #[TestWith([Compression::Bzip2, Compression::Bzip2])]
     #[TestWith([Compression::Gzip, 'Gzip'])]
     #[TestWith([Compression::Gzip, 'gzip'])]
     #[TestWith([Compression::None, null])]
@@ -192,12 +193,57 @@ class BackupExportTest extends TestCase
         };
         $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
 
+        $result = $this->BackupExport->export();
+
+        $this->assertStringStartsWith(Configure::read('DatabaseBackup.target'), $result);
+        $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql$/', $result);
+        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+    }
+
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::export()
+     */
+    #[Test]
+    public function testExportWithCompression(): void
+    {
+        $this->BackupExport->Executor = new class extends FakeExecutor {
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
+        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
+
         $result = $this->BackupExport
-            ->filename(TMP . 'backup.sql')
-            ->timeout(120)
+            ->compression(Compression::Bzip2)
             ->export();
 
-        $this->assertSame(TMP . 'backup.sql', $result);
+        $this->assertStringStartsWith(Configure::read('DatabaseBackup.target'), $result);
+        $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql\.bz2$/', $result);
+        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
+        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+    }
+
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::export()
+     */
+    #[Test]
+    public function testExportWithFilename(): void
+    {
+        $this->BackupExport->Executor = new class extends FakeExecutor {
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
+        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
+
+        $result = $this->BackupExport
+            ->filename(TMP . 'backup.sql.gz')
+            ->export();
+
+        $this->assertSame(TMP . 'backup.sql.gz', $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
     }
