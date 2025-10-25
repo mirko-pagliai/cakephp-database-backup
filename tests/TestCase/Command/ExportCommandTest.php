@@ -86,11 +86,20 @@ txt;
         $expectedFilename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('')->once();
-        $BackupExport->shouldNotReceive('timeout');
-        $BackupExport->shouldNotReceive('filename');
-        $BackupExport->shouldNotReceive('compression');
-        $BackupExport->shouldReceive('export')->once()->andReturn($expectedFilename);
+        $BackupExport
+            ->shouldReceive('__construct')
+            ->once()
+            ->with('');
+        $BackupExport
+            ->shouldNotReceive('timeout');
+        $BackupExport
+            ->shouldNotReceive('filename');
+        $BackupExport
+            ->shouldNotReceive('compression');
+        $BackupExport
+            ->shouldReceive('export')
+            ->once()
+            ->andReturn($expectedFilename);
 
         $this->exec('database_backup.export');
 
@@ -108,12 +117,25 @@ txt;
         $filename = 'custom_filename.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('custom_connection')->once();
-        $BackupExport->shouldReceive('timeout')->with(120)->once();
-        $BackupExport->shouldReceive('filename')->with($filename)->once();
+        $BackupExport
+            ->shouldReceive('__construct')
+            ->once()
+            ->with('custom_connection');
+        $BackupExport
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(120);
+        $BackupExport
+            ->shouldReceive('filename')
+            ->once()
+            ->with($filename);
         //Note that in this case the `--compression` option was passed, but is ignored
-        $BackupExport->shouldNotReceive('compression');
-        $BackupExport->shouldReceive('export')->once()->andReturn($filename);
+        $BackupExport
+            ->shouldNotReceive('compression');
+        $BackupExport
+            ->shouldReceive('export')
+            ->once()
+            ->andReturn($filename);
 
         $this->exec('database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename ' . $filename);
 
@@ -129,11 +151,22 @@ txt;
     public function testExecuteWithCompressionOption(): void
     {
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('')->once();
-        $BackupExport->shouldNotReceive('timeout');
-        $BackupExport->shouldNotReceive('filename');
-        $BackupExport->shouldReceive('compression')->with('gzip')->once();
-        $BackupExport->shouldReceive('export')->once()->andReturn('my_backup.sql.gz');
+        $BackupExport
+            ->shouldReceive('__construct')
+            ->once()
+            ->with('');
+        $BackupExport
+            ->shouldNotReceive('timeout');
+        $BackupExport
+            ->shouldNotReceive('filename');
+        $BackupExport
+            ->shouldReceive('compression')
+            ->once()
+            ->with('gzip');
+        $BackupExport
+            ->shouldReceive('export')
+            ->once()
+            ->andReturn('my_backup.sql.gz');
 
         $this->exec('database_backup.export --compression gzip');
 
