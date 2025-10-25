@@ -36,7 +36,7 @@ use Symfony\Component\Process\Process;
 use ValueError;
 
 /**
- * BackupExportTest
+ * BackupExportTest.
  */
 #[CoversClass(BackupExport::class)]
 class BackupExportTest extends TestCase
@@ -51,6 +51,15 @@ class BackupExportTest extends TestCase
         parent::setUp();
 
         $this->BackupExport = new BackupExport(Connection: new FakeConnection());
+
+        $this->BackupExport->Executor = new class extends FakeExecutor {
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
+
+        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
     }
 
     /**
@@ -180,19 +189,13 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests for the `export()` method, without calls to the `filename()` and `compression()` methods.
+     *
      * @link \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExport(): void
     {
-        $this->BackupExport->Executor = new class extends FakeExecutor {
-            public function runProcess(string $filename, int $timeout = 60): Process
-            {
-                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
-            }
-        };
-        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
-
         $result = $this->BackupExport->export();
 
         $this->assertStringStartsWith(Configure::read('DatabaseBackup.target'), $result);
@@ -202,19 +205,13 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests for the `export()` method, with a call to the `compression()` method.
+     *
      * @link \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExportWithCompression(): void
     {
-        $this->BackupExport->Executor = new class extends FakeExecutor {
-            public function runProcess(string $filename, int $timeout = 60): Process
-            {
-                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
-            }
-        };
-        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
-
         $result = $this->BackupExport
             ->compression(Compression::Bzip2)
             ->export();
@@ -226,19 +223,13 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests for the `export()` method, with a call to the `filename()` method.
+     *
      * @link \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
     public function testExportWithFilename(): void
     {
-        $this->BackupExport->Executor = new class extends FakeExecutor {
-            public function runProcess(string $filename, int $timeout = 60): Process
-            {
-                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
-            }
-        };
-        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
-
         $result = $this->BackupExport
             ->filename(TMP . 'backup.sql.gz')
             ->export();
@@ -273,6 +264,7 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests for the `export()` method.
      * `export()` is stopped by the `Backup.beforeExport` event (implemented by the `Executor` class).
      *
      * @link \DatabaseBackup\Utility\BackupExport::export()
