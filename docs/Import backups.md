@@ -120,6 +120,8 @@ class ImportBackupCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io): int
     {
+        $hasError = false;
+
         /** @var string $target */
         $target = Configure::readOrFail('DatabaseBackup.target');
 
@@ -135,7 +137,9 @@ class ImportBackupCommand extends Command
             $cFinder = (clone $Finder)->name('/^backup_' . $databaseName . '_\d{14}\.sql(\.bz2|\.gz)?$/');
 
             if (!$cFinder->hasResults()) {
-                $io->abort('No backup files found in `' . $target . '`');
+                $hasError = true;
+                $io->error('No backup files for the `' . $Connection->configName() .'` connection found in `' . $target . '`');
+                continue;
             }
 
             /**
@@ -152,10 +156,16 @@ class ImportBackupCommand extends Command
                 ->filename($File->getRealPath());
             $result = $BackupImport->import();
             if (!$result) {
-                $io->abort('Backup file `' . $File->getRealPath() . '` could not be imported');
+                $hasError = true;
+                $io->error('Backup file `' . $File->getRealPath() . '` could not be imported');
+                continue;
             }
 
             $io->success('Backup file `' . $result . '` imported successfully');
+        }
+
+        if ($hasError) {
+            return static::CODE_ERROR;
         }
 
         return static::CODE_SUCCESS;
@@ -168,4 +178,5 @@ There are some significant differences from the previous example:
 1. a generic `Finder` instance is created, without calling the `name()` method;
 2. a `foreach` loop is executed with the names of the two connections;
 3. within the single loop, the `Finder` instance is cloned and the `name()` method is executed;
-4. the backup file for that connection is imported, taking care to instantiate `BackupImport` by passing the `$Connection` parameter (otherwise it would only use the default one).
+4. the backup file for that connection is imported, taking care to instantiate `BackupImport` by passing the `$Connection` parameter (otherwise it would only use the default one);
+5. overall, in case of an error, the `ConsoleIo::error()` method is called (rather than `abort()`), the `$hasError` variable is set and the current loop is interrupted (with `continue`) to skip to the next one. This ensures that the command is not interrupted at the first error (for example, if one of the two backup files is missing or cannot be imported).
