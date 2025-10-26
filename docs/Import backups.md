@@ -3,7 +3,7 @@
 > [!WARNING]  
 > Please note: These backup import commands are for illustrative purposes only.  
 > You shouldn't normally use them in a production environment; in fact, they shouldn't be present.  
-> This means that if you're testing them in a development environment, you should add them to your `.gitignore`; or you could use an environment variable and make the command exit if it's not the development environment.
+> This means that if you're testing them in a development environment, you should add them to your `.gitignore`; or [you could use an environment variable](https://book.cakephp.org/5/en/development/configuration.html#environment-variables) and make the command exit if it's not the development environment.
 
 ## Import the latest backup file
 
