@@ -78,3 +78,94 @@ class ImportBackupCommand extends Command
     }
 }
 ```
+
+## Import the latest backup file for multiple connections (databases)
+
+Let's now move on to a more complex case.
+
+Real-world example: my application uses two different connections (and therefore two different databases), `default` and `logs` (the latter containing tables and log data).  
+Using cron jobs, the databases are exported programmatically according to different criteria: for example, the `default` database is exported several times a day, while the `log` database is exported only once a day or a few times a week.
+
+When working in the development environment, I would like to be able to import the latest backup file of both databases, for example these:
+
+```
+backups/backup_myapp_20251026100000.sql.gz
+backups/backup_myapp_logs_20251026000002.sql.gz
+```
+
+I then need to adapt the previous command to search for two different backup files (corresponding to two different connections) and then import both of them (again on two different connections):
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Command;
+
+use Cake\Command\Command;
+use Cake\Console\Arguments;
+use Cake\Console\ConsoleIo;
+use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
+use DatabaseBackup\Utility\BackupImport;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+
+/**
+ * ImportBackupCommand.
+ */
+class ImportBackupCommand extends Command
+{
+    /**
+     * @inheritDoc
+     */
+    public function execute(Arguments $args, ConsoleIo $io): int
+    {
+        /** @var string $target */
+        $target = Configure::readOrFail('DatabaseBackup.target');
+
+        $Finder = new Finder()
+            ->files()
+            ->in($target)
+            ->sort(fn(SplFileInfo $a, SplFileInfo $b): int => strcmp($b->getRealPath(), $a->getRealPath()));
+
+        foreach (['default', 'logs'] as $connectionName) {
+            $Connection = ConnectionManager::get($connectionName);
+            $databaseName = $Connection->config()['database'];
+
+            $cFinder = (clone $Finder)->name('/^backup_' . $databaseName . '_\d{14}\.sql(\.bz2|\.gz)?$/');
+
+            if (!$cFinder->hasResults()) {
+                $io->abort('No backup files found in `' . $target . '`');
+            }
+
+            /**
+             * It only gets the first backup file.
+             *
+             * @var \Symfony\Component\Finder\SplFileInfo $File
+             */
+            $File = array_values(iterator_to_array($cFinder))[0];
+
+            /**
+             * Imports the backup file.
+             */
+            $BackupImport = new BackupImport($Connection)
+                ->filename($File->getRealPath());
+            $result = $BackupImport->import();
+            if (!$result) {
+                $io->abort('Backup file `' . $File->getRealPath() . '` could not be imported');
+            }
+
+            $io->success('Backup file `' . $result . '` imported successfully');
+        }
+
+        return static::CODE_SUCCESS;
+    }
+}
+```
+
+There are some significant differences from the previous example:
+
+1. a generic `Finder` instance is created, without calling the `name()` method;
+2. a `foreach` loop is executed with the names of the two connections;
+3. within the single loop, the `Finder` instance is cloned and the `name()` method is executed;
+4. the backup file for that connection is imported, taking care to instantiate `BackupImport` by passing the `$Connection` parameter (otherwise it would only use the default one).
