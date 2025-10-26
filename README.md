@@ -63,7 +63,7 @@ no longer guaranteed, especially regarding old dependencies that may no longer b
 
 ## Configuration and How to use
 
-See [our wiki](/docs).
+See [our documentation](/docs).
 
 Before opening an issue, check this list of [common issues](docs/Common%20issues.md).
 
