@@ -138,7 +138,7 @@ class ImportBackupCommand extends Command
 
             if (!$cFinder->hasResults()) {
                 $hasError = true;
-                $io->error('No backup files for the `' . $Connection->configName() .'` connection found in `' . $target . '`');
+                $io->error('No backup files for the `' . $Connection->configName() . '` connection found in `' . $target . '`');
                 continue;
             }
 
