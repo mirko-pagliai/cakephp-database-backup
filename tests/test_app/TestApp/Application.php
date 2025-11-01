@@ -18,7 +18,7 @@ namespace App;
 use Cake\Http\BaseApplication;
 use Cake\Http\MiddlewareQueue;
 use Cake\Routing\RouteBuilder;
-use DatabaseBackup\Plugin as DatabaseBackup;
+use DatabaseBackup\DatabaseBackupPlugin;
 
 /**
  * @extends \Cake\Http\BaseApplication<\App\Application>
@@ -27,7 +27,7 @@ class Application extends BaseApplication
 {
     public function bootstrap(): void
     {
-        $this->addPlugin(DatabaseBackup::class);
+        $this->addPlugin(DatabaseBackupPlugin::class);
     }
 
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue

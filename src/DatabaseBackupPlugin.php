@@ -18,8 +18,8 @@ namespace DatabaseBackup;
 use Cake\Core\BasePlugin;
 
 /**
- * Plugin class.
+ * DatabaseBackupPlugin class.
  */
-class Plugin extends BasePlugin
+class DatabaseBackupPlugin extends BasePlugin
 {
 }
