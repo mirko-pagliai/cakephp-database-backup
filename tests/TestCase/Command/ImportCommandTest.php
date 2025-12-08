@@ -39,11 +39,16 @@ class ImportCommandTest extends TestCase
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
-        $root = ROOT;
-        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
-
         $this->exec('database_backup.import -h');
         $this->assertExitSuccess();
+        $this->assertOutputContains('Imports a database backup');
+        $this->assertOutputContains('cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>');
+
+        //Requires at least CakePHP 5.2.10, otherwise the `--quiet` option has a slightly different description
+        $this->skipUnless(version_compare(Configure::version(), '5.2.10', '>='));
+
+        $root = ROOT;
+        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
 
         $expected = <<<txt
 Imports a database backup
