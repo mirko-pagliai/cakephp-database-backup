@@ -56,7 +56,7 @@ cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>
 --connection      Name of the alternative connection to use, for example
                   if you are not using the default connection
 --help, -h        Display this help.
---quiet, -q       Enable quiet output.
+--quiet, -q       Enable quiet output and non-interactive mode.
 --timeout, -t     Timeout for shell commands
 --verbose, -v     Enable verbose output.
 

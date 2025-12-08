@@ -68,7 +68,7 @@ cake database_backup.export [options]
                    <comment>$defaultTarget</comment>
                    (default target directory).
 --help, -h         Display this help.
---quiet, -q        Enable quiet output.
+--quiet, -q        Enable quiet output and non-interactive mode.
 --timeout, -t      Timeout for shell commands
 --verbose, -v      Enable verbose output.
 
