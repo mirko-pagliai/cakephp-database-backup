@@ -44,6 +44,7 @@ class ImportBackupCommand extends Command
         /** @var string $target */
         $target = Configure::readOrFail('DatabaseBackup.target');
 
+        /** @var string $databaseName */
         $databaseName = ConnectionManager::get('default')->config()['database'];
 
         $Finder = new Finder()
@@ -132,6 +133,8 @@ class ImportBackupCommand extends Command
 
         foreach (['default', 'logs'] as $connectionName) {
             $Connection = ConnectionManager::get($connectionName);
+
+            /** @var string $databaseName */
             $databaseName = $Connection->config()['database'];
 
             $cFinder = (clone $Finder)->name('/^backup_' . $databaseName . '_\d{14}\.sql(\.bz2|\.gz)?$/');
