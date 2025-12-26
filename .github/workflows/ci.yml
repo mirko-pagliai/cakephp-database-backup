@@ -14,21 +14,20 @@ jobs:
       matrix:
         php-version: ['8.3', '8.4']
         db-type: [sqlite, mysql, pgsql]
-        prefer-lowest: ['']
+        dependencies: ['highest']
         include:
           - php-version: '8.1'
             db-type: 'mysql'
+            dependencies: 'lowest'
           - php-version: '8.2'
             db-type: 'mysql'
-          - php-version: '8.1'
-            db-type: 'mysql'
-            prefer-lowest: 'prefer-lowest'
+            dependencies: 'lowest'
           - php-version: '8.3'
             db-type: 'mysql'
-            prefer-lowest: 'prefer-lowest'
+            dependencies: 'lowest'
           - php-version: '8.4'
             db-type: 'mysql'
-            prefer-lowest: 'prefer-lowest'
+            dependencies: 'lowest'
 
     steps:
         - name: Setup MySQL 8.0
@@ -62,12 +61,9 @@ jobs:
               ${{ runner.os }}-php-
 
         - name: Composer install
-          run: |
-            if ${{ matrix.prefer-lowest == 'prefer-lowest' }}; then
-              composer update --prefer-lowest --prefer-stable
-            else
-              composer update
-            fi
+          uses: ramsey/composer-install@v3
+          with:
+            dependency-versions: ${{ matrix.dependencies }}
 
         - name: Composer show
           run: composer show
@@ -82,19 +78,18 @@ jobs:
             if [[ ${{ matrix.db-type }} == 'mysql' ]]; then export db_dsn='mysql://root:root@127.0.0.1/test?encoding=utf8'; fi
             if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_dsn='postgres://postgres:postgres@127.0.0.1/test'; fi
 
-            if [[ ${{ matrix.php-version }} == '8.4' ]]; then
+            if [[ ${{ matrix.php-version }} == '8.4' && ${{ matrix.dependencies }} == 'highest' && ${{ matrix.db-type}} == 'sqlite' ]]; then
               export XDEBUG_MODE=coverage
-              vendor/bin/phpunit --coverage-clover=coverage.xml
+              vendor/bin/phpunit --display-skipped --display-deprecations --display-warnings --coverage-clover=coverage.xml
             else
-              vendor/bin/phpunit
+              vendor/bin/phpunit --display-deprecations --display-warnings
             fi
 
         - name: Submit code coverage
-          if: success() && matrix.php-version == '8.4' && matrix.db-type == 'sqlite'
+          if: success() && matrix.php-version == '8.4' &&matrix.dependencies == 'highest' && matrix.db-type == 'sqlite'
           uses: codecov/codecov-action@v5
           with:
             token: ${{ secrets.CODECOV_TOKEN }}
-            slug: mirko-pagliai/cakephp-database-backup
 
   cs-stan:
     name: Coding Standard & Static Analysis
@@ -167,4 +162,4 @@ jobs:
       env:
         db_dsn: 'mysql://root@localhost/test'
       run: |
-          vendor/bin/phpunit --group mysql
+          vendor/bin/phpunit --display-incomplete --group mysql
