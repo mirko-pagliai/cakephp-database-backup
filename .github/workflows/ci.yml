@@ -22,9 +22,17 @@ jobs:
           - php-version: '8.4'
             real-drivers: 'real-drivers'
             dependencies: 'highest'
+          - php-version: '8.5'
+            real-drivers: 'real-drivers'
+            dependencies: 'highest'
           - php-version: '8.4'
             dependencies: 'lowest'
+          - php-version: '8.5'
+            dependencies: 'lowest'
           - php-version: '8.4'
+            real-drivers: 'real-drivers'
+            dependencies: 'lowest'
+          - php-version: '8.5'
             real-drivers: 'real-drivers'
             dependencies: 'lowest'
 
@@ -75,11 +83,10 @@ jobs:
           db_dsn_mysqli: mysql://root:root@127.0.0.1/test?encoding=utf8
 
       - name: Code Coverage Report
-        if: success() && matrix.dependencies == 'highest'
+        if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: mirko-pagliai/cakephp-database-backup
 
   cs-stan:
     name: Coding Standard & Static Analysis
