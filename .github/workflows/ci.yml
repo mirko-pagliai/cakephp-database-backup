@@ -83,7 +83,7 @@ jobs:
           db_dsn_mysqli: mysql://root:root@127.0.0.1/test?encoding=utf8
 
       - name: Code Coverage Report
-        if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest'
+        if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest' && matrix.real-drivers == 'real-drivers'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
