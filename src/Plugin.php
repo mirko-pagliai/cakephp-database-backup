@@ -16,11 +16,11 @@ declare(strict_types=1);
 
 namespace DatabaseBackup;
 
-use Cake\Core\BasePlugin;
-
 /**
  * Plugin class.
+ *
+ * @deprecated 2.15.2 Use `DatabaseBackupPlugin` instead
  */
-class Plugin extends BasePlugin
+class Plugin extends DatabaseBackupPlugin
 {
 }

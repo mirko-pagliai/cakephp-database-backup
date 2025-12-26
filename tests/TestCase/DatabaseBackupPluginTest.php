@@ -6,18 +6,17 @@ namespace DatabaseBackup\Test\TestCase;
 use App\Application;
 use Cake\Console\CommandCollection;
 use Cake\TestSuite\TestCase;
-use DatabaseBackup\Plugin;
-use DatabaseBackup\Plugin as DatabaseBackup;
+use DatabaseBackup\DatabaseBackupPlugin;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * PluginTest.
+ * DatabaseBackupPluginTest.
  */
-#[CoversClass(Plugin::class)]
-class PluginTest extends TestCase
+#[CoversClass(DatabaseBackupPlugin::class)]
+class DatabaseBackupPluginTest extends TestCase
 {
     /**
      * Tests that the application console includes all expected commands.
@@ -40,7 +39,7 @@ class PluginTest extends TestCase
 
         $CommandCollection = new CommandCollection();
         $App = new Application(CONFIG);
-        $App->addPlugin(DatabaseBackup::class);
+        $App->addPlugin(DatabaseBackupPlugin::class);
         $App->pluginConsole($CommandCollection);
         $availableCommands = $CommandCollection->keys();
 
