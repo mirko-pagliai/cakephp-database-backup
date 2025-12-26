@@ -82,7 +82,7 @@ jobs:
             if [[ ${{ matrix.db-type }} == 'mysql' ]]; then export db_dsn='mysql://root:root@127.0.0.1/test?encoding=utf8'; fi
             if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export db_dsn='postgres://postgres:postgres@127.0.0.1/test'; fi
 
-            if [[ ${{ matrix.php-version }} == '8.3' ]]; then
+            if [[ ${{ matrix.php-version }} == '8.4' ]]; then
               export XDEBUG_MODE=coverage
               vendor/bin/phpunit --coverage-clover=coverage.xml
             else
@@ -90,7 +90,7 @@ jobs:
             fi
 
         - name: Submit code coverage
-          if: matrix.php-version == '8.3'
+          if: matrix.php-version == '8.4'
           uses: codecov/codecov-action@v5
           with:
             token: ${{ secrets.CODECOV_TOKEN }}
