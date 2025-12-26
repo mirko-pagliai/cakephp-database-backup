@@ -34,7 +34,7 @@ class BackupManager
     /**
      * Returns a list of database backups.
      *
-     * @return \Cake\Collection\CollectionInterface
+     * @return \Cake\Collection\CollectionInterface<int, array{basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
      * @deprecated `BackupManager::index()` has been deprecated and will be removed in a future release
      */
     public static function index(): CollectionInterface
