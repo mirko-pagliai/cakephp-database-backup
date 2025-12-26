@@ -90,7 +90,7 @@ jobs:
             fi
 
         - name: Submit code coverage
-          if: matrix.php-version == '8.4'
+          if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest' && matrix.db-type == 'sqlite'
           uses: codecov/codecov-action@v5
           with:
             token: ${{ secrets.CODECOV_TOKEN }}
