@@ -1,5 +1,9 @@
 # 3.x branch
 ## 3.0 branch
+### 3.0.2
+* full compatibility with PHP 8.5;
+* requires at least CakePHP 5.2.10, due to the `PDO::MYSQL_ATTR_USE_BUFFERED_QUERY` costant which has been deprecated. This also ensures full compatibility with PHP 8.5.
+
 ### 3.0.1
 * Fixed a serious bug in the `BackupExport::compression()` method, which did not correctly reset the filename to use. Extended testing.
 
