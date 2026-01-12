@@ -1,5 +1,8 @@
 # 3.x branch
 ## 3.0 branch
+### 3.0.3
+* ready for CakePHP 5.3.
+
 ### 3.0.2
 * full compatibility with PHP 8.5. CI actions have been optimized;
 * requires at least CakePHP 5.2.10, due to the `PDO::MYSQL_ATTR_USE_BUFFERED_QUERY` costant which has been deprecated. This also ensures full compatibility with PHP 8.5.
