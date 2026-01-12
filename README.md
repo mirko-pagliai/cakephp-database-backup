@@ -69,18 +69,23 @@ Before opening an issue, check this list of [common issues](docs/Common%20issues
 
 ## Testing
 
-Unlike previous versions, with the 3.x branch, thanks to the Mockery's overloading and the (external) component `Process` that actually takes care of executing the commands to export/import the databases, normally the tests do not really use the database drivers and do not actually write or read files on the filesystem (i.e. everything is simulated).
+Unlike previous versions, with the 3.x branch, thanks to the Mockery's overloading and the (external) component `Process`
+that actually takes care of executing the commands to export/import the databases, normally the tests do not really use
+the database drivers and do not write or read files on the filesystem (i.e., everything is simulated).
 
-The only exception is given by the class `DatabaseBackup\Test\TestCase\Utility\BackupExportAndImportTest`, which however does not belong to the testsuite executed by default (it is therefore an optional test) and is marked with the attribute `#[CoversNothing]`.
+The only exception is given by the class `DatabaseBackup\Test\TestCase\Utility\BackupExportAndImportTest`, which however
+does not belong to the testsuite executed by default (it is therefore an optional test) and is marked with the attribute `#[CoversNothing]`.
 
-This test class, when executed, will test a real database export and import, using the PHP extensions `sqlite3`, `mysqli` and `pgsql`, that is all the drivers and databases supported by the plugin.
+This test class, when executed, will test a real database export and import, using the `pdo_mysql`, `pdo_pgsql` and
+`pdo_sqlite` PHP extensions, that is all the drivers and databases supported by the plugin.
 
 You can test the class directly or the configured `real-drivers` testsuite ([see available testsuites](phpunit.xml.dist)):
 ```bash
 vendor/bin/phpunit --testsuite=real-drivers
 ```
 
-[Continuous integration (CI) workflows](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml) must be run with `highest`/`lowest` dependencies and "without"/"only with" real drivers and databases.
+[Continuous integration (CI) workflows](https://github.com/mirko-pagliai/cakephp-database-backup/actions/workflows/ci.yml) must be run with `highest`/`lowest` dependencies and "without"/"only with"
+real drivers and databases.
 
 ## Versioning
 
