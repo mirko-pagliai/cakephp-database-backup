@@ -1,7 +1,8 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.3
-* ready for CakePHP 5.3.
+* ready for CakePHP 5.3;
+* PostgreSQL 11.16 is used by default for testing.
 
 ### 3.0.2
 * full compatibility with PHP 8.5. CI actions have been optimized;
