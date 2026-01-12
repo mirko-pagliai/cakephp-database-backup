@@ -105,13 +105,13 @@ class BackupExportAndImportTest extends TestCase
      * @return void
      */
     #[Test]
-    #[TestWith(['sqlite3', SqliteExecutor::class])]
-    #[TestWith(['mysqli', MysqlExecutor::class])]
+    #[TestWith(['mysql', MysqlExecutor::class])]
     #[TestWith(['pgsql', PostgresExecutor::class])]
+    #[TestWith(['sqlite', SqliteExecutor::class])]
     public function testExportAndImport(string $extension, string $expectedExecutor): void
     {
-        if (!extension_loaded($extension)) {
-            $this->fail('The `' . $extension . '` extension is not available');
+        if (!extension_loaded('pdo_' . $extension)) {
+            $this->fail('The `pdo_' . $extension . '` extension is not available');
         }
 
         /**
