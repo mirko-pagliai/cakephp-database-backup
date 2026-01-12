@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
-use Cake\Console\TestSuite\StubConsoleOutput;
 use Cake\Core\Configure;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
@@ -36,15 +35,23 @@ class ExportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::buildOptionParser()
+     */
     #[Test]
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
-        $root = ROOT;
-        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
-
         $this->exec('database_backup.export -h');
         $this->assertExitSuccess();
+        $this->assertOutputContains('Exports a database backup');
+        $this->assertOutputContains('cake database_backup.export [options]');
+
+        //Requires at least CakePHP 5.2.10, otherwise the `--quiet` option has a slightly different description
+        $this->skipUnless(version_compare(Configure::version(), '5.2.10', '>='));
+
+        $root = ROOT;
+        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
 
         $expected = <<<txt
 Exports a database backup
@@ -66,7 +73,7 @@ cake database_backup.export [options]
                    <comment>$defaultTarget</comment>
                    (default target directory).
 --help, -h         Display this help.
---quiet, -q        Enable quiet output.
+--quiet, -q        Enable quiet output and non-interactive mode.
 --timeout, -t      Timeout for shell commands
 --verbose, -v      Enable verbose output.
 
@@ -74,6 +81,9 @@ txt;
         $this->assertOutputContains($expected);
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecute(): void
@@ -81,11 +91,20 @@ txt;
         $expectedFilename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('')->once();
-        $BackupExport->shouldNotReceive('timeout');
-        $BackupExport->shouldNotReceive('filename');
-        $BackupExport->shouldNotReceive('compression');
-        $BackupExport->shouldReceive('export')->once()->andReturn($expectedFilename);
+        $BackupExport
+            ->shouldReceive('__construct')
+            ->once()
+            ->with('');
+        $BackupExport
+            ->shouldNotReceive('timeout');
+        $BackupExport
+            ->shouldNotReceive('filename');
+        $BackupExport
+            ->shouldNotReceive('compression');
+        $BackupExport
+            ->shouldReceive('export')
+            ->once()
+            ->andReturn($expectedFilename);
 
         $this->exec('database_backup.export');
 
@@ -93,6 +112,9 @@ txt;
         $this->assertOutputContains('<success>Backup `' . $expectedFilename . '` has been exported</success>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
@@ -100,12 +122,25 @@ txt;
         $filename = 'custom_filename.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('custom_connection')->once();
-        $BackupExport->shouldReceive('timeout')->with(120)->once();
-        $BackupExport->shouldReceive('filename')->with($filename)->once();
+        $BackupExport
+            ->shouldReceive('__construct')
+            ->once()
+            ->with('custom_connection');
+        $BackupExport
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(120);
+        $BackupExport
+            ->shouldReceive('filename')
+            ->once()
+            ->with($filename);
         //Note that in this case the `--compression` option was passed, but is ignored
-        $BackupExport->shouldNotReceive('compression');
-        $BackupExport->shouldReceive('export')->once()->andReturn($filename);
+        $BackupExport
+            ->shouldNotReceive('compression');
+        $BackupExport
+            ->shouldReceive('export')
+            ->once()
+            ->andReturn($filename);
 
         $this->exec('database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename ' . $filename);
 
@@ -113,16 +148,30 @@ txt;
         $this->assertOutputContains('<success>Backup `' . $filename . '` has been exported</success>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteWithCompressionOption(): void
     {
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('__construct')->with('')->once();
-        $BackupExport->shouldNotReceive('timeout');
-        $BackupExport->shouldNotReceive('filename');
-        $BackupExport->shouldReceive('compression')->with('gzip')->once();
-        $BackupExport->shouldReceive('export')->once()->andReturn('my_backup.sql.gz');
+        $BackupExport
+            ->shouldReceive('__construct')
+            ->once()
+            ->with('');
+        $BackupExport
+            ->shouldNotReceive('timeout');
+        $BackupExport
+            ->shouldNotReceive('filename');
+        $BackupExport
+            ->shouldReceive('compression')
+            ->once()
+            ->with('gzip');
+        $BackupExport
+            ->shouldReceive('export')
+            ->once()
+            ->andReturn('my_backup.sql.gz');
 
         $this->exec('database_backup.export --compression gzip');
 
@@ -130,27 +179,36 @@ txt;
         $this->assertOutputContains('<success>Backup `my_backup.sql.gz` has been exported</success>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteOnException(): void
     {
-        $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('export')->once()->andThrow(new Exception('Exception message'));
+        Mockery::mock('overload:' . BackupExport::class)
+            ->shouldReceive('export')
+            ->once()
+            ->andThrow(new Exception('Exception message'));
 
         $this->exec('database_backup.export');
         $this->assertExitError();
         $this->assertErrorContains('<error>Exception message</error>');
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteOnStoppedEvent(): void
     {
-        $BackupExport = Mockery::mock('overload:' . BackupExport::class);
-        $BackupExport->shouldReceive('export')->once()->andReturnFalse();
+        Mockery::mock('overload:' . BackupExport::class)
+            ->shouldReceive('export')
+            ->once()
+            ->andReturnFalse();
 
         $this->exec('database_backup.export');
-
         $this->assertExitError();
         $this->assertErrorContains('<error>The `Backup.beforeExport` event stopped the operation</error>');
     }

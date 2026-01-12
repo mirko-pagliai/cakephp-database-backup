@@ -1,5 +1,12 @@
 # 3.x branch
 ## 3.0 branch
+### 3.0.2
+* full compatibility with PHP 8.5. CI actions have been optimized;
+* requires at least CakePHP 5.2.10, due to the `PDO::MYSQL_ATTR_USE_BUFFERED_QUERY` costant which has been deprecated. This also ensures full compatibility with PHP 8.5.
+
+### 3.0.1
+* fixed a serious bug in the `BackupExport::compression()` method, which did not correctly reset the filename to use. Extended testing.
+
 ### 3.0.0
 * `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for significant code optimization.  
   Thanks to the magic `__call()` method provided by `Utility`, they still support the use of already known methods (`filename()`, `compression()`, `timeout()`) to set properties;
@@ -21,6 +28,13 @@
 
 # 2.x branch
 ## 2.15 branch
+### 2.15.2
+* the `Plugin` class has been deprecated and will be removed in a future release, use `DatabaseBackupPlugin` instead;
+* full support for PHP 8.5. CI actions have been optimized.
+
+### 2.15.1
+* little fixes.
+
 ### 2.15.0
 * `BackupManager::index()` and `BackupManager::rotate()` methods have been deprecated and will be removed in a future
   release. At this point, the entire `BackupManager` class is considered deprecated and will be removed;
