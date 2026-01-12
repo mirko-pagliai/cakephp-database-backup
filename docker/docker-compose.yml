@@ -1,0 +1,38 @@
+services:
+
+  php:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    volumes:
+      - ..:/app
+    working_dir: /app
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    tty: true
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: test
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
