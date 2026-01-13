@@ -91,9 +91,6 @@ class BackupImportTest extends TestCase
         $this->BackupImport->filename($filename);
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testImport(): void
     {
@@ -104,7 +101,7 @@ class BackupImportTest extends TestCase
         $BackupImport
             ->expects($this->once())
             ->method('getProcess')
-            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+            ->willReturn($this->createConfiguredStub(Process::class, ['isSuccessful' => true]));
 
         $BackupImport->getExecutor()->getEventManager()->setEventList(new EventList());
 
@@ -128,14 +125,11 @@ class BackupImportTest extends TestCase
 
     /**
      * Import is stopped by the `Backup.beforeImport` event (implemented by the `Executor` class).
-     *
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testImportStoppedByBeforeImport(): void
     {
         $Executor = $this->createPartialMock(AbstractExecutor::class, ['beforeImport']);
-
         $Executor
             ->expects($this->once())
             ->method('beforeImport')
@@ -146,7 +140,7 @@ class BackupImportTest extends TestCase
         $BackupImport = $this->getBackupImportMock(['getExecutor']);
 
         $BackupImport
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('getExecutor')
             ->willReturn($Executor);
 
@@ -159,14 +153,12 @@ class BackupImportTest extends TestCase
 
     /**
      * Test for `import()` method, on failure (error for `Process`).
-     *
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testImportOnFailure(): void
     {
         $expectedError = 'ERROR 1044 (42000): Access denied for user \'root\'@\'localhost\' to database \'noExisting\'';
-        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
+        $Process = $this->createConfiguredStub(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
 
         $BackupImport = $this->getBackupImportMock(['getProcess']);
 
@@ -186,7 +178,6 @@ class BackupImportTest extends TestCase
      * Test for `import()` method, exceeding the timeout.
      *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testImportExceedingTimeout(): void
@@ -200,7 +191,7 @@ class BackupImportTest extends TestCase
             ->method('getProcess')
             ->willThrowException($ProcessTimedOutException);
 
-        $this->expectException(ProcessTimedOutException::class);
+        $this->expectException($ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');
         $BackupImport
             ->filename($this->createBackup(fakeBackup: true))

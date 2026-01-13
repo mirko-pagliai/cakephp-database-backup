@@ -32,23 +32,16 @@ use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 #[CoversClass(AbstractExecutor::class)]
 class AbstractExecutorTest extends TestCase
 {
-    /**
-     * @var \Cake\Datasource\ConnectionInterface&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected ConnectionInterface $Connection;
-
     protected AbstractExecutor $Executor;
 
     /**
-     * {@inheritDoc}
-     *
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @inheritDoc
      */
     protected function setUp(): void
     {
-        $this->Connection = $this->createMock(ConnectionInterface::class);
+        $Connection = $this->createStub(ConnectionInterface::class);
 
-        $this->Executor = new class ($this->Connection) extends AbstractExecutor {
+        $this->Executor = new class ($Connection) extends AbstractExecutor {
         };
     }
 
@@ -64,7 +57,6 @@ class AbstractExecutorTest extends TestCase
     public function testCallMagicMethod(string $expectedNewMethod, string $oldMethod): void
     {
         $Executor = $this->createPartialMock(AbstractExecutor::class, [$expectedNewMethod]);
-
         $Executor
             ->expects($this->once())
             ->method($expectedNewMethod)
@@ -97,22 +89,19 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'sqlite3-binary\' my-database .dump | \'bzip2-binary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
     public function testGetExportCommand(string $expectedExportCommand, string $filename): void
     {
-        $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$this->Connection, 'Sqlite'])
-            ->onlyMethods(['getBinary', 'getConfig'])
-            ->getMock();
+        $Connection = $this->createStub(ConnectionInterface::class);
 
-        $Executor
-            ->expects($this->any())
-            ->method('getBinary')
-            ->willReturnCallback(function (Compression|string $binaryName): string {
+        $Executor = new class ($Connection, 'Sqlite') extends AbstractExecutor {
+            public function getBinary(string|Compression $binaryName): string
+            {
                 return ($binaryName instanceof Compression ? strtolower($binaryName->name) : $binaryName) . '-binary';
-            });
+            }
 
-        $Executor
-            ->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(fn(string $key): string => 'my-' . $key);
+            public function getConfig(string $key): string
+            {
+                return 'my-' . $key;
+            }
+        };
 
         $result = $Executor->getExportCommand($filename);
 
@@ -128,22 +117,19 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'bzip2-binary\' -dc \'filename.sql.bz2\' | \'sqlite3-binary\' my-database', 'filename.sql.bz2'])]
     public function testGetImportCommand(string $expectedImportCommand, string $filename): void
     {
-        $Executor = $this->getMockBuilder(AbstractExecutor::class)
-            ->setConstructorArgs([$this->Connection, 'Sqlite'])
-            ->onlyMethods(['getBinary', 'getConfig'])
-            ->getMock();
+        $Connection = $this->createStub(ConnectionInterface::class);
 
-        $Executor
-            ->expects($this->any())
-            ->method('getBinary')
-            ->willReturnCallback(function (Compression|string $binaryName): string {
+        $Executor = new class ($Connection, 'Sqlite') extends AbstractExecutor {
+            public function getBinary(string|Compression $binaryName): string
+            {
                 return ($binaryName instanceof Compression ? strtolower($binaryName->name) : $binaryName) . '-binary';
-            });
+            }
 
-        $Executor
-            ->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(fn(string $key): string => 'my-' . $key);
+            public function getConfig(string $key): string
+            {
+                return 'my-' . $key;
+            }
+        };
 
         $result = $Executor->getImportCommand($filename);
 
@@ -175,12 +161,16 @@ class AbstractExecutorTest extends TestCase
     #[TestWith([null, 'noExisting'])]
     public function testGetConfig(?string $expectedConfig, string $configKey): void
     {
-        $this->Connection
+        $Connection = $this->createMock(ConnectionInterface::class);
+        $Connection
             ->expects($this->once())
             ->method('config')
             ->willReturn(['name' => 'test']);
 
-        $result = $this->Executor->getConfig($configKey);
+        $Executor = new class ($Connection) extends AbstractExecutor {
+        };
+
+        $result = $Executor->getConfig($configKey);
         $this->assertSame($expectedConfig, $result);
     }
 }

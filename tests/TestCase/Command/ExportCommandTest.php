@@ -81,18 +81,20 @@ class ExportCommandTest extends TestCase
         $this->assertErrorContains('File or directory `/noExistingDir` is not writable');
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
-        $ExportCommand = $this->createPartialMock(ExportCommand::class, ['getBackupExport']);
-
-        $ExportCommand
-            ->expects($this->once())
-            ->method('getBackupExport')
-            ->willReturn($this->createConfiguredMock(BackupExport::class, ['export' => false]));
+        $ExportCommand = new class extends ExportCommand {
+            public function getBackupExport(): BackupExport
+            {
+                return new class extends BackupExport {
+                    public function export(): string|false
+                    {
+                        return false;
+                    }
+                };
+            }
+        };
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeExport` event stopped the operation');
