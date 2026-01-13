@@ -58,7 +58,7 @@ class SqliteExecutor extends AbstractExecutor
         //For each table, drops the table
         $this->dropAllTables();
 
-        //Needs disconnect and re-connect because the database schema has changed
+        //Needs to disconnect and to re-connect, because the database schema has changed
         $Connection->getDriver()->disconnect();
         $Connection->getDriver()->connect();
     }

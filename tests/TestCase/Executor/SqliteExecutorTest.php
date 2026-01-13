@@ -17,8 +17,9 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use Cake\Database\Connection;
 use Cake\Database\Driver\Sqlite;
-use Cake\Database\Schema\CollectionInterface;
+use Cake\Database\Schema\Collection as SchemaCollection;
 use Cake\Database\Schema\TableSchema;
+use Cake\Database\Schema\TableSchemaInterface;
 use Cake\Database\StatementInterface;
 use Cake\Datasource\ConnectionInterface;
 use DatabaseBackup\Executor\AbstractExecutor;
@@ -36,6 +37,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 class SqliteExecutorTest extends TestCase
 {
     /**
+     * @link \DatabaseBackup\Executor\SqliteExecutor::dropAllTables()
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
@@ -43,48 +45,37 @@ class SqliteExecutorTest extends TestCase
     {
         $tables = [1 => 'articles', 2 => 'comments'];
 
+        $Connection = $this->getMockBuilder(Connection::class)
+            ->setConstructorArgs([['driver' => new Sqlite()]])
+            ->onlyMethods(['execute'])
+            ->getMock();
+
         /**
-         * `$Schema` describes the tables.
+         * `$SchemaCollection` describes the tables.
          */
-        $Schema = $this->createMock(CollectionInterface::class);
+        $SchemaCollection = new class ($Connection) extends SchemaCollection {
+            public function describe(string $name, array $options = []): TableSchemaInterface
+            {
+                return new TableSchema($name);
+            }
 
-        $Schema
-            ->expects($this->once())
-            ->method('listTables')
-            ->willReturn($tables);
+            public function listTables(): array
+            {
+                return [1 => 'articles', 2 => 'comments'];
+            }
+        };
 
-        $Schema
-            ->expects($this->any())
-            ->method('describe')
-            ->willReturnCallback(function (string $tableName): TableSchema {
-                return $this->getMockBuilder(TableSchema::class)
-                    ->setConstructorArgs([$tableName])
-                    ->onlyMethods([])
-                    ->getMock();
-            });
-
-        $Connection = $this->createMock(Connection::class);
-
-        $Connection
-            ->expects($this->any())
-            ->method('getDriver')
-            ->willReturn(new Sqlite());
-
-        $Connection
-            ->expects($this->once())
-            ->method('getSchemaCollection')
-            ->willReturn($Schema);
+        $Connection->setSchemaCollection($SchemaCollection);
 
         /**
          * The important thing is to check the number of times and the arguments with which the `Connection::execute()`
          *  method is called.
          */
         $matcher = $this->exactly(2);
-        $Connection
-            ->expects($matcher)
+        $Connection->expects($matcher)
             ->method('execute')
             ->willReturnCallback(function (string $sql) use ($matcher, $tables): StatementInterface {
-                $expectedSql = sprintf('DROP TABLE "%s"', $tables[$matcher->numberOfInvocations()]);
+                $expectedSql = "DROP TABLE \"{$tables[$matcher->numberOfInvocations()]}\"";
                 $this->assertSame($expectedSql, $sql);
 
                 return $this->createStub(StatementInterface::class);
@@ -95,6 +86,7 @@ class SqliteExecutorTest extends TestCase
     }
 
     /**
+     * @link \DatabaseBackup\Executor\SqliteExecutor::beforeImport()
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]

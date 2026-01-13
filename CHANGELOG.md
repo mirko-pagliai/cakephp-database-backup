@@ -1,5 +1,8 @@
 # 2.x branch
 ## 2.15 branch
+### 2.15.3
+* slightly improved the `SqliteExecutorTest` test class.
+* 
 ### 2.15.2
 * the `Plugin` class has been deprecated and will be removed in a future release, use `DatabaseBackupPlugin` instead;
 * full support for PHP 8.5. CI actions have been optimized.
