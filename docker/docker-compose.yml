@@ -17,13 +17,15 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: test
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: test
+        MYSQL_USER: test
+        MYSQL_PASSWORD: test
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 2s
-      timeout: 2s
-      retries: 20
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+        interval: 2s
+        timeout: 2s
+        retries: 20
 
   postgres:
     image: postgres:16
