@@ -37,11 +37,20 @@ jobs:
             dependencies: 'lowest'
 
     steps:
-      - name: Setup MySQL 8.0
+      - name: Setup MariaDB 10.11
         if: matrix.real-drivers == 'real-drivers'
         run: |
-          sudo service mysql start
-          mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE test;'
+          docker run -d \
+            --name=mariadb \
+            -e MARIADB_ROOT_PASSWORD=root \
+            -e MARIADB_DATABASE=test \
+            -p 3306:3306 \
+            mariadb:10.11
+
+          for i in {1..30}; do
+            docker exec mariadb mariadb-admin ping --silent && break
+            sleep 1
+          done
 
       - name: Setup PostgreSQL 11.16
         if: matrix.real-drivers == 'real-drivers'
@@ -117,7 +126,7 @@ jobs:
 
   testsuite-windows:
     runs-on: windows-2022
-    name: Windows - PHP 8.4 & Mysql 8.0
+    name: Windows - PHP 8.4
 
     env:
       EXTENSIONS: mbstring, intl
