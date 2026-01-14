@@ -8,15 +8,13 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
     libpq-dev \
-    default-mysql-client \
-    postgresql-client \
+    mysql-client \
+    postgresql-client-16 \
     && docker-php-ext-install \
         intl \
         pdo \
         pdo_mysql \
-        mysqli \
         pdo_pgsql \
-        pgsql \
         zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
