@@ -1,5 +1,8 @@
 # 3.x branch
 ## 3.0 branch
+### 3.0.4
+* by default, the GitHub's actions now use `mariadb` (instead of `mysql`).
+
 ### 3.0.3
 * ready for CakePHP 5.3;
 * PostgreSQL 11.16 is used by default for testing.
