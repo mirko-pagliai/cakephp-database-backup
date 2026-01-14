@@ -63,11 +63,3 @@ foreach ([
         putenv("$key=$value");
     }
 }
-
-//Always use the `--skip-ssl` option for exports and imports with mysql
-foreach (['export', 'import'] as $commandName) {
-    $command = Configure::read("DatabaseBackup.Mysql.$commandName");
-    if (!str_contains($command, '--skip-ssl')) {
-        Configure::write("DatabaseBackup.Mysql.$commandName", "$command --skip-ssl");
-    }
-}
