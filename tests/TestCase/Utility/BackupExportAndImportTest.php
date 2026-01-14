@@ -91,6 +91,18 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @inheritDoc
      */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        foreach (glob(Configure::read('DatabaseBackup.target') . '*') as $file) {
+            unlink($file);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function tearDown(): void
     {
         parent::tearDown();
@@ -143,11 +155,11 @@ class BackupExportAndImportTest extends TestCase
         $BackupExport = new BackupExport(Connection: ConnectionManager::get('test'));
 
         $result = $BackupExport
-            ->filename(TMP . 'test.sql')
+            ->filename('test.sql')
             ->export();
 
         $this->assertInstanceOf($expectedExecutor, $BackupExport->Executor);
-        $this->assertSame(TMP . 'test.sql', $result);
+        $this->assertSame(Configure::read('DatabaseBackup.target') . 'test.sql', $result);
         $this->assertFileExists($result);
 
         /**
@@ -170,9 +182,7 @@ class BackupExportAndImportTest extends TestCase
             ->import();
 
         $this->assertInstanceOf($expectedExecutor, $BackupImport->Executor);
-        $this->assertSame(TMP . 'test.sql', $result);
-
-        unlink($result);
+        $this->assertSame(Configure::read('DatabaseBackup.target') . 'test.sql', $result);
 
         /**
          * Gets the final data.
