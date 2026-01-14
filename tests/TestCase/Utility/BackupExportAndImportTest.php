@@ -95,7 +95,9 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::setUp();
 
-        foreach (glob(Configure::read('DatabaseBackup.target') . '*') as $file) {
+        /** @var list<string> $tmpFiles */
+        $tmpFiles = glob(Configure::read('DatabaseBackup.target') . '*');
+        foreach ($tmpFiles as $file) {
             unlink($file);
         }
     }
