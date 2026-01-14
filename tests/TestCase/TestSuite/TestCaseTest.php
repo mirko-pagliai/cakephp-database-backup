@@ -99,7 +99,6 @@ class TestCaseTest extends CakeTestCase
 
         $TestCase->expects($this->exactly(3))
             ->method('createBackup')
-            // @phpstan-ignore argument.named
             ->with(...self::withConsecutive([$expectedFiles[0]], [$expectedFiles[1]], [$expectedFiles[2]]))
             ->willReturnArgument(0);
 

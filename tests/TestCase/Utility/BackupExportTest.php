@@ -120,7 +120,7 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Test for `filename()` method, with patterns on the filename (`{$DATABASE}`, `{$DATETIME}` and so on...).
+     * Test for the `filename()` method, with patterns on the filename (`{$DATABASE}`, `{$DATETIME}` and so on...).
      */
     #[Test]
     #[TestWith(['test.sql', '{$DATABASE}.sql'])]
@@ -155,9 +155,6 @@ class BackupExportTest extends TestCase
         $this->assertSame(10, $this->BackupExport->getRotate());
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testExport(): void
     {
@@ -165,13 +162,13 @@ class BackupExportTest extends TestCase
 
         $BackupExport
             ->expects($this->any())
-            ->method('getProcess')
-            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
-
-        $BackupExport
-            ->expects($this->any())
             ->method('getFilesystem')
             ->willReturn($this->createStub(Filesystem::class));
+
+        $BackupExport
+            ->expects($this->atLeastOnce())
+            ->method('getProcess')
+            ->willReturn($this->createConfiguredStub(Process::class, ['isSuccessful' => true]));
 
         $BackupExport->getExecutor()->getEventManager()->setEventList(new EventList());
 
@@ -201,8 +198,6 @@ class BackupExportTest extends TestCase
 
     /**
      * Export is stopped by the `Backup.beforeExport` event (implemented by the `Executor` class).
-     *
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testExportStoppedByBeforeExport(): void
@@ -224,7 +219,7 @@ class BackupExportTest extends TestCase
         $BackupExport = $this->getBackupExportMock(['getExecutor']);
 
         $BackupExport
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('getExecutor')
             ->willReturn($Executor);
 
@@ -237,14 +232,16 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `export()` method, on failure (error for `Process`).
-     *
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testExportOnFailure(): void
     {
         $expectedError = 'mysqldump: Got error: 1044: "Access denied for user \'root\'@\'localhost\' to database \'noExisting\'" when selecting the database';
-        $Process = $this->createConfiguredMock(Process::class, ['getErrorOutput' => $expectedError . PHP_EOL, 'isSuccessful' => false]);
+
+        $Process = $this->createConfiguredStub(Process::class, [
+            'getErrorOutput' => $expectedError,
+            'isSuccessful' => false,
+        ]);
 
         $BackupExport = $this->getBackupExportMock(['getProcess']);
 
@@ -262,7 +259,6 @@ class BackupExportTest extends TestCase
      * Test for `export()` method, with a different chmod configuration value.
      *
      * @requires OS Linux
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testExportWithDifferentChmod(): void
@@ -288,7 +284,7 @@ class BackupExportTest extends TestCase
         $BackupExport
             ->expects($this->once())
             ->method('getProcess')
-            ->willReturn($this->createConfiguredMock(Process::class, ['isSuccessful' => true]));
+            ->willReturn($this->createConfiguredStub(Process::class, ['isSuccessful' => true]));
 
         $BackupExport
             ->filename($filename)
@@ -299,19 +295,16 @@ class BackupExportTest extends TestCase
      * Test for `export()` method, `Process` exceeding the timeout.
      *
      * @see https://symfony.com/doc/current/components/process.html#process-timeout
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testExportProcessExceedingTimeout(): void
     {
-        $ProcessTimedOutException = new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
-
-        $BackupExport = $this->getBackupExportMock(['getProcess']);
-
-        $BackupExport
-            ->expects($this->once())
-            ->method('getProcess')
-            ->willThrowException($ProcessTimedOutException);
+        $BackupExport = new class extends BackupExport {
+            public function getProcess(string $command): Process
+            {
+                throw new ProcessTimedOutException(Process::fromShellCommandline('dir'), 1);
+            }
+        };
 
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage('The process "dir" exceeded the timeout of 60 seconds');

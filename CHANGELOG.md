@@ -1,5 +1,10 @@
 # 2.x branch
 ## 2.15 branch
+### 2.15.3
+* slightly improved the `SqliteExecutorTest` test class;
+* refactor tests to replace deprecated PHPUnit mocks with stubs and improve event-based tests;
+* PostgreSQL 11.16 is used by default for testing.
+
 ### 2.15.2
 * the `Plugin` class has been deprecated and will be removed in a future release, use `DatabaseBackupPlugin` instead;
 * full support for PHP 8.5. CI actions have been optimized.

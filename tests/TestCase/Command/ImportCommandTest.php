@@ -71,8 +71,6 @@ class ImportCommandTest extends TestCase
 
     /**
      * Test for `execute()` method, with `--timeout` option.
-     *
-     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     #[Test]
     public function testExecuteTimeoutOption(): void
@@ -115,18 +113,20 @@ class ImportCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
     #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
-        $ImportCommand = $this->createPartialMock(ImportCommand::class, ['getBackupImport']);
-
-        $ImportCommand
-            ->expects($this->once())
-            ->method('getBackupImport')
-            ->willReturn($this->createConfiguredMock(BackupImport::class, ['import' => false]));
+        $ImportCommand = new class extends ImportCommand {
+            public function getBackupImport(): BackupImport
+            {
+                return new class extends BackupImport {
+                    public function import(): string|false
+                    {
+                        return false;
+                    }
+                };
+            }
+        };
 
         $this->expectException(StopException::class);
         $this->expectExceptionMessage('The `Backup.beforeImport` event stopped the operation');
