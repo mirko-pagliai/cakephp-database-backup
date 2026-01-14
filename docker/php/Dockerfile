@@ -1,6 +1,5 @@
 FROM php:8.4-cli
 
-# System packages required by CakePHP, Composer and the plugin
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -8,8 +7,8 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
     libpq-dev \
-    mysql-client \
-    postgresql-client-16 \
+    mariadb-client-compat \
+    postgresql-client \
     && docker-php-ext-install \
         intl \
         pdo \
