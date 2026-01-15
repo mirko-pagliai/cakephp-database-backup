@@ -10,52 +10,15 @@ permissions:
   contents: read
 
 jobs:
-  testsuite:
+  testsuite-linux:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php-version: ['8.4', '8.5']
-        dependencies: ['highest']
-        real-drivers: ['']
-        include:
-          - php-version: '8.4'
-            real-drivers: 'real-drivers'
-            dependencies: 'highest'
-          - php-version: '8.5'
-            real-drivers: 'real-drivers'
-            dependencies: 'highest'
-          - php-version: '8.4'
-            dependencies: 'lowest'
-          - php-version: '8.5'
-            dependencies: 'lowest'
-          - php-version: '8.4'
-            real-drivers: 'real-drivers'
-            dependencies: 'lowest'
-          - php-version: '8.5'
-            real-drivers: 'real-drivers'
-            dependencies: 'lowest'
+        dependencies: ['highest', 'lowest']
 
     steps:
-      - name: Setup MariaDB 10.11
-        if: matrix.real-drivers == 'real-drivers'
-        run: |
-          docker run -d \
-            --name=mariadb \
-            -e MARIADB_ROOT_PASSWORD=root \
-            -e MARIADB_DATABASE=test \
-            -p 3306:3306 \
-            mariadb:10.11
-
-          for i in {1..30}; do
-            docker exec mariadb mariadb-admin ping --silent && break
-            sleep 1
-          done
-
-      - name: Setup PostgreSQL 11.16
-        if: matrix.real-drivers == 'real-drivers'
-        run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:11.16
-
       - uses: actions/checkout@v4
 
       - name: Validate composer.json and composer.lock
@@ -73,10 +36,8 @@ jobs:
         uses: ramsey/composer-install@v3
         with:
           dependency-versions: ${{ matrix.dependencies }}
-          composer-options: ${{ matrix.composer-options }}
 
       - name: Run test suite
-        if: matrix.real-drivers == ''
         run: |
           if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
             export XDEBUG_MODE=coverage;
@@ -85,17 +46,60 @@ jobs:
             vendor/bin/phpunit --display-deprecations --display-warnings
           fi
 
-      - name: Run "real driver" test suite
-        if: matrix.real-drivers == 'real-drivers'
-        run: composer run-script test-real-drivers
-        env:
-          db_dsn_mysql: mysql://root:root@127.0.0.1/test?encoding=utf8
-
       - name: Code Coverage Report
-        if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest' && matrix.real-drivers == 'real-drivers'
+        # Coverage is generated only for PHP 8.4 with highest dependencies
+        if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  testsuite-windows:
+    runs-on: windows-2022
+    name: Windows - PHP 8.4
+
+    env:
+      EXTENSIONS: mbstring, intl
+      PHP_VERSION: '8.4'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.EXTENSIONS }}
+          ini-values: apc.enable_cli = 1
+
+      - name: Composer install
+        uses: ramsey/composer-install@v3
+
+      - name: Run test suite
+        run: composer run-script test
+
+  real-drivers:
+    name: Real drivers tests (Docker, PHP 8.4)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker environment
+        run: docker compose -f docker/docker-compose.yml build
+
+      - name: Start services
+        run: docker compose -f docker/docker-compose.yml up -d
+
+      - name: Install Composer dependencies (highest)
+        run: docker compose -f docker/docker-compose.yml exec php composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Run real-drivers test suite
+        run: docker compose -f docker/docker-compose.yml exec php vendor/bin/phpunit --testsuite=real-drivers
+
+      - name: Shutdown services
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
 
   cs-stan:
     name: Coding Standard & Static Analysis
@@ -123,36 +127,3 @@ jobs:
 
         - name: Run phpstan
           run: vendor/bin/phpstan analyse --error-format=github
-
-  testsuite-windows:
-    runs-on: windows-2022
-    name: Windows - PHP 8.4
-
-    env:
-      EXTENSIONS: mbstring, intl
-      PHP_VERSION: '8.4'
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ env.PHP_VERSION }}
-        extensions: ${{ env.EXTENSIONS }}
-        ini-values: apc.enable_cli = 1
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v4
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-
-    - name: Install dependencies
-      run: composer install --no-progress
-
-    - name: Run test suite
-      run: composer run-script test

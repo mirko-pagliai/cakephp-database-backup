@@ -1,0 +1,40 @@
+services:
+
+  php:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    volumes:
+      - ..:/app
+    working_dir: /app
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    tty: true
+
+  mariadb:
+    image: mariadb:11.4
+    environment:
+        MARIADB_ROOT_PASSWORD: root
+        MARIADB_DATABASE: test
+        MARIADB_USER: test
+        MARIADB_PASSWORD: test
+    healthcheck:
+        test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+        interval: 2s
+        timeout: 2s
+        retries: 20
+
+  postgres:
+    image: postgres:17.7
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 20

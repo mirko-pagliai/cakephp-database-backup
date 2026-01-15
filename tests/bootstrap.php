@@ -55,8 +55,8 @@ require_once ROOT . 'config' . DS . 'bootstrap.php';
  * ```
  */
 foreach ([
-    'db_dsn_mysql' => 'mysql://travis@localhost/test',
-    'db_dsn_pgsql' => 'postgres://postgres:postgres@127.0.0.1/test',
+    'db_dsn_mysql' => 'mysql://test:test@mariadb/test',
+    'db_dsn_pgsql'  => 'postgres://postgres:postgres@postgres/test',
     'db_dsn_sqlite' => 'sqlite:///' . TMP . 'test.sq3',
 ] as $key => $value) {
     if (!getenv($key)) {
