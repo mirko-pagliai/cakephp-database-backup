@@ -105,8 +105,7 @@ From the project root:
 docker compose -f docker/docker-compose.yml down -v
 docker compose -f docker/docker-compose.yml build
 docker compose -f docker/docker-compose.yml up -d
-docker compose -f docker/docker-compose.yml exec php \
-vendor/bin/phpunit --testsuite=real-drivers
+docker compose -f docker/docker-compose.yml exec php vendor/bin/phpunit --testsuite=real-drivers
 ```
 
 This setup runs the real-drivers test suite against real MySQL/MariaDB and PostgreSQL servers, using their corresponding
