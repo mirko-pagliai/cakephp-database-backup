@@ -97,6 +97,30 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  real-drivers:
+    name: Real drivers tests (Docker, PHP 8.4)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker environment
+        run: docker compose -f docker/docker-compose.yml build
+
+      - name: Start services
+        run: docker compose -f docker/docker-compose.yml up -d
+
+      - name: Install Composer dependencies (highest)
+        run: docker compose -f docker/docker-compose.yml exec php composer install --no-interaction --prefer-dist
+
+      - name: Run real-drivers test suite
+        run: docker compose -f docker/docker-compose.yml exec php vendor/bin/phpunit --testsuite=real-drivers
+
+      - name: Shutdown services
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
+
   cs-stan:
     name: Coding Standard & Static Analysis
     runs-on: ubuntu-latest
