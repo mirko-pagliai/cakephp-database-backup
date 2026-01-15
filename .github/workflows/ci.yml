@@ -16,46 +16,9 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ['8.4', '8.5']
-        dependencies: ['highest']
-        real-drivers: ['']
-        include:
-          - php-version: '8.4'
-            real-drivers: 'real-drivers'
-            dependencies: 'highest'
-          - php-version: '8.5'
-            real-drivers: 'real-drivers'
-            dependencies: 'highest'
-          - php-version: '8.4'
-            dependencies: 'lowest'
-          - php-version: '8.5'
-            dependencies: 'lowest'
-          - php-version: '8.4'
-            real-drivers: 'real-drivers'
-            dependencies: 'lowest'
-          - php-version: '8.5'
-            real-drivers: 'real-drivers'
-            dependencies: 'lowest'
+        dependencies: ['highest', 'lowest']
 
     steps:
-      - name: Setup MariaDB 10.11
-        if: matrix.real-drivers == 'real-drivers'
-        run: |
-          docker run -d \
-            --name=mariadb \
-            -e MARIADB_ROOT_PASSWORD=root \
-            -e MARIADB_DATABASE=test \
-            -p 3306:3306 \
-            mariadb:10.11
-
-          for i in {1..30}; do
-            docker exec mariadb mariadb-admin ping --silent && break
-            sleep 1
-          done
-
-      - name: Setup PostgreSQL 11.16
-        if: matrix.real-drivers == 'real-drivers'
-        run: docker run --rm --name=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=test -p 5432:5432 -d postgres:11.16
-
       - uses: actions/checkout@v4
 
       - name: Validate composer.json and composer.lock
@@ -76,7 +39,6 @@ jobs:
           composer-options: ${{ matrix.composer-options }}
 
       - name: Run test suite
-        if: matrix.real-drivers == ''
         run: |
           if [[ ${{ matrix.dependencies }} == 'highest' ]]; then
             export XDEBUG_MODE=coverage;
@@ -85,17 +47,35 @@ jobs:
             vendor/bin/phpunit --display-deprecations --display-warnings
           fi
 
-      - name: Run "real driver" test suite
-        if: matrix.real-drivers == 'real-drivers'
-        run: composer run-script test-real-drivers
-        env:
-          db_dsn_mysql: mysql://root:root@127.0.0.1/test?encoding=utf8
-
       - name: Code Coverage Report
-        if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest' && matrix.real-drivers == 'real-drivers'
+        if: success() && matrix.php-version == '8.4' && matrix.dependencies == 'highest'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  real-drivers:
+    name: Real drivers tests (Docker, PHP 8.4)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker environment
+        run: docker compose -f docker/docker-compose.yml build
+
+      - name: Start services
+        run: docker compose -f docker/docker-compose.yml up -d
+
+      - name: Install Composer dependencies (highest)
+        run: docker compose -f docker/docker-compose.yml exec php composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Run real-drivers test suite
+        run: docker compose -f docker/docker-compose.yml exec php vendor/bin/phpunit --testsuite=real-drivers
+
+      - name: Shutdown services
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
 
   cs-stan:
     name: Coding Standard & Static Analysis
