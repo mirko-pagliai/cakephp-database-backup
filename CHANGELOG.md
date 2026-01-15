@@ -1,7 +1,8 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.4
-* by default, the GitHub's actions now use `mariadb` (instead of `mysql`).
+* for testing with real drivers, a configuration for _Docker_ is proposed and used (see the `README.md` file);
+* by default, the GitHub's actions now use `mariadb` (instead of `mysql`). Improved the entire configuration.
 
 ### 3.0.3
 * ready for CakePHP 5.3;
