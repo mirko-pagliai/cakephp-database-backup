@@ -2,7 +2,9 @@
 ## 3.0 branch
 ### 3.0.4
 * for testing with real drivers, a configuration for _Docker_ is proposed and used (see the `README.md` file);
-* by default, the GitHub's actions now use `mariadb` (instead of `mysql`). Improved the entire configuration.
+* by default, the GitHub's actions now use `mariadb` (instead of `mysql`). Improved the entire configuration;
+* fixed https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/2;
+* fixed https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/3.
 
 ### 3.0.3
 * ready for CakePHP 5.3;
@@ -36,6 +38,10 @@
 
 # 2.x branch
 ## 2.15 branch
+### 2.15.4
+* fixed https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/2;
+* fixed https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/3.
+
 ### 2.15.3
 * slightly improved the `SqliteExecutorTest` test class;
 * refactor tests to replace deprecated PHPUnit mocks with stubs and improve event-based tests;
