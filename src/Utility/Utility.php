@@ -30,6 +30,10 @@ use function Cake\I18n\__d;
  * Abstract utility.
  *
  * Provides methods and properties common to utility classes.
+ *
+ * @method $this connection(ConnectionInterface|string $connection)
+ * @method $this filename(string $filename)
+ * @method $this timeout(int $timeout)
  */
 abstract class Utility
 {
@@ -103,6 +107,9 @@ abstract class Utility
      */
     public function __call(string $name, array $arguments)
     {
+        if (property_exists($this, ucfirst($name))) {
+            $name = ucfirst($name);
+        }
         if (!property_exists($this, $name)) {
             throw new BadMethodCallException(sprintf('Method `%s::%s()` does not exist', $this::class, $name));
         }
