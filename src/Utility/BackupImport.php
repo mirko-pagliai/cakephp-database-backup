@@ -25,9 +25,6 @@ use function Cake\I18n\__d;
 
 /**
  * Utility to import databases.
- *
- * @method \DatabaseBackup\Utility\BackupImport filename(string $filename)
- * @method \DatabaseBackup\Utility\BackupImport timeout(int $timeout)
  */
 class BackupImport extends Utility
 {

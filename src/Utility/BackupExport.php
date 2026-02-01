@@ -27,8 +27,6 @@ use function Cake\I18n\__d;
  * Utility to export databases.
  *
  * @method \DatabaseBackup\Utility\BackupExport compression(\DatabaseBackup\Compression|string|null $compression)
- * @method \DatabaseBackup\Utility\BackupExport filename(string $filename)
- * @method \DatabaseBackup\Utility\BackupExport timeout(int $timeout)
  */
 class BackupExport extends Utility
 {

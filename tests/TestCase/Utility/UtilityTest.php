@@ -42,6 +42,24 @@ class UtilityTest extends TestCase
     /**
      * @inheritDoc
      */
+    public static function setUpBeforeClass(): void
+    {
+        ConnectionManager::setConfig('test', new FakeConnection());
+        ConnectionManager::setConfig('test_another_connection', new FakeConnection(['name' => 'test_another_connection']));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function tearDownAfterClass(): void
+    {
+        ConnectionManager::drop('test');
+        ConnectionManager::drop('test_another_connection');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function setUp(): void
     {
         parent::setUp();
@@ -53,12 +71,11 @@ class UtilityTest extends TestCase
      * @link \DatabaseBackup\Utility\Utility::$connection
      */
     #[Test]
-    #[TestWith([new FakeConnection()])]
-    #[TestWith(['test'])]
-    public function testConnectionProperty(mixed $connection): void
+    #[TestWith([new FakeConnection(), 'test'])]
+    #[TestWith(['test', 'test'])]
+    #[TestWith(['test_another_connection', 'test_another_connection'])]
+    public function testConnectionProperty(string|ConnectionInterface $connection, string $expectedNameConnection): void
     {
-        ConnectionManager::setConfig('test', new FakeConnection());
-
         //Default value, without calling the setter
         $this->assertSame('test', $this->Utility->Connection->config()['name']);
 
@@ -66,10 +83,8 @@ class UtilityTest extends TestCase
 
         $result = $this->Utility->Connection;
 
-        ConnectionManager::drop('test');
-
         $this->assertInstanceOf(ConnectionInterface::class, $result);
-        $this->assertSame('test', $result->config()['name']);
+        $this->assertSame($expectedNameConnection, $result->config()['name']);
     }
 
     /**
@@ -138,7 +153,24 @@ class UtilityTest extends TestCase
         $this->Utility->timeout = -1;
     }
 
+
     /**
+     * @link \DatabaseBackup\Utility\Utility::__call()
+     */
+    #[Test]
+    public function testCallMagicMethod(): void
+    {
+        $this->Utility->connection('test_another_connection');
+
+        $result = $this->Utility->Connection;
+
+        $this->assertInstanceOf(ConnectionInterface::class, $result);
+        $this->assertSame('test_another_connection', $result->config()['name']);
+    }
+
+    /**
+     * Tests for `__call()` magic method, with a non-existing method.
+     *
      * @link \DatabaseBackup\Utility\Utility::__call()
      */
     #[Test]

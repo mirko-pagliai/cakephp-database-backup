@@ -1,6 +1,9 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.4
+* the `Utility::__call()` method now correctly handles properties with an initial capital letter. This means that
+  `BackupExport()` and `BackupImport()` magically implement the `connection()` method, which allows you to set up the
+    connection even at runtime;
 * for testing with real drivers, a configuration for _Docker_ is proposed and used (see the `README.md` file);
 * by default, the GitHub's actions now use `mariadb` (instead of `mysql`). Improved the entire configuration;
 * fixed https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/2;
