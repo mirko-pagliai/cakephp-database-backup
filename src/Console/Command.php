@@ -29,8 +29,6 @@ use Symfony\Component\Filesystem\Path;
 
 /**
  * Base class for console commands.
- *
- * @extends \Cake\Console\BaseCommand<\Cake\Command\Command>
  */
 abstract class Command extends BaseCommand
 {
