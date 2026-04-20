@@ -48,12 +48,13 @@ class BackupManager
         $Finder->files()
             ->in(Configure::readOrFail('DatabaseBackup.target'))
             ->name('/\.sql(\.(gz|bz2))?$/')
-            //Sorts in descending order by the last modified date
+            //Sorts in descending order by the last-modified date
             ->sort(fn(SplFileInfo $a, SplFileInfo $b): int => $b->getMTime() - $a->getMTime());
 
         $DateTimeZone = DateTime::now()->getTimezone();
 
-        return (new Collection($Finder))
+        /** @var \Cake\Collection\CollectionInterface<int, array{basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}> $collection */
+        $collection = (new Collection($Finder))
             ->map(fn(SplFileInfo $File): array => [
                 'basename' => $File->getBasename(),
                 'path' => $File->getPathname(),
@@ -62,6 +63,8 @@ class BackupManager
                 'datetime' => DateTime::createFromTimestamp($File->getMTime(), $DateTimeZone),
             ])
             ->compile(false);
+
+        return $collection;
     }
 
     /**
@@ -70,7 +73,7 @@ class BackupManager
      * You must indicate the number of backups you want to keep. So, it will delete all backups that are older.
      *
      * @param int $keep Number of backups that you want to keep
-     * @return array<array{filename: string, basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
+     * @return array<int, array{basename: string, path: string, compression: \DatabaseBackup\Compression, size: int|false, datetime: \Cake\I18n\DateTime}>
      * @throws \InvalidArgumentException With an Invalid rotate value.
      * @deprecated `BackupManager::rotate()` has been deprecated and will be removed in a future release
      */
