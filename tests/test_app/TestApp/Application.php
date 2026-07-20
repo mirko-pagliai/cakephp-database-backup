@@ -20,9 +20,6 @@ use Cake\Http\MiddlewareQueue;
 use Cake\Routing\RouteBuilder;
 use DatabaseBackup\DatabaseBackupPlugin;
 
-/**
- * @extends \Cake\Http\BaseApplication<\App\Application>
- */
 class Application extends BaseApplication
 {
     public function bootstrap(): void

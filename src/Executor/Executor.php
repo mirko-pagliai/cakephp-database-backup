@@ -36,9 +36,6 @@ use function Cake\I18n\__d;
  */
 abstract class Executor implements EventListenerInterface
 {
-    /**
-     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Executor\Executor>
-     */
     use EventDispatcherTrait;
 
     /**
