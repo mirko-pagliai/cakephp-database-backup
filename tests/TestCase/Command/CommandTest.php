@@ -30,6 +30,9 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(Command::class)]
 class CommandTest extends TestCase
 {
+    /**
+     * @link \DatabaseBackup\Command\Command::makeAbsolutePath()
+     */
     #[Test]
     #[TestWith([ROOT . 'file_exists_in_root.sql', 'file_exists_in_root.sql'])]
     #[TestWith(['file_does_not_exist_in_root.sql', 'file_does_not_exist_in_root.sql'])]
@@ -45,7 +48,9 @@ class CommandTest extends TestCase
          *
          * So it will return `false` when the argument is `file_does_not_exist_in_root.sql`.
          */
-        $Filesystem->shouldReceive('exists')->andReturn($path == 'file_exists_in_root.sql');
+        $Filesystem
+            ->shouldReceive('exists')
+            ->andReturn($path == 'file_exists_in_root.sql');
 
         $Command = new class extends Command { };
         $result = $Command->makeAbsolutePath($path);
@@ -53,6 +58,9 @@ class CommandTest extends TestCase
         $this->assertSame($expectedAbsolutePath, $result);
     }
 
+    /**
+     * @link \DatabaseBackup\Command\Command::makeRelativePath()
+     */
     #[Test]
     #[TestWith(['backup.sql', 'backup.sql'])]
     #[TestWith(['backup.sql', ROOT . 'backup.sql'])]
