@@ -1,5 +1,8 @@
 # 3.x branch
 ## 3.0 branch
+### 3.0.5
+* refactor: apply consistent formatting across tests and source files.
+
 ### 3.0.4
 * the `Utility::__call()` method now correctly handles properties with an initial capital letter. This means that
   `BackupExport()` and `BackupImport()` magically implement the `connection()` method, which allows you to set up the

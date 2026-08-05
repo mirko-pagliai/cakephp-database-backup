@@ -67,7 +67,7 @@ class ExecutorTest extends TestCase
         Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder')
             ->shouldReceive('find')
             ->once()
-            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
+            ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
 
         $result = new FakeExecutor()->findBinary($name);
 
@@ -84,10 +84,10 @@ class ExecutorTest extends TestCase
     public function testFindBinaryFromConfiguration(string $expectedBinary, Compression|string $binaryName): void
     {
         $binaryName = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
-        Configure::write(config: 'DatabaseBackup.binaries.' . $binaryName, value: '/customPath/' . $binaryName);
+        Configure::write(config: "DatabaseBackup.binaries.$binaryName", value: "/customPath/$binaryName");
 
         $result = new FakeExecutor()->findBinary($binaryName);
-        Configure::delete('DatabaseBackup.binaries.' . $binaryName);
+        Configure::delete("DatabaseBackup.binaries.$binaryName");
 
         $this->assertSame($expectedBinary, $result);
     }
@@ -157,7 +157,7 @@ class ExecutorTest extends TestCase
         $ExecutableFinder
             ->shouldReceive('find')
             ->withSomeOfArgs($OperationType->value . '-binary')
-            ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
+            ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
 
         /**
          * With a valid compression, `ExecutableFinder::find()` expects the lowercase name of the compression (e.g.
@@ -167,7 +167,7 @@ class ExecutorTest extends TestCase
             $ExecutableFinder
                 ->shouldReceive('find')
                 ->withSomeOfArgs(lcfirst($Compression->name))
-                ->andReturnUsing(fn (string $name): string => '/usr/bin/' . $name);
+                ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
         }
 
         $Process = Mockery::mock('overload:' . Process::class);

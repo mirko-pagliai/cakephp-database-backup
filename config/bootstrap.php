@@ -38,5 +38,5 @@ if (!file_exists($target)) {
     mkdir($target, 0777, true);
 }
 if (!is_dir($target) || !is_writeable($target)) {
-    trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target), E_USER_ERROR);
+    trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target));
 }

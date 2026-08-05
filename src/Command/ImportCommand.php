@@ -50,7 +50,7 @@ class ImportCommand extends Command
                     'database_backup',
                     'Filenames can be relative to {0} (root of your app) or {1} (default target directory).',
                     '<comment>' . ROOT . '</comment>',
-                    '<comment>' . Configure::readOrFail('DatabaseBackup.target'). '</comment>',
+                    '<comment>' . Configure::readOrFail('DatabaseBackup.target') . '</comment>',
                 ),
             ]),
             'required' => true,
@@ -80,12 +80,18 @@ class ImportCommand extends Command
             $filename = $BackupImport->import();
 
             if (!$filename) {
-                throw new StopException(
-                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeImport')
-                );
+                throw new StopException(__d(
+                    'database_backup',
+                    'The `{0}` event stopped the operation',
+                    'Backup.beforeImport',
+                ));
             }
-            $io->success(__d('database_backup', 'Backup `{0}` has been imported', $this->makeRelativePath($filename)));
-        } catch (Exception|ValueError $e) {
+            $io->success(__d(
+                'database_backup',
+                'Backup `{0}` has been imported',
+                $this->makeRelativePath($filename),
+            ));
+        } catch (Exception | ValueError $e) {
             $io->abort($e->getMessage());
         }
 

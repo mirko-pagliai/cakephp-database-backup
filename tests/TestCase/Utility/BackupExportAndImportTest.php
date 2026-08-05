@@ -54,8 +54,8 @@ class BackupExportAndImportTest extends TestCase
             ->find()
             ->enableHydration(false)
             ->all()
-            ->map(fn (array $record): array => array_map(
-                callback: fn (mixed $value): string => (string)$value,
+            ->map(fn(array $record): array => array_map(
+                callback: fn(mixed $value): string => (string)$value,
                 array: $record,
             ))
             ->toList();

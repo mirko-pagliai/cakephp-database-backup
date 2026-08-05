@@ -20,7 +20,6 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Exception\StopException;
 use Cake\Core\Configure;
-use Cake\Utility\Text;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
@@ -45,11 +44,11 @@ class ExportCommand extends Command
 
         $parser->setDescription(__d('database_backup', 'Exports a database backup'));
 
-        $parser->addOption('compression',  [
+        $parser->addOption('compression', [
             'choices' => array_map(callback: 'lcfirst', array: array_column(
                 array: array_filter(
                     array: Compression::cases(),
-                    callback: fn (Compression $Compression): bool => $Compression->isValid(),
+                    callback: fn(Compression $Compression): bool => $Compression->isValid(),
                 ),
                 column_key: 'name',
             )),
@@ -61,13 +60,13 @@ class ExportCommand extends Command
             'help' => implode(' ', [
                 __d(
                     'database_backup',
-                    'Filename. It can be an absolute path and may contain patterns. The compression type will be automatically set.'
+                    'Filename. It can be an absolute path and may contain patterns. The compression type will be automatically set.',
                 ),
                 __d(
                     'database_backup',
                     'Filenames can be relative to {0} (root of your app) or {1} (default target directory).',
                     '<comment>' . ROOT . '</comment>',
-                    '<comment>' . Configure::readOrFail('DatabaseBackup.target'). '</comment>',
+                    '<comment>' . Configure::readOrFail('DatabaseBackup.target') . '</comment>',
                 ),
             ]),
             'short' => 'f',
@@ -101,12 +100,18 @@ class ExportCommand extends Command
             $filename = $BackupExport->export();
 
             if (!$filename) {
-                throw new StopException(
-                    __d('database_backup', 'The `{0}` event stopped the operation', 'Backup.beforeExport')
-                );
+                throw new StopException(__d(
+                    'database_backup',
+                    'The `{0}` event stopped the operation',
+                    'Backup.beforeExport',
+                ));
             }
-            $io->success(__d('database_backup', 'Backup `{0}` has been exported', $this->makeRelativePath($filename)));
-        } catch (Exception|ValueError $e) {
+            $io->success(__d(
+                'database_backup',
+                'Backup `{0}` has been exported',
+                $this->makeRelativePath($filename),
+            ));
+        } catch (Exception | ValueError $e) {
             $io->abort($e->getMessage());
         }
 

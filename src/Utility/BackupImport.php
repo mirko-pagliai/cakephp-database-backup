@@ -34,7 +34,7 @@ class BackupImport extends Utility
 
             if (!new Filesystem()->exists($filename)) {
                 throw new IOException(
-                    __d('database_backup', 'File `{0}` does not exist', $filename)
+                    __d('database_backup', 'File `{0}` does not exist', $filename),
                 );
             }
 
@@ -43,7 +43,10 @@ class BackupImport extends Utility
 
             $this->filename = $filename;
         }
-        get => $this->filename ?? throw new LogicException(__d('database_backup', 'You must first set the filename'));
+        get => $this->filename ?? throw new LogicException(__d(
+            'database_backup',
+            'You must first set the filename',
+        ));
     }
 
     /**

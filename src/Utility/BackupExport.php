@@ -48,9 +48,14 @@ class BackupExport extends Utility
             if (new Filesystem()->exists($filename)) {
                 throw new IOException(__d('database_backup', 'File `{0}` already exists', $filename));
             }
+
             $targetDir = dirname($filename);
             if (!is_writable($targetDir)) {
-                throw new IOException(__d('database_backup', 'File or directory `{0}` is not writable', $targetDir));
+                throw new IOException(__d(
+                    'database_backup',
+                    'File or directory `{0}` is not writable',
+                    $targetDir,
+                ));
             }
 
             //Sets the compression
@@ -73,7 +78,11 @@ class BackupExport extends Utility
             replace: [
                 $this->Connection->config()['database'],
                 new DateTime()->format('YmdHis'),
-                str_replace(['127.0.0.1', '::1'], 'localhost', $this->Connection->config()['host'] ?? 'localhost'),
+                str_replace(
+                    search: ['127.0.0.1', '::1'],
+                    replace: 'localhost',
+                    subject: $this->Connection->config()['host'] ?? 'localhost',
+                ),
                 (string)time(),
             ],
             subject: $filename,

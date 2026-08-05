@@ -114,7 +114,7 @@ txt;
         $this->assertOutputContains('<success>Backup `' . $filename . '` has been imported</success>');
     }
 
-        /**
+    /**
      * Tests the execution of the database_backup.import command without providing the required filename argument
      */
     #[Test]

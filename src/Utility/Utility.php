@@ -31,7 +31,7 @@ use function Cake\I18n\__d;
  *
  * Provides methods and properties common to utility classes.
  *
- * @method $this connection(ConnectionInterface|string $connection)
+ * @method $this connection(\Cake\Datasource\ConnectionInterface|string $connection)
  * @method $this filename(string $filename)
  * @method $this timeout(int $timeout)
  */
@@ -57,9 +57,13 @@ abstract class Utility
                 $name = substr(strrchr($this->Connection->config()['driver'], '\\') ?: '', 1);
 
                 /** @var class-string<\DatabaseBackup\Executor\Executor> $className */
-                $className = App::classname('DatabaseBackup.' . $name . 'Executor', 'Executor');
+                $className = App::classname("DatabaseBackup.{$name}Executor", 'Executor');
                 if (!$className) {
-                    throw new InvalidArgumentException(__d('database_backup', 'The Executor class for the `{0}` driver does not exist', $name));
+                    throw new InvalidArgumentException(__d(
+                        'database_backup',
+                        'The Executor class for the `{0}` driver does not exist',
+                        $name,
+                    ));
                 }
 
                 $this->Executor = new $className(Connection: $this->Connection, OperationType: $this->OperationType);
@@ -72,7 +76,10 @@ abstract class Utility
     public int $timeout {
         set (int $timeout) {
             if ($timeout < 0) {
-                throw new InvalidArgumentException(__d('database_backup', 'The `timeout` property must be greater than or equal to 0'));
+                throw new InvalidArgumentException(__d(
+                    'database_backup',
+                    'The `timeout` property must be greater than or equal to 0',
+                ));
             }
             $this->timeout = $timeout;
         }

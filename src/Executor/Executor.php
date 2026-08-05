@@ -104,7 +104,7 @@ abstract class Executor implements EventListenerInterface
         /** @var string $binary */
         $binary = Configure::read(
             var: 'DatabaseBackup.binaries.' . $binaryName,
-            default: new ExecutableFinder()->find(name: $binaryName)
+            default: new ExecutableFinder()->find(name: $binaryName),
         );
 
         if (!$binary) {
@@ -112,9 +112,8 @@ abstract class Executor implements EventListenerInterface
                 'database_backup',
                 'Binary for `{0}` not found. Set path manually: `{1}`',
                 $binaryName,
-                sprintf("Configure::write('DatabaseBackup.binaries.%s', '/path/to/%s')", $binaryName, $binaryName)
+                "Configure::write('DatabaseBackup.binaries.$binaryName', '/path/to/$binaryName')",
             ));
-
         }
 
         return $binary;
@@ -129,7 +128,7 @@ abstract class Executor implements EventListenerInterface
      */
     public function getCommand(Compression $Compression): string
     {
-        $isExport = $this->OperationType == OperationType::Export;
+        $isExport = $this->OperationType === OperationType::Export;
 
         /**
          * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
@@ -208,7 +207,9 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function afterExport(): void {}
+    public function afterExport(): void
+    {
+    }
 
     /**
      * Called after import.
@@ -217,7 +218,9 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function afterImport(): void {}
+    public function afterImport(): void
+    {
+    }
 
     /**
      * Called before export.
@@ -227,7 +230,9 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function beforeExport(EventInterface $Event): void {}
+    public function beforeExport(EventInterface $Event): void
+    {
+    }
 
     /**
      * Called before import.
@@ -237,5 +242,7 @@ abstract class Executor implements EventListenerInterface
      * @since 2.1.0
      * @codeCoverageIgnore
      */
-    public function beforeImport(EventInterface $Event): void {}
+    public function beforeImport(EventInterface $Event): void
+    {
+    }
 }

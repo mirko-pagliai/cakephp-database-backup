@@ -71,7 +71,12 @@ enum Compression: string
     {
         $Compression = self::tryFromFilename($filename);
         if (!$Compression) {
-            throw new ValueError(__d('database_backup', 'No valid `{0}` value was found for filename `{1}`', self::class, $filename));
+            throw new ValueError(__d(
+                'database_backup',
+                'No valid `{0}` value was found for filename `{1}`',
+                self::class,
+                $filename,
+            ));
         }
 
         return $Compression;
@@ -85,6 +90,12 @@ enum Compression: string
      */
     public static function tryFromFilename(string $filename): ?self
     {
-        return array_find(self::cases(), fn($Compression) => str_ends_with(haystack: strtolower($filename), needle: '.' . $Compression->value));
+        return array_find(
+            array: self::cases(),
+            callback: fn($Compression) => str_ends_with(
+                haystack: strtolower($filename),
+                needle: '.' . $Compression->value,
+            ),
+        );
     }
 }

@@ -64,7 +64,8 @@ class UtilityTest extends TestCase
     {
         parent::setUp();
 
-        $this->Utility = new class (OperationType: OperationType::Export) extends Utility {};
+        $this->Utility = new class (OperationType: OperationType::Export) extends Utility {
+        };
     }
 
     /**
@@ -152,7 +153,6 @@ class UtilityTest extends TestCase
         $this->expectExceptionMessage('The `timeout` property must be greater than or equal to 0');
         $this->Utility->timeout = -1;
     }
-
 
     /**
      * @link \DatabaseBackup\Utility\Utility::__call()

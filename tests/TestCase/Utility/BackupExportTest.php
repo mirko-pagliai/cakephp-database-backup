@@ -123,7 +123,7 @@ class BackupExportTest extends TestCase
     {
         $this->BackupExport->filename = $filename;
 
-        if (str_starts_with($expectedFilename,'/') && str_ends_with($expectedFilename, '/')) {
+        if (str_starts_with($expectedFilename, '/') && str_ends_with($expectedFilename, '/')) {
             $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
         } else {
             $this->assertSame($expectedFilename, $this->BackupExport->filename);

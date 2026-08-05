@@ -29,6 +29,6 @@ class PostgresExecutor extends Executor
     #[Override]
     public function getBinaryName(): string
     {
-        return $this->OperationType == OperationType::Export ? 'pg_dump' : 'pg_restore';
+        return $this->OperationType === OperationType::Export ? 'pg_dump' : 'pg_restore';
     }
 }

@@ -41,7 +41,7 @@ class MysqlExecutor extends Executor
     #[Override]
     public function getBinaryName(): string
     {
-        return $this->OperationType == OperationType::Export ? 'mariadb-dump' : 'mariadb';
+        return $this->OperationType === OperationType::Export ? 'mariadb-dump' : 'mariadb';
     }
 
     /**
@@ -130,7 +130,7 @@ class MysqlExecutor extends Executor
         $content = str_replace(
             search: ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
             replace: [$config['username'], $config['password'], $config['host']],
-            subject: $content
+            subject: $content,
         );
 
         $Filesystem = new Filesystem();

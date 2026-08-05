@@ -52,7 +52,8 @@ class CommandTest extends TestCase
             ->shouldReceive('exists')
             ->andReturn($path == 'file_exists_in_root.sql');
 
-        $Command = new class extends Command { };
+        $Command = new class extends Command {
+        };
         $result = $Command->makeAbsolutePath($path);
 
         $this->assertSame($expectedAbsolutePath, $result);
@@ -69,7 +70,8 @@ class CommandTest extends TestCase
     #[TestWith(['/anotherDir/backup.sql', '/anotherDir/backup.sql'])]
     public function testMakeRelativePath(string $expectedRelativePath, string $path): void
     {
-        $Command = new class extends Command { };
+        $Command = new class extends Command {
+        };
 
         $result = $Command->makeRelativePath($path);
         $this->assertSame($expectedRelativePath, $result);
