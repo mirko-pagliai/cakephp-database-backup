@@ -17,7 +17,6 @@ namespace DatabaseBackup\Command;
 
 use Cake\Command\Command as CakeCommand;
 use Cake\Console\ConsoleOptionParser;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
@@ -74,7 +73,7 @@ abstract class Command extends CakeCommand
         $absolutePath = Path::makeAbsolute($path, ROOT);
         $absolutePath = DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
 
-        return new Filesystem()->exists($absolutePath) ? $absolutePath : $path;
+        return file_exists($absolutePath) ? $absolutePath : $path;
     }
 
     /**
