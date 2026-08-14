@@ -102,7 +102,7 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testFilenameWithNoWritableTarget(): void
     {
-        $filename = '/noExistingDir/backup.sql';
+        $filename = DS . 'noExistingDir' . DS . 'backup.sql';
 
         $this->expectException(IOException::class);
         $this->expectExceptionMessage('File or directory `' . dirname($filename) . '` is not writable');
@@ -115,7 +115,7 @@ class BackupExportTest extends TestCase
         $filename = $this->createBackup();
 
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File `' . $filename . '` already exists');
+        $this->expectExceptionMessage("File `$filename ` already exists");
         $this->BackupExport->filename($filename);
     }
 
