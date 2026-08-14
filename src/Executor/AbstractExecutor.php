@@ -34,9 +34,6 @@ use Override;
  */
 abstract class AbstractExecutor implements EventListenerInterface
 {
-    /**
-     * @use \Cake\Event\EventDispatcherTrait<\DatabaseBackup\Executor\AbstractExecutor>
-     */
     use EventDispatcherTrait;
 
     protected string $name;
