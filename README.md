@@ -19,9 +19,9 @@ even a coffee is enough! Thank you.
 
 *DatabaseBackup* requires:
 
-*   `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (previously `mysql` and `mysqldump`);
-*   `pg_dump` and `pg_restore` for *Postgres* databases;
-*   `sqlite3` for *Sqlite* databases.
+* `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (previously `mysql` and `mysqldump`);
+* `pg_dump` and `pg_restore` for *Postgres* databases;
+* `sqlite3` for *Sqlite* databases.
 
 **Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are
 also required.
