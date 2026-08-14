@@ -130,7 +130,7 @@ jobs:
     name: Windows - PHP 8.4 & Mysql 8.0
 
     env:
-      EXTENSIONS: mbstring, intl, pdo_mysql
+      EXTENSIONS: mbstring, intl, pdo_mysql, sqlite3, pdo_sqlite
       PHP_VERSION: '8.4'
 
     steps:
