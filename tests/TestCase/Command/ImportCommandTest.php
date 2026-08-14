@@ -62,7 +62,7 @@ class ImportCommandTest extends TestCase
     #[Test]
     public function testExecuteNoExistingFile(): void
     {
-        $filename = '/noExistingDir/backup.sql';
+        $filename = DS . 'noExistingDir' . DS . 'backup.sql';
 
         $this->exec($this->command . ' ' . $filename);
         $this->assertExitError();
