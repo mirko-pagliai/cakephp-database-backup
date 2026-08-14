@@ -76,9 +76,9 @@ class ExportCommandTest extends TestCase
     #[Test]
     public function testExecuteNotWritableTarget(): void
     {
-        $this->exec($this->command . ' --filename /noExistingDir/backup.sql');
+        $this->exec($this->command . ' --filename ' . DS . 'noExistingDir' . DS . 'backup.sql');
         $this->assertExitError();
-        $this->assertErrorContains('File or directory `' . DS . 'noExistingDir` is not writable');
+        $this->assertErrorContains('File or directory `'. DS . 'noExistingDir` is not writable');
     }
 
     #[Test]
