@@ -164,5 +164,4 @@ jobs:
     - name: Run PHPUnit
       env:
         db_dsn: 'mysql://root@localhost/test'
-      run: |
-          vendor/bin/phpunit --display-incomplete --group mysql
+      run: vendor/bin/phpunit --display-deprecations --display-warnings
