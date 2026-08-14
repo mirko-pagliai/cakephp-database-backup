@@ -87,8 +87,13 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'sqlite3-binary\' my-database .dump > \'filename.sql\'', 'filename.sql'])]
     #[TestWith(['\'sqlite3-binary\' my-database .dump | \'gzip-binary\' > \'filename.sql.gz\'', 'filename.sql.gz'])]
     #[TestWith(['\'sqlite3-binary\' my-database .dump | \'bzip2-binary\' > \'filename.sql.bz2\'', 'filename.sql.bz2'])]
-    public function testGetExportCommand(string $expectedExportCommand, string $filename): void
+    public function testGetExportCommand(string $expectedCommand, string $filename): void
     {
+        // It changes the expected escaping under Windows systems
+        if (DS === '\\') {
+            $expectedCommand = str_replace('\'', '"', $expectedCommand);
+        }
+
         $Connection = $this->createStub(ConnectionInterface::class);
 
         $Executor = new class ($Connection, 'Sqlite') extends AbstractExecutor {
@@ -105,7 +110,7 @@ class AbstractExecutorTest extends TestCase
 
         $result = $Executor->getExportCommand($filename);
 
-        $this->assertSame($expectedExportCommand, $result);
+        $this->assertSame($expectedCommand, $result);
     }
 
     /**
@@ -115,8 +120,13 @@ class AbstractExecutorTest extends TestCase
     #[TestWith(['\'sqlite3-binary\' my-database < \'filename.sql\'', 'filename.sql'])]
     #[TestWith(['\'gzip-binary\' -dc \'filename.sql.gz\' | \'sqlite3-binary\' my-database', 'filename.sql.gz'])]
     #[TestWith(['\'bzip2-binary\' -dc \'filename.sql.bz2\' | \'sqlite3-binary\' my-database', 'filename.sql.bz2'])]
-    public function testGetImportCommand(string $expectedImportCommand, string $filename): void
+    public function testGetImportCommand(string $expectedCommand, string $filename): void
     {
+        // It changes the expected escaping under Windows systems
+        if (DS === '\\') {
+            $expectedCommand = str_replace('\'', '"', $expectedCommand);
+        }
+
         $Connection = $this->createStub(ConnectionInterface::class);
 
         $Executor = new class ($Connection, 'Sqlite') extends AbstractExecutor {
@@ -133,7 +143,7 @@ class AbstractExecutorTest extends TestCase
 
         $result = $Executor->getImportCommand($filename);
 
-        $this->assertSame($expectedImportCommand, $result);
+        $this->assertSame($expectedCommand, $result);
     }
 
     #[Test]
