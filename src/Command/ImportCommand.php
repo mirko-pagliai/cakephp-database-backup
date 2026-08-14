@@ -74,7 +74,11 @@ class ImportCommand extends Command
     public static function makeAbsoluteFilename(string $filename): string
     {
         if (Path::isRelative($filename) && is_readable(Path::makeAbsolute($filename, ROOT))) {
-            $filename = Path::makeAbsolute($filename, ROOT);
+            $filename = str_replace(
+                search: '/',
+                replace: DS,
+                subject: Path::makeAbsolute($filename, ROOT),
+            );
         }
 
         return $filename;
