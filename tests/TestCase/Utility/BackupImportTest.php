@@ -61,10 +61,10 @@ class BackupImportTest extends TestCase
     }
 
     #[Test]
-    #[TestWith([TMP . 'backups/backup.sql', 'backup.sql'])]
-    #[TestWith([TMP . 'backups/backup.sql.gz', 'backup.sql.gz'])]
-    #[TestWith([TMP . 'backups/backup.sql.bz2', 'backup.sql.bz2'])]
-    #[TestWith([TMP . 'backups/backup.sql.bz2', TMP . 'backups/backup.sql.bz2'])]
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql', 'backup.sql'])]
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql.gz', 'backup.sql.gz'])]
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql.bz2', 'backup.sql.bz2'])]
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql.bz2', TMP . 'backups' . DS . 'backup.sql.bz2'])]
     public function testFilename(string $expectedFilename, string $filename): void
     {
         $filename = $this->createBackup(filename: $filename, fakeBackup: true);
