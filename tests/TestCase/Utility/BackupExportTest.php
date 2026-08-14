@@ -115,7 +115,7 @@ class BackupExportTest extends TestCase
         $filename = $this->createBackup();
 
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage("File `$filename ` already exists");
+        $this->expectExceptionMessage("File `$filename` already exists");
         $this->BackupExport->filename($filename);
     }
 
