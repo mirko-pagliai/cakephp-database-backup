@@ -42,7 +42,7 @@ class ExportCommandTest extends TestCase
     {
         $this->exec($this->command);
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\~]+backup_[\w_]+\.sql` has been exported/');
         $this->assertErrorEmpty();
     }
 
@@ -51,7 +51,7 @@ class ExportCommandTest extends TestCase
     {
         $this->exec($this->command . ' --compression bzip2');
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup_[\w_]+\.sql\.bz2` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\~]+backup_[\w_]+\.sql\.bz2` has been exported/');
         $this->assertErrorEmpty();
     }
 
@@ -60,7 +60,7 @@ class ExportCommandTest extends TestCase
     {
         $this->exec($this->command . ' --filename backup.sql');
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\]+backup.sql` has been exported/');
+        $this->assertOutputRegExp('/Backup `[\w\-\/\:\\\\~]+backup.sql` has been exported/');
         $this->assertErrorEmpty();
     }
 
