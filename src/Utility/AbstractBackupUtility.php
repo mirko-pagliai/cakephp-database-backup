@@ -105,7 +105,10 @@ abstract class AbstractBackupUtility
      */
     public function makeAbsolutePath(string $path): string
     {
-        return Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+        return str_replace(search: '/', replace: DS, subject: Path::makeAbsolute(
+            path: $path,
+            basePath: Configure::readOrFail('DatabaseBackup.target'),
+        ));
     }
 
     /**

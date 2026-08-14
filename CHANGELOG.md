@@ -1,7 +1,8 @@
 # 2.x branch
 ## 2.15 branch
 ### 2.15.5
-* normalize directory separators in `ImportCommand::makeAbsoluteFilename()` to ensure compatibility across environments.
+* normalize directory separators for `AbstractBackupUtility::makeAbsolutePath()` and
+  `ImportCommand::makeAbsoluteFilename()` methods to ensure compatibility across environments.
 
 ### 2.15.4
 * fixed https://github.com/mirko-pagliai/cakephp-database-backup/security/dependabot/2;
