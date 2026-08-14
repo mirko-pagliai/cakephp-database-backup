@@ -23,6 +23,7 @@ use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\AbstractBackupUtility;
 use DatabaseBackup\Utility\BackupExport;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -257,13 +258,12 @@ class BackupExportTest extends TestCase
 
     /**
      * Test for `export()` method, with a different chmod configuration value.
-     *
-     * @requires OS Linux
      */
     #[Test]
+    #[RequiresOperatingSystem('Linux')]
     public function testExportWithDifferentChmod(): void
     {
-        $filename = TMP . 'backups/backup.sql';
+        $filename = TMP . 'backups' . DS . 'backup.sql';
         $chmodValue = 0777;
         Configure::write('DatabaseBackup.chmod', $chmodValue);
 
