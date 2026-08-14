@@ -55,22 +55,22 @@ class ImportCommandTest extends TestCase
 
         $this->exec($this->command . ' ' . $backup);
         $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `' . $backup . '` has been imported</success>');
+        $this->assertOutputContains("<success>Backup `$backup` has been imported</success>");
         $this->assertErrorEmpty();
     }
 
     #[Test]
     public function testExecuteNoExistingFile(): void
     {
-        $filename = '/noExistingDir/backup.sql';
+        $filename = DS . 'noExistingDir' . DS . 'backup.sql';
 
         $this->exec($this->command . ' ' . $filename);
         $this->assertExitError();
-        $this->assertErrorContains('File or directory `' . $filename . '` is not readable');
+        $this->assertErrorContains("File or directory `$filename` is not readable");
     }
 
     /**
-     * Test for `execute()` method, with `--timeout` option.
+     * Test for the `execute()` method, with the `-- timeout` option.
      */
     #[Test]
     public function testExecuteTimeoutOption(): void
