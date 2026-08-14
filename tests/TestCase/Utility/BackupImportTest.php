@@ -76,9 +76,9 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testFilenameNoReadableFile(): void
     {
-        $filename = TMP . 'noExistingDir/backup.sql';
+        $filename = TMP . 'noExistingDir' . DS . 'backup.sql';
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File or directory `' . $filename . '` is not readable');
+        $this->expectExceptionMessage("File or directory `$filename` is not readable");
         $this->BackupImport->filename($filename);
     }
 
