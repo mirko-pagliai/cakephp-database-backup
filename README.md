@@ -19,9 +19,9 @@ even a coffee is enough! Thank you.
 
 *DatabaseBackup* requires:
 
-*   `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (if you still use `mysql`/`mysqldump`, [see here](https://github.com/mirko-pagliai/cakephp-database-backup/blob/3.0.x/docs/Common%20issues.md#transition-from-mysql-and-mysqldump-to-mariadb-and-mariadb-dump));
-*   `pg_dump` and `pg_restore` for *Postgres* databases;
-*   `sqlite3` for *Sqlite* databases.
+* `mariadb` and `mariadb-dump` for *MariaDB*/*MySql* databases (if you still use `mysql`/`mysqldump`, [see here](https://github.com/mirko-pagliai/cakephp-database-backup/blob/3.0.x/docs/Common%20issues.md#transition-from-mysql-and-mysqldump-to-mariadb-and-mariadb-dump));
+* `pg_dump` and `pg_restore` for *Postgres* databases;
+* `sqlite3` for *Sqlite* databases.
 
 **Optionally**, if you want to handle compressed backups, `bzip2` and `gzip` are
 also required.
@@ -45,21 +45,19 @@ bin/cake plugin load DatabaseBackup
 ```
 This would update your application's bootstrap method.
 
-### Installation on older CakePHP and PHP versions
+### Package versions and installation based on CakePHP/PHP version
 
-Compared to the current installation requirements, some tags or branches are provided for those using older versions of
-CakePHP and PHP:
+| Branch                                                                                           | Status                                                                            | Requires CakePHP | Requires PHP |
+|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------| --- | --- |
+| `3.1.x`                                                                                          | In development                                                                    |           |         |
+| `3.0.x`                                                                                          | **Current branch**                                                                | `^5.2.10` | `>=8.4` |
+| `2.15.x`                                                                                         | Only security updates and relevant bugs                                           | `^5.0` | `>=8.1` |
+| `2.14.x`                                                                                         | Abandoned on May 30, 2025                                                         | `^5.0`       | `>=8.1`        |
+| tag [`cakephp4`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp4) | Abandoned on January 5, 2024, and roughly coincides with what `2.12.3` version was | `^4.0` | `>=7.4.0` |
+| tag [`cakephp3`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp3) | Abandoned April 29, 2021, and roughly coincides with what `2.8.5` version was     | `^3.5.1` | `>=5.6 <7.4` | 
 
-- `2.15` versions, which require at least CakePHP `5.0` and PHP `8.1`;
-- tag [`cakephp4`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp4), which requires at
-  least PHP `>=7.4.0` and CakePHP `^4.0`.   
-  This tag no longer receives any updates as of January 5, 2024, and roughly coincides with what `2.12.3` version was.
-- tag [`cakephp3`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp3), which requires at
-  least PHP `>=5.6 <7.4` and CakePHP `^3.5.1`.   
-  This tag no longer receives any updates as of April 29, 2021, and roughly coincides with what `2.8.5` version was.
-
-You can freely use these, even by downloading the source codes from the attached assets, but their functioning is
-no longer guaranteed, especially regarding old dependencies that may no longer be available.
+You are free to use the `cakephp4` and `cakephp3` tags, even by downloading the source codes from the attached assets,
+but their functioning is no longer guaranteed, especially regarding old dependencies that may no longer be available.
 
 ## Configuration and How to use
 
