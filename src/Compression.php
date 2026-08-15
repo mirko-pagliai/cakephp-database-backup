@@ -90,6 +90,10 @@ enum Compression: string
      */
     public static function tryFromFilename(string $filename): ?self
     {
+        if ($filename === '') {
+            return null;
+        }
+
         return array_find(
             array: self::cases(),
             callback: fn($Compression) => str_ends_with(

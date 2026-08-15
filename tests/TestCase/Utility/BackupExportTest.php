@@ -113,6 +113,8 @@ class BackupExportTest extends TestCase
 
     /**
      * @link \DatabaseBackup\Utility\BackupExport::$filename
+     * @param non-empty-string $expectedFilename
+     * @param string $filename
      */
     #[Test]
     #[TestWith([TMP . 'my_file_my_hostname.sql', TMP . 'my_file_{$HOSTNAME}.sql'])]

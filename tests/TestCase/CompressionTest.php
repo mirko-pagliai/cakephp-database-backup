@@ -78,6 +78,8 @@ class CompressionTest extends TestCase
     #[TestWith([Compression::Bzip2, 'FILENAME.SQL.BZ2'])]
     #[TestWith([null, 'filename.txt'])]
     #[TestWith([null, 'FILENAME.TXT'])]
+    #[TestWith([null, ''])]
+    #[TestWith([null, ' '])]
     public function testTryFromFilename(?Compression $ExpectedCompression, string $filename): void
     {
         $this->assertSame($ExpectedCompression, Compression::tryFromFilename($filename));
