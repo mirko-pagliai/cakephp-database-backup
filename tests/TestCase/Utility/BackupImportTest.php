@@ -58,7 +58,9 @@ class BackupImportTest extends TestCase
     {
         $filename = TMP . 'backup.sql';
 
-        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
+        Mockery::mock('overload:' . Filesystem::class)
+            ->shouldReceive('exists')
+            ->andReturn(true);
 
         $this->BackupImport->filename = $filename;
 
@@ -80,7 +82,9 @@ class BackupImportTest extends TestCase
     #[RunInSeparateProcess]
     public function testCallMagicMethod(): void
     {
-        Mockery::mock('overload:' . Filesystem::class)->shouldReceive('exists')->andReturnTrue();
+        Mockery::mock('overload:' . Filesystem::class)
+            ->shouldReceive('exists')
+            ->andReturn(true);
 
         $result = $this->BackupImport->filename(TMP . 'backup.sql');
         $this->assertInstanceOf(BackupImport::class, $result);
@@ -130,7 +134,6 @@ class BackupImportTest extends TestCase
 
     /**
      * @link \DatabaseBackup\Utility\BackupImport::import()
-     * @throws \ReflectionException
      */
     #[Test]
     #[RunInSeparateProcess]
