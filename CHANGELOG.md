@@ -1,6 +1,8 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.5
+* updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
+  [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
 * refactor: apply consistent formatting across tests and source files.
 
 ### 3.0.4
@@ -47,6 +49,8 @@
 ### 2.15.5
 * normalize directory separators for `AbstractBackupUtility::makeAbsolutePath()` and
   `ImportCommand::makeAbsoluteFilename()` methods to ensure compatibility across environments;
+* updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
+  [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
 * Windows tests have been restored, previously disabled.
 
 ### 2.15.4
