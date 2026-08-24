@@ -23,6 +23,7 @@ use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
@@ -82,24 +83,62 @@ txt;
         $this->assertOutputContains($expected);
     }
 
-    #[Test]
-    #[RunInSeparateProcess]
-    public function testExecute(): void
+    /**
+     * @return array<array{string, string}>
+     */
+    public static function executeDataProvider(): array
     {
-        $filename = 'custom_filename.sql';
-
-        $BackupImport = Mockery::mock('overload:' . BackupImport::class);
-        $BackupImport->shouldReceive('__construct')->with('')->once();
-        $BackupImport->shouldNotReceive('timeout');
-        $BackupImport->shouldReceive('filename')->with($filename)->once();
-        $BackupImport->shouldReceive('import')->once()->andReturn($filename);
-
-        $this->exec('database_backup.import ' . $filename);
-
-        $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `' . $filename . '` has been imported</success>');
+        return [
+            [
+                Configure::readOrFail('DatabaseBackup.target') . 'absolute_filename.sql',
+                Configure::readOrFail('DatabaseBackup.target') . 'absolute_filename.sql',
+            ],
+            [
+                ROOT . 'backups' . DS . 'relative_filename.sql',
+                'backups/relative_filename.sql',
+            ],
+        ];
     }
 
+    /**
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    #[Test]
+    #[DataProvider('executeDataProvider')]
+    #[RunInSeparateProcess]
+    public function testExecute(string $expectedFilename, string $filename): void
+    {
+        $BackupImport = Mockery::mock('overload:' . BackupImport::class);
+
+        $BackupImport
+            ->shouldReceive('__construct')
+            ->with('')
+            ->once();
+
+        $BackupImport
+            ->shouldNotReceive('timeout');
+
+        $BackupImport
+            ->shouldReceive('filename')
+            ->with($expectedFilename)
+            ->once();
+
+        $BackupImport
+            ->shouldReceive('import')
+            ->once()
+            ->andReturn($expectedFilename);
+
+        $this->exec("database_backup.import $filename");
+
+        $this->assertExitSuccess();
+        $this->assertOutputContains("<success>Backup `$filename` has been imported</success>");
+    }
+
+    /**
+     * Tests for the `execute()` method with some options.
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
@@ -107,19 +146,37 @@ txt;
         $filename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
 
         $BackupImport = Mockery::mock('overload:' . BackupImport::class);
-        $BackupImport->shouldReceive('__construct')->with('custom_connection')->once();
-        $BackupImport->shouldReceive('timeout')->with(120)->once();
-        $BackupImport->shouldReceive('filename')->with($filename)->once();
-        $BackupImport->shouldReceive('import')->once()->andReturn($filename);
 
-        $this->exec('database_backup.import --connection custom_connection --timeout 120 ' . $filename);
+        $BackupImport
+            ->shouldReceive('__construct')
+            ->with('custom_connection')
+            ->once();
+
+        $BackupImport
+            ->shouldReceive('timeout')
+            ->with(120)
+            ->once();
+
+        $BackupImport
+            ->shouldReceive('filename')
+            ->with($filename)
+            ->once();
+
+        $BackupImport
+            ->shouldReceive('import')
+            ->once()
+            ->andReturn($filename);
+
+        $this->exec("database_backup.import --connection custom_connection --timeout 120 $filename");
 
         $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `' . $filename . '` has been imported</success>');
+        $this->assertOutputContains("<success>Backup `$filename` has been imported</success>");
     }
 
     /**
-     * Tests the execution of the database_backup.import command without providing the required filename argument
+     * Tests for the `execute()` method without providing the required filename argument.
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
      */
     #[Test]
     public function testExecuteWithNoFilename(): void
@@ -130,26 +187,48 @@ txt;
         $this->assertErrorContains('Error: Missing required argument. The `filename` argument is required.');
     }
 
+    /**
+     * Tests for the `execute()` method when `BackupImport::import()` throws an exception.
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteOnException(): void
     {
         $BackupImport = Mockery::mock('overload:' . BackupImport::class);
-        $BackupImport->shouldReceive('filename');
-        $BackupImport->shouldReceive('import')->once()->andThrow(new Exception('Exception message'));
+
+        $BackupImport
+            ->shouldReceive('filename');
+
+        $BackupImport
+            ->shouldReceive('import')
+            ->once()
+            ->andThrow(new Exception('Exception message'));
 
         $this->exec('database_backup.import my_backup.sql');
         $this->assertExitError();
         $this->assertErrorContains('<error>Exception message</error>');
     }
 
+    /**
+     * Tests for the `execute()` method on stopped event (`BackupImport::import()` returns `false`).
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testExecuteOnStoppedEvent(): void
     {
         $BackupImport = Mockery::mock('overload:' . BackupImport::class);
-        $BackupImport->shouldReceive('filename');
-        $BackupImport->shouldReceive('import')->once()->andReturnFalse();
+
+        $BackupImport
+            ->shouldReceive('filename');
+
+        $BackupImport
+            ->shouldReceive('import')
+            ->once()
+            ->andReturn(false);
 
         $this->exec('database_backup.import my_backup.sql');
 
