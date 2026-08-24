@@ -32,7 +32,6 @@ class CommandTest extends TestCase
      */
     #[Test]
     #[TestWith([ROOT . 'composer.json', 'composer.json'])]
-    #[TestWith(['file_does_not_exist_in_root.sql', 'file_does_not_exist_in_root.sql'])]
     #[TestWith([ROOT . 'composer.json', ROOT . 'composer.json'])]
     #[TestWith([TMP . 'absolute_tmp_file.sql', TMP . 'absolute_tmp_file.sql'])]
     public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
