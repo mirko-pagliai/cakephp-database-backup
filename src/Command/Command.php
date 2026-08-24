@@ -71,9 +71,8 @@ abstract class Command extends CakeCommand
         }
 
         $absolutePath = Path::makeAbsolute($path, ROOT);
-        $absolutePath = DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
 
-        return $absolutePath;
+        return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
 
     /**
