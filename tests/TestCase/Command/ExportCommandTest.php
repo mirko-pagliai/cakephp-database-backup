@@ -47,7 +47,11 @@ class ExportCommandTest extends TestCase
         $this->assertOutputContains('Exports a database backup');
         $this->assertOutputContains('cake database_backup.export [options]');
 
-        //Requires at least CakePHP 5.2.10, otherwise the `--quiet` option has a slightly different description
+        /**
+         * Requires at least 5.2.10, otherwise the `--quiet` option has a slightly different description.
+         *
+         * @todo remove after it will require at least Cakephp 5.2.10
+         */
         $this->skipUnless(version_compare(Configure::version(), '5.2.10', '>='));
 
         $root = ROOT;
