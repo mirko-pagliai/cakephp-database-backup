@@ -190,9 +190,23 @@ class UtilityTest extends TestCase
         $basePath = Configure::readOrFail('DatabaseBackup.target');
 
         return [
-            [$basePath . 'relative_file_to_target.txt', 'relative_file_to_target.txt'],
-            [$basePath . 'absolute_file_to_target.txt', $basePath . 'absolute_file_to_target.txt'],
-            [TMP . 'absolute_tmp_file', TMP . 'absolute_tmp_file'],
+            [
+                $basePath . 'relative_file_to_target.txt',
+                'relative_file_to_target.txt',
+            ],
+            [
+                $basePath . 'absolute_file_to_target.txt',
+                $basePath . 'absolute_file_to_target.txt',
+            ],
+            [
+                TMP . 'absolute_tmp_file',
+                TMP . 'absolute_tmp_file',
+            ],
+            [
+                TMP . 'relative_file_to_target.txt',
+                'relative_file_to_target.txt',
+                TMP,
+            ],
         ];
     }
 
@@ -201,9 +215,9 @@ class UtilityTest extends TestCase
      */
     #[Test]
     #[DataProvider('makeAbsolutePathDataProvider')]
-    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
+    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path, string $basePath = ''): void
     {
-        $result = $this->Utility->makeAbsolutePath($path);
+        $result = $this->Utility->makeAbsolutePath(path: $path, basePath: $basePath);
 
         $this->assertSame($expectedAbsolutePath, $result);
     }

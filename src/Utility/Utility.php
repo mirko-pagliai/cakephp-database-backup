@@ -127,19 +127,27 @@ abstract class Utility
     }
 
     /**
-     * Converts a relative file path to an absolute path based on the specified target directory.
+     * Constructs an absolute path from a given relative path and base path.
      *
-     * @param string $path
-     * @return string
-     * @since 2.13.5
+     * If the input path is already absolute, it is returned as is. The base path is used to resolve relative paths,
+     * with a default fallback if not provided.
+     *
+     * @param string $path The relative or absolute path that needs to be processed.
+     * @param string $basePath The base directory path to resolve the relative path against. If not provided, a default
+     * is read from configuration.
+     * @return string Returns the absolute path.
      */
-    public function makeAbsolutePath(string $path): string
+    public function makeAbsolutePath(string $path, string $basePath = ''): string
     {
         if (Path::isAbsolute($path)) {
             return $path;
         }
 
-        $absolutePath = Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+        if (!$basePath) {
+            $basePath = Configure::readOrFail('DatabaseBackup.target');
+        }
+
+        $absolutePath = Path::makeAbsolute($path, $basePath);
 
         return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
