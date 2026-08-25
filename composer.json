@@ -22,7 +22,6 @@
     "cakephp/cakephp-codesniffer": "^5.3.2",
     "cakephp/migrations": "^4.0",
     "phpunit/phpunit": "^10.5.62 || ^11.5.50 || ^12.5.22",
-    "symfony/finder": "^6.0|^7.2",
     "mockery/mockery": "^1.6.10"
   },
   "autoload": {
