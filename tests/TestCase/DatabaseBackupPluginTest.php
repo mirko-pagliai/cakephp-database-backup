@@ -21,8 +21,6 @@ use DatabaseBackup\DatabaseBackupPlugin;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * DatabaseBackupPluginTest.
@@ -41,22 +39,19 @@ class DatabaseBackupPluginTest extends TestCase
     #[Test]
     public function testConsole(): void
     {
-        //Sets the expected commands from `Command` files
-        $Finder = new Finder();
-        $Finder = $Finder->files()->in(ROOT . 'src/Command')->name('/.+Command\.php/');
-        $expected = array_map(
-            callback: fn(SplFileInfo $File): string => 'database_backup.' . lcfirst($File->getBasename('Command.php')),
-            array: iterator_to_array($Finder),
-        );
+        $expected = [
+            'export',
+            'database_backup.export',
+            'import',
+            'database_backup.import',
+        ];
 
         $CommandCollection = new CommandCollection();
         $App = new Application(CONFIG);
         $App->addPlugin(DatabaseBackupPlugin::class);
         $App->pluginConsole($CommandCollection);
-        $availableCommands = $CommandCollection->keys();
 
-        foreach ($expected as $expectedCommand) {
-            $this->assertContains($expectedCommand, $availableCommands);
-        }
+        $availableCommands = $CommandCollection->keys();
+        $this->assertSame($expected, $availableCommands);
     }
 }
