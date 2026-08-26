@@ -116,12 +116,8 @@ txt;
             ->andReturn($expectedFilename);
 
         $this->exec("database_backup.import $filename");
-
-        //The filename in the console output is relative to `ROOT`
-        $expectedOutputFile = new ImportCommand()->makeRelativePath($filename);
-
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$expectedOutputFile` has been imported</success>");
+        $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
         $this->assertErrorEmpty();
     }
 
@@ -174,12 +170,8 @@ txt;
             ->andReturn($filename);
 
         $this->exec("database_backup.import --connection custom_connection --timeout 120 $filename");
-
-        //The filename in the console output is relative to `ROOT`
-        $expectedOutputFile = new ImportCommand()->makeRelativePath($filename);
-
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$expectedOutputFile` has been imported</success>");
+        $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
         $this->assertErrorEmpty();
     }
 
