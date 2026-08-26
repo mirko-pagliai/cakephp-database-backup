@@ -80,7 +80,7 @@ class FakeConnection extends Connection
                 return new class ($name) extends TableSchema {
                     /**
                      * @param \Cake\Database\Connection $connection
-                     * @return array<int, string>
+                     * @return array<string>
                      */
                     public function dropSql(Connection $connection): array
                     {
