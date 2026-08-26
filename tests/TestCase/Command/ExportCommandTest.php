@@ -26,6 +26,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * ExportCommandTest.
@@ -93,7 +94,7 @@ txt;
     #[RunInSeparateProcess]
     public function testExecute(): void
     {
-        $expectedFilename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
+        $expectedFilename = TMP . 'my_backup.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
 
@@ -119,6 +120,40 @@ txt;
         $this->exec('database_backup.export');
         $this->assertExitSuccess();
         $this->assertOutputContains('<success>Backup `' . $expectedFilename . '` has been exported</success>');
+        $this->assertErrorEmpty();
+    }
+
+    /**
+     * Tests for the `execute()` method with the `--filename` option and absolute and relative filenames.
+     *
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    #[Test]
+    #[TestWith([ROOT . 'backups' . DS . 'absolute_filename.sql'])]
+    #[TestWith(['backups/relative_filename.sql'])]
+    #[RunInSeparateProcess]
+    public function testExecuteWithFilenameOption(string $filename): void
+    {
+        $BackupExport = Mockery::mock('overload:' . BackupExport::class);
+
+        $BackupExport
+            ->shouldReceive('__construct')
+            ->once()
+            ->with('');
+
+        $BackupExport
+            ->shouldReceive('filename')
+            ->with($filename)
+            ->once();
+
+        $BackupExport
+            ->shouldReceive('export')
+            ->once()
+            ->andReturn($filename);
+
+        $this->exec("database_backup.export --filename $filename");
+        $this->assertExitSuccess();
+        $this->assertOutputRegExp('#^<success>Backup `[^`]*' . preg_quote(basename($filename)) . '` has been exported</success>$#');
         $this->assertErrorEmpty();
     }
 
