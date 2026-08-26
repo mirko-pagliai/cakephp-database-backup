@@ -95,9 +95,12 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests for the `$filename` property, with absolute and relative paths.
+     *
      * @link \DatabaseBackup\Utility\BackupExport::$filename
      */
     #[Test]
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql', Compression::None, 'backup.sql'])]
     #[TestWith([TMP . 'backup.sql', Compression::None, TMP . 'backup.sql'])]
     #[TestWith([TMP . 'backup.sql.gz', Compression::Gzip, TMP . 'backup.sql.gz'])]
     #[TestWith([TMP . 'backup.sql.bz2', Compression::Bzip2, TMP . 'backup.sql.bz2'])]
@@ -229,18 +232,20 @@ class BackupExportTest extends TestCase
     }
 
     /**
-     * Tests for the `export()` method, with a call to the `filename()` method.
+     * Tests for the `export()` method, with a call to the `filename()` method and using relative and absolute paths.
      *
      * @link \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
-    public function testExportWithFilename(): void
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql.gz', 'backup.sql.gz'])]
+    #[TestWith([TMP . 'backup.sql.gz', TMP . 'backup.sql.gz'])]
+    public function testExportWithFilename(string $expectedFilename, string $filename): void
     {
         $result = $this->BackupExport
-            ->filename(TMP . 'backup.sql.gz')
+            ->filename($filename)
             ->export();
 
-        $this->assertSame(TMP . 'backup.sql.gz', $result);
+        $this->assertSame($expectedFilename, $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
     }
