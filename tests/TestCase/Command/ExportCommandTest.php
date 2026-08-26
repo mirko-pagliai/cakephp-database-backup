@@ -70,6 +70,7 @@ cake database_backup.export [options]
                    used <comment>(choices: gzip|bzip2)</comment>
 --connection       Name of the alternative connection to use, for
                    example if you are not using the default connection
+--debug            Enable debug mode
 --filename, -f     Filename. It can be an absolute path and may contain
                    patterns. The compression type will be automatically
                    set. Filenames can be relative to

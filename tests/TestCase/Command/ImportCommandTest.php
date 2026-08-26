@@ -43,7 +43,7 @@ class ImportCommandTest extends TestCase
         $this->exec('database_backup.import -h');
         $this->assertExitSuccess();
         $this->assertOutputContains('Imports a database backup');
-        $this->assertOutputContains('cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>');
+        $this->assertOutputContains('cake database_backup.import [--connection] [--debug] [-h] [-q] [-t] [-v] <filename>');
 
         /**
          * Requires at least 5.2.10, otherwise the `--quiet` option has a slightly different description.
@@ -59,12 +59,13 @@ class ImportCommandTest extends TestCase
 Imports a database backup
 
 <info>Usage:</info>
-cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>
+cake database_backup.import [--connection] [--debug] [-h] [-q] [-t] [-v] <filename>
 
 <info>Options:</info>
 
 --connection      Name of the alternative connection to use, for example
                   if you are not using the default connection
+--debug           Enable debug mode
 --help, -h        Display this help.
 --quiet, -q       Enable quiet output and non-interactive mode.
 --timeout, -t     Timeout for shell commands

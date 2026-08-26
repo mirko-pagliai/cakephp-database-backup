@@ -42,6 +42,11 @@ abstract class Command extends CakeCommand
             ),
         ]);
 
+        $parser->addOption(name: 'debug', options: [
+            'help' => __d('database_backup', 'Enable debug mode'),
+            'boolean' => true,
+        ]);
+
         $parser->addOption(name: 'timeout', options: [
             'help' => __d('database_backup', 'Timeout for shell commands'),
             'short' => 't',
@@ -71,9 +76,8 @@ abstract class Command extends CakeCommand
         }
 
         $absolutePath = Path::makeAbsolute($path, ROOT);
-        $absolutePath = DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
 
-        return $absolutePath;
+        return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
 
     /**
