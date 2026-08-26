@@ -128,7 +128,7 @@ txt;
      */
     #[Test]
     #[TestWith([TMP . 'no_existing_filename.sql', TMP . 'no_existing_filename.sql'])]
-    #[TestWith([ROOT . 'backups/no_existing_filename.sql', 'backups/no_existing_filename.sql'])]
+    #[TestWith([ROOT . 'backups' . DS . 'no_existing_filename.sql', 'backups' . DS . 'no_existing_filename.sql'])]
     public function testExecuteWithNoExistingFile(string $expectedFilename, string $filename): void
     {
         $this->exec("database_backup.import $filename");
