@@ -83,6 +83,7 @@ cake database_backup.export [options]
 
 txt;
         $this->assertOutputContains($expected);
+        $this->assertErrorEmpty();
     }
 
     /**
@@ -95,28 +96,35 @@ txt;
         $expectedFilename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
+
         $BackupExport
             ->shouldReceive('__construct')
             ->once()
             ->with('');
+
         $BackupExport
             ->shouldNotReceive('timeout');
+
         $BackupExport
             ->shouldNotReceive('filename');
+
         $BackupExport
             ->shouldNotReceive('compression');
+
         $BackupExport
             ->shouldReceive('export')
             ->once()
             ->andReturn($expectedFilename);
 
         $this->exec('database_backup.export');
-
         $this->assertExitSuccess();
         $this->assertOutputContains('<success>Backup `' . $expectedFilename . '` has been exported</success>');
+        $this->assertErrorEmpty();
     }
 
     /**
+     * Tests for the `execute()` method with some options.
+     *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
@@ -126,33 +134,40 @@ txt;
         $filename = 'custom_filename.sql';
 
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
+
         $BackupExport
             ->shouldReceive('__construct')
             ->once()
             ->with('custom_connection');
+
         $BackupExport
             ->shouldReceive('timeout')
             ->once()
             ->with(120);
+
         $BackupExport
             ->shouldReceive('filename')
             ->once()
             ->with($filename);
+
         //Note that in this case the `--compression` option was passed, but is ignored
         $BackupExport
             ->shouldNotReceive('compression');
+
         $BackupExport
             ->shouldReceive('export')
             ->once()
             ->andReturn($filename);
 
         $this->exec('database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename ' . $filename);
-
         $this->assertExitSuccess();
         $this->assertOutputContains('<success>Backup `' . $filename . '` has been exported</success>');
+        $this->assertErrorEmpty();
     }
 
     /**
+     * Tests for the `execute()` method with the `--compression` option.
+     *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
@@ -160,30 +175,37 @@ txt;
     public function testExecuteWithCompressionOption(): void
     {
         $BackupExport = Mockery::mock('overload:' . BackupExport::class);
+
         $BackupExport
             ->shouldReceive('__construct')
             ->once()
             ->with('');
+
         $BackupExport
             ->shouldNotReceive('timeout');
+
         $BackupExport
             ->shouldNotReceive('filename');
+
         $BackupExport
             ->shouldReceive('compression')
             ->once()
             ->with('gzip');
+
         $BackupExport
             ->shouldReceive('export')
             ->once()
             ->andReturn('my_backup.sql.gz');
 
         $this->exec('database_backup.export --compression gzip');
-
         $this->assertExitSuccess();
         $this->assertOutputContains('<success>Backup `my_backup.sql.gz` has been exported</success>');
+        $this->assertErrorEmpty();
     }
 
     /**
+     * Tests for the `execute()` method when `BackupExport::import()` throws an exception.
+     *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
@@ -201,6 +223,8 @@ txt;
     }
 
     /**
+     * Tests for the `execute()` method on the stopped event (`BackupExport::export()` returns `false`).
+     *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
