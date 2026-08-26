@@ -1,6 +1,7 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.5
+* tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened, with particular attention to relative/absolute paths;
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
   [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
 * refactor: apply consistent formatting across tests and source files.
