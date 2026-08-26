@@ -23,10 +23,10 @@ use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * ImportCommandTest.
@@ -81,30 +81,17 @@ filename  Filename. It can be an absolute path. Filenames can be
 
 txt;
         $this->assertOutputContains($expected);
+        $this->assertErrorEmpty();
     }
 
     /**
-     * @return array<array{string, string}>
-     */
-    public static function executeDataProvider(): array
-    {
-        return [
-            [
-                Configure::readOrFail('DatabaseBackup.target') . 'absolute_filename.sql',
-                Configure::readOrFail('DatabaseBackup.target') . 'absolute_filename.sql',
-            ],
-            [
-                ROOT . 'backups' . DS . 'relative_filename.sql',
-                'backups/relative_filename.sql',
-            ],
-        ];
-    }
-
-    /**
+     * Tests for the `execute()` method with an absolute filename and a relative filename.
+     *
      * @link \DatabaseBackup\Command\ImportCommand::execute()
      */
     #[Test]
-    #[DataProvider('executeDataProvider')]
+    #[TestWith([ROOT . 'backups' . DS . 'absolute_filename.sql', ROOT . 'backups' . DS . 'absolute_filename.sql'])]
+    #[TestWith([ROOT . 'backups' . DS . 'relative_filename.sql', 'backups/relative_filename.sql'])]
     #[RunInSeparateProcess]
     public function testExecute(string $expectedFilename, string $filename): void
     {
@@ -130,8 +117,27 @@ txt;
 
         $this->exec("database_backup.import $filename");
 
+        //The filename in the console output is relative to `ROOT`
+        $expectedOutputFile = new ImportCommand()->makeRelativePath($filename);
+
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$filename` has been imported</success>");
+        $this->assertOutputContains("<success>Backup `$expectedOutputFile` has been imported</success>");
+        $this->assertErrorEmpty();
+    }
+
+    /**
+     * Tests for the `execute()` method with no existing file (absolute and relative).
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    #[Test]
+    #[TestWith([TMP . 'no_existing_filename.sql', TMP . 'no_existing_filename.sql'])]
+    #[TestWith([ROOT . 'backups/no_existing_filename.sql', 'backups/no_existing_filename.sql'])]
+    public function testExecuteWithNoExistingFile(string $expectedFilename, string $filename): void
+    {
+        $this->exec("database_backup.import $filename");
+        $this->assertExitError();
+        $this->assertErrorContains("<error>File `$expectedFilename` does not exist</error>");
     }
 
     /**
@@ -143,7 +149,7 @@ txt;
     #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
     {
-        $filename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
+        $filename = ROOT . 'backups' . DS . 'absolute_filename.sql';
 
         $BackupImport = Mockery::mock('overload:' . BackupImport::class);
 
@@ -169,8 +175,12 @@ txt;
 
         $this->exec("database_backup.import --connection custom_connection --timeout 120 $filename");
 
+        //The filename in the console output is relative to `ROOT`
+        $expectedOutputFile = new ImportCommand()->makeRelativePath($filename);
+
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$filename` has been imported</success>");
+        $this->assertOutputContains("<success>Backup `$expectedOutputFile` has been imported</success>");
+        $this->assertErrorEmpty();
     }
 
     /**
@@ -182,7 +192,6 @@ txt;
     public function testExecuteWithNoFilename(): void
     {
         $this->exec('database_backup.import');
-
         $this->assertExitError();
         $this->assertErrorContains('Error: Missing required argument. The `filename` argument is required.');
     }
@@ -212,7 +221,7 @@ txt;
     }
 
     /**
-     * Tests for the `execute()` method on stopped event (`BackupImport::import()` returns `false`).
+     * Tests for the `execute()` method on the stopped event (`BackupImport::import()` returns `false`).
      *
      * @link \DatabaseBackup\Command\ImportCommand::execute()
      */
@@ -231,7 +240,6 @@ txt;
             ->andReturn(false);
 
         $this->exec('database_backup.import my_backup.sql');
-
         $this->assertExitError();
         $this->assertErrorContains('<error>The `Backup.beforeImport` event stopped the operation</error>');
     }
