@@ -1,4 +1,8 @@
 # 3.x branch
+## 3.1 branch
+### 3.1.0
+* requires at least CakePHP 5.4.0.
+
 ## 3.0 branch
 ### 3.0.6
 * tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened, with particular attention to relative/absolute paths;
