@@ -63,6 +63,8 @@ but their functioning is no longer guaranteed, especially regarding old dependen
 
 See [our documentation](/docs).
 
+If you are upgrading from the `2.x` branch, see [Migration from branch 2.15 to 3.0](docs/Migration%20from%20branch%202.15%20to%203.0.md).
+
 Before opening an issue, check this list of [common issues](docs/Common%20issues.md).
 
 ## Testing
