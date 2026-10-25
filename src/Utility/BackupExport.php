@@ -76,7 +76,7 @@ class BackupExport extends Utility
         return str_replace(
             search: ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
             replace: [
-                $this->Connection->config()['database'],
+                pathinfo($this->Connection->config()['database'], PATHINFO_FILENAME),
                 new DateTime()->format('YmdHis'),
                 str_replace(
                     search: ['127.0.0.1', '::1'],

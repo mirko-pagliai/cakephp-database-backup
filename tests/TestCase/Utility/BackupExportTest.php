@@ -136,6 +136,27 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests that the `{$DATABASE}` pattern is replaced only by the database name.
+     *
+     * With SQLite, the `database` key of the connection is the full path of the database file, but the pattern must be
+     * replaced only by the file name, without path and extension (this is how it worked in the `2.15.x` branch).
+     *
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
+    #[Test]
+    #[TestWith(['my_database'])]
+    #[TestWith([TMP . 'my_database.sq3'])]
+    #[TestWith([TMP . 'my_database.sqlite'])]
+    public function testFilenamePropertyWithDatabasePattern(string $database): void
+    {
+        $BackupExport = new BackupExport(Connection: new FakeConnection(['database' => $database]));
+
+        $BackupExport->filename = TMP . 'my_file_{$DATABASE}.sql';
+
+        $this->assertSame(TMP . 'my_file_my_database.sql', $BackupExport->filename);
+    }
+
+    /**
      * @link \DatabaseBackup\Utility\BackupExport::$filename
      */
     #[Test]
