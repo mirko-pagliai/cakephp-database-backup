@@ -105,13 +105,9 @@ class MysqlExecutorTest extends TestCase
         $authFile = $MysqlExecutor->authFile;
         touch($authFile);
 
-        try {
-            $MysqlExecutor->runProcess(TMP . 'no_existing_backup.sql');
-
-            $this->fail('The process should have failed');
-        } catch (ProcessFailedException) {
-            $this->assertFileDoesNotExist($authFile);
-        }
+        $this->expectException(ProcessFailedException::class);
+        $MysqlExecutor->runProcess(TMP . 'no_existing_backup.sql');
+        $this->assertFileDoesNotExist($authFile);
     }
 
     /**
