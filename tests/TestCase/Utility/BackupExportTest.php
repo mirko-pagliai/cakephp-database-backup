@@ -157,6 +157,21 @@ class BackupExportTest extends TestCase
     }
 
     /**
+     * Tests that an empty filename resets the `$filename` property.
+     *
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
+    #[Test]
+    public function testFilenamePropertyWithEmptyString(): void
+    {
+        $this->BackupExport->filename = TMP . 'backup.sql';
+        $this->assertSame(TMP . 'backup.sql', $this->BackupExport->filename);
+
+        $this->BackupExport->filename = '';
+        $this->assertSame('', $this->BackupExport->filename);
+    }
+
+    /**
      * @link \DatabaseBackup\Utility\BackupExport::$filename
      */
     #[Test]
@@ -269,6 +284,28 @@ class BackupExportTest extends TestCase
         $this->assertSame($expectedFilename, $result);
         $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
         $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+    }
+
+    /**
+     * Tests for the `export()` method, called twice on the same instance.
+     *
+     * After the first call the filename is reset, so the second call must generate a new filename and must not reuse
+     * (and overwrite) the previous one.
+     *
+     * @link \DatabaseBackup\Utility\BackupExport::export()
+     */
+    #[Test]
+    public function testExportCalledTwice(): void
+    {
+        $firstResult = $this->BackupExport
+            ->filename(TMP . 'backup.sql')
+            ->export();
+
+        $this->assertSame(TMP . 'backup.sql', $firstResult);
+
+        $secondResult = $this->BackupExport->export() ?: '';
+
+        $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql$/', $secondResult);
     }
 
     /**

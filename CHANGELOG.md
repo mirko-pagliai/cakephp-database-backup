@@ -4,6 +4,8 @@
 * fixed a regression for SQLite introduced in `3.0.0`: the `{$DATABASE}` filename pattern was replaced by the full path
   of the database file (so the default export filename contained a path). As in the `2.15.x` branch, it is now replaced
   by the name of the database file, without path and extension;
+* fixed a regression introduced in `3.0.0`: `BackupExport::export()` did not reset the filename, so a second call on the
+  same instance overwrote the previous backup. As in the `2.15.x` branch, the filename is now reset;
 * the migration guide `docs/Migration from version 2.md` has been renamed `docs/Migration from branch 2.15 to 3.0.md`
   and completed: it now describes all the changes between the `2.15.x` and the `3.0.x` branches (requirements,
   configuration, classes, methods, events, commands and test suite).
