@@ -6,12 +6,19 @@
   by the name of the database file, without path and extension;
 * fixed a regression introduced in `3.0.0`: `BackupExport::export()` did not reset the filename, so a second call on the
   same instance overwrote the previous backup. As in the `2.15.x` branch, the filename is now reset;
+* fixed a bug in `MysqlExecutor`: if the process failed or reached the timeout, the temporary file with the
+  authentication data (which contains the password) was not deleted and remained in the temporary directory;
+* fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a
+  password containing `{{HOST}}`) was altered when the file with the authentication data was written;
+* the temporary file with the authentication data created by `MysqlExecutor` is now readable and writable only by its
+  owner (permissions `0600`), instead of being readable by other users (`0644` with the usual umask);
 * the migration guide `docs/Migration from version 2.md` has been renamed `docs/Migration from branch 2.15 to 3.0.md`
   and completed: it now describes all the changes between the `2.15.x` and the `3.0.x` branches (requirements,
   configuration, classes, methods, events, commands and test suite).
 
 ### 3.0.5
-* tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened, with particular attention to relative/absolute paths;
+* tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened, with particular
+  attention to relative/absolute paths;
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
   [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
 * refactor: apply consistent formatting across tests and source files.

@@ -19,6 +19,7 @@ use Cake\Event\EventInterface;
 use DatabaseBackup\OperationType;
 use Override;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 
 /**
  * MysqlExecutor to export/import database backups.
@@ -42,6 +43,26 @@ class MysqlExecutor extends Executor
     public function getBinaryName(): string
     {
         return $this->OperationType === OperationType::Export ? 'mariadb-dump' : 'mariadb';
+    }
+
+    /**
+     * Executes a backup process with the given parameters.
+     *
+     * The temporary file with the authentication data is always deleted at the end of the process, even if the process
+     * fails or reaches the timeout.
+     *
+     * @inheritDoc
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException If an error occurs during the execution of the process
+     * @since 3.0.6
+     */
+    #[Override]
+    public function runProcess(string $filename, int $timeout = 60): Process
+    {
+        try {
+            return parent::runProcess(filename: $filename, timeout: $timeout);
+        } finally {
+            $this->deleteAuthFile();
+        }
     }
 
     /**
@@ -127,13 +148,15 @@ class MysqlExecutor extends Executor
     {
         $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null,];
 
-        $content = str_replace(
-            search: ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
-            replace: [$config['username'], $config['password'], $config['host']],
-            subject: $content,
-        );
+        $content = strtr($content, [
+            '{{USER}}' => $config['username'],
+            '{{PASSWORD}}' => $config['password'],
+            '{{HOST}}' => $config['host'],
+        ]);
 
         $Filesystem = new Filesystem();
+        $Filesystem->touch($this->authFile);
+        $Filesystem->chmod($this->authFile, 0600);
         $Filesystem->dumpFile($this->authFile, $content);
 
         return $Filesystem->exists($this->authFile);
