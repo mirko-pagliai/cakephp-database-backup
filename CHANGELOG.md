@@ -4,6 +4,11 @@
 * requires at least CakePHP 5.4.0.
 
 ## 3.0 branch
+### 3.0.7
+* the migration guide `docs/Migration from version 2.md` has been renamed `docs/Migration from branch 2.15 to 3.0.md`
+  and completed: it now describes all the changes between the `2.15.x` and the `3.0.x` branches (requirements,
+  configuration, classes, methods, events, commands and test suite).
+
 ### 3.0.6
 * tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened, with particular attention to relative/absolute paths;
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
@@ -34,7 +39,7 @@
 * `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for significant code optimization.  
   Thanks to the magic `__call()` method provided by `Utility`, they still support the use of already known methods (`filename()`, `compression()`, `timeout()`) to set properties;
 * `ExportCommand` now also accepts paths relative to your app's root, in addition to the default target directory, as `ImportCommand` already did. This allows for proper shell autocompletion;
-* the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`, [see here](docs/Migration%20from%20version%202.md#from-mysqlmysql-dump-to-mariadbmariadb-dump));
+* the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`, [see here](docs/Migration%20from%20branch%202.15%20to%203.0.md#from-mysqlmysql-dump-to-mariadbmariadb-dump));
 * it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:
