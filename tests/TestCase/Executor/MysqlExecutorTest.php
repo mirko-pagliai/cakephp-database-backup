@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 use App\Database\FakeConnection;
 use Cake\Core\Configure;
 use Cake\Database\Driver\Mysql;
+use Cake\Event\EventInterface;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -231,6 +232,27 @@ class MysqlExecutorTest extends TestCase
         $result = $this->MysqlExecutor->writeAuthFile('{{USER}}_{{PASSWORD}}_{{HOST}}');
 
         $this->assertTrue($result);
+    }
+
+    /**
+     * If another listener stops the `before` event, the file with the authentication data is not written.
+     *
+     * @link \DatabaseBackup\Executor\MysqlExecutor::beforeExport()
+     * @link \DatabaseBackup\Executor\MysqlExecutor::beforeImport()
+     */
+    #[Test]
+    #[TestWith([OperationType::Export, 'Backup.beforeExport'])]
+    #[TestWith([OperationType::Import, 'Backup.beforeImport'])]
+    public function testAuthFileNotWrittenIfBeforeEventIsStopped(OperationType $OperationType, string $eventName): void
+    {
+        $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $MysqlExecutor->getEventManager()->on($eventName, function (EventInterface $Event): void {
+            $Event->stopPropagation();
+        });
+
+        $MysqlExecutor->dispatchEvent($eventName);
+
+        $this->assertFileDoesNotExist($MysqlExecutor->authFile);
     }
 
     /**

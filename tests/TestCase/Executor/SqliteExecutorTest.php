@@ -18,6 +18,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 use App\Database\FakeConnection;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
+use Cake\Event\EventInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -104,5 +105,24 @@ class SqliteExecutorTest extends TestCase
         $SqliteExecutor->shouldHaveReceived('dropAllTables')->once();
         $Driver->shouldHaveReceived('connect')->once();
         $Driver->shouldHaveReceived('disconnect')->once();
+    }
+
+    /**
+     * If another listener stops the `Backup.beforeImport` event, the tables are not dropped.
+     *
+     * @link \DatabaseBackup\Executor\SqliteExecutor::beforeImport()
+     */
+    #[Test]
+    public function testBeforeImportStoppedByAnotherListener(): void
+    {
+        /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
+        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [new FakeConnection(), OperationType::Import]);
+        $SqliteExecutor->getEventManager()->on('Backup.beforeImport', function (EventInterface $Event): void {
+            $Event->stopPropagation();
+        });
+
+        $SqliteExecutor->dispatchEvent('Backup.beforeImport');
+
+        $SqliteExecutor->shouldNotHaveReceived('dropAllTables');
     }
 }

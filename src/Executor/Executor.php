@@ -52,8 +52,9 @@ abstract class Executor implements EventListenerInterface
      * List of events this object is implementing. When the class is registered in an event manager, each individual
      *  method will be associated with the respective event.
      *
-     * @return array<string, string> Associative array or event key names pointing to the function that should be called
-     *  in the object when the respective event is fired
+     * @return array<string, string|array<string, mixed>> Associative array or event key names pointing to the function
+     *  that should be called in the object when the respective event is fired (or to an array that also contains the
+     *  priority)
      * @since 2.1.1
      */
     final public function implementedEvents(): array
@@ -61,8 +62,9 @@ abstract class Executor implements EventListenerInterface
         return [
             'Backup.afterExport' => 'afterExport',
             'Backup.afterImport' => 'afterImport',
-            'Backup.beforeExport' => 'beforeExport',
-            'Backup.beforeImport' => 'beforeImport',
+            // A high priority number means that the `before` events run after any other listener can stop them
+            'Backup.beforeExport' => ['callable' => 'beforeExport', 'priority' => 1000],
+            'Backup.beforeImport' => ['callable' => 'beforeImport', 'priority' => 1000],
         ];
     }
 
@@ -158,7 +160,8 @@ abstract class Executor implements EventListenerInterface
      * @param string $filename The name of the file to process
      * @param int $timeout Maximum execution time in seconds
      * @return \Symfony\Component\Process\Process The executed process instance
-     * @throws \Symfony\Component\Process\Exception\ProcessFailedException If an error occurs during the execution of the process
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException If an error occurs during the execution of
+     *  the process
      * @since 3.0.0
      */
     public function runProcess(string $filename, int $timeout = 60): Process

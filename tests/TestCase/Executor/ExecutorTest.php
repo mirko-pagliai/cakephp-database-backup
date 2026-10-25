@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Executor\FakeExecutor;
 use Cake\Core\Configure;
+use Cake\Event\EventInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\OperationType;
@@ -46,12 +47,47 @@ class ExecutorTest extends TestCase
         $expected = [
             'Backup.afterExport' => 'afterExport',
             'Backup.afterImport' => 'afterImport',
-            'Backup.beforeExport' => 'beforeExport',
-            'Backup.beforeImport' => 'beforeImport',
+            'Backup.beforeExport' => ['callable' => 'beforeExport', 'priority' => 1000],
+            'Backup.beforeImport' => ['callable' => 'beforeImport', 'priority' => 1000],
         ];
         $result = new FakeExecutor()->implementedEvents();
 
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The `before` events run after any other listener, so that a listener can stop the operation before the
+     * `Executor` acts.
+     *
+     * @link \DatabaseBackup\Executor\Executor::implementedEvents()
+     */
+    #[Test]
+    #[TestWith(['Backup.beforeExport'])]
+    #[TestWith(['Backup.beforeImport'])]
+    public function testBeforeEventsRunAfterOtherListeners(string $eventName): void
+    {
+        $Executor = new class extends FakeExecutor {
+            public bool $beforeCalled = false;
+
+            public function beforeExport(EventInterface $Event): void
+            {
+                $this->beforeCalled = true;
+            }
+
+            public function beforeImport(EventInterface $Event): void
+            {
+                $this->beforeCalled = true;
+            }
+        };
+
+        // This listener is attached after the `Executor`, with the default priority
+        $Executor->getEventManager()->on($eventName, function (EventInterface $Event): void {
+            $Event->stopPropagation();
+        });
+
+        $Executor->dispatchEvent($eventName);
+
+        $this->assertFalse($Executor->beforeCalled);
     }
 
     /**

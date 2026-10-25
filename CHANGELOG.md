@@ -10,6 +10,10 @@
   authentication data (which contains the password) was not deleted and remained in the temporary directory;
 * fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a
   password containing `{{HOST}}`) was altered when the file with the authentication data was written;
+* fixed a bug: if a listener stopped the `Backup.beforeExport` or `Backup.beforeImport` event after the `Executor` had
+  already acted, the operation was not executed anyway, but the temporary file with the authentication data remained
+  (`MysqlExecutor`) or the tables were already dropped (`SqliteExecutor`). Now the `Executor` handles these two events
+  after any other listener (priority `1000`, instead of the default `10`);
 * the temporary file with the authentication data created by `MysqlExecutor` is now readable and writable only by its
   owner (permissions `0600`), instead of being readable by other users (`0644` with the usual umask);
 * the migration guide `docs/Migration from version 2.md` has been renamed `docs/Migration from branch 2.15 to 3.0.md`
