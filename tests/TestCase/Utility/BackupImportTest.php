@@ -78,6 +78,9 @@ class BackupImportTest extends TestCase
         $this->BackupImport->filename = '/noExistingDir/backup.sql';
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupImport::__call()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testCallMagicMethod(): void

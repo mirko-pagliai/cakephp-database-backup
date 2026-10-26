@@ -36,6 +36,9 @@ class ImportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
+    /**
+     * @link \DatabaseBackup\Command\ImportCommand::buildOptionParser()
+     */
     #[Test]
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void

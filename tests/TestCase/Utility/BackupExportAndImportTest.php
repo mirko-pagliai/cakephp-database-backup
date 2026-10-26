@@ -117,9 +117,10 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * @param string $extension
      * @param class-string $expectedExecutor
      * @return void
+     * @link \DatabaseBackup\Utility\BackupExport::export()
+     * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     #[TestWith(['mysql', MysqlExecutor::class])]
@@ -127,8 +128,8 @@ class BackupExportAndImportTest extends TestCase
     #[TestWith(['sqlite', SqliteExecutor::class])]
     public function testExportAndImport(string $extension, string $expectedExecutor): void
     {
-        if (!extension_loaded('pdo_' . $extension)) {
-            $this->fail('The `pdo_' . $extension . '` extension is not available');
+        if (!extension_loaded("pdo_$extension")) {
+            $this->fail("The `pdo_$extension` extension is not available");
         }
 
         /**
@@ -139,7 +140,7 @@ class BackupExportAndImportTest extends TestCase
          *
          * @see tests/bootstrap.php
          */
-        ConnectionManager::setConfig('test', ['url' => getenv('db_dsn_' . $extension)]);
+        ConnectionManager::setConfig('test', ['url' => getenv("db_dsn_$extension")]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
