@@ -116,23 +116,26 @@ class BackupExportTest extends TestCase
 
     /**
      * @link \DatabaseBackup\Utility\BackupExport::$filename
-     * @param non-empty-string $expectedFilename
-     * @param string $filename
      */
     #[Test]
-    #[TestWith([TMP . 'my_file_my_hostname.sql', TMP . 'my_file_{$HOSTNAME}.sql'])]
-    #[TestWith([TMP . 'my_file_my_database.sql', TMP . 'my_file_{$DATABASE}.sql'])]
-    #[TestWith(['/my_file_\d{14}\.sql$/', TMP . 'my_file_{$DATETIME}.sql'])]
-    #[TestWith(['/my_file_\d{10}\.sql$/', TMP . 'my_file_{$TIMESTAMP}.sql'])]
-    public function testFilenamePropertyWithPatterns(string $expectedFilename, string $filename): void
+    #[TestWith(['/tmp/my_file_{$HOSTNAME}.sql', '/tmp/my_file_my_hostname.sql'])]
+    #[TestWith(['/tmp/my_file_{$DATABASE}.sql', '/tmp/my_file_my_database.sql'])]
+    public function testFilenamePropertyWithPatterns(string $filename, string $expectedFilename): void
     {
         $this->BackupExport->filename = $filename;
+        $this->assertSame($expectedFilename, $this->BackupExport->filename);
+    }
 
-        if (str_starts_with($expectedFilename, '/') && str_ends_with($expectedFilename, '/')) {
-            $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
-        } else {
-            $this->assertSame($expectedFilename, $this->BackupExport->filename);
-        }
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
+    #[Test]
+    #[TestWith(['{$DATETIME}', '/my_file_\d{14}\.sql$/'])]
+    #[TestWith(['{$TIMESTAMP}', '/my_file_\d{10}\.sql$/'])]
+    public function testFilenamePropertyWithTimePatterns(string $pattern, string $expectedFilename): void
+    {
+        $this->BackupExport->filename = "/tmp/my_file_$pattern.sql";
+        $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
     }
 
     /**
