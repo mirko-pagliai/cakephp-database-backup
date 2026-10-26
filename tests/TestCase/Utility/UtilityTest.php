@@ -17,11 +17,15 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
+use ArgumentCountError;
 use BadMethodCallException;
 use Cake\Core\Configure;
+use Cake\Database\Driver\Mysql;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\Executor;
+use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
@@ -127,6 +131,34 @@ class UtilityTest extends TestCase
     }
 
     /**
+     * Tests that the `$Executor` property is created again if the connection changes.
+     *
+     * @link \DatabaseBackup\Utility\Utility::$Executor
+     */
+    #[Test]
+    public function testExecutorPropertyAfterConnectionChange(): void
+    {
+        $this->Utility->Connection = new FakeConnection();
+        $this->assertInstanceOf(SqliteExecutor::class, $this->Utility->Executor);
+
+        $this->Utility->Connection = new FakeConnection(['driver' => Mysql::class]);
+        $this->assertInstanceOf(MysqlExecutor::class, $this->Utility->Executor);
+    }
+
+    /**
+     * Tests that the `$Executor` property is not created again if the connection does not change.
+     *
+     * @link \DatabaseBackup\Utility\Utility::$Executor
+     */
+    #[Test]
+    public function testExecutorPropertyIsCreatedOnlyOnce(): void
+    {
+        $this->Utility->Connection = new FakeConnection();
+
+        $this->assertSame($this->Utility->Executor, $this->Utility->Executor);
+    }
+
+    /**
      * @link \DatabaseBackup\Utility\Utility::$timeout
      */
     #[Test]
@@ -169,6 +201,20 @@ class UtilityTest extends TestCase
     }
 
     /**
+     * Tests for `__call()` magic method, without arguments.
+     *
+     * @link \DatabaseBackup\Utility\Utility::__call()
+     */
+    #[Test]
+    public function testCallMagicMethodWithNoArguments(): void
+    {
+        $this->expectException(ArgumentCountError::class);
+        $this->expectExceptionMessageMatches('/^Method `DatabaseBackup\\\\Utility\\\\.+timeout\(\)` expects at least 1 argument, 0 given$/');
+        /** @phpstan-ignore-next-line */
+        $this->Utility->timeout();
+    }
+
+    /**
      * Tests for `__call()` magic method, with a non-existing method.
      *
      * @link \DatabaseBackup\Utility\Utility::__call()
@@ -187,26 +233,13 @@ class UtilityTest extends TestCase
      */
     public static function makeAbsolutePathDataProvider(): array
     {
+        /** @var string $basePath */
         $basePath = Configure::readOrFail('DatabaseBackup.target');
 
         return [
-            [
-                $basePath . 'relative_file_to_target.txt',
-                'relative_file_to_target.txt',
-            ],
-            [
-                $basePath . 'absolute_file_to_target.txt',
-                $basePath . 'absolute_file_to_target.txt',
-            ],
-            [
-                TMP . 'absolute_tmp_file',
-                TMP . 'absolute_tmp_file',
-            ],
-            [
-                TMP . 'relative_file_to_target.txt',
-                'relative_file_to_target.txt',
-                TMP,
-            ],
+            ["{$basePath}relative_file_to_target.txt", 'relative_file_to_target.txt'],
+            ["{$basePath}absolute_file_to_target.txt", "{$basePath}absolute_file_to_target.txt"],
+            [TMP . 'absolute_tmp_file', TMP . 'absolute_tmp_file'],
         ];
     }
 
@@ -215,9 +248,9 @@ class UtilityTest extends TestCase
      */
     #[Test]
     #[DataProvider('makeAbsolutePathDataProvider')]
-    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path, string $basePath = ''): void
+    public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
     {
-        $result = $this->Utility->makeAbsolutePath(path: $path, basePath: $basePath);
+        $result = $this->Utility->makeAbsolutePath($path);
 
         $this->assertSame($expectedAbsolutePath, $result);
     }

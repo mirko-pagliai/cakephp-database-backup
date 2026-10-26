@@ -54,8 +54,8 @@ class BackupExportAndImportTest extends TestCase
             ->find()
             ->enableHydration(false)
             ->all()
-            ->map(fn(array $record): array => array_map(
-                callback: fn(mixed $value): string => (string)$value,
+            ->map(static fn(array $record): array => array_map(
+                callback: static fn(mixed $value): string => (string)$value,
                 array: $record,
             ))
             ->toList();
@@ -72,7 +72,7 @@ class BackupExportAndImportTest extends TestCase
         $ExecutableFinder = new ExecutableFinder();
         foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
             if (!$ExecutableFinder->find($binary)) {
-                Configure::write("DatabaseBackup.binaries.$binary", $ExecutableFinder->find($oldAlias));
+                Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($oldAlias));
             }
         }
     }
@@ -117,9 +117,10 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * @param string $extension
      * @param class-string $expectedExecutor
      * @return void
+     * @link \DatabaseBackup\Utility\BackupExport::export()
+     * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     #[TestWith(['mysql', MysqlExecutor::class])]
@@ -127,8 +128,8 @@ class BackupExportAndImportTest extends TestCase
     #[TestWith(['sqlite', SqliteExecutor::class])]
     public function testExportAndImport(string $extension, string $expectedExecutor): void
     {
-        if (!extension_loaded('pdo_' . $extension)) {
-            $this->fail('The `pdo_' . $extension . '` extension is not available');
+        if (!extension_loaded("pdo_{$extension}")) {
+            $this->fail("The `pdo_{$extension}` extension is not available");
         }
 
         /**
@@ -139,7 +140,7 @@ class BackupExportAndImportTest extends TestCase
          *
          * @see tests/bootstrap.php
          */
-        ConnectionManager::setConfig('test', ['url' => getenv('db_dsn_' . $extension)]);
+        ConnectionManager::setConfig('test', ['url' => getenv("db_dsn_{$extension}")]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');

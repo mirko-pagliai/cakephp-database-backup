@@ -62,6 +62,6 @@ foreach (
     ] as $key => $value
 ) {
     if (!getenv($key)) {
-        putenv("$key=$value");
+        putenv("{$key}={$value}");
     }
 }

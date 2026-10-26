@@ -59,7 +59,9 @@ class BackupExportTest extends TestCase
             }
         };
 
-        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $EventManager->setEventList(new EventList());
     }
 
     /**
@@ -88,16 +90,20 @@ class BackupExportTest extends TestCase
     #[Test]
     #[TestWith([true])]
     #[TestWith(['invalidCompression'])]
-    public function testCompressionPropertyWithInvalidValue(mixed $invalidCompression): void
+    public function testCompressionPropertyWithInvalidValue(string|bool $invalidCompression): void
     {
         $this->expectException(Error::class);
+        // @phpstan-ignore assign.propertyType
         $this->BackupExport->compression = $invalidCompression;
     }
 
     /**
+     * Tests for the `$filename` property, with absolute and relative paths.
+     *
      * @link \DatabaseBackup\Utility\BackupExport::$filename
      */
     #[Test]
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql', Compression::None, 'backup.sql'])]
     #[TestWith([TMP . 'backup.sql', Compression::None, TMP . 'backup.sql'])]
     #[TestWith([TMP . 'backup.sql.gz', Compression::Gzip, TMP . 'backup.sql.gz'])]
     #[TestWith([TMP . 'backup.sql.bz2', Compression::Bzip2, TMP . 'backup.sql.bz2'])]
@@ -113,23 +119,62 @@ class BackupExportTest extends TestCase
 
     /**
      * @link \DatabaseBackup\Utility\BackupExport::$filename
-     * @param non-empty-string $expectedFilename
-     * @param string $filename
      */
     #[Test]
-    #[TestWith([TMP . 'my_file_my_hostname.sql', TMP . 'my_file_{$HOSTNAME}.sql'])]
-    #[TestWith([TMP . 'my_file_my_database.sql', TMP . 'my_file_{$DATABASE}.sql'])]
-    #[TestWith(['/my_file_\d{14}\.sql$/', TMP . 'my_file_{$DATETIME}.sql'])]
-    #[TestWith(['/my_file_\d{10}\.sql$/', TMP . 'my_file_{$TIMESTAMP}.sql'])]
-    public function testFilenamePropertyWithPatterns(string $expectedFilename, string $filename): void
+    #[TestWith([TMP . 'my_file_{$HOSTNAME}.sql', TMP . 'my_file_my_hostname.sql'])]
+    #[TestWith([TMP . 'my_file_{$DATABASE}.sql', TMP . 'my_file_my_database.sql'])]
+    public function testFilenamePropertyWithPatterns(string $filename, string $expectedFilename): void
     {
         $this->BackupExport->filename = $filename;
+        $this->assertSame($expectedFilename, $this->BackupExport->filename);
+    }
 
-        if (str_starts_with($expectedFilename, '/') && str_ends_with($expectedFilename, '/')) {
-            $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
-        } else {
-            $this->assertSame($expectedFilename, $this->BackupExport->filename);
-        }
+    /**
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
+    #[Test]
+    #[TestWith(['{$DATETIME}', '/my_file_\d{14}\.sql$/'])]
+    #[TestWith(['{$TIMESTAMP}', '/my_file_\d{10}\.sql$/'])]
+    public function testFilenamePropertyWithTimePatterns(string $pattern, string $expectedFilename): void
+    {
+        $this->BackupExport->filename = TMP . "my_file_{$pattern}.sql";
+        $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
+    }
+
+    /**
+     * Tests that the `{$DATABASE}` pattern is replaced only by the database name.
+     *
+     * With SQLite, the `database` key of the connection is the full path of the database file, but the pattern must be
+     * replaced only by the file name, without path and extension (this is how it worked in the `2.15.x` branch).
+     *
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
+    #[Test]
+    #[TestWith(['my_database'])]
+    #[TestWith([TMP . 'my_database.sq3'])]
+    #[TestWith([TMP . 'my_database.sqlite'])]
+    public function testFilenamePropertyWithDatabasePattern(string $database): void
+    {
+        $BackupExport = new BackupExport(Connection: new FakeConnection(['database' => $database]));
+
+        $BackupExport->filename = TMP . 'my_file_{$DATABASE}.sql';
+
+        $this->assertSame(TMP . 'my_file_my_database.sql', $BackupExport->filename);
+    }
+
+    /**
+     * Tests that an empty filename resets the `$filename` property.
+     *
+     * @link \DatabaseBackup\Utility\BackupExport::$filename
+     */
+    #[Test]
+    public function testFilenamePropertyWithEmptyString(): void
+    {
+        $this->BackupExport->filename = TMP . 'backup.sql';
+        $this->assertSame(TMP . 'backup.sql', $this->BackupExport->filename);
+
+        $this->BackupExport->filename = '';
+        $this->assertSame('', $this->BackupExport->filename);
     }
 
     /**
@@ -167,7 +212,9 @@ class BackupExportTest extends TestCase
     public function testFilenamePropertyWithInvalidFilenameAndCompression(): void
     {
         $this->expectException(ValueError::class);
-        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . TMP . 'backup.txt`');
+        $this->expectExceptionMessage(
+            'No valid `' . Compression::class . '` value was found for filename `' . TMP . 'backup.txt`',
+        );
         $this->BackupExport->filename = TMP . 'backup.txt';
     }
 
@@ -204,8 +251,11 @@ class BackupExportTest extends TestCase
         $targetDir = Configure::read('DatabaseBackup.target');
         $this->assertStringStartsWith($targetDir, $result);
         $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql$/', $result);
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $this->assertEventFired('Backup.beforeExport', $EventManager);
+        $this->assertEventFired('Backup.afterExport', $EventManager);
     }
 
     /**
@@ -224,25 +274,55 @@ class BackupExportTest extends TestCase
         $targetDir = Configure::read('DatabaseBackup.target');
         $this->assertStringStartsWith($targetDir, $result);
         $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql\.bz2$/', $result);
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $this->assertEventFired('Backup.beforeExport', $EventManager);
+        $this->assertEventFired('Backup.afterExport', $EventManager);
     }
 
     /**
-     * Tests for the `export()` method, with a call to the `filename()` method.
+     * Tests for the `export()` method, with a call to the `filename()` method and using relative and absolute paths.
      *
      * @link \DatabaseBackup\Utility\BackupExport::export()
      */
     #[Test]
-    public function testExportWithFilename(): void
+    #[TestWith([TMP . 'backups' . DS . 'backup.sql.gz', 'backup.sql.gz'])]
+    #[TestWith([TMP . 'backup.sql.gz', TMP . 'backup.sql.gz'])]
+    public function testExportWithFilename(string $expectedFilename, string $filename): void
     {
         $result = $this->BackupExport
-            ->filename(TMP . 'backup.sql.gz')
+            ->filename($filename)
             ->export();
 
-        $this->assertSame(TMP . 'backup.sql.gz', $result);
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+        $this->assertSame($expectedFilename, $result);
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $this->assertEventFired('Backup.beforeExport', $EventManager);
+        $this->assertEventFired('Backup.afterExport', $EventManager);
+    }
+
+    /**
+     * Tests for the `export()` method, called twice on the same instance.
+     *
+     * After the first call the filename is reset, so the second call must generate a new filename and must not reuse
+     * (and overwrite) the previous one.
+     *
+     * @link \DatabaseBackup\Utility\BackupExport::export()
+     */
+    #[Test]
+    public function testExportCalledTwice(): void
+    {
+        $firstResult = $this->BackupExport
+            ->filename(TMP . 'backup.sql')
+            ->export();
+
+        $this->assertSame(TMP . 'backup.sql', $firstResult);
+
+        $secondResult = $this->BackupExport->export() ?: '';
+
+        $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql$/', $secondResult);
     }
 
     /**

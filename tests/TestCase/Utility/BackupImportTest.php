@@ -78,6 +78,9 @@ class BackupImportTest extends TestCase
         $this->BackupImport->filename = '/noExistingDir/backup.sql';
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupImport::__call()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testCallMagicMethod(): void
@@ -121,15 +124,18 @@ class BackupImportTest extends TestCase
         };
 
         $BackupImport->Executor = $Executor;
-        $BackupImport->Executor->getEventManager()->setEventList(new EventList());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $BackupImport->Executor->getEventManager();
+        $EventManager->setEventList(new EventList());
 
         $result = $BackupImport
             ->filename($filename)
             ->import();
 
         $this->assertSame($filename, $result);
-        $this->assertEventFired('Backup.beforeImport', $BackupImport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $BackupImport->Executor->getEventManager());
+        $this->assertEventFired('Backup.beforeImport', $EventManager);
+        $this->assertEventFired('Backup.afterImport', $EventManager);
     }
 
     /**
@@ -142,6 +148,7 @@ class BackupImportTest extends TestCase
         Configure::write('DatabaseBackup.processTimeout', 45);
 
         $filename = TMP . 'backup.sql';
+        $Process = new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
 
         /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
         $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
@@ -149,12 +156,11 @@ class BackupImportTest extends TestCase
             ->shouldReceive('runProcess')
             ->with($filename, 45)
             ->once()
-            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
+            ->andReturn($Process);
 
         $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
             public string $filename {
                 set(string $filename) {
-
                     $this->filename = $filename;
                 }
             }

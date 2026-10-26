@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Executor\FakeExecutor;
 use Cake\Core\Configure;
+use Cake\Event\EventInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\OperationType;
@@ -46,12 +47,47 @@ class ExecutorTest extends TestCase
         $expected = [
             'Backup.afterExport' => 'afterExport',
             'Backup.afterImport' => 'afterImport',
-            'Backup.beforeExport' => 'beforeExport',
-            'Backup.beforeImport' => 'beforeImport',
+            'Backup.beforeExport' => ['callable' => 'beforeExport', 'priority' => 1000],
+            'Backup.beforeImport' => ['callable' => 'beforeImport', 'priority' => 1000],
         ];
         $result = new FakeExecutor()->implementedEvents();
 
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The `before` events run after any other listener, so that a listener can stop the operation before the
+     * `Executor` acts.
+     *
+     * @link \DatabaseBackup\Executor\Executor::implementedEvents()
+     */
+    #[Test]
+    #[TestWith(['Backup.beforeExport'])]
+    #[TestWith(['Backup.beforeImport'])]
+    public function testBeforeEventsRunAfterOtherListeners(string $eventName): void
+    {
+        $Executor = new class extends FakeExecutor {
+            public bool $beforeCalled = false;
+
+            public function beforeExport(EventInterface $Event): void
+            {
+                $this->beforeCalled = true;
+            }
+
+            public function beforeImport(EventInterface $Event): void
+            {
+                $this->beforeCalled = true;
+            }
+        };
+
+        // This listener is attached after the `Executor`, with the default priority
+        $Executor->getEventManager()->on($eventName, static function (EventInterface $Event): void {
+            $Event->stopPropagation();
+        });
+
+        $Executor->dispatchEvent($eventName);
+
+        $this->assertFalse($Executor->beforeCalled);
     }
 
     /**
@@ -67,7 +103,7 @@ class ExecutorTest extends TestCase
         Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder')
             ->shouldReceive('find')
             ->once()
-            ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
+            ->andReturnUsing(static fn(string $name): string => "/usr/bin/{$name}");
 
         $result = new FakeExecutor()->findBinary($name);
 
@@ -84,10 +120,10 @@ class ExecutorTest extends TestCase
     public function testFindBinaryFromConfiguration(string $expectedBinary, Compression|string $binaryName): void
     {
         $binaryName = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
-        Configure::write(config: "DatabaseBackup.binaries.$binaryName", value: "/customPath/$binaryName");
+        Configure::write(config: "DatabaseBackup.binaries.{$binaryName}", value: "/customPath/{$binaryName}");
 
         $result = new FakeExecutor()->findBinary($binaryName);
-        Configure::delete("DatabaseBackup.binaries.$binaryName");
+        Configure::delete("DatabaseBackup.binaries.{$binaryName}");
 
         $this->assertSame($expectedBinary, $result);
     }
@@ -128,7 +164,8 @@ class ExecutorTest extends TestCase
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
-        $result = new FakeExecutor(OperationType: $OperationType)->getCommand(Compression: $Compression);
+        $result = new FakeExecutor(OperationType: $OperationType)
+            ->getCommand(Compression: $Compression);
 
         $this->assertSame($expectedCommand, $result);
     }
@@ -156,8 +193,8 @@ class ExecutorTest extends TestCase
          */
         $ExecutableFinder
             ->shouldReceive('find')
-            ->withSomeOfArgs($OperationType->value . '-binary')
-            ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
+            ->withSomeOfArgs("{$OperationType->value}-binary")
+            ->andReturnUsing(static fn(string $name): string => "/usr/bin/{$name}");
 
         /**
          * With a valid compression, `ExecutableFinder::find()` expects the lowercase name of the compression (e.g.
@@ -167,7 +204,7 @@ class ExecutorTest extends TestCase
             $ExecutableFinder
                 ->shouldReceive('find')
                 ->withSomeOfArgs(lcfirst($Compression->name))
-                ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
+                ->andReturnUsing(static fn(string $name): string => "/usr/bin/{$name}");
         }
 
         $Process = Mockery::mock('overload:' . Process::class);
@@ -200,7 +237,7 @@ class ExecutorTest extends TestCase
             ->withArgs(function ($env) use ($Compression, $filename, $OperationType): bool {
                 $expectedEnv = [
                     'AUTH_FILE' => 'path/to/auth_file',
-                    'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
+                    'BINARY' => "/usr/bin/{$OperationType->value}-binary",
                     'DB_HOST' => 'my_hostname',
                     'DB_NAME' => 'my_database',
                     'DB_PASSWORD' => 'my_password',
@@ -237,9 +274,17 @@ class ExecutorTest extends TestCase
             ->andReturn('/usr/bin/binary');
 
         $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
-        $Process->shouldReceive('fromShellCommandline')->andReturnSelf();
-        $Process->shouldReceive('isSuccessful')->andReturnFalse();
-        $Process->shouldReceive('getCommandLine')->andReturn('failureCommand');
+
+        $Process
+            ->shouldReceive('fromShellCommandline')
+            ->andReturnSelf();
+        $Process
+            ->shouldReceive('isSuccessful')
+            ->andReturnFalse();
+
+        $Process
+            ->shouldReceive('getCommandLine')
+            ->andReturn('failureCommand');
 
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessage('The command "failureCommand" failed.');

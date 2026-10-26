@@ -16,15 +16,20 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Core\Configure;
+use Cake\Database\Driver\Mysql;
+use Cake\Event\EventInterface;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * MysqlExecutorTest.
@@ -41,7 +46,10 @@ class MysqlExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
+        $this->MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(),
+            OperationType: OperationType::Export,
+        );
     }
 
     /**
@@ -57,13 +65,68 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::runProcess()
+     */
+    #[Test]
+    #[RunInSeparateProcess]
+    public function testRunProcessDeletesAuthFile(): void
+    {
+        Configure::write('DatabaseBackup.binaries.mariadb', '/path/to/mariadb');
+        // The binary is never run: the command only reads the (empty) file to import
+        Configure::write('DatabaseBackup.Mysql.import', 'true');
+
+        $filename = TMP . 'empty_backup.sql';
+        touch($filename);
+
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(['driver' => Mysql::class]),
+            OperationType: OperationType::Import,
+        );
+        $authFile = $MysqlExecutor->authFile;
+        touch($authFile);
+
+        $MysqlExecutor->runProcess($filename);
+
+        $this->assertFileDoesNotExist($authFile);
+
+        unlink($filename);
+    }
+
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::runProcess()
+     */
+    #[Test]
+    #[RunInSeparateProcess]
+    public function testRunProcessDeletesAuthFileOnFailure(): void
+    {
+        Configure::write('DatabaseBackup.binaries.mariadb', '/path/to/mariadb');
+        // The binary is never run: the process fails earlier because the shell cannot open the file to import
+        Configure::write('DatabaseBackup.Mysql.import', 'true');
+
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(['driver' => Mysql::class]),
+            OperationType: OperationType::Import,
+        );
+        $authFile = $MysqlExecutor->authFile;
+        touch($authFile);
+
+        $this->expectException(ProcessFailedException::class);
+        $MysqlExecutor->runProcess(TMP . 'no_existing_backup.sql');
+        $this->assertFileDoesNotExist($authFile);
+    }
+
+    /**
      * @link \DatabaseBackup\Executor\MysqlExecutor::afterExport()
      */
     #[Test]
     public function testAfterExport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [new FakeConnection(), OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(
+            MysqlExecutor::class . '[deleteAuthFile]',
+            [new FakeConnection(), OperationType::Export],
+        );
+
         $MysqlExecutor->dispatchEvent('Backup.afterExport');
 
         $MysqlExecutor
@@ -79,7 +142,11 @@ class MysqlExecutorTest extends TestCase
     public function testAfterImport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[deleteAuthFile]', [new FakeConnection(), OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(
+            MysqlExecutor::class . '[deleteAuthFile]',
+            [new FakeConnection(), OperationType::Export],
+        );
+
         $MysqlExecutor->dispatchEvent('Backup.afterImport');
 
         $MysqlExecutor
@@ -95,7 +162,11 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeExport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [new FakeConnection(), OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(
+            MysqlExecutor::class . '[writeAuthFile]',
+            [new FakeConnection(), OperationType::Export],
+        );
+
         $MysqlExecutor->dispatchEvent('Backup.beforeExport');
 
         $MysqlExecutor
@@ -114,7 +185,11 @@ class MysqlExecutorTest extends TestCase
     public function testBeforeImport(): void
     {
         /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(MysqlExecutor::class . '[writeAuthFile]', [new FakeConnection(), OperationType::Export]);
+        $MysqlExecutor = Mockery::spy(
+            MysqlExecutor::class . '[writeAuthFile]',
+            [new FakeConnection(), OperationType::Export],
+        );
+
         $MysqlExecutor->dispatchEvent('Backup.beforeImport');
 
         $MysqlExecutor
@@ -136,8 +211,27 @@ class MysqlExecutorTest extends TestCase
         $Filesystem = Mockery::mock('overload:' . Filesystem::class);
 
         $Filesystem
+            ->shouldReceive('touch')
+            ->withArgs(function (string $filename): bool {
+                $this->assertStringStartsWith(TMP . 'auth', $filename);
+
+                return true;
+            })
+            ->once();
+
+        $Filesystem
+            ->shouldReceive('chmod')
+            ->withArgs(function (string $filename, $mode): bool {
+                $this->assertStringStartsWith(TMP . 'auth', $filename);
+                $this->assertSame(0600, $mode);
+
+                return true;
+            })
+            ->once();
+
+        $Filesystem
             ->shouldReceive('dumpFile')
-            ->withArgs(function ($filename, $content): bool {
+            ->withArgs(function (string $filename, $content): bool {
                 $this->assertStringStartsWith(TMP . 'auth', $filename);
                 $this->assertSame('my_username_my_password_my_hostname', $content);
 
@@ -147,7 +241,7 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem
             ->shouldReceive('exists')
-            ->withArgs(function ($filename): bool {
+            ->withArgs(function (string $filename): bool {
                 $this->assertStringStartsWith(TMP . 'auth', $filename);
 
                 return true;
@@ -158,6 +252,95 @@ class MysqlExecutorTest extends TestCase
         $result = $this->MysqlExecutor->writeAuthFile('{{USER}}_{{PASSWORD}}_{{HOST}}');
 
         $this->assertTrue($result);
+    }
+
+    /**
+     * If another listener stops the `before` event, the file with the authentication data is not written.
+     *
+     * @link \DatabaseBackup\Executor\MysqlExecutor::beforeExport()
+     * @link \DatabaseBackup\Executor\MysqlExecutor::beforeImport()
+     */
+    #[Test]
+    #[TestWith([OperationType::Export, 'Backup.beforeExport'])]
+    #[TestWith([OperationType::Import, 'Backup.beforeImport'])]
+    public function testAuthFileNotWrittenIfBeforeEventIsStopped(OperationType $OperationType, string $eventName): void
+    {
+        $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $MysqlExecutor->getEventManager()->on($eventName, static function (EventInterface $Event): void {
+            $Event->stopPropagation();
+        });
+
+        $MysqlExecutor->dispatchEvent($eventName);
+
+        $this->assertFileDoesNotExist($MysqlExecutor->authFile);
+    }
+
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
+     */
+    #[Test]
+    public function testWriteAuthFileWithPlaceholdersInValues(): void
+    {
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(['password' => 'pass{{HOST}}{{USER}}']),
+            OperationType: OperationType::Export,
+        );
+
+        $MysqlExecutor->writeAuthFile('{{USER}}_{{PASSWORD}}_{{HOST}}');
+
+        $this->assertStringEqualsFile(
+            $MysqlExecutor->authFile,
+            'my_username_pass{{HOST}}{{USER}}_my_hostname',
+        );
+
+        $MysqlExecutor->deleteAuthFile();
+    }
+
+    /**
+     * The password is written between double quotes, so backslashes, double quotes and line breaks must be escaped.
+     *
+     * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
+     */
+    #[Test]
+    #[TestWith(['pass\\word', 'pass\\\\word'])]
+    #[TestWith(['pass\\nword', 'pass\\\\nword'])]
+    #[TestWith(['pass"word', 'pass\\"word'])]
+    #[TestWith(["pass\nword", 'pass\\nword'])]
+    #[TestWith(["pass\rword", 'pass\\rword'])]
+    #[TestWith(['pa#ss word', 'pa#ss word'])]
+    #[TestWith([null, ''])]
+    public function testWriteAuthFileWithSpecialCharactersInPassword(?string $password, string $expectedPassword): void
+    {
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(compact('password')),
+            OperationType: OperationType::Export,
+        );
+
+        $MysqlExecutor->writeAuthFile('password="{{PASSWORD}}"');
+
+        $this->assertStringEqualsFile($MysqlExecutor->authFile, "password=\"{$expectedPassword}\"");
+
+        $MysqlExecutor->deleteAuthFile();
+    }
+
+    /**
+     * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
+     */
+    #[Test]
+    #[RequiresOperatingSystemFamily('Linux')]
+    #[RunInSeparateProcess]
+    public function testWriteAuthFilePermissions(): void
+    {
+        // With this umask, a file created without an explicit `chmod()` would be readable by other users
+        umask(0022);
+
+        $this->MysqlExecutor->writeAuthFile('{{PASSWORD}}');
+        $authFile = $this->MysqlExecutor->authFile;
+
+        $this->assertStringEqualsFile($authFile, 'my_password');
+        $this->assertSame('0600', substr(sprintf('%o', fileperms($authFile)), -4));
+
+        $this->MysqlExecutor->deleteAuthFile();
     }
 
     /**

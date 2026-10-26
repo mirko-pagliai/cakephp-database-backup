@@ -23,6 +23,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Override;
+use TypeError;
 use ValueError;
 use function Cake\I18n\__d;
 
@@ -39,6 +40,9 @@ class ImportCommand extends Command
     #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
+        /** @var string $targetDir */
+        $targetDir = Configure::readOrFail('DatabaseBackup.target');
+
         $parser = parent::buildOptionParser($parser);
 
         $parser->setDescription(__d('database_backup', 'Imports a database backup'));
@@ -50,7 +54,7 @@ class ImportCommand extends Command
                     'database_backup',
                     'Filenames can be relative to {0} (root of your app) or {1} (default target directory).',
                     '<comment>' . ROOT . '</comment>',
-                    '<comment>' . Configure::readOrFail('DatabaseBackup.target') . '</comment>',
+                    "<comment>{$targetDir}</comment>",
                 ),
             ]),
             'required' => true,
@@ -71,8 +75,9 @@ class ImportCommand extends Command
         try {
             $BackupImport = new BackupImport((string)$args->getOption('connection') ?: '');
 
-            if ($args->getOption('timeout')) {
-                $BackupImport->timeout((int)$args->getOption('timeout'));
+            $timeout = $this->getTimeoutOption($args);
+            if ($timeout !== null) {
+                $BackupImport->timeout($timeout);
             }
 
             $BackupImport->filename($this->makeAbsolutePath((string)$args->getArgument('filename')));
@@ -91,8 +96,8 @@ class ImportCommand extends Command
                 'Backup `{0}` has been imported',
                 $this->makeRelativePath($filename),
             ));
-        } catch (Exception | ValueError $e) {
-            $io->abort($e->getMessage());
+        } catch (Exception | TypeError | ValueError $e) {
+            $io->abort(get_class($e) . ': ' . lcfirst($e->getMessage()));
         }
 
         return static::CODE_SUCCESS;

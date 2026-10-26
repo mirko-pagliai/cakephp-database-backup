@@ -1,7 +1,43 @@
 # 3.x branch
 ## 3.0 branch
+### 3.0.6
+* fixed a regression for SQLite introduced in `3.0.0`: the `{$DATABASE}` filename pattern was replaced by the full path
+  of the database file (so the default export filename contained a path). As in the `2.15.x` branch, it is now replaced
+  by the name of the database file, without path and extension;
+* fixed a regression introduced in `3.0.0`: `BackupExport::export()` did not reset the filename, so a second call on the
+  same instance overwrote the previous backup. As in the `2.15.x` branch, the filename is now reset;
+* fixed a bug in the `ExportCommand` and `ImportCommand` commands: an invalid `--timeout` value (for example
+  `--timeout abc`) was silently converted to `0`, which disables the timeout, while `--timeout 0` was ignored and the
+  default timeout was used. Now the value must be an integer greater than `0`, otherwise the command fails with an
+  error;
+* fixed a bug in `BackupExport` and `BackupImport`: if the connection was changed after the `Executor` had already been
+  created (for example, by exporting twice with two different connections on the same instance), the `Executor` of the
+  previous connection kept being used. Now the `Executor` is created again for the new connection;
+* fixed a bug in `Utility::__call()`: calling a magic method without arguments (for example `$BackupExport->timeout()`)
+  raised a PHP warning and then a misleading `TypeError`. Now an `ArgumentCountError` is thrown;
+* fixed a bug in the `ExportCommand` and `ImportCommand` commands: a `TypeError` was not caught, so the command ended with
+  a PHP error and its stack trace instead of the usual error message. Now it is handled like any other exception;
+* fixed a bug in `MysqlExecutor`: if the process failed or reached the timeout, the temporary file with the
+  authentication data (which contains the password) was not deleted and remained in the temporary directory;
+* fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a
+  password containing `{{HOST}}`) was altered when the file with the authentication data was written;
+* fixed a bug in `MysqlExecutor::writeAuthFile()`: a password containing a line break, or a backslash followed by `n`,
+  `r`, `t`, `b`, `s`, `"`, `'` or another backslash (for example `ab\\cd`), was read incorrectly by the client, because
+  these characters were not escaped in the file with the authentication data. Now they are escaped;
+* fixed a bug: if a listener stopped the `Backup.beforeExport` or `Backup.beforeImport` event after the `Executor` had
+  already acted, the operation was not executed anyway, but the temporary file with the authentication data remained
+  (`MysqlExecutor`) or the tables were already dropped (`SqliteExecutor`). Now the `Executor` handles these two events
+  after any other listener (priority `1000`, instead of the default `10`);
+* the temporary file with the authentication data created by `MysqlExecutor` is now readable and writable only by its
+  owner (permissions `0600`), instead of being readable by other users (`0644` with the usual umask). On Windows, which
+  does not support these permissions, nothing changes;
+* the migration guide `docs/Migration from version 2.md` has been renamed `docs/Migration from branch 2.15 to 3.0.md`
+  and completed: it now describes all the changes between the `2.15.x` and the `3.0.x` branches (requirements,
+  configuration, classes, methods, events, commands and test suite).
+
 ### 3.0.5
-* the `Utility::makeAbsolutePath()` method now accepts `$basePath` as an optional second parameter, to allow specifying a different base path (the default behavior remains unchanged);
+* tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened, with particular
+  attention to relative/absolute paths;
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
   [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
 * refactor: apply consistent formatting across tests and source files.
@@ -30,7 +66,7 @@
 * `BackupExport` and `BackupImport` now make extensive use of property hooks (instead of methods), which has allowed for significant code optimization.  
   Thanks to the magic `__call()` method provided by `Utility`, they still support the use of already known methods (`filename()`, `compression()`, `timeout()`) to set properties;
 * `ExportCommand` now also accepts paths relative to your app's root, in addition to the default target directory, as `ImportCommand` already did. This allows for proper shell autocompletion;
-* the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`, [see here](docs/Migration%20from%20version%202.md#from-mysqlmysql-dump-to-mariadbmariadb-dump));
+* the `MysqlExecutor` uses only and directly `mariadb` and `mariadb-dump` binaries (and no longer also `mysql` and `mysqldump`, [see here](docs/Migration%20from%20branch%202.15%20to%203.0.md#from-mysqlmysql-dump-to-mariadbmariadb-dump));
 * it requires at least PHP 8.4 and CakePHP 5.1.
 
 #### Minor changes:

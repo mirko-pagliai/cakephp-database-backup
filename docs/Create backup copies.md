@@ -28,7 +28,7 @@ It will also use the `DatabaseBackup.copyDirTarget` configuration, which must be
 Configure::write('DatabaseBackup.copyDirTarget', 'ftp://username:password@example.com:21/my/target/copy/dir');
 ```
 
-It can also be the path of a simple directory (for example an external disk), but if it contains the authentication data to an FTP server as plain text (as in my case), **it is best to set this configuration in a safe place**.
+It can also be the path of a simple directory (for example, an external disk), but if it contains the authentication data to an FTP server as plain text (as in my case), **it is best to set this configuration in a safe place**.
 
 ## Create a command to export (`ExportBackupCommand`)
 
@@ -112,6 +112,7 @@ As mentioned, in my specific case this command will be executed 5 times a day, t
 Let's see the `src/Command/RotateBackupCommand.php` file:
 
 ```php
+<?php
 declare(strict_types=1);
 
 namespace App\Command;

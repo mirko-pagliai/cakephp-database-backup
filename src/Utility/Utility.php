@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use ArgumentCountError;
 use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Core\Configure;
@@ -44,13 +45,24 @@ abstract class Utility
             }
 
             $this->Connection = $Connection;
+
+            // The `Executor` was created for the previous connection
+            $this->ExecutorInstance = null;
         }
         get => $this->Connection ?? ConnectionManager::get('default');
     }
 
+    /**
+     * The `Executor` instance, created by the `$Executor` getter or set with the `$Executor` setter.
+     */
+    private ?Executor $ExecutorInstance = null;
+
     public Executor $Executor {
+        set (Executor $Executor) {
+            $this->ExecutorInstance = $Executor;
+        }
         get {
-            if (empty($this->Executor)) {
+            if (!$this->ExecutorInstance) {
                 /**
                  * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
                  */
@@ -66,10 +78,13 @@ abstract class Utility
                     ));
                 }
 
-                $this->Executor = new $className(Connection: $this->Connection, OperationType: $this->OperationType);
+                $this->ExecutorInstance = new $className(
+                    Connection: $this->Connection,
+                    OperationType: $this->OperationType,
+                );
             }
 
-            return $this->Executor;
+            return $this->ExecutorInstance;
         }
     }
 
@@ -110,7 +125,8 @@ abstract class Utility
      * @param string $name
      * @param array<array-key, mixed> $arguments
      * @return $this
-     * @throws \BadMethodCallException
+     * @throws \ArgumentCountError If the method is called without arguments
+     * @throws \BadMethodCallException If the method does not exist
      */
     public function __call(string $name, array $arguments)
     {
@@ -118,7 +134,12 @@ abstract class Utility
             $name = ucfirst($name);
         }
         if (!property_exists($this, $name)) {
-            throw new BadMethodCallException(sprintf('Method `%s::%s()` does not exist', $this::class, $name));
+            throw new BadMethodCallException('Method `' . $this::class . "::{$name}()` does not exist");
+        }
+        if (!$arguments) {
+            throw new ArgumentCountError(
+                'Method `' . $this::class . "::{$name}()` expects at least 1 argument, 0 given",
+            );
         }
 
         $this->{$name} = $arguments[0];
@@ -127,28 +148,22 @@ abstract class Utility
     }
 
     /**
-     * Constructs an absolute path from a given relative path and base path.
+     * Converts a relative file path to an absolute path based on the specified target directory.
      *
-     * If the input path is already absolute, it is returned as is. The base path is used to resolve relative paths,
-     * with a default fallback if not provided.
-     *
-     * @param string $path The relative or absolute path that needs to be processed.
-     * @param string $basePath The base directory path to resolve the relative path against. If not provided, a default
-     * is read from configuration.
-     * @return string Returns the absolute path.
+     * @param string $path
+     * @return string
+     * @since 2.13.5
      */
-    public function makeAbsolutePath(string $path, string $basePath = ''): string
+    public function makeAbsolutePath(string $path): string
     {
         if (Path::isAbsolute($path)) {
             return $path;
         }
 
-        if (!$basePath) {
-            $basePath = Configure::readOrFail('DatabaseBackup.target');
-        }
+        /** @var string $targetDir */
+        $targetDir = Configure::readOrFail('DatabaseBackup.target');
+        $absolutePath = Path::makeAbsolute($path, $targetDir);
 
-        $absolutePath = Path::makeAbsolute($path, $basePath);
-
-        return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
+        return DS === '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
 }

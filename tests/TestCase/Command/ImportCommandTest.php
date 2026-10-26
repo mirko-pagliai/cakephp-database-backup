@@ -15,18 +15,22 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Command;
 
+use App\Database\FakeConnection;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Command\ImportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
+use Throwable;
+use TypeError;
 
 /**
  * ImportCommandTest.
@@ -36,6 +40,29 @@ class ImportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
+    /**
+     * @inheritDoc
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        ConnectionManager::setConfig('fake_connection', new FakeConnection());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        ConnectionManager::drop('fake_connection');
+    }
+
+    /**
+     * @link \DatabaseBackup\Command\ImportCommand::buildOptionParser()
+     */
     #[Test]
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
@@ -53,6 +80,7 @@ class ImportCommandTest extends TestCase
         $this->skipUnless(version_compare(Configure::version(), '5.2.10', '>='));
 
         $root = ROOT;
+        /** @var string $defaultTarget */
         $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
 
         $expected = <<<txt
@@ -74,37 +102,24 @@ cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>
 
 filename  Filename. It can be an absolute path. Filenames can be
           relative to
-          <comment>$root</comment>
+          <comment>{$root}</comment>
           (root of your app) or
-          <comment>$defaultTarget</comment>
+          <comment>{$defaultTarget}</comment>
           (default target directory).
 
 txt;
         $this->assertOutputContains($expected);
+        $this->assertErrorEmpty();
     }
 
     /**
-     * @return array<array{string, string}>
-     */
-    public static function executeDataProvider(): array
-    {
-        return [
-            [
-                Configure::readOrFail('DatabaseBackup.target') . 'absolute_filename.sql',
-                Configure::readOrFail('DatabaseBackup.target') . 'absolute_filename.sql',
-            ],
-            [
-                ROOT . 'backups' . DS . 'relative_filename.sql',
-                'backups/relative_filename.sql',
-            ],
-        ];
-    }
-
-    /**
+     * Tests for the `execute()` method with an absolute filename and a relative filename.
+     *
      * @link \DatabaseBackup\Command\ImportCommand::execute()
      */
     #[Test]
-    #[DataProvider('executeDataProvider')]
+    #[TestWith([ROOT . 'backups' . DS . 'absolute_filename.sql', ROOT . 'backups' . DS . 'absolute_filename.sql'])]
+    #[TestWith([ROOT . 'backups' . DS . 'relative_filename.sql', 'backups/relative_filename.sql'])]
     #[RunInSeparateProcess]
     public function testExecute(string $expectedFilename, string $filename): void
     {
@@ -128,10 +143,27 @@ txt;
             ->once()
             ->andReturn($expectedFilename);
 
-        $this->exec("database_backup.import $filename");
-
+        $this->exec("database_backup.import {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$filename` has been imported</success>");
+        $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
+        $this->assertErrorEmpty();
+    }
+
+    /**
+     * Tests for the `execute()` method with no existing file (absolute and relative).
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    #[Test]
+    #[TestWith([TMP . 'no_existing_filename.sql', TMP . 'no_existing_filename.sql'])]
+    #[TestWith([ROOT . 'backups' . DS . 'no_existing_filename.sql', 'backups' . DS . 'no_existing_filename.sql'])]
+    public function testExecuteWithNoExistingFile(string $expectedFilename, string $filename): void
+    {
+        $this->exec("database_backup.import {$filename}");
+        $this->assertExitError();
+        $this->assertErrorContains(
+            "<error>Symfony\Component\Filesystem\Exception\IOException: file `{$expectedFilename}` does not exist</error>",
+        );
     }
 
     /**
@@ -143,7 +175,7 @@ txt;
     #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
     {
-        $filename = Configure::readOrFail('DatabaseBackup.target') . 'my_backup.sql';
+        $filename = ROOT . 'backups' . DS . 'absolute_filename.sql';
 
         $BackupImport = Mockery::mock('overload:' . BackupImport::class);
 
@@ -167,10 +199,10 @@ txt;
             ->once()
             ->andReturn($filename);
 
-        $this->exec("database_backup.import --connection custom_connection --timeout 120 $filename");
-
+        $this->exec("database_backup.import --connection custom_connection --timeout 120 {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$filename` has been imported</success>");
+        $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
+        $this->assertErrorEmpty();
     }
 
     /**
@@ -182,19 +214,38 @@ txt;
     public function testExecuteWithNoFilename(): void
     {
         $this->exec('database_backup.import');
-
         $this->assertExitError();
         $this->assertErrorContains('Error: Missing required argument. The `filename` argument is required.');
     }
 
     /**
-     * Tests for the `execute()` method when `BackupImport::import()` throws an exception.
+     * Tests for the `execute()` method with an invalid `--timeout` option.
      *
      * @link \DatabaseBackup\Command\ImportCommand::execute()
      */
     #[Test]
+    #[TestWith(['0'])]
+    #[TestWith(['abc'])]
+    #[TestWith(['1.5'])]
+    public function testExecuteWithInvalidTimeout(string $timeout): void
+    {
+        $this->exec("database_backup.import --connection fake_connection --timeout {$timeout} backups/file.sql");
+        $this->assertExitError();
+        $this->assertErrorContains(
+            '<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>',
+        );
+    }
+
+    /**
+     * Tests for the `execute()` method when `BackupImport::import()` throws an exception or an error.
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    #[Test]
+    #[TestWith([new Exception('This is an exception message'), 'Exception: this is an exception message'])]
+    #[TestWith([new TypeError('This is an exception message'), 'TypeError: this is an exception message'])]
     #[RunInSeparateProcess]
-    public function testExecuteOnException(): void
+    public function testExecuteOnException(Throwable $Exception, string $expectedErrorMessage): void
     {
         $BackupImport = Mockery::mock('overload:' . BackupImport::class);
 
@@ -204,15 +255,15 @@ txt;
         $BackupImport
             ->shouldReceive('import')
             ->once()
-            ->andThrow(new Exception('Exception message'));
+            ->andThrow($Exception);
 
         $this->exec('database_backup.import my_backup.sql');
         $this->assertExitError();
-        $this->assertErrorContains('<error>Exception message</error>');
+        $this->assertErrorContains("<error>{$expectedErrorMessage}</error>");
     }
 
     /**
-     * Tests for the `execute()` method on stopped event (`BackupImport::import()` returns `false`).
+     * Tests for the `execute()` method on the stopped event.
      *
      * @link \DatabaseBackup\Command\ImportCommand::execute()
      */
@@ -231,8 +282,9 @@ txt;
             ->andReturn(false);
 
         $this->exec('database_backup.import my_backup.sql');
-
         $this->assertExitError();
-        $this->assertErrorContains('<error>The `Backup.beforeImport` event stopped the operation</error>');
+        $this->assertErrorContains(
+            '<error>Cake\Console\Exception\StopException: the `Backup.beforeImport` event stopped the operation</error>',
+        );
     }
 }
