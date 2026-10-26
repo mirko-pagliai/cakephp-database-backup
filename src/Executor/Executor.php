@@ -134,7 +134,7 @@ abstract class Executor implements EventListenerInterface
         /**
          * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
          */
-        $name = substr(strrchr($this->Connection->config()['driver'], '\\') ?: '', 1);
+        $name = substr((string)strrchr($this->Connection->config()['driver'], '\\'), 1);
 
         /**
          * This is the base command.
@@ -184,9 +184,12 @@ abstract class Executor implements EventListenerInterface
             $env['COMPRESSION_BINARY'] = $this->findBinary($Compression);
         }
         foreach (['host', 'password', 'username'] as $key) {
-            if (isset($config[$key])) {
-                $env['DB_' . strtoupper($key)] = $config[$key];
+            $value = $config[$key] ?? null;
+            if ($value === null) {
+                continue;
             }
+
+            $env['DB_' . strtoupper($key)] = $value;
         }
 
         $Process->run(env: [

@@ -101,4 +101,5 @@ This is useful when working with very large databases that take a long time to e
 ```php
 export()
 ```
-Exports the database and returns its filename path on success or `false` if the `Backup.beforeExport` event is stopped.
+Exports the database and returns its filename path on success or `false` if the `Backup.beforeExport` event is stopped.  
+After the export, the filename is reset: to export again with a custom filename, set it again with [`filename()`](#filename--).

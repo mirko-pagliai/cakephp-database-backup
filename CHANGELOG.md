@@ -1,49 +1,36 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.6
-* fixed a regression for SQLite introduced in `3.0.0`: the `{$DATABASE}` filename pattern was replaced by the full path
-  of the database file (so the default export filename contained a path). As in the `2.15.x` branch, it is now replaced
-  by the name of the database file, without path and extension;
+* fixed a regression introduced in `3.0.0` (SQLite): the `{$DATABASE}` filename pattern was replaced by the full path of
+  the database file. Now it is its name without path and extension, as in the `2.15.x` branch;
 * fixed a regression introduced in `3.0.0`: `BackupExport::export()` did not reset the filename, so a second call on the
-  same instance overwrote the previous backup. As in the `2.15.x` branch, the filename is now reset;
-* fixed a bug in the `ExportCommand` and `ImportCommand` commands: an invalid `--timeout` value (for example
-  `--timeout abc`) was silently converted to `0`, which disables the timeout, while `--timeout 0` was ignored and the
-  default timeout was used. Now the value must be an integer greater than `0`, otherwise the command fails with an
-  error;
-* fixed a bug in `BackupExport` and `BackupImport`: if the connection was changed after the `Executor` had already been
-  created (for example, by exporting twice with two different connections on the same instance), the `Executor` of the
-  previous connection kept being used. Now the `Executor` is created again for the new connection;
+  same instance overwrote the previous backup. Now it is reset, as in the `2.15.x` branch;
+* fixed a bug in `ExportCommand` and `ImportCommand`: an invalid `--timeout` (for example `abc`) became `0`, which
+  disables the timeout. Now it must be an integer greater than `0`, otherwise the command fails;
+* fixed a bug in `ExportCommand` and `ImportCommand`: a `TypeError` was not caught and the command ended with a PHP
+  error. Now it is handled like any other exception;
+* fixed a bug in `BackupExport` and `BackupImport`: if the connection was changed after the `Executor` had been created,
+  the `Executor` of the previous connection kept being used;
 * fixed a bug in `Utility::__call()`: calling a magic method without arguments (for example `$BackupExport->timeout()`)
-  raised a PHP warning and then a misleading `TypeError`. Now an `ArgumentCountError` is thrown;
-* fixed a bug in the `ExportCommand` and `ImportCommand` commands: a `TypeError` was not caught, so the command ended with
-  a PHP error and its stack trace instead of the usual error message. Now it is handled like any other exception;
+  raised a warning and a misleading `TypeError`. Now it throws an `ArgumentCountError`;
 * fixed a bug in `MysqlExecutor`: if the process failed or reached the timeout, the temporary file with the
-  authentication data (which contains the password) was not deleted and remained in the temporary directory;
-* fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a
-  password containing `{{HOST}}`) was altered when the file with the authentication data was written;
-* fixed a bug in `MysqlExecutor::writeAuthFile()`: a password containing a line break, or a backslash followed by `n`,
-  `r`, `t`, `b`, `s`, `"`, `'` or another backslash (for example `ab\\cd`), was read incorrectly by the client, because
-  these characters were not escaped in the file with the authentication data. Now they are escaped;
-* fixed a bug in `MysqlExecutor::writeAuthFile()`: a username or a host containing `#` (for example `my#host`) was cut
-  at that character by the client, because, unlike the password, they were written without double quotes in the file
-  with the authentication data. Now they are written between double quotes and escaped like the password;
-* fixed a bug: if a listener stopped the `Backup.beforeExport` or `Backup.beforeImport` event after the `Executor` had
-  already acted, the operation was not executed anyway, but the temporary file with the authentication data remained
-  (`MysqlExecutor`) or the tables were already dropped (`SqliteExecutor`). Now the `Executor` handles these two events
-  after any other listener (priority `1000`, instead of the default `10`);
-* the temporary file with the authentication data created by `MysqlExecutor` is now readable and writable only by its
-  owner (permissions `0600`), instead of being readable by other users (`0644` with the usual umask). On Windows, which
-  does not support these permissions, nothing changes;
+  authentication data (which contains the password) was not deleted;
+* fixed some bugs in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for
+  example `{{HOST}}`) was altered; a password containing a line break, a double quote or a backslash was misread by the
+  client; a username or host containing `#` was cut at that character. Now the values are written between double
+  quotes and escaped;
+* fixed a bug: if a listener stopped `Backup.beforeExport` or `Backup.beforeImport` after the `Executor` had already
+  acted, the temporary authentication file remained (`MysqlExecutor`) or the tables were already dropped
+  (`SqliteExecutor`). Now the `Executor` handles these events after any other listener (priority `1000`);
+* the temporary file with the authentication data created by `MysqlExecutor` is now readable only by its owner (`0600`,
+  instead of `0644` with the usual umask). On Windows nothing changes;
 * the migration guide `docs/Migration from version 2.md` has been renamed `docs/Migration from branch 2.15 to 3.0.md`
-  and completed: it now describes all the changes between the `2.15.x` and the `3.0.x` branches (requirements,
-  configuration, classes, methods, events, commands and test suite).
-
-### 3.0.5
-* tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened, with particular
-  attention to relative/absolute paths;
+  and completed;
+* tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened and
+  [use _Mockery_ less](https://github.com/mirko-pagliai/cakephp-database-backup/issues/231);
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
   [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
-* refactor: apply consistent formatting across tests and source files.
+* refactor: consistent formatting and string interpolation across tests and source files.
 
 ### 3.0.4
 * the `Utility::__call()` method now correctly handles properties with an initial capital letter. This means that
