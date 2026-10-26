@@ -15,8 +15,12 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Command;
 
+use App\Database\FakeConnection;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
+use Cake\Event\Event;
+use Cake\Event\EventManager;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -27,6 +31,8 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Throwable;
+use TypeError;
 
 /**
  * ExportCommandTest.
@@ -247,61 +253,67 @@ txt;
     #[TestWith(['0'])]
     #[TestWith(['abc'])]
     #[TestWith(['1.5'])]
-    #[RunInSeparateProcess]
     public function testExecuteWithInvalidTimeout(string $timeout): void
     {
-        $BackupExport = Mockery::mock('overload:' . BackupExport::class);
+        ConnectionManager::setConfig('fake_connection', new FakeConnection());
 
-        $BackupExport
-            ->shouldReceive('__construct')
-            ->once();
+        $this->exec("database_backup.export --connection fake_connection --timeout $timeout");
 
-        $BackupExport
-            ->shouldNotReceive('timeout');
+        ConnectionManager::drop('fake_connection');
 
-        $BackupExport
-            ->shouldNotReceive('export');
-
-        $this->exec("database_backup.export --timeout $timeout");
         $this->assertExitError();
-        $this->assertErrorContains('<error>The `--timeout` option must be an integer greater than 0</error>');
+        $this->assertErrorContains('<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>');
     }
 
     /**
-     * Tests for the `execute()` method when `BackupExport::import()` throws an exception.
+     * Tests for the `execute()` method when `BackupExport::export()` throws an exception or an error.
      *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
-    #[RunInSeparateProcess]
-    public function testExecuteOnException(): void
+    #[TestWith([new Exception('This is an exception message'), 'Exception: this is an exception message'])]
+    #[TestWith([new TypeError('This is an exception message'), 'TypeError: this is an exception message'])]
+    public function testExecuteOnException(Throwable $Exception, string $expectedErrorMessage): void
     {
-        Mockery::mock('overload:' . BackupExport::class)
-            ->shouldReceive('export')
-            ->once()
-            ->andThrow(new Exception('Exception message'));
+        ConnectionManager::setConfig('fake_connection', new FakeConnection());
 
-        $this->exec('database_backup.export');
+        $listener = function () use ($Exception): never {
+            throw $Exception;
+        };
+        EventManager::instance()->on('Backup.beforeExport', $listener);
+
+        $this->exec('database_backup.export --connection fake_connection');
+
+        EventManager::instance()->off('Backup.beforeExport', $listener);
+        ConnectionManager::drop('fake_connection');
+
         $this->assertExitError();
-        $this->assertErrorContains('<error>Exception message</error>');
+        $this->assertErrorContains("<error>$expectedErrorMessage</error>");
     }
 
     /**
-     * Tests for the `execute()` method on the stopped event (`BackupExport::export()` returns `false`).
+     * Tests for the `execute()` method on the stopped event.
      *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testExecuteOnStoppedEvent(): void
     {
-        Mockery::mock('overload:' . BackupExport::class)
-            ->shouldReceive('export')
-            ->once()
-            ->andReturnFalse();
+        ConnectionManager::setConfig('fake_connection', new FakeConnection());
 
-        $this->exec('database_backup.export');
+        $listener = function (Event $Event): void {
+            $Event->stopPropagation();
+        };
+        EventManager::instance()->on('Backup.beforeExport', $listener);
+
+        $this->exec('database_backup.export --connection fake_connection');
+
+        EventManager::instance()->off('Backup.beforeExport', $listener);
+        ConnectionManager::drop('fake_connection');
+
         $this->assertExitError();
-        $this->assertErrorContains('<error>The `Backup.beforeExport` event stopped the operation</error>');
+        $this->assertErrorContains(
+            '<error>Cake\Console\Exception\StopException: the `Backup.beforeExport` event stopped the operation</error>',
+        );
     }
 }

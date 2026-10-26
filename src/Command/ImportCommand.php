@@ -23,6 +23,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Override;
+use TypeError;
 use ValueError;
 use function Cake\I18n\__d;
 
@@ -95,8 +96,8 @@ class ImportCommand extends Command
                 'Backup `{0}` has been imported',
                 $this->makeRelativePath($filename),
             ));
-        } catch (Exception | ValueError $e) {
-            $io->abort($e->getMessage());
+        } catch (Exception | TypeError | ValueError $e) {
+            $io->abort(get_class($e) . ': ' . lcfirst($e->getMessage()));
         }
 
         return static::CODE_SUCCESS;
