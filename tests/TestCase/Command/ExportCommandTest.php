@@ -15,8 +15,12 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Command;
 
+use App\Database\FakeConnection;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
+use Cake\Event\Event;
+use Cake\Event\EventManager;
 use DatabaseBackup\Command\ExportCommand;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
@@ -27,6 +31,8 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Throwable;
+use TypeError;
 
 /**
  * ExportCommandTest.
@@ -35,6 +41,26 @@ use PHPUnit\Framework\Attributes\TestWith;
 class ExportCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
+
+    /**
+     * @inheritDoc
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        ConnectionManager::setConfig('fake_connection', new FakeConnection());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        ConnectionManager::drop('fake_connection');
+    }
 
     /**
      * @link \DatabaseBackup\Command\ExportCommand::buildOptionParser()
@@ -73,9 +99,9 @@ cake database_backup.export [options]
 --filename, -f     Filename. It can be an absolute path and may contain
                    patterns. The compression type will be automatically
                    set. Filenames can be relative to
-                   <comment>$root</comment>
+                   <comment>{$root}</comment>
                    (root of your app) or
-                   <comment>$defaultTarget</comment>
+                   <comment>{$defaultTarget}</comment>
                    (default target directory).
 --help, -h         Display this help.
 --quiet, -q        Enable quiet output and non-interactive mode.
@@ -119,7 +145,7 @@ txt;
 
         $this->exec('database_backup.export');
         $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `' . $expectedFilename . '` has been exported</success>');
+        $this->assertOutputContains("<success>Backup `{$expectedFilename}` has been exported</success>");
         $this->assertErrorEmpty();
     }
 
@@ -151,9 +177,11 @@ txt;
             ->once()
             ->andReturn($filename);
 
-        $this->exec("database_backup.export --filename $filename");
+        $this->exec("database_backup.export --filename {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('#^<success>Backup `[^`]*' . preg_quote(basename($filename)) . '` has been exported</success>$#');
+        $this->assertOutputRegExp(
+            '#^<success>Backup `[^`]*' . preg_quote(basename($filename), '#') . '` has been exported</success>$#',
+        );
         $this->assertErrorEmpty();
     }
 
@@ -194,9 +222,9 @@ txt;
             ->once()
             ->andReturn($filename);
 
-        $this->exec('database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename ' . $filename);
+        $this->exec("database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `' . $filename . '` has been exported</success>');
+        $this->assertOutputContains("<success>Backup `{$filename}` has been exported</success>");
         $this->assertErrorEmpty();
     }
 
@@ -239,40 +267,64 @@ txt;
     }
 
     /**
-     * Tests for the `execute()` method when `BackupExport::import()` throws an exception.
+     * Tests for the `execute()` method with an invalid `--timeout` option.
      *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
-    #[RunInSeparateProcess]
-    public function testExecuteOnException(): void
+    #[TestWith(['0'])]
+    #[TestWith(['abc'])]
+    #[TestWith(['1.5'])]
+    public function testExecuteWithInvalidTimeout(string $timeout): void
     {
-        Mockery::mock('overload:' . BackupExport::class)
-            ->shouldReceive('export')
-            ->once()
-            ->andThrow(new Exception('Exception message'));
-
-        $this->exec('database_backup.export');
+        $this->exec("database_backup.export --connection fake_connection --timeout {$timeout}");
         $this->assertExitError();
-        $this->assertErrorContains('<error>Exception message</error>');
+        $this->assertErrorContains(
+            '<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>',
+        );
     }
 
     /**
-     * Tests for the `execute()` method on the stopped event (`BackupExport::export()` returns `false`).
+     * Tests for the `execute()` method when `BackupExport::export()` throws an exception or an error.
      *
      * @link \DatabaseBackup\Command\ExportCommand::execute()
      */
     #[Test]
-    #[RunInSeparateProcess]
+    #[TestWith([new Exception('This is an exception message'), 'Exception: this is an exception message'])]
+    #[TestWith([new TypeError('This is an exception message'), 'TypeError: this is an exception message'])]
+    public function testExecuteOnException(Throwable $Exception, string $expectedErrorMessage): void
+    {
+        $listener = static fn (): never => throw $Exception;
+        EventManager::instance()->on('Backup.beforeExport', $listener);
+
+        $this->exec('database_backup.export --connection fake_connection');
+
+        EventManager::instance()->off('Backup.beforeExport', $listener);
+
+        $this->assertExitError();
+        $this->assertErrorContains("<error>{$expectedErrorMessage}</error>");
+    }
+
+    /**
+     * Tests for the `execute()` method on the stopped event.
+     *
+     * @link \DatabaseBackup\Command\ExportCommand::execute()
+     */
+    #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
-        Mockery::mock('overload:' . BackupExport::class)
-            ->shouldReceive('export')
-            ->once()
-            ->andReturnFalse();
+        $listener = static function (Event $Event): void {
+            $Event->stopPropagation();
+        };
+        EventManager::instance()->on('Backup.beforeExport', $listener);
 
-        $this->exec('database_backup.export');
+        $this->exec('database_backup.export --connection fake_connection');
+
+        EventManager::instance()->off('Backup.beforeExport', $listener);
+
         $this->assertExitError();
-        $this->assertErrorContains('<error>The `Backup.beforeExport` event stopped the operation</error>');
+        $this->assertErrorContains(
+            '<error>Cake\Console\Exception\StopException: the `Backup.beforeExport` event stopped the operation</error>',
+        );
     }
 }

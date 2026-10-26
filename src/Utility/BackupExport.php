@@ -42,6 +42,13 @@ class BackupExport extends Utility
 
     public string $filename {
         set(string $filename) {
+            // An empty filename resets the property, so that the next call of `export()` generates a new filename
+            if ($filename === '') {
+                $this->filename = '';
+
+                return;
+            }
+
             $filename = $this->replaceFilenamePatterns($filename);
             $filename = $this->makeAbsolutePath($filename);
 
@@ -76,7 +83,7 @@ class BackupExport extends Utility
         return str_replace(
             search: ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
             replace: [
-                $this->Connection->config()['database'],
+                pathinfo($this->Connection->config()['database'], PATHINFO_FILENAME),
                 new DateTime()->format('YmdHis'),
                 str_replace(
                     search: ['127.0.0.1', '::1'],
@@ -116,17 +123,21 @@ class BackupExport extends Utility
             $this->filename = 'backup_{$DATABASE}_{$DATETIME}.' . $this->compression->value;
         }
 
+        // Gets the filename and resets the property, so that the next call of this method will not reuse it
+        $filename = $this->filename;
+        $this->filename = '';
+
         //Dispatches the `Backup.beforeExport` event implemented by the `Executor` class
         $BeforeExport = $this->Executor->dispatchEvent('Backup.beforeExport');
         if ($BeforeExport->isStopped()) {
             return false;
         }
 
-        $this->Executor->runProcess(filename: $this->filename, timeout: $this->timeout);
+        $this->Executor->runProcess(filename: $filename, timeout: $this->timeout);
 
         //Dispatches the `Backup.afterExport` event implemented by the `Executor` class
         $this->Executor->dispatchEvent('Backup.afterExport');
 
-        return $this->filename;
+        return $filename;
     }
 }

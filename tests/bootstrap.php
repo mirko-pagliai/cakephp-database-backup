@@ -61,7 +61,9 @@ foreach (
         'db_dsn_sqlite' => 'sqlite:///' . TMP . 'test.sq3',
     ] as $key => $value
 ) {
-    if (!getenv($key)) {
-        putenv("$key=$value");
+    if (getenv($key)) {
+        continue;
     }
+
+    putenv("{$key}={$value}");
 }

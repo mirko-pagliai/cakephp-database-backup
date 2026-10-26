@@ -75,7 +75,8 @@ Sets the filename of the backup you want to export.
 Note that using this method, the compression type will be automatically setted by the filename.
 
 The filename can accept some patterns that will make it dynamic.  
-Patterns are: `{$DATABASE}` (database name), `{$DATETIME}` (datetime), `{$HOSTNAME}` (hostname) and `{$TIMESTAMP}` (timestamp).
+Patterns are: `{$DATABASE}` (database name), `{$DATETIME}` (datetime), `{$HOSTNAME}` (hostname) and `{$TIMESTAMP}` (timestamp).  
+With SQLite, `{$DATABASE}` is the name of the database file, without path and extension (for example, `my_database` for `/path/to/my_database.sqlite`).
 
 For example, with (database name is `my_database`):
 ```php
@@ -100,4 +101,5 @@ This is useful when working with very large databases that take a long time to e
 ```php
 export()
 ```
-Exports the database and returns its filename path on success or `false` if the `Backup.beforeExport` event is stopped.
+Exports the database and returns its filename path on success or `false` if the `Backup.beforeExport` event is stopped.  
+After the export, the filename is reset: to export again with a custom filename, set it again with [`filename()`](#filename--).

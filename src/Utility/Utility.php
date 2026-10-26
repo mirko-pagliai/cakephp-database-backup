@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use ArgumentCountError;
 use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Core\Configure;
@@ -44,17 +45,28 @@ abstract class Utility
             }
 
             $this->Connection = $Connection;
+
+            // The `Executor` was created for the previous connection
+            $this->ExecutorInstance = null;
         }
         get => $this->Connection ?? ConnectionManager::get('default');
     }
 
+    /**
+     * The `Executor` instance, created by the `$Executor` getter or set with the `$Executor` setter.
+     */
+    private ?Executor $ExecutorInstance = null;
+
     public Executor $Executor {
+        set (Executor $Executor) {
+            $this->ExecutorInstance = $Executor;
+        }
         get {
-            if (empty($this->Executor)) {
+            if (!$this->ExecutorInstance) {
                 /**
                  * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
                  */
-                $name = substr(strrchr($this->Connection->config()['driver'], '\\') ?: '', 1);
+                $name = substr((string)strrchr($this->Connection->config()['driver'], '\\'), 1);
 
                 /** @var class-string<\DatabaseBackup\Executor\Executor> $className */
                 $className = App::classname("DatabaseBackup.{$name}Executor", 'Executor');
@@ -66,10 +78,13 @@ abstract class Utility
                     ));
                 }
 
-                $this->Executor = new $className(Connection: $this->Connection, OperationType: $this->OperationType);
+                $this->ExecutorInstance = new $className(
+                    Connection: $this->Connection,
+                    OperationType: $this->OperationType,
+                );
             }
 
-            return $this->Executor;
+            return $this->ExecutorInstance;
         }
     }
 
@@ -110,7 +125,8 @@ abstract class Utility
      * @param string $name
      * @param array<array-key, mixed> $arguments
      * @return $this
-     * @throws \BadMethodCallException
+     * @throws \ArgumentCountError If the method is called without arguments
+     * @throws \BadMethodCallException If the method does not exist
      */
     public function __call(string $name, array $arguments)
     {
@@ -118,7 +134,12 @@ abstract class Utility
             $name = ucfirst($name);
         }
         if (!property_exists($this, $name)) {
-            throw new BadMethodCallException(sprintf('Method `%s::%s()` does not exist', $this::class, $name));
+            throw new BadMethodCallException('Method `' . $this::class . "::{$name}()` does not exist");
+        }
+        if (!$arguments) {
+            throw new ArgumentCountError(
+                'Method `' . $this::class . "::{$name}()` expects at least 1 argument, 0 given",
+            );
         }
 
         $this->{$name} = $arguments[0];
@@ -139,8 +160,10 @@ abstract class Utility
             return $path;
         }
 
-        $absolutePath = Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+        /** @var string $targetDir */
+        $targetDir = Configure::readOrFail('DatabaseBackup.target');
+        $absolutePath = Path::makeAbsolute($path, $targetDir);
 
-        return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
+        return DS === '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
 }
