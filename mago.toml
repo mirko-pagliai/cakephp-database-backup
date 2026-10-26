@@ -25,9 +25,14 @@ integrations = ["symfony", "phpunit"]
 ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
-no-literal-password = { enabled = false }
 # Enforce the `$this->assert*()` style in tests
 assertion-style = { style = "this" }
+# Test values like `DB_PASSWORD` are expected in the test suite
+no-literal-password = { exclude = ["tests/"] }
+# Test classes naturally have many test methods
+too-many-methods = { exclude = ["tests/"] }
+# Test parameters like `$password` hold dummy values, not real secrets
+sensitive-parameter = { exclude = ["tests/"] }
 
 [analyzer]
 plugins = []
