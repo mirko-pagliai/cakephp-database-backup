@@ -43,7 +43,7 @@ enum Compression: string
     {
         return array_filter(
             array: Compression::cases(),
-            callback: fn(Compression $Compression): bool => $Compression->isValid(),
+            callback: static fn(Compression $Compression): bool => $Compression->isValid(),
         );
     }
 

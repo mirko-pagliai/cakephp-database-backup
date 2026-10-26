@@ -104,7 +104,7 @@ abstract class Executor implements EventListenerInterface
 
         /** @var string $binary */
         $binary = Configure::read(
-            var: "DatabaseBackup.binaries.$binaryName",
+            var: "DatabaseBackup.binaries.{$binaryName}",
             default: new ExecutableFinder()->find(name: $binaryName),
         );
 
@@ -113,7 +113,7 @@ abstract class Executor implements EventListenerInterface
                 'database_backup',
                 'Binary for `{0}` not found. Set path manually: `{1}`',
                 $binaryName,
-                "Configure::write('DatabaseBackup.binaries.$binaryName', '/path/to/$binaryName')",
+                "Configure::write('DatabaseBackup.binaries.{$binaryName}', '/path/to/{$binaryName}')",
             ));
         }
 
@@ -140,10 +140,10 @@ abstract class Executor implements EventListenerInterface
          * This is the base command.
          * It still needs to be properly articulated.
          */
-        $command = Configure::readOrFail("DatabaseBackup.$name." . $this->OperationType->value);
+        $command = Configure::readOrFail("DatabaseBackup.{$name}." . $this->OperationType->value);
 
         if (!$Compression->isValid()) {
-            return "$command " . ($isExport ? '>' : '<') . ' "${:FILENAME}"';
+            return "{$command} " . ($isExport ? '>' : '<') . ' "${:FILENAME}"';
         }
 
         if ($isExport) {

@@ -103,7 +103,7 @@ class ExecutorTest extends TestCase
         Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder')
             ->shouldReceive('find')
             ->once()
-            ->andReturnUsing(fn(string $name): string => "/usr/bin/{$name}");
+            ->andReturnUsing(static fn(string $name): string => "/usr/bin/{$name}");
 
         $result = new FakeExecutor()->findBinary($name);
 

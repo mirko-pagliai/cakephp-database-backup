@@ -102,9 +102,9 @@ cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>
 
 filename  Filename. It can be an absolute path. Filenames can be
           relative to
-          <comment>$root</comment>
+          <comment>{$root}</comment>
           (root of your app) or
-          <comment>$defaultTarget</comment>
+          <comment>{$defaultTarget}</comment>
           (default target directory).
 
 txt;
@@ -143,7 +143,7 @@ txt;
             ->once()
             ->andReturn($expectedFilename);
 
-        $this->exec("database_backup.import $filename");
+        $this->exec("database_backup.import {$filename}");
         $this->assertExitSuccess();
         $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
         $this->assertErrorEmpty();
@@ -159,10 +159,10 @@ txt;
     #[TestWith([ROOT . 'backups' . DS . 'no_existing_filename.sql', 'backups' . DS . 'no_existing_filename.sql'])]
     public function testExecuteWithNoExistingFile(string $expectedFilename, string $filename): void
     {
-        $this->exec("database_backup.import $filename");
+        $this->exec("database_backup.import {$filename}");
         $this->assertExitError();
         $this->assertErrorContains(
-            "<error>Symfony\Component\Filesystem\Exception\IOException: file `$expectedFilename` does not exist</error>",
+            "<error>Symfony\Component\Filesystem\Exception\IOException: file `{$expectedFilename}` does not exist</error>",
         );
     }
 
@@ -199,7 +199,7 @@ txt;
             ->once()
             ->andReturn($filename);
 
-        $this->exec("database_backup.import --connection custom_connection --timeout 120 $filename");
+        $this->exec("database_backup.import --connection custom_connection --timeout 120 {$filename}");
         $this->assertExitSuccess();
         $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
         $this->assertErrorEmpty();
@@ -229,7 +229,7 @@ txt;
     #[TestWith(['1.5'])]
     public function testExecuteWithInvalidTimeout(string $timeout): void
     {
-        $this->exec("database_backup.import --connection fake_connection --timeout $timeout backups/file.sql");
+        $this->exec("database_backup.import --connection fake_connection --timeout {$timeout} backups/file.sql");
         $this->assertExitError();
         $this->assertErrorContains(
             '<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>',
@@ -259,7 +259,7 @@ txt;
 
         $this->exec('database_backup.import my_backup.sql');
         $this->assertExitError();
-        $this->assertErrorContains("<error>$expectedErrorMessage</error>");
+        $this->assertErrorContains("<error>{$expectedErrorMessage}</error>");
     }
 
     /**

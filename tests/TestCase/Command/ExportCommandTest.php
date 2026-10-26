@@ -99,9 +99,9 @@ cake database_backup.export [options]
 --filename, -f     Filename. It can be an absolute path and may contain
                    patterns. The compression type will be automatically
                    set. Filenames can be relative to
-                   <comment>$root</comment>
+                   <comment>{$root}</comment>
                    (root of your app) or
-                   <comment>$defaultTarget</comment>
+                   <comment>{$defaultTarget}</comment>
                    (default target directory).
 --help, -h         Display this help.
 --quiet, -q        Enable quiet output and non-interactive mode.
@@ -145,7 +145,7 @@ txt;
 
         $this->exec('database_backup.export');
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$expectedFilename` has been exported</success>");
+        $this->assertOutputContains("<success>Backup `{$expectedFilename}` has been exported</success>");
         $this->assertErrorEmpty();
     }
 
@@ -177,7 +177,7 @@ txt;
             ->once()
             ->andReturn($filename);
 
-        $this->exec("database_backup.export --filename $filename");
+        $this->exec("database_backup.export --filename {$filename}");
         $this->assertExitSuccess();
         $this->assertOutputRegExp('#^<success>Backup `[^`]*' . preg_quote(basename($filename)) . '` has been exported</success>$#');
         $this->assertErrorEmpty();
@@ -220,9 +220,9 @@ txt;
             ->once()
             ->andReturn($filename);
 
-        $this->exec("database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename $filename");
+        $this->exec("database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputContains("<success>Backup `$filename` has been exported</success>");
+        $this->assertOutputContains("<success>Backup `{$filename}` has been exported</success>");
         $this->assertErrorEmpty();
     }
 
@@ -275,9 +275,11 @@ txt;
     #[TestWith(['1.5'])]
     public function testExecuteWithInvalidTimeout(string $timeout): void
     {
-        $this->exec("database_backup.export --connection fake_connection --timeout $timeout");
+        $this->exec("database_backup.export --connection fake_connection --timeout {$timeout}");
         $this->assertExitError();
-        $this->assertErrorContains('<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>');
+        $this->assertErrorContains(
+            '<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>',
+        );
     }
 
     /**
@@ -290,9 +292,7 @@ txt;
     #[TestWith([new TypeError('This is an exception message'), 'TypeError: this is an exception message'])]
     public function testExecuteOnException(Throwable $Exception, string $expectedErrorMessage): void
     {
-        $listener = function () use ($Exception): never {
-            throw $Exception;
-        };
+        $listener = static fn (): never => throw $Exception;
         EventManager::instance()->on('Backup.beforeExport', $listener);
 
         $this->exec('database_backup.export --connection fake_connection');
@@ -300,7 +300,7 @@ txt;
         EventManager::instance()->off('Backup.beforeExport', $listener);
 
         $this->assertExitError();
-        $this->assertErrorContains("<error>$expectedErrorMessage</error>");
+        $this->assertErrorContains("<error>{$expectedErrorMessage}</error>");
     }
 
     /**
@@ -311,7 +311,7 @@ txt;
     #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
-        $listener = function (Event $Event): void {
+        $listener = static function (Event $Event): void {
             $Event->stopPropagation();
         };
         EventManager::instance()->on('Backup.beforeExport', $listener);

@@ -49,7 +49,7 @@ class ExportCommand extends Command
             'choices' => array_map(callback: 'lcfirst', array: array_column(
                 array: array_filter(
                     array: Compression::cases(),
-                    callback: fn(Compression $Compression): bool => $Compression->isValid(),
+                    callback: static fn(Compression $Compression): bool => $Compression->isValid(),
                 ),
                 column_key: 'name',
             )),
