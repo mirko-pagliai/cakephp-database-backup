@@ -25,6 +25,7 @@ integrations = ["symfony", "phpunit"]
 ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
+explicit-octal = { enabled = false }
 # Enforce the `$this->assert*()` style in tests
 assertion-style = { style = "this" }
 # Test values like `DB_PASSWORD` are expected in the test suite
