@@ -44,13 +44,24 @@ abstract class Utility
             }
 
             $this->Connection = $Connection;
+
+            // The `Executor` was created for the previous connection
+            $this->ExecutorInstance = null;
         }
         get => $this->Connection ?? ConnectionManager::get('default');
     }
 
+    /**
+     * The `Executor` instance, created by the `$Executor` getter or set with the `$Executor` setter.
+     */
+    private ?Executor $ExecutorInstance = null;
+
     public Executor $Executor {
+        set (Executor $Executor) {
+            $this->ExecutorInstance = $Executor;
+        }
         get {
-            if (empty($this->Executor)) {
+            if (!$this->ExecutorInstance) {
                 /**
                  * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
                  */
@@ -66,10 +77,13 @@ abstract class Utility
                     ));
                 }
 
-                $this->Executor = new $className(Connection: $this->Connection, OperationType: $this->OperationType);
+                $this->ExecutorInstance = new $className(
+                    Connection: $this->Connection,
+                    OperationType: $this->OperationType,
+                );
             }
 
-            return $this->Executor;
+            return $this->ExecutorInstance;
         }
     }
 

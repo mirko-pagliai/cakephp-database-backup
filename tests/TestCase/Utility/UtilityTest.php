@@ -19,9 +19,12 @@ use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
 use BadMethodCallException;
 use Cake\Core\Configure;
+use Cake\Database\Driver\Mysql;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 use DatabaseBackup\Executor\Executor;
+use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\Utility;
@@ -124,6 +127,34 @@ class UtilityTest extends TestCase
         $this->expectExceptionMessage('The Executor class for the `NoExistingDriver` driver does not exist');
         /** @phpstan-ignore-next-line */
         $this->Utility->Executor;
+    }
+
+    /**
+     * Tests that the `$Executor` property is created again if the connection changes.
+     *
+     * @link \DatabaseBackup\Utility\Utility::$Executor
+     */
+    #[Test]
+    public function testExecutorPropertyAfterConnectionChange(): void
+    {
+        $this->Utility->Connection = new FakeConnection();
+        $this->assertInstanceOf(SqliteExecutor::class, $this->Utility->Executor);
+
+        $this->Utility->Connection = new FakeConnection(['driver' => Mysql::class]);
+        $this->assertInstanceOf(MysqlExecutor::class, $this->Utility->Executor);
+    }
+
+    /**
+     * Tests that the `$Executor` property is not created again if the connection does not change.
+     *
+     * @link \DatabaseBackup\Utility\Utility::$Executor
+     */
+    #[Test]
+    public function testExecutorPropertyIsCreatedOnlyOnce(): void
+    {
+        $this->Utility->Connection = new FakeConnection();
+
+        $this->assertSame($this->Utility->Executor, $this->Utility->Executor);
     }
 
     /**

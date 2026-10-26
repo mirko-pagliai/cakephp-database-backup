@@ -10,6 +10,9 @@
   `--timeout abc`) was silently converted to `0`, which disables the timeout, while `--timeout 0` was ignored and the
   default timeout was used. Now the value must be an integer greater than `0`, otherwise the command fails with an
   error;
+* fixed a bug in `BackupExport` and `BackupImport`: if the connection was changed after the `Executor` had already been
+  created (for example, by exporting twice with two different connections on the same instance), the `Executor` of the
+  previous connection kept being used. Now the `Executor` is created again for the new connection;
 * fixed a bug in `MysqlExecutor`: if the process failed or reached the timeout, the temporary file with the
   authentication data (which contains the password) was not deleted and remained in the temporary directory;
 * fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a
