@@ -31,7 +31,6 @@ use function Cake\I18n\__d;
 /**
  * Represents an "Executor" class containing all methods to export/import database backups, according to the connection.
  *
- * @method \Cake\Event\EventManager getEventManager()
  * @since 2.0.0
  */
 abstract class Executor implements EventListenerInterface
