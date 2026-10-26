@@ -179,7 +179,9 @@ txt;
 
         $this->exec("database_backup.export --filename {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('#^<success>Backup `[^`]*' . preg_quote(basename($filename)) . '` has been exported</success>$#');
+        $this->assertOutputRegExp(
+            '#^<success>Backup `[^`]*' . preg_quote(basename($filename), '#') . '` has been exported</success>$#',
+        );
         $this->assertErrorEmpty();
     }
 

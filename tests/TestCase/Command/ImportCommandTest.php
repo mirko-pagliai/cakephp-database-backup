@@ -145,7 +145,9 @@ txt;
 
         $this->exec("database_backup.import {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
+        $this->assertOutputRegExp(
+            '#^<success>Backup `[^`]+' . preg_quote(basename($filename), '#') . '` has been imported</success>$#',
+        );
         $this->assertErrorEmpty();
     }
 
@@ -201,7 +203,9 @@ txt;
 
         $this->exec("database_backup.import --connection custom_connection --timeout 120 {$filename}");
         $this->assertExitSuccess();
-        $this->assertOutputRegExp('#^<success>Backup `[^`]+' . preg_quote(basename($filename)) . '` has been imported</success>$#');
+        $this->assertOutputRegExp(
+            '#^<success>Backup `[^`]+' . preg_quote(basename($filename), '#') . '` has been imported</success>$#',
+        );
         $this->assertErrorEmpty();
     }
 

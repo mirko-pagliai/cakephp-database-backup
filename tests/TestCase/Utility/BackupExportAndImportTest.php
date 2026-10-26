@@ -69,9 +69,11 @@ class BackupExportAndImportTest extends TestCase
         //If some binaries are missing, sets the old aliases
         $ExecutableFinder = new ExecutableFinder();
         foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
-            if (!$ExecutableFinder->find($binary)) {
-                Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($oldAlias));
+            if ($ExecutableFinder->find($binary)) {
+                continue;
             }
+
+            Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($oldAlias));
         }
     }
 
