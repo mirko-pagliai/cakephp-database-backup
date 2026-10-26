@@ -71,8 +71,9 @@ class ImportCommand extends Command
         try {
             $BackupImport = new BackupImport((string)$args->getOption('connection') ?: '');
 
-            if ($args->getOption('timeout')) {
-                $BackupImport->timeout((int)$args->getOption('timeout'));
+            $timeout = $this->getTimeoutOption($args);
+            if ($timeout !== null) {
+                $BackupImport->timeout($timeout);
             }
 
             $BackupImport->filename($this->makeAbsolutePath((string)$args->getArgument('filename')));

@@ -189,6 +189,35 @@ txt;
     }
 
     /**
+     * Tests for the `execute()` method with an invalid `--timeout` option.
+     *
+     * @link \DatabaseBackup\Command\ImportCommand::execute()
+     */
+    #[Test]
+    #[TestWith(['0'])]
+    #[TestWith(['abc'])]
+    #[TestWith(['1.5'])]
+    #[RunInSeparateProcess]
+    public function testExecuteWithInvalidTimeout(string $timeout): void
+    {
+        $BackupImport = Mockery::mock('overload:' . BackupImport::class);
+
+        $BackupImport
+            ->shouldReceive('__construct')
+            ->once();
+
+        $BackupImport
+            ->shouldNotReceive('timeout');
+
+        $BackupImport
+            ->shouldNotReceive('import');
+
+        $this->exec('database_backup.import --timeout ' . $timeout . ' backups/file.sql');
+        $this->assertExitError();
+        $this->assertErrorContains('<error>The `--timeout` option must be an integer greater than 0</error>');
+    }
+
+    /**
      * Tests for the `execute()` method when `BackupImport::import()` throws an exception.
      *
      * @link \DatabaseBackup\Command\ImportCommand::execute()

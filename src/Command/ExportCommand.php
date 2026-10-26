@@ -87,8 +87,9 @@ class ExportCommand extends Command
         try {
             $BackupExport = new BackupExport((string)$args->getOption('connection') ?: '');
 
-            if ($args->getOption('timeout')) {
-                $BackupExport->timeout((int)$args->getOption('timeout'));
+            $timeout = $this->getTimeoutOption($args);
+            if ($timeout !== null) {
+                $BackupExport->timeout($timeout);
             }
 
             if ($args->getOption('filename')) {

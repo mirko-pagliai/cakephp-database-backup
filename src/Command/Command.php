@@ -16,7 +16,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Command;
 
 use Cake\Command\Command as CakeCommand;
+use Cake\Console\Arguments;
 use Cake\Console\ConsoleOptionParser;
+use InvalidArgumentException;
 use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
@@ -48,6 +50,32 @@ abstract class Command extends CakeCommand
         ]);
 
         return $parser;
+    }
+
+    /**
+     * Gets the value of the `--timeout` option.
+     *
+     * @param \Cake\Console\Arguments $args
+     * @return int|null The timeout in seconds, or `null` if the option has not been passed
+     * @throws \InvalidArgumentException If the value is not an integer greater than `0`
+     * @since 3.0.6
+     */
+    public function getTimeoutOption(Arguments $args): ?int
+    {
+        $timeout = $args->getOption('timeout');
+        if ($timeout === null) {
+            return null;
+        }
+
+        if (!is_string($timeout) || !ctype_digit($timeout) || (int)$timeout < 1) {
+            throw new InvalidArgumentException(__d(
+                'database_backup',
+                'The `{0}` option must be an integer greater than 0',
+                '--timeout',
+            ));
+        }
+
+        return (int)$timeout;
     }
 
     /**

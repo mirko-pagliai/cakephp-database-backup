@@ -6,6 +6,10 @@
   by the name of the database file, without path and extension;
 * fixed a regression introduced in `3.0.0`: `BackupExport::export()` did not reset the filename, so a second call on the
   same instance overwrote the previous backup. As in the `2.15.x` branch, the filename is now reset;
+* fixed a bug in the `ExportCommand` and `ImportCommand` commands: an invalid `--timeout` value (for example
+  `--timeout abc`) was silently converted to `0`, which disables the timeout, while `--timeout 0` was ignored and the
+  default timeout was used. Now the value must be an integer greater than `0`, otherwise the command fails with an
+  error;
 * fixed a bug in `MysqlExecutor`: if the process failed or reached the timeout, the temporary file with the
   authentication data (which contains the password) was not deleted and remained in the temporary directory;
 * fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a
