@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
-use Cake\Database\Schema\TableSchema;
+use Cake\Database\Schema\TableSchemaInterface;
 use Cake\Event\EventInterface;
 use Override;
 
@@ -36,18 +36,13 @@ class SqliteExecutor extends Executor
     /**
      * Gets all tables schemas
      *
-     * @return array<\Cake\Database\Schema\TableSchema>
+     * @return array<\Cake\Database\Schema\TableSchemaInterface>
      * @since 3.0.0
      */
     public function getAllTableSchemas(): array
     {
         return array_map(
-            callback: function (string $tableName): TableSchema {
-                /** @var \Cake\Database\Schema\TableSchema $TableSchema */
-                $TableSchema = $this->Connection->getSchemaCollection()->describe($tableName);
-
-                return $TableSchema;
-            },
+            callback: fn(string $tableName): TableSchemaInterface => $this->Connection->getSchemaCollection()->describe($tableName),
             array: $this->Connection->getSchemaCollection()->listTables(),
         );
     }
@@ -61,6 +56,8 @@ class SqliteExecutor extends Executor
     public function dropAllTables(): array
     {
         $statements = [];
+
+        /** @var array<\Cake\Database\Schema\TableSchema> $tableSchemas */
         $tableSchemas = $this->getAllTableSchemas();
 
         foreach ($tableSchemas as $TableSchema) {
