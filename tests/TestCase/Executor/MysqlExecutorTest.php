@@ -117,88 +117,52 @@ class MysqlExecutorTest extends TestCase
 
     /**
      * @link \DatabaseBackup\Executor\MysqlExecutor::afterExport()
-     */
-    #[Test]
-    public function testAfterExport(): void
-    {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(
-            MysqlExecutor::class . '[deleteAuthFile]',
-            [new FakeConnection(), OperationType::Export],
-        );
-
-        $MysqlExecutor->dispatchEvent('Backup.afterExport');
-
-        $MysqlExecutor
-            ->shouldHaveReceived('deleteAuthFile')
-            ->withNoArgs()
-            ->once();
-    }
-
-    /**
      * @link \DatabaseBackup\Executor\MysqlExecutor::afterImport()
      */
     #[Test]
-    public function testAfterImport(): void
+    #[TestWith([OperationType::Export, 'Backup.afterExport'])]
+    #[TestWith([OperationType::Import, 'Backup.afterImport'])]
+    public function testAfterEvents(OperationType $OperationType, string $eventName): void
     {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(
-            MysqlExecutor::class . '[deleteAuthFile]',
-            [new FakeConnection(), OperationType::Export],
-        );
+        $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $authFile = $MysqlExecutor->authFile;
 
-        $MysqlExecutor->dispatchEvent('Backup.afterImport');
+        $MysqlExecutor->dispatchEvent($eventName);
 
-        $MysqlExecutor
-            ->shouldHaveReceived('deleteAuthFile')
-            ->withNoArgs()
-            ->once();
+        // `deleteAuthFile()` resets the property, so the path of the file with the authentication data changes
+        $this->assertNotSame($authFile, $MysqlExecutor->authFile);
     }
 
     /**
      * @link \DatabaseBackup\Executor\MysqlExecutor::beforeExport()
-     */
-    #[Test]
-    public function testBeforeExport(): void
-    {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(
-            MysqlExecutor::class . '[writeAuthFile]',
-            [new FakeConnection(), OperationType::Export],
-        );
-
-        $MysqlExecutor->dispatchEvent('Backup.beforeExport');
-
-        $MysqlExecutor
-            ->shouldHaveReceived('writeAuthFile')
-            ->with('[mysqldump]' . PHP_EOL .
-                'user="{{USER}}"' . PHP_EOL .
-                'password="{{PASSWORD}}"' . PHP_EOL .
-                'host="{{HOST}}"')
-            ->once();
-    }
-
-    /**
      * @link \DatabaseBackup\Executor\MysqlExecutor::beforeImport()
      */
     #[Test]
-    public function testBeforeImport(): void
+    #[TestWith([OperationType::Export, 'Backup.beforeExport', '[mysqldump]'])]
+    #[TestWith([OperationType::Import, 'Backup.beforeImport', '[client]'])]
+    public function testBeforeEvents(OperationType $OperationType, string $eventName, string $expectedSection): void
     {
-        /** @var \DatabaseBackup\Executor\MysqlExecutor&\Mockery\MockInterface $MysqlExecutor */
-        $MysqlExecutor = Mockery::spy(
-            MysqlExecutor::class . '[writeAuthFile]',
-            [new FakeConnection(), OperationType::Export],
-        );
+        $MysqlExecutor = new class (new FakeConnection(), $OperationType) extends MysqlExecutor {
+            /**
+             * @var array<string>
+             */
+            public array $contents = [];
 
-        $MysqlExecutor->dispatchEvent('Backup.beforeImport');
+            public function writeAuthFile(string $content): bool
+            {
+                $this->contents[] = $content;
 
-        $MysqlExecutor
-            ->shouldHaveReceived('writeAuthFile')
-            ->with('[client]' . PHP_EOL .
-                'user="{{USER}}"' . PHP_EOL .
-                'password="{{PASSWORD}}"' . PHP_EOL .
-                'host="{{HOST}}"')
-            ->once();
+                return true;
+            }
+        };
+
+        $MysqlExecutor->dispatchEvent($eventName);
+
+        $expectedContent = $expectedSection . PHP_EOL .
+            'user="{{USER}}"' . PHP_EOL .
+            'password="{{PASSWORD}}"' . PHP_EOL .
+            'host="{{HOST}}"';
+        $this->assertSame([$expectedContent], $MysqlExecutor->contents);
     }
 
     /**

@@ -24,14 +24,11 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupExport;
 use Error;
-use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use ValueError;
 
@@ -192,17 +189,11 @@ class BackupExportTest extends TestCase
      * @link \DatabaseBackup\Utility\BackupExport::$filename
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testFilenamePropertyWithFileAlreadyExists(): void
     {
-        Mockery::mock('overload:' . Filesystem::class)
-            ->shouldReceive('exists')
-            ->with('/backup.sql')
-            ->andReturnTrue();
-
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File `/backup.sql` already exists');
-        $this->BackupExport->filename = '/backup.sql';
+        $this->expectExceptionMessage('File `' . __FILE__ . '` already exists');
+        $this->BackupExport->filename = __FILE__;
     }
 
     /**
@@ -327,26 +318,34 @@ class BackupExportTest extends TestCase
 
     /**
      * @link \DatabaseBackup\Utility\BackupExport::export()
-     * @throws \ReflectionException
      */
     #[Test]
     public function testExportWithTimeoutFromConfiguration(): void
     {
         Configure::write('DatabaseBackup.processTimeout', 45);
 
-        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
-        $Executor = Mockery::mock(FakeExecutor::class . '[runProcess]')
-            ->shouldReceive('runProcess')
-            ->with(TMP . 'backup.sql', 45)
-            ->once()
-            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor())
-            ->getMock();
+        $Executor = new class extends FakeExecutor {
+            public string $filename = '';
+
+            public int $timeout = 0;
+
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                $this->filename = $filename;
+                $this->timeout = $timeout;
+
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
 
         $this->BackupExport->Executor = $Executor;
 
         $this->BackupExport
             ->filename(TMP . 'backup.sql')
             ->export();
+
+        $this->assertSame(TMP . 'backup.sql', $Executor->filename);
+        $this->assertSame(45, $Executor->timeout);
     }
 
     /**
