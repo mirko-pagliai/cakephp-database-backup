@@ -41,6 +41,26 @@ class ImportCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * @inheritDoc
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        ConnectionManager::setConfig('fake_connection', new FakeConnection());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        ConnectionManager::drop('fake_connection');
+    }
+
+    /**
      * @link \DatabaseBackup\Command\ImportCommand::buildOptionParser()
      */
     #[Test]
@@ -209,12 +229,7 @@ txt;
     #[TestWith(['1.5'])]
     public function testExecuteWithInvalidTimeout(string $timeout): void
     {
-        ConnectionManager::setConfig('fake_connection', new FakeConnection());
-
         $this->exec("database_backup.import --connection fake_connection --timeout $timeout backups/file.sql");
-
-        ConnectionManager::drop('fake_connection');
-
         $this->assertExitError();
         $this->assertErrorContains(
             '<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>',

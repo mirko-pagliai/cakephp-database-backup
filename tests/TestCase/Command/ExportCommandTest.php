@@ -43,6 +43,26 @@ class ExportCommandTest extends TestCase
     use ConsoleIntegrationTestTrait;
 
     /**
+     * @inheritDoc
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        ConnectionManager::setConfig('fake_connection', new FakeConnection());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        ConnectionManager::drop('fake_connection');
+    }
+
+    /**
      * @link \DatabaseBackup\Command\ExportCommand::buildOptionParser()
      */
     #[Test]
@@ -255,12 +275,7 @@ txt;
     #[TestWith(['1.5'])]
     public function testExecuteWithInvalidTimeout(string $timeout): void
     {
-        ConnectionManager::setConfig('fake_connection', new FakeConnection());
-
         $this->exec("database_backup.export --connection fake_connection --timeout $timeout");
-
-        ConnectionManager::drop('fake_connection');
-
         $this->assertExitError();
         $this->assertErrorContains('<error>InvalidArgumentException: the `--timeout` option must be an integer greater than 0</error>');
     }
@@ -275,8 +290,6 @@ txt;
     #[TestWith([new TypeError('This is an exception message'), 'TypeError: this is an exception message'])]
     public function testExecuteOnException(Throwable $Exception, string $expectedErrorMessage): void
     {
-        ConnectionManager::setConfig('fake_connection', new FakeConnection());
-
         $listener = function () use ($Exception): never {
             throw $Exception;
         };
@@ -285,7 +298,6 @@ txt;
         $this->exec('database_backup.export --connection fake_connection');
 
         EventManager::instance()->off('Backup.beforeExport', $listener);
-        ConnectionManager::drop('fake_connection');
 
         $this->assertExitError();
         $this->assertErrorContains("<error>$expectedErrorMessage</error>");
@@ -299,8 +311,6 @@ txt;
     #[Test]
     public function testExecuteOnStoppedEvent(): void
     {
-        ConnectionManager::setConfig('fake_connection', new FakeConnection());
-
         $listener = function (Event $Event): void {
             $Event->stopPropagation();
         };
@@ -309,7 +319,6 @@ txt;
         $this->exec('database_backup.export --connection fake_connection');
 
         EventManager::instance()->off('Backup.beforeExport', $listener);
-        ConnectionManager::drop('fake_connection');
 
         $this->assertExitError();
         $this->assertErrorContains(
