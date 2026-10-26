@@ -50,8 +50,8 @@ Configure::write('DatabaseBackup.binaries.bzip2', '/full/path/to/bzip2');
 And an example for Windows:
 
 ```php
-Configure::write('DatabaseBackup.binaries.mysql', 'C:\\xampp\\mysql\\bin\\mysql.exe');
-Configure::write('DatabaseBackup.binaries.mysqldump', 'C:\\xampp\\mysql\\bin\\mysqldump.exe');
+Configure::write('DatabaseBackup.binaries.mariadb', 'C:\\xampp\\mysql\\bin\\mariadb.exe');
+Configure::write('DatabaseBackup.binaries.mariadb-dump', 'C:\\xampp\\mysql\\bin\\mariadb-dump.exe');
 ```
 
 The same applies to all other binaries, just change the binary name shown in the example.
@@ -64,11 +64,11 @@ However, in some particular environments or conditions it may be necessary to ex
 
 The default commands are defined in the `config/bootstrap.php` file and placeholders (such as `"${:BINARY}"` or `"${:DB_HOST}"`) are replaced and escaped before the command is executed.
 
-It is therefore possible to use custom commands by acting on the configuration, before loading the plugin.
+It is therefore possible to use custom commands by acting on the configuration before loading the plugin.
 
 An example: suppose you want to run the command to export mysql databases with the `--column-statistics=0` option. Then in the bootstrap of your application:
 ```php
-Configure::write('DatabaseBackup.mysql.export', '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}" --column-statistics=0');
+Configure::write('DatabaseBackup.Mysql.export', '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}" --column-statistics=0');
 ```
 
 However, remember that some values should be escaped and that incorrect customization of the commands could make the plugin unusable or otherwise cause unwanted effects.

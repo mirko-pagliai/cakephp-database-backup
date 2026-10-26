@@ -34,7 +34,7 @@ Example:
 ```php
 $BackupImport = new BackupImport();
 $BackupImport->filename('my_backup.sql');
-$filename = $backup->import();
+$filename = $BackupImport->import();
 ```
 Note that the `import()` method returns the path of the backup that you have imported.  
 See [how to use the `import()` method](#import) below.
