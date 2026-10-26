@@ -49,8 +49,8 @@ class BackupExportAndImportTest extends TestCase
      */
     protected function getAllRecords(Table $Table): array
     {
-        /** @var array<array<array-key, string>> $results */
-        $results = $Table
+        /** @var array<array<array-key, string>> */
+        return $Table
             ->find()
             ->enableHydration(false)
             ->all()
@@ -59,8 +59,6 @@ class BackupExportAndImportTest extends TestCase
                 array: $record,
             ))
             ->toList();
-
-        return $results;
     }
 
     /**
