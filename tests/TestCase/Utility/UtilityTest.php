@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
+use ArgumentCountError;
 use BadMethodCallException;
 use Cake\Core\Configure;
 use Cake\Database\Driver\Mysql;
@@ -197,6 +198,20 @@ class UtilityTest extends TestCase
 
         $this->assertInstanceOf(ConnectionInterface::class, $result);
         $this->assertSame('test_another_connection', $result->config()['name']);
+    }
+
+    /**
+     * Tests for `__call()` magic method, without arguments.
+     *
+     * @link \DatabaseBackup\Utility\Utility::__call()
+     */
+    #[Test]
+    public function testCallMagicMethodWithNoArguments(): void
+    {
+        $this->expectException(ArgumentCountError::class);
+        $this->expectExceptionMessageMatches('/^Method `DatabaseBackup\\\\Utility\\\\.+timeout\(\)` expects at least 1 argument, 0 given$/');
+        /** @phpstan-ignore-next-line */
+        $this->Utility->timeout();
     }
 
     /**

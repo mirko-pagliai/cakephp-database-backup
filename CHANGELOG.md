@@ -13,6 +13,8 @@
 * fixed a bug in `BackupExport` and `BackupImport`: if the connection was changed after the `Executor` had already been
   created (for example, by exporting twice with two different connections on the same instance), the `Executor` of the
   previous connection kept being used. Now the `Executor` is created again for the new connection;
+* fixed a bug in `Utility::__call()`: calling a magic method without arguments (for example `$BackupExport->timeout()`)
+  raised a PHP warning and then a misleading `TypeError`. Now an `ArgumentCountError` is thrown;
 * fixed a bug in `MysqlExecutor`: if the process failed or reached the timeout, the temporary file with the
   authentication data (which contains the password) was not deleted and remained in the temporary directory;
 * fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a

@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Utility;
 
+use ArgumentCountError;
 use BadMethodCallException;
 use Cake\Core\App;
 use Cake\Core\Configure;
@@ -124,7 +125,8 @@ abstract class Utility
      * @param string $name
      * @param array<array-key, mixed> $arguments
      * @return $this
-     * @throws \BadMethodCallException
+     * @throws \ArgumentCountError If the method is called without arguments
+     * @throws \BadMethodCallException If the method does not exist
      */
     public function __call(string $name, array $arguments)
     {
@@ -132,7 +134,12 @@ abstract class Utility
             $name = ucfirst($name);
         }
         if (!property_exists($this, $name)) {
-            throw new BadMethodCallException(sprintf('Method `%s::%s()` does not exist', $this::class, $name));
+            throw new BadMethodCallException('Method `' . $this::class . "::$name()` does not exist");
+        }
+        if (!$arguments) {
+            throw new ArgumentCountError(
+                'Method `' . $this::class . "::$name()` expects at least 1 argument, 0 given",
+            );
         }
 
         $this->{$name} = $arguments[0];
