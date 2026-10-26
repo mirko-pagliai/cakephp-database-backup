@@ -119,7 +119,7 @@ txt;
 
         $this->exec('database_backup.export');
         $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `' . $expectedFilename . '` has been exported</success>');
+        $this->assertOutputContains("<success>Backup `$expectedFilename` has been exported</success>");
         $this->assertErrorEmpty();
     }
 
@@ -194,9 +194,9 @@ txt;
             ->once()
             ->andReturn($filename);
 
-        $this->exec('database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename ' . $filename);
+        $this->exec("database_backup.export --connection custom_connection --timeout 120 --compression gzip --filename $filename");
         $this->assertExitSuccess();
-        $this->assertOutputContains('<success>Backup `' . $filename . '` has been exported</success>');
+        $this->assertOutputContains("<success>Backup `$filename` has been exported</success>");
         $this->assertErrorEmpty();
     }
 
@@ -262,7 +262,7 @@ txt;
         $BackupExport
             ->shouldNotReceive('export');
 
-        $this->exec('database_backup.export --timeout ' . $timeout);
+        $this->exec("database_backup.export --timeout $timeout");
         $this->assertExitError();
         $this->assertErrorContains('<error>The `--timeout` option must be an integer greater than 0</error>');
     }

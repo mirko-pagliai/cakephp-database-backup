@@ -79,8 +79,16 @@ class SqliteExecutorTest extends TestCase
     {
         /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
         $Connection = Mockery::mock(FakeConnection::class . '[execute]');
-        $Connection->shouldReceive('execute')->with('DROP TABLE "articles"')->once();
-        $Connection->shouldReceive('execute')->with('DROP TABLE "comments"')->once();
+
+        $Connection
+            ->shouldReceive('execute')
+            ->with('DROP TABLE "articles"')
+            ->once();
+
+        $Connection
+            ->shouldReceive('execute')
+            ->with('DROP TABLE "comments"')
+            ->once();
 
         $SqliteExecutor = new SqliteExecutor(Connection: $Connection, OperationType: OperationType::Export);
         $SqliteExecutor->dropAllTables();
@@ -96,15 +104,29 @@ class SqliteExecutorTest extends TestCase
 
         /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
         $Connection = Mockery::mock(Connection::class);
-        $Connection->shouldReceive('getDriver')->andReturn($Driver);
+        $Connection
+            ->shouldReceive('getDriver')
+            ->andReturn($Driver);
 
         /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
-        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [$Connection, OperationType::Export]);
+        $SqliteExecutor = Mockery::spy(
+            SqliteExecutor::class . '[dropAllTables]',
+            [$Connection, OperationType::Export],
+        );
+
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
 
-        $SqliteExecutor->shouldHaveReceived('dropAllTables')->once();
-        $Driver->shouldHaveReceived('connect')->once();
-        $Driver->shouldHaveReceived('disconnect')->once();
+        $SqliteExecutor
+            ->shouldHaveReceived('dropAllTables')
+            ->once();
+
+        $Driver
+            ->shouldHaveReceived('connect')
+            ->once();
+
+        $Driver
+            ->shouldHaveReceived('disconnect')
+            ->once();
     }
 
     /**
@@ -116,7 +138,11 @@ class SqliteExecutorTest extends TestCase
     public function testBeforeImportStoppedByAnotherListener(): void
     {
         /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
-        $SqliteExecutor = Mockery::spy(SqliteExecutor::class . '[dropAllTables]', [new FakeConnection(), OperationType::Import]);
+        $SqliteExecutor = Mockery::spy(
+            SqliteExecutor::class . '[dropAllTables]',
+            [new FakeConnection(), OperationType::Import],
+        );
+
         $SqliteExecutor->getEventManager()->on('Backup.beforeImport', function (EventInterface $Event): void {
             $Event->stopPropagation();
         });

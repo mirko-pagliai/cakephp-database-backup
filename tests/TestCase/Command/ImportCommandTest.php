@@ -212,7 +212,7 @@ txt;
         $BackupImport
             ->shouldNotReceive('import');
 
-        $this->exec('database_backup.import --timeout ' . $timeout . ' backups/file.sql');
+        $this->exec("database_backup.import --timeout $timeout backups/file.sql");
         $this->assertExitError();
         $this->assertErrorContains('<error>The `--timeout` option must be an integer greater than 0</error>');
     }

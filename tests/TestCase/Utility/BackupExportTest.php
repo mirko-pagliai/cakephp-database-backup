@@ -206,7 +206,9 @@ class BackupExportTest extends TestCase
     public function testFilenamePropertyWithInvalidFilenameAndCompression(): void
     {
         $this->expectException(ValueError::class);
-        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `' . TMP . 'backup.txt`');
+        $this->expectExceptionMessage(
+            'No valid `' . Compression::class . '` value was found for filename `' . TMP . 'backup.txt`',
+        );
         $this->BackupExport->filename = TMP . 'backup.txt';
     }
 

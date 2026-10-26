@@ -164,7 +164,8 @@ class ExecutorTest extends TestCase
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
-        $result = new FakeExecutor(OperationType: $OperationType)->getCommand(Compression: $Compression);
+        $result = new FakeExecutor(OperationType: $OperationType)
+            ->getCommand(Compression: $Compression);
 
         $this->assertSame($expectedCommand, $result);
     }
@@ -273,9 +274,17 @@ class ExecutorTest extends TestCase
             ->andReturn('/usr/bin/binary');
 
         $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
-        $Process->shouldReceive('fromShellCommandline')->andReturnSelf();
-        $Process->shouldReceive('isSuccessful')->andReturnFalse();
-        $Process->shouldReceive('getCommandLine')->andReturn('failureCommand');
+
+        $Process
+            ->shouldReceive('fromShellCommandline')
+            ->andReturnSelf();
+        $Process
+            ->shouldReceive('isSuccessful')
+            ->andReturnFalse();
+
+        $Process
+            ->shouldReceive('getCommandLine')
+            ->andReturn('failureCommand');
 
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessage('The command "failureCommand" failed.');
