@@ -66,7 +66,7 @@ abstract class Utility
                 /**
                  * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
                  */
-                $name = substr(strrchr($this->Connection->config()['driver'], '\\') ?: '', 1);
+                $name = substr((string)strrchr($this->Connection->config()['driver'], '\\'), 1);
 
                 /** @var class-string<\DatabaseBackup\Executor\Executor> $className */
                 $className = App::classname("DatabaseBackup.{$name}Executor", 'Executor');
