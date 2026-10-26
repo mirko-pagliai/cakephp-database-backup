@@ -56,6 +56,7 @@ class ImportCommandTest extends TestCase
         $this->skipUnless(version_compare(Configure::version(), '5.2.10', '>='));
 
         $root = ROOT;
+        /** @var string $defaultTarget */
         $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
 
         $expected = <<<txt

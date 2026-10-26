@@ -134,11 +134,11 @@ abstract class Utility
             $name = ucfirst($name);
         }
         if (!property_exists($this, $name)) {
-            throw new BadMethodCallException('Method `' . $this::class . "::$name()` does not exist");
+            throw new BadMethodCallException('Method `' . $this::class . "::{$name}()` does not exist");
         }
         if (!$arguments) {
             throw new ArgumentCountError(
-                'Method `' . $this::class . "::$name()` expects at least 1 argument, 0 given",
+                'Method `' . $this::class . "::{$name}()` expects at least 1 argument, 0 given",
             );
         }
 
@@ -160,8 +160,10 @@ abstract class Utility
             return $path;
         }
 
-        $absolutePath = Path::makeAbsolute($path, Configure::readOrFail('DatabaseBackup.target'));
+        /** @var string $targetDir */
+        $targetDir = Configure::readOrFail('DatabaseBackup.target');
+        $absolutePath = Path::makeAbsolute($path, $targetDir);
 
-        return DS == '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
+        return DS === '\\' ? str_replace(search: '/', replace: DS, subject: $absolutePath) : $absolutePath;
     }
 }

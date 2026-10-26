@@ -39,6 +39,9 @@ class ImportCommand extends Command
     #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
+        /** @var string $targetDir */
+        $targetDir = Configure::readOrFail('DatabaseBackup.target');
+
         $parser = parent::buildOptionParser($parser);
 
         $parser->setDescription(__d('database_backup', 'Imports a database backup'));
@@ -50,7 +53,7 @@ class ImportCommand extends Command
                     'database_backup',
                     'Filenames can be relative to {0} (root of your app) or {1} (default target directory).',
                     '<comment>' . ROOT . '</comment>',
-                    '<comment>' . Configure::readOrFail('DatabaseBackup.target') . '</comment>',
+                    "<comment>{$targetDir}</comment>",
                 ),
             ]),
             'required' => true,

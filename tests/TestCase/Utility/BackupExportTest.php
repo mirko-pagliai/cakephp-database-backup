@@ -88,9 +88,10 @@ class BackupExportTest extends TestCase
     #[Test]
     #[TestWith([true])]
     #[TestWith(['invalidCompression'])]
-    public function testCompressionPropertyWithInvalidValue(mixed $invalidCompression): void
+    public function testCompressionPropertyWithInvalidValue(string|bool $invalidCompression): void
     {
         $this->expectException(Error::class);
+        // @phpstan-ignore assign.propertyType
         $this->BackupExport->compression = $invalidCompression;
     }
 
@@ -134,7 +135,7 @@ class BackupExportTest extends TestCase
     #[TestWith(['{$TIMESTAMP}', '/my_file_\d{10}\.sql$/'])]
     public function testFilenamePropertyWithTimePatterns(string $pattern, string $expectedFilename): void
     {
-        $this->BackupExport->filename = TMP . "my_file_$pattern.sql";
+        $this->BackupExport->filename = TMP . "my_file_{$pattern}.sql";
         $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
     }
 

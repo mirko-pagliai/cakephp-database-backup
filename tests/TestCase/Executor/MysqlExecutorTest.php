@@ -212,7 +212,7 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem
             ->shouldReceive('touch')
-            ->withArgs(function ($filename): bool {
+            ->withArgs(function (string $filename): bool {
                 $this->assertStringStartsWith(TMP . 'auth', $filename);
 
                 return true;
@@ -221,7 +221,7 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem
             ->shouldReceive('chmod')
-            ->withArgs(function ($filename, $mode): bool {
+            ->withArgs(function (string $filename, $mode): bool {
                 $this->assertStringStartsWith(TMP . 'auth', $filename);
                 $this->assertSame(0600, $mode);
 
@@ -231,7 +231,7 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem
             ->shouldReceive('dumpFile')
-            ->withArgs(function ($filename, $content): bool {
+            ->withArgs(function (string $filename, $content): bool {
                 $this->assertStringStartsWith(TMP . 'auth', $filename);
                 $this->assertSame('my_username_my_password_my_hostname', $content);
 
@@ -241,7 +241,7 @@ class MysqlExecutorTest extends TestCase
 
         $Filesystem
             ->shouldReceive('exists')
-            ->withArgs(function ($filename): bool {
+            ->withArgs(function (string $filename): bool {
                 $this->assertStringStartsWith(TMP . 'auth', $filename);
 
                 return true;
@@ -266,7 +266,7 @@ class MysqlExecutorTest extends TestCase
     public function testAuthFileNotWrittenIfBeforeEventIsStopped(OperationType $OperationType, string $eventName): void
     {
         $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
-        $MysqlExecutor->getEventManager()->on($eventName, function (EventInterface $Event): void {
+        $MysqlExecutor->getEventManager()->on($eventName, static function (EventInterface $Event): void {
             $Event->stopPropagation();
         });
 
