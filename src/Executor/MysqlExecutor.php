@@ -106,9 +106,9 @@ class MysqlExecutor extends Executor
     public function beforeExport(EventInterface $Event): void
     {
         $result = $this->writeAuthFile('[mysqldump]' . PHP_EOL .
-            'user={{USER}}' . PHP_EOL .
+            'user="{{USER}}"' . PHP_EOL .
             'password="{{PASSWORD}}"' . PHP_EOL .
-            'host={{HOST}}');
+            'host="{{HOST}}"');
 
         $Event->setResult($result);
     }
@@ -130,9 +130,9 @@ class MysqlExecutor extends Executor
     public function beforeImport(EventInterface $Event): void
     {
         $result = $this->writeAuthFile('[client]' . PHP_EOL .
-            'user={{USER}}' . PHP_EOL .
+            'user="{{USER}}"' . PHP_EOL .
             'password="{{PASSWORD}}"' . PHP_EOL .
-            'host={{HOST}}');
+            'host="{{HOST}}"');
 
         $Event->setResult($result);
     }
@@ -148,19 +148,22 @@ class MysqlExecutor extends Executor
     {
         $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null,];
 
-        // In the file the password is between double quotes, so the characters that are special there are escaped
-        $password = strtr((string)$config['password'], [
-            '\\' => '\\\\',
-            '"' => '\\"',
-            "\n" => '\\n',
-            "\r" => '\\r',
-        ]);
+        // In the file the values are between double quotes, so the characters that are special there are escaped
+        $values = array_map(
+            static fn(mixed $value): string => strtr((string)$value, [
+                '\\' => '\\\\',
+                '"' => '\\"',
+                "\n" => '\\n',
+                "\r" => '\\r',
+            ]),
+            [
+                '{{USER}}' => $config['username'],
+                '{{PASSWORD}}' => $config['password'],
+                '{{HOST}}' => $config['host'],
+            ],
+        );
 
-        $content = strtr($content, [
-            '{{USER}}' => $config['username'],
-            '{{PASSWORD}}' => $password,
-            '{{HOST}}' => $config['host'],
-        ]);
+        $content = strtr($content, $values);
 
         $Filesystem = new Filesystem();
         $Filesystem->touch($this->authFile);

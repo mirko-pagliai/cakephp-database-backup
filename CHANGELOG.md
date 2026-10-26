@@ -24,6 +24,9 @@
 * fixed a bug in `MysqlExecutor::writeAuthFile()`: a password containing a line break, or a backslash followed by `n`,
   `r`, `t`, `b`, `s`, `"`, `'` or another backslash (for example `ab\\cd`), was read incorrectly by the client, because
   these characters were not escaped in the file with the authentication data. Now they are escaped;
+* fixed a bug in `MysqlExecutor::writeAuthFile()`: a username or a host containing `#` (for example `my#host`) was cut
+  at that character by the client, because, unlike the password, they were written without double quotes in the file
+  with the authentication data. Now they are written between double quotes and escaped like the password;
 * fixed a bug: if a listener stopped the `Backup.beforeExport` or `Backup.beforeImport` event after the `Executor` had
   already acted, the operation was not executed anyway, but the temporary file with the authentication data remained
   (`MysqlExecutor`) or the tables were already dropped (`SqliteExecutor`). Now the `Executor` handles these two events

@@ -172,9 +172,9 @@ class MysqlExecutorTest extends TestCase
         $MysqlExecutor
             ->shouldHaveReceived('writeAuthFile')
             ->with('[mysqldump]' . PHP_EOL .
-                'user={{USER}}' . PHP_EOL .
+                'user="{{USER}}"' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}')
+                'host="{{HOST}}"')
             ->once();
     }
 
@@ -195,9 +195,9 @@ class MysqlExecutorTest extends TestCase
         $MysqlExecutor
             ->shouldHaveReceived('writeAuthFile')
             ->with('[client]' . PHP_EOL .
-                'user={{USER}}' . PHP_EOL .
+                'user="{{USER}}"' . PHP_EOL .
                 'password="{{PASSWORD}}"' . PHP_EOL .
-                'host={{HOST}}')
+                'host="{{HOST}}"')
             ->once();
     }
 
@@ -319,6 +319,39 @@ class MysqlExecutorTest extends TestCase
         $MysqlExecutor->writeAuthFile('password="{{PASSWORD}}"');
 
         $this->assertStringEqualsFile($MysqlExecutor->authFile, "password=\"{$expectedPassword}\"");
+
+        $MysqlExecutor->deleteAuthFile();
+    }
+
+    /**
+     * Like the password, the username and the host are written between double quotes, so a `#` must not truncate them
+     * and the characters that are special between double quotes must be escaped.
+     *
+     * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
+     */
+    #[Test]
+    #[TestWith(['username', 'my#user', 'my#user'])]
+    #[TestWith(['username', 'my user', 'my user'])]
+    #[TestWith(['username', 'my"user', 'my\\"user'])]
+    #[TestWith(['username', 'my\\user', 'my\\\\user'])]
+    #[TestWith(['host', 'my#host', 'my#host'])]
+    #[TestWith(['host', 'my host', 'my host'])]
+    #[TestWith(['host', 'my"host', 'my\\"host'])]
+    #[TestWith(['host', 'my\\host', 'my\\\\host'])]
+    public function testWriteAuthFileWithSpecialCharactersInUsernameAndHost(string $key, string $value, string $expectedValue): void
+    {
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection([$key => $value]),
+            OperationType: OperationType::Export,
+        );
+
+        $MysqlExecutor->writeAuthFile('user="{{USER}}"' . PHP_EOL . 'host="{{HOST}}"');
+
+        $expected = [$key => $expectedValue] + ['username' => 'my_username', 'host' => 'my_hostname'];
+        $this->assertStringEqualsFile(
+            $MysqlExecutor->authFile,
+            "user=\"{$expected['username']}\"" . PHP_EOL . "host=\"{$expected['host']}\"",
+        );
 
         $MysqlExecutor->deleteAuthFile();
     }
