@@ -297,6 +297,33 @@ class MysqlExecutorTest extends TestCase
     }
 
     /**
+     * The password is written between double quotes, so backslashes, double quotes and line breaks must be escaped.
+     *
+     * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
+     */
+    #[Test]
+    #[TestWith(['pass\\word', 'pass\\\\word'])]
+    #[TestWith(['pass\\nword', 'pass\\\\nword'])]
+    #[TestWith(['pass"word', 'pass\\"word'])]
+    #[TestWith(["pass\nword", 'pass\\nword'])]
+    #[TestWith(["pass\rword", 'pass\\rword'])]
+    #[TestWith(['pa#ss word', 'pa#ss word'])]
+    #[TestWith([null, ''])]
+    public function testWriteAuthFileWithSpecialCharactersInPassword(?string $password, string $expectedPassword): void
+    {
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(compact('password')),
+            OperationType: OperationType::Export,
+        );
+
+        $MysqlExecutor->writeAuthFile('password="{{PASSWORD}}"');
+
+        $this->assertStringEqualsFile($MysqlExecutor->authFile, "password=\"{$expectedPassword}\"");
+
+        $MysqlExecutor->deleteAuthFile();
+    }
+
+    /**
      * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
      */
     #[Test]

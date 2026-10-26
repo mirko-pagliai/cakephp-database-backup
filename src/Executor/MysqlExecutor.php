@@ -148,9 +148,17 @@ class MysqlExecutor extends Executor
     {
         $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null,];
 
+        // In the file the password is between double quotes, so the characters that are special there are escaped
+        $password = strtr((string)$config['password'], [
+            '\\' => '\\\\',
+            '"' => '\\"',
+            "\n" => '\\n',
+            "\r" => '\\r',
+        ]);
+
         $content = strtr($content, [
             '{{USER}}' => $config['username'],
-            '{{PASSWORD}}' => $config['password'],
+            '{{PASSWORD}}' => $password,
             '{{HOST}}' => $config['host'],
         ]);
 

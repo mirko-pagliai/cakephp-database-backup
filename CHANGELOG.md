@@ -19,6 +19,9 @@
   authentication data (which contains the password) was not deleted and remained in the temporary directory;
 * fixed a bug in `MysqlExecutor::writeAuthFile()`: a username, password or host containing a placeholder (for example, a
   password containing `{{HOST}}`) was altered when the file with the authentication data was written;
+* fixed a bug in `MysqlExecutor::writeAuthFile()`: a password containing a line break, or a backslash followed by `n`,
+  `r`, `t`, `b`, `s`, `"`, `'` or another backslash (for example `ab\\cd`), was read incorrectly by the client, because
+  these characters were not escaped in the file with the authentication data. Now they are escaped;
 * fixed a bug: if a listener stopped the `Backup.beforeExport` or `Backup.beforeImport` event after the `Executor` had
   already acted, the operation was not executed anyway, but the temporary file with the authentication data remained
   (`MysqlExecutor`) or the tables were already dropped (`SqliteExecutor`). Now the `Executor` handles these two events
