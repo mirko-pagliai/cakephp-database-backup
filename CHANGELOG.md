@@ -24,7 +24,8 @@
   (`MysqlExecutor`) or the tables were already dropped (`SqliteExecutor`). Now the `Executor` handles these two events
   after any other listener (priority `1000`, instead of the default `10`);
 * the temporary file with the authentication data created by `MysqlExecutor` is now readable and writable only by its
-  owner (permissions `0600`), instead of being readable by other users (`0644` with the usual umask);
+  owner (permissions `0600`), instead of being readable by other users (`0644` with the usual umask). On Windows, which
+  does not support these permissions, nothing changes;
 * the migration guide `docs/Migration from version 2.md` has been renamed `docs/Migration from branch 2.15 to 3.0.md`
   and completed: it now describes all the changes between the `2.15.x` and the `3.0.x` branches (requirements,
   configuration, classes, methods, events, commands and test suite).
