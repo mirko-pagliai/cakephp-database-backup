@@ -124,15 +124,18 @@ class BackupImportTest extends TestCase
         };
 
         $BackupImport->Executor = $Executor;
-        $BackupImport->Executor->getEventManager()->setEventList(new EventList());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $BackupImport->Executor->getEventManager();
+        $EventManager->setEventList(new EventList());
 
         $result = $BackupImport
             ->filename($filename)
             ->import();
 
         $this->assertSame($filename, $result);
-        $this->assertEventFired('Backup.beforeImport', $BackupImport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $BackupImport->Executor->getEventManager());
+        $this->assertEventFired('Backup.beforeImport', $EventManager);
+        $this->assertEventFired('Backup.afterImport', $EventManager);
     }
 
     /**

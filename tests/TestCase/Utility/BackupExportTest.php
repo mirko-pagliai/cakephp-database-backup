@@ -59,7 +59,9 @@ class BackupExportTest extends TestCase
             }
         };
 
-        $this->BackupExport->Executor->getEventManager()->setEventList(new EventList());
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $EventManager->setEventList(new EventList());
     }
 
     /**
@@ -249,8 +251,11 @@ class BackupExportTest extends TestCase
         $targetDir = Configure::read('DatabaseBackup.target');
         $this->assertStringStartsWith($targetDir, $result);
         $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql$/', $result);
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $this->assertEventFired('Backup.beforeExport', $EventManager);
+        $this->assertEventFired('Backup.afterExport', $EventManager);
     }
 
     /**
@@ -269,8 +274,11 @@ class BackupExportTest extends TestCase
         $targetDir = Configure::read('DatabaseBackup.target');
         $this->assertStringStartsWith($targetDir, $result);
         $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql\.bz2$/', $result);
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $this->assertEventFired('Backup.beforeExport', $EventManager);
+        $this->assertEventFired('Backup.afterExport', $EventManager);
     }
 
     /**
@@ -288,8 +296,11 @@ class BackupExportTest extends TestCase
             ->export();
 
         $this->assertSame($expectedFilename, $result);
-        $this->assertEventFired('Backup.beforeExport', $this->BackupExport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterExport', $this->BackupExport->Executor->getEventManager());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $this->BackupExport->Executor->getEventManager();
+        $this->assertEventFired('Backup.beforeExport', $EventManager);
+        $this->assertEventFired('Backup.afterExport', $EventManager);
     }
 
     /**
