@@ -42,7 +42,10 @@ class SqliteExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->SqliteExecutor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: OperationType::Export);
+        $this->SqliteExecutor = new SqliteExecutor(
+            Connection: new FakeConnection(),
+            OperationType: OperationType::Export,
+        );
     }
 
     /**
@@ -143,9 +146,12 @@ class SqliteExecutorTest extends TestCase
             [new FakeConnection(), OperationType::Import],
         );
 
-        $SqliteExecutor->getEventManager()->on('Backup.beforeImport', function (EventInterface $Event): void {
-            $Event->stopPropagation();
-        });
+        $SqliteExecutor->getEventManager()->on(
+            'Backup.beforeImport',
+            static function (EventInterface $Event): void {
+                $Event->stopPropagation();
+            },
+        );
 
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
 
