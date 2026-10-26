@@ -24,6 +24,7 @@ use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -299,6 +300,7 @@ class MysqlExecutorTest extends TestCase
      * @link \DatabaseBackup\Executor\MysqlExecutor::writeAuthFile()
      */
     #[Test]
+    #[RequiresOperatingSystemFamily('Linux')]
     #[RunInSeparateProcess]
     public function testWriteAuthFilePermissions(): void
     {
