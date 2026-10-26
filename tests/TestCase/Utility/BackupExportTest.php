@@ -118,8 +118,8 @@ class BackupExportTest extends TestCase
      * @link \DatabaseBackup\Utility\BackupExport::$filename
      */
     #[Test]
-    #[TestWith(['/tmp/my_file_{$HOSTNAME}.sql', '/tmp/my_file_my_hostname.sql'])]
-    #[TestWith(['/tmp/my_file_{$DATABASE}.sql', '/tmp/my_file_my_database.sql'])]
+    #[TestWith([TMP . 'my_file_{$HOSTNAME}.sql', TMP . 'my_file_my_hostname.sql'])]
+    #[TestWith([TMP . 'my_file_{$DATABASE}.sql', TMP . 'my_file_my_database.sql'])]
     public function testFilenamePropertyWithPatterns(string $filename, string $expectedFilename): void
     {
         $this->BackupExport->filename = $filename;
@@ -134,7 +134,7 @@ class BackupExportTest extends TestCase
     #[TestWith(['{$TIMESTAMP}', '/my_file_\d{10}\.sql$/'])]
     public function testFilenamePropertyWithTimePatterns(string $pattern, string $expectedFilename): void
     {
-        $this->BackupExport->filename = "/tmp/my_file_$pattern.sql";
+        $this->BackupExport->filename = TMP . "my_file_$pattern.sql";
         $this->assertMatchesRegularExpression($expectedFilename, $this->BackupExport->filename);
     }
 

@@ -145,7 +145,7 @@ class BackupImportTest extends TestCase
         Configure::write('DatabaseBackup.processTimeout', 45);
 
         $filename = TMP . 'backup.sql';
-        $process = new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+        $Process = new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
 
         /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
         $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
@@ -153,7 +153,7 @@ class BackupImportTest extends TestCase
             ->shouldReceive('runProcess')
             ->with($filename, 45)
             ->once()
-            ->andReturn($process);
+            ->andReturn($Process);
 
         $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
             public string $filename {
