@@ -28,6 +28,7 @@
   and completed;
 * tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened and
   [use _Mockery_ less](https://github.com/mirko-pagliai/cakephp-database-backup/issues/231);
+* added _Mago_ as a development dependency and adapted the code to its rules;
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
   [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
 * refactor: consistent formatting and string interpolation across tests and source files.
