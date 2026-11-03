@@ -40,9 +40,9 @@ class BackupExport extends Utility
         }
     }
 
-    public string $filename {
+    public string $filename = '' {
         set(string $filename) {
-            // An empty filename resets the property, so that the next call of `export()` generates a new filename
+            // An empty filename resets the property so that the next call of `export()` generates a new filename
             if ($filename === '') {
                 $this->filename = '';
 
@@ -119,7 +119,7 @@ class BackupExport extends Utility
      */
     public function export(): string|false
     {
-        if (empty($this->filename)) {
+        if ($this->filename === '') {
             $this->filename = 'backup_{$DATABASE}_{$DATETIME}.' . $this->compression->value;
         }
 

@@ -86,16 +86,18 @@ class ExportCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io): int
     {
         try {
-            $BackupExport = new BackupExport((string)$args->getOption('connection') ?: '');
+            $BackupExport = new BackupExport((string)$args->getOption('connection'));
 
             $timeout = $this->getTimeoutOption($args);
             if ($timeout !== null) {
                 $BackupExport->timeout($timeout);
             }
 
-            if ($args->getOption('filename')) {
-                $BackupExport->filename((string)$args->getOption('filename'));
-            } elseif ($args->getOption('compression')) {
+            $filenameOption = $args->getOption('filename');
+            if ($filenameOption) {
+                $BackupExport->filename((string)$filenameOption);
+            }
+            if (!$filenameOption && $args->getOption('compression')) {
                 $BackupExport->compression((string)$args->getOption('compression'));
             }
 
