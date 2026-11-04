@@ -53,6 +53,8 @@ As a last resort, the `--skip-ssl` option disables TLS completely.
 
 Use these options only on networks you trust: **they can expose your system to malicious attacks if used incorrectly**.
 
+If the error is instead `TLS/SSL error: certificate is not yet valid`, the problem is the clock, not the trust. When no certificate is configured, the server generates a self-signed one each time it starts, valid from that moment. If the system clock was ahead at that time (for example because of a wrong hardware clock at boot, corrected afterwards by NTP), the certificate is not yet valid for the client. Check that the clock is correct (`date -u`) and restart the MariaDB server, so that it generates a new certificate.
+
 ## `LOCK TABLES` permission
 
 When exporting, an error similar to this occurs:
