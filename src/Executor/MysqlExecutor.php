@@ -26,9 +26,9 @@ use Symfony\Component\Process\Process;
  */
 class MysqlExecutor extends Executor
 {
-    protected(set) string $authFile {
+    protected(set) string $authFile = '' {
         get {
-            if (empty($this->authFile)) {
+            if ($this->authFile === '') {
                 $this->authFile = TMP . uniqid('auth');
             }
 

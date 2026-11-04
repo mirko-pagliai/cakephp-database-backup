@@ -67,22 +67,35 @@ class BackupImport extends Utility
      *  - `Backup.afterImport`: will be triggered after import.
      *
      * @return string|false Filename path on success or `false` if the `Backup.beforeImport` event is stopped
+     * @throws \LogicException If the filename has not been set
+     * @throws \InvalidArgumentException If the binary for the compression cannot be found
      * @see \DatabaseBackup\Executor\Executor::afterImport()
      * @see \DatabaseBackup\Executor\Executor::beforeImport()
      */
     public function import(): string|false
     {
+        /**
+         * @todo Temporary patch for 3.0.x (issue #238), to be properly fixed in 3.1.x. The `Backup.beforeImport` event
+         *  can be destructive, so the filename and the compression binary are checked before it
+         */
+        $filename = $this->filename;
+
+        $Compression = Compression::fromFilename($filename);
+        if ($Compression->isValid()) {
+            $this->Executor->findBinary($Compression);
+        }
+
         //Dispatches the `Backup.beforeImport` event implemented by the `Executor` class
         $BeforeImport = $this->Executor->dispatchEvent('Backup.beforeImport');
         if ($BeforeImport->isStopped()) {
             return false;
         }
 
-        $this->Executor->runProcess(filename: $this->filename, timeout: $this->timeout);
+        $this->Executor->runProcess(filename: $filename, timeout: $this->timeout);
 
         //Dispatches the `Backup.afterImport` event implemented by the `Executor` class
         $this->Executor->dispatchEvent('Backup.afterImport');
 
-        return $this->filename;
+        return $filename;
     }
 }

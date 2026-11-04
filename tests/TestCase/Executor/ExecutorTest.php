@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
@@ -216,9 +217,9 @@ class ExecutorTest extends TestCase
          */
         $Process
             ->shouldReceive('fromShellCommandline')
-            ->withArgs(function ($command, $timeout) use ($expectedCommand): bool {
-                $this->assertSame($expectedCommand, $command);
-                $this->assertSame(60, $timeout);
+            ->withArgs(static function ($command, $timeout) use ($expectedCommand): bool {
+                static::assertSame($expectedCommand, $command);
+                static::assertSame(60, $timeout);
 
                 return true;
             })
@@ -234,7 +235,7 @@ class ExecutorTest extends TestCase
          */
         $Process
             ->shouldReceive('run')
-            ->withArgs(function ($env) use ($Compression, $filename, $OperationType): bool {
+            ->withArgs(static function ($env) use ($Compression, $filename, $OperationType): bool {
                 $expectedEnv = [
                     'AUTH_FILE' => 'path/to/auth_file',
                     'BINARY' => "/usr/bin/{$OperationType->value}-binary",
@@ -244,10 +245,12 @@ class ExecutorTest extends TestCase
                     'DB_USERNAME' => 'my_username',
                     'FILENAME' => $filename,
                 ];
+
                 if ($Compression->isValid()) {
                     $expectedEnv['COMPRESSION_BINARY'] = '/usr/bin/' . lcfirst($Compression->name);
                 }
-                $this->assertEquals($expectedEnv, $env);
+
+                static::assertEquals($expectedEnv, $env);
 
                 return true;
             })
@@ -258,6 +261,63 @@ class ExecutorTest extends TestCase
         };
 
         $result = $Executor->runProcess($filename);
+
+        $this->assertSame($Process, $result);
+    }
+
+    /**
+     * Tests that `host`, `password` and `username` of the connection are not passed to the process if they are `null`.
+     *
+     * @link \DatabaseBackup\Executor\Executor::runProcess()
+     */
+    #[Test]
+    #[TestWith(['host', 'DB_HOST'])]
+    #[TestWith(['password', 'DB_PASSWORD'])]
+    #[TestWith(['username', 'DB_USERNAME'])]
+    #[RunInSeparateProcess]
+    public function testRunProcessWithNullConnectionConfig(string $configKey, string $envKey): void
+    {
+        Mockery::mock('overload:' . ExecutableFinder::class)
+            ->shouldReceive('find')
+            ->andReturn('/usr/bin/export-binary');
+
+        $Process = Mockery::mock('overload:' . Process::class);
+
+        $Process
+            ->shouldReceive('isSuccessful')
+            ->andReturnTrue();
+
+        $Process
+            ->shouldReceive('fromShellCommandline')
+            ->andReturnSelf();
+
+        $Process
+            ->shouldReceive('run')
+            ->withArgs(static function ($env) use ($envKey): bool {
+                $expectedEnv = [
+                    'BINARY' => '/usr/bin/export-binary',
+                    'DB_HOST' => 'my_hostname',
+                    'DB_NAME' => 'my_database',
+                    'DB_PASSWORD' => 'my_password',
+                    'DB_USERNAME' => 'my_username',
+                    'FILENAME' => 'filename.sql',
+                ];
+                unset($expectedEnv[$envKey]);
+
+                static::assertEquals($expectedEnv, $env);
+
+                return true;
+            })
+            ->once();
+
+        $Executor = new class (new FakeConnection([$configKey => null]), OperationType::Export) extends Executor {
+            public function getBinaryName(): string
+            {
+                return 'export-binary';
+            }
+        };
+
+        $result = $Executor->runProcess('filename.sql');
 
         $this->assertSame($Process, $result);
     }
@@ -278,6 +338,7 @@ class ExecutorTest extends TestCase
         $Process
             ->shouldReceive('fromShellCommandline')
             ->andReturnSelf();
+
         $Process
             ->shouldReceive('isSuccessful')
             ->andReturnFalse();

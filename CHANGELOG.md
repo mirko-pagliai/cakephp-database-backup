@@ -1,6 +1,9 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.6
+* fixed a several bug in `BackupImport`: with SQLite, if the filename was not set or a binary (`sqlite3`, `gzip` or
+  `bzip2`) was not found, the import failed after all the tables had already been dropped. Now these checks are made
+  before the `Backup.beforeImport` event ([#238](https://github.com/mirko-pagliai/cakephp-database-backup/issues/238));
 * fixed a regression introduced in `3.0.0` (SQLite): the `{$DATABASE}` filename pattern was replaced by the full path of
   the database file. Now it is its name without path and extension, as in the `2.15.x` branch;
 * fixed a regression introduced in `3.0.0`: `BackupExport::export()` did not reset the filename, so a second call on the
@@ -28,6 +31,7 @@
   and completed;
 * tests for `BackupExport`, `ExportCommand` and `ImportCommand` have been greatly strengthened and
   [use _Mockery_ less](https://github.com/mirko-pagliai/cakephp-database-backup/issues/231);
+* added _Mago_ as a development dependency and adapted the code to its rules;
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
   [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
 * refactor: consistent formatting and string interpolation across tests and source files.

@@ -75,6 +75,12 @@ class SqliteExecutor extends Executor
     #[Override]
     public function beforeImport(EventInterface $Event): void
     {
+        /**
+         * @todo Temporary patch for 3.0.x (issue #238), to be properly fixed in 3.1.x. The binary is searched for
+         *  before dropping the tables, so they are not lost if it cannot be found
+         */
+        $this->findBinary($this->getBinaryName());
+
         //For each table, drops the table
         $this->dropAllTables();
 

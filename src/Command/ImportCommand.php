@@ -73,7 +73,7 @@ class ImportCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io): int
     {
         try {
-            $BackupImport = new BackupImport((string)$args->getOption('connection') ?: '');
+            $BackupImport = new BackupImport((string)$args->getOption('connection'));
 
             $timeout = $this->getTimeoutOption($args);
             if ($timeout !== null) {

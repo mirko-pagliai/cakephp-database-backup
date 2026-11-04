@@ -16,13 +16,16 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
 use Cake\Event\EventInterface;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
+use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -103,6 +106,9 @@ class SqliteExecutorTest extends TestCase
     #[Test]
     public function testBeforeImport(): void
     {
+        //@todo Temporary, needed by the 3.0.x patch (issue #238), to be reviewed when properly fixed in 3.1.x
+        Configure::write('DatabaseBackup.binaries.sqlite3', '/path/to/sqlite3');
+
         $Driver = Mockery::spy(Driver::class);
 
         /** @var \Cake\Database\Connection&\Mockery\MockInterface $Connection */
@@ -130,6 +136,29 @@ class SqliteExecutorTest extends TestCase
         $Driver
             ->shouldHaveReceived('disconnect')
             ->once();
+    }
+
+    /**
+     * If the `sqlite3` binary cannot be found, the tables are not dropped.
+     *
+     * @link \DatabaseBackup\Executor\SqliteExecutor::beforeImport()
+     * @todo Temporary test for the 3.0.x patch (issue #238), to be reviewed or removed when properly fixed in 3.1.x
+     */
+    #[Test]
+    public function testBeforeImportWithBinaryNotFound(): void
+    {
+        Configure::write('DatabaseBackup.binaries.sqlite3', '');
+
+        $SqliteExecutor = new class (new FakeConnection(), OperationType::Import) extends SqliteExecutor {
+            public function dropAllTables(): array
+            {
+                Assert::fail('The tables must not be dropped');
+            }
+        };
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Binary for `sqlite3` not found');
+        $SqliteExecutor->dispatchEvent('Backup.beforeImport');
     }
 
     /**

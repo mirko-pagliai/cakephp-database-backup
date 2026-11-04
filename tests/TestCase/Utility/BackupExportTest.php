@@ -236,7 +236,7 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExport(): void
     {
-        $result = $this->BackupExport->export() ?: '';
+        $result = (string)$this->BackupExport->export();
 
         /** @var non-empty-string $targetDir */
         $targetDir = Configure::read('DatabaseBackup.target');
@@ -257,9 +257,9 @@ class BackupExportTest extends TestCase
     #[Test]
     public function testExportWithCompression(): void
     {
-        $result = $this->BackupExport
+        $result = (string)$this->BackupExport
             ->compression(Compression::Bzip2)
-            ->export() ?: '';
+            ->export();
 
         /** @var non-empty-string $targetDir */
         $targetDir = Configure::read('DatabaseBackup.target');
@@ -311,7 +311,7 @@ class BackupExportTest extends TestCase
 
         $this->assertSame(TMP . 'backup.sql', $firstResult);
 
-        $secondResult = $this->BackupExport->export() ?: '';
+        $secondResult = (string)$this->BackupExport->export();
 
         $this->assertMatchesRegularExpression('/backup_my_database_\d{14}\.sql$/', $secondResult);
     }
