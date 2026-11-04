@@ -1,6 +1,9 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.6
+* fixed a several bug in `BackupImport`: with SQLite, if the filename was not set or a binary (`sqlite3`, `gzip` or
+  `bzip2`) was not found, the import failed after all the tables had already been dropped. Now these checks are made
+  before the `Backup.beforeImport` event ([#238](https://github.com/mirko-pagliai/cakephp-database-backup/issues/238));
 * fixed a regression introduced in `3.0.0` (SQLite): the `{$DATABASE}` filename pattern was replaced by the full path of
   the database file. Now it is its name without path and extension, as in the `2.15.x` branch;
 * fixed a regression introduced in `3.0.0`: `BackupExport::export()` did not reset the filename, so a second call on the

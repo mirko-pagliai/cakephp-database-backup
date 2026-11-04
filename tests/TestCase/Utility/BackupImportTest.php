@@ -20,12 +20,17 @@ use App\Executor\FakeExecutor;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Event\EventList;
+use DatabaseBackup\Executor\SqliteExecutor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -188,7 +193,16 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeImport(): void
     {
-        $this->BackupImport->Executor = new class extends FakeExecutor
+        $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
+            public string $filename {
+                set(string $filename) {
+                    $this->filename = $filename;
+                }
+            }
+        };
+
+        $BackupImport->filename = TMP . 'backup.sql';
+        $BackupImport->Executor = new class extends FakeExecutor
         {
             public function beforeImport(EventInterface $Event): void
             {
@@ -196,19 +210,62 @@ class BackupImportTest extends TestCase
             }
         };
 
-        $result = $this->BackupImport->import();
+        $result = $BackupImport->import();
         $this->assertFalse($result);
     }
 
     /**
+     * If the filename has not been set, `import()` fails before the `Backup.beforeImport` event, so with SQLite the
+     * tables are not dropped.
+     *
      * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     public function testImportWithFilenamePropertyNotSet(): void
     {
-        $this->BackupImport->Executor = new FakeExecutor();
+        $this->BackupImport->Executor = new class (new FakeConnection(), OperationType::Import) extends SqliteExecutor {
+            public function dropAllTables(): array
+            {
+                Assert::fail('The tables must not be dropped');
+            }
+        };
 
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
+    }
+
+    /**
+     * If the binary for the compression cannot be found, `import()` fails before the `Backup.beforeImport` event, so
+     * with SQLite the tables are not dropped.
+     *
+     * @link \DatabaseBackup\Utility\BackupImport::import()
+     * @todo Temporary test for the 3.0.x patch (issue #238), to be reviewed or removed when properly fixed in 3.1.x
+     */
+    #[Test]
+    #[TestWith(['gzip', 'backup.sql.gz'])]
+    #[TestWith(['bzip2', 'backup.sql.bz2'])]
+    public function testImportWithCompressionBinaryNotFound(string $binaryName, string $filename): void
+    {
+        Configure::write("DatabaseBackup.binaries.{$binaryName}", '');
+
+        $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
+            public string $filename {
+                set(string $filename) {
+                    $this->filename = $filename;
+                }
+            }
+        };
+
+        $BackupImport->filename = TMP . $filename;
+        $BackupImport->Executor = new class (new FakeConnection(), OperationType::Import) extends SqliteExecutor {
+            public function dropAllTables(): array
+            {
+                Assert::fail('The tables must not be dropped');
+            }
+        };
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Binary for `{$binaryName}` not found");
+        $BackupImport->import();
     }
 }
