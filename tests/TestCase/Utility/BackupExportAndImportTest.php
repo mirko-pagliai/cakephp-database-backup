@@ -121,16 +121,24 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
+     * @param string $extension
      * @param class-string $expectedExecutor
+     * @param string $filename The compression is derived from its extension
      * @return void
      * @link \DatabaseBackup\Utility\BackupExport::export()
      * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
-    #[TestWith(['mysql', MysqlExecutor::class])]
-    #[TestWith(['pgsql', PostgresExecutor::class])]
-    #[TestWith(['sqlite', SqliteExecutor::class])]
-    public function testExportAndImport(string $extension, string $expectedExecutor): void
+    #[TestWith(['mysql', MysqlExecutor::class, 'test.sql'])]
+    #[TestWith(['mysql', MysqlExecutor::class, 'test.sql.gz'])]
+    #[TestWith(['mysql', MysqlExecutor::class, 'test.sql.bz2'])]
+    #[TestWith(['pgsql', PostgresExecutor::class, 'test.sql'])]
+    #[TestWith(['pgsql', PostgresExecutor::class, 'test.sql.gz'])]
+    #[TestWith(['pgsql', PostgresExecutor::class, 'test.sql.bz2'])]
+    #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql'])]
+    #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql.gz'])]
+    #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql.bz2'])]
+    public function testExportAndImport(string $extension, string $expectedExecutor, string $filename): void
     {
         if (!extension_loaded("pdo_{$extension}")) {
             $this->fail("The `pdo_{$extension}` extension is not available");
@@ -168,11 +176,11 @@ class BackupExportAndImportTest extends TestCase
         $BackupExport = new BackupExport(Connection: ConnectionManager::get('test'));
 
         $result = $BackupExport
-            ->filename('test.sql')
+            ->filename($filename)
             ->export();
 
         $this->assertInstanceOf($expectedExecutor, $BackupExport->Executor);
-        $this->assertSame("{$targetDir}test.sql", $result);
+        $this->assertSame($targetDir . $filename, $result);
         $this->assertFileExists($result);
 
         /**
@@ -195,7 +203,7 @@ class BackupExportAndImportTest extends TestCase
             ->import();
 
         $this->assertInstanceOf($expectedExecutor, $BackupImport->Executor);
-        $this->assertSame("{$targetDir}test.sql", $result);
+        $this->assertSame($targetDir . $filename, $result);
 
         /**
          * Gets the final data.
