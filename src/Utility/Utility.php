@@ -38,6 +38,14 @@ use function Cake\I18n\__d;
  */
 abstract class Utility
 {
+    /**
+     * The connection used by the operation.
+     *
+     * It can be set with a connection instance or with a connection name. If it has not been set, the `default`
+     * connection is used. Setting it discards the `Executor` created for the previous connection.
+     *
+     * @since 3.0.0
+     */
     public ConnectionInterface $Connection {
         set (ConnectionInterface|string $Connection) {
             if (!$Connection instanceof ConnectionInterface) {
@@ -57,6 +65,13 @@ abstract class Utility
      */
     private ?Executor $ExecutorInstance = null;
 
+    /**
+     * The `Executor` of the operation.
+     *
+     * If it has not been set, it is created at the first access, according to the driver of the connection.
+     *
+     * @since 3.0.0
+     */
     public Executor $Executor {
         set (Executor $Executor) {
             $this->ExecutorInstance = $Executor;
@@ -91,6 +106,14 @@ abstract class Utility
         }
     }
 
+    /**
+     * The maximum execution time of the process, in seconds.
+     *
+     * It must be greater than or equal to `0`. If it has not been set, the `DatabaseBackup.processTimeout`
+     * configuration value is used.
+     *
+     * @since 3.0.0
+     */
     public int $timeout {
         set (int $timeout) {
             if ($timeout < 0) {

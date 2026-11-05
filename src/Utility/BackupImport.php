@@ -28,6 +28,14 @@ use function Cake\I18n\__d;
  */
 class BackupImport extends Utility
 {
+    /**
+     * The filename of the backup to import.
+     *
+     * The path is made absolute. Setting a file that does not exist throws an `IOException`, setting a file with an
+     * unsupported extension throws a `ValueError`. Reading it before it has been set throws a `LogicException`.
+     *
+     * @since 3.0.0
+     */
     public string $filename {
         set(string $filename) {
             $filename = $this->makeAbsolutePath(path: $filename);

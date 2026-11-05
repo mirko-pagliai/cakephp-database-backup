@@ -26,6 +26,13 @@ use Symfony\Component\Process\Process;
  */
 class MysqlExecutor extends Executor
 {
+    /**
+     * The path of the temporary file with the database authentication data.
+     *
+     * It is generated in `TMP` at the first access and reset by `deleteAuthFile()`.
+     *
+     * @since 3.0.0
+     */
     protected(set) string $authFile = '' {
         get {
             if ($this->authFile === '') {

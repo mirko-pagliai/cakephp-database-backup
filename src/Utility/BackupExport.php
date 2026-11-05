@@ -30,6 +30,15 @@ use function Cake\I18n\__d;
  */
 class BackupExport extends Utility
 {
+    /**
+     * The compression of the backup.
+     *
+     * It can be set with a `Compression` case or with its name (for example `gzip`); `null` or an empty string means no
+     * compression. It is used to build the default filename. Setting the filename overrides it, according to the
+     * extension of the filename.
+     *
+     * @since 3.0.0
+     */
     public Compression $compression = Compression::None {
         set (Compression|string|null $compression) {
             if (!$compression instanceof Compression) {
@@ -40,6 +49,15 @@ class BackupExport extends Utility
         }
     }
 
+    /**
+     * The filename of the backup.
+     *
+     * The filename patterns are replaced and the path is made absolute. Setting a filename that already exists, or in
+     * a directory that is not writable, throws an `IOException`. An empty string resets the property, so the next
+     * `export()` call generates a new filename.
+     *
+     * @since 3.0.0
+     */
     public string $filename = '' {
         set(string $filename) {
             // An empty filename resets the property so that the next call of `export()` generates a new filename
