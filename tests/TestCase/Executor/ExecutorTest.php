@@ -116,11 +116,11 @@ class ExecutorTest extends TestCase
     #[TestWith(['/customPath/gzip', Compression::Gzip])]
     public function testFindBinaryFromConfiguration(string $expectedBinary, Compression|string $binaryName): void
     {
-        $binaryName = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
-        Configure::write(config: "DatabaseBackup.binaries.{$binaryName}", value: "/customPath/{$binaryName}");
+        $configKey = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
+        Configure::write(config: "DatabaseBackup.binaries.{$configKey}", value: "/customPath/{$configKey}");
 
         $result = new FakeExecutor()->findBinary($binaryName);
-        Configure::delete("DatabaseBackup.binaries.{$binaryName}");
+        Configure::delete("DatabaseBackup.binaries.{$configKey}");
 
         $this->assertSame($expectedBinary, $result);
     }
