@@ -34,7 +34,9 @@
 * added _Mago_ as a development dependency and adapted the code to its rules;
 * updated `cakephp/cakephp-codesniffer` to 5.3.2. This was made necessary due to
   [this security advisory](https://github.com/PHPCSStandards/PHP_CodeSniffer/security/advisories/GHSA-hmqg-cxww-wqhq);
-* refactor: consistent formatting and string interpolation across tests and source files.
+* refactor: consistent formatting and string interpolation across tests and source files;
+* `symfony/filesystem` and `symfony/process` now allow Symfony 8. `symfony/filesystem` `6.4` is no longer supported:
+  the minimum is now `7.2`.
 
 ### 3.0.4
 * the `Utility::__call()` method now correctly handles properties with an initial capital letter. This means that
