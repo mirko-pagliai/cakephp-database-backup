@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
 use Cake\Event\EventInterface;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -27,8 +28,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 
 /**
  * MysqlExecutorTest.
@@ -67,55 +66,54 @@ class MysqlExecutorTest extends TestCase
      * @link \DatabaseBackup\Executor\MysqlExecutor::runProcess()
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testRunProcessDeletesAuthFile(): void
     {
-        Mockery::mock('overload:' . ExecutableFinder::class)
-            ->shouldReceive('find')
-            ->andReturn('/usr/bin/mariadb-dump');
+        $MysqlExecutor = new class (new FakeConnection(), OperationType::Export) extends MysqlExecutor {
+            public function getCommand(Compression $Compression): string
+            {
+                return 'exit 0';
+            }
 
-        $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
-        $Process
-            ->shouldReceive('fromShellCommandline')
-            ->andReturnSelf();
-        $Process
-            ->shouldReceive('isSuccessful')
-            ->andReturnTrue();
+            public function findBinary(Compression|string $binaryName): string
+            {
+                return '/usr/bin/mariadb-dump';
+            }
+        };
+        $authFile = $MysqlExecutor->authFile;
 
-        Mockery::mock('overload:' . Filesystem::class)
-            ->shouldReceive('remove')
-            ->with($this->MysqlExecutor->authFile)
-            ->once();
+        $MysqlExecutor->runProcess('backup.sql');
 
-        $this->MysqlExecutor->runProcess('backup.sql');
+        // `deleteAuthFile()` resets the property, so the path of the file with the authentication data changes
+        $this->assertNotSame($authFile, $MysqlExecutor->authFile);
     }
 
     /**
      * @link \DatabaseBackup\Executor\MysqlExecutor::runProcess()
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testRunProcessDeletesAuthFileOnFailure(): void
     {
-        Mockery::mock('overload:' . ExecutableFinder::class)
-            ->shouldReceive('find')
-            ->andReturn('/usr/bin/mariadb-dump');
+        $MysqlExecutor = new class (new FakeConnection(), OperationType::Export) extends MysqlExecutor {
+            public function getCommand(Compression $Compression): string
+            {
+                return 'exit 1';
+            }
 
-        $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
-        $Process
-            ->shouldReceive('fromShellCommandline')
-            ->andReturnSelf();
-        $Process
-            ->shouldReceive('isSuccessful')
-            ->andReturnFalse();
-
-        Mockery::mock('overload:' . Filesystem::class)
-            ->shouldReceive('remove')
-            ->with($this->MysqlExecutor->authFile)
-            ->once();
+            public function findBinary(Compression|string $binaryName): string
+            {
+                return '/usr/bin/mariadb-dump';
+            }
+        };
+        $authFile = $MysqlExecutor->authFile;
 
         $this->expectException(ProcessFailedException::class);
-        $this->MysqlExecutor->runProcess('backup.sql');
+
+        try {
+            $MysqlExecutor->runProcess('backup.sql');
+        } finally {
+            // `deleteAuthFile()` resets the property, so the path of the file with the authentication data changes
+            $this->assertNotSame($authFile, $MysqlExecutor->authFile);
+        }
     }
 
     /**
