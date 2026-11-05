@@ -169,11 +169,12 @@ class SqliteExecutorTest extends TestCase
     #[Test]
     public function testBeforeImportStoppedByAnotherListener(): void
     {
-        /** @var \DatabaseBackup\Executor\SqliteExecutor&\Mockery\MockInterface $SqliteExecutor */
-        $SqliteExecutor = Mockery::spy(
-            SqliteExecutor::class . '[dropAllTables]',
-            [new FakeConnection(), OperationType::Import],
-        );
+        $SqliteExecutor = new class (new FakeConnection(), OperationType::Import) extends SqliteExecutor {
+            public function dropAllTables(): array
+            {
+                Assert::fail('The tables must not be dropped');
+            }
+        };
 
         $SqliteExecutor->getEventManager()->on(
             'Backup.beforeImport',
@@ -182,8 +183,8 @@ class SqliteExecutorTest extends TestCase
             },
         );
 
-        $SqliteExecutor->dispatchEvent('Backup.beforeImport');
+        $Event = $SqliteExecutor->dispatchEvent('Backup.beforeImport');
 
-        $SqliteExecutor->shouldNotHaveReceived('dropAllTables');
+        $this->assertTrue($Event->isStopped());
     }
 }
