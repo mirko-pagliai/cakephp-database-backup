@@ -47,14 +47,14 @@ This would update your application's bootstrap method.
 
 ### Package versions and installation based on CakePHP/PHP version
 
-| Branch                                                                                           | Status                                                                            | Requires CakePHP | Requires PHP |
-|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------| --- | --- |
-| `3.1.x`                                                                                          | In development                                                                    |           |         |
-| `3.0.x`                                                                                          | **Current branch**                                                                | `^5.2.10` | `>=8.4` |
-| `2.15.x`                                                                                         | Only security updates and relevant bugs                                           | `^5.0` | `>=8.1` |
-| `2.14.x`                                                                                         | Abandoned on May 30, 2025                                                         | `^5.0`       | `>=8.1`        |
-| tag [`cakephp4`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp4) | Abandoned on January 5, 2024, and roughly coincides with what `2.12.3` version was | `^4.0` | `>=7.4.0` |
-| tag [`cakephp3`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp3) | Abandoned April 29, 2021, and roughly coincides with what `2.8.5` version was     | `^3.5.1` | `>=5.6 <7.4` | 
+| Branch                                                                                           | Status                                                                             | Requires CakePHP | Requires PHP |
+|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------| ---------------- | ------------ |
+| `3.1.x`                                                                                          | In development                                                                     |                  |              |
+| `3.0.x`                                                                                          | **Current branch**                                                                 | `^5.2.10`        | `>=8.4`      |
+| `2.15.x`                                                                                         | Abandoned on November 5, 2026                                                      | `^5.0`           | `>=8.1`      |
+| `2.14.x`                                                                                         | Abandoned on May 30, 2025                                                          | `^5.0`           | `>=8.1`      |
+| tag [`cakephp4`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp4) | Abandoned on January 5, 2024, and roughly coincides with what `2.12.3` version was | `^4.0`           | `>=7.4.0`    |
+| tag [`cakephp3`](https://github.com/mirko-pagliai/cakephp-database-backup/releases/tag/cakephp3) | Abandoned April 29, 2021, and roughly coincides with what `2.8.5` version was      | `^3.5.1`         | `>=5.6 <7.4` | 
 
 You are free to use the `cakephp4` and `cakephp3` tags, even by downloading the source codes from the attached assets,
 but their functioning is no longer guaranteed, especially regarding old dependencies that may no longer be available.

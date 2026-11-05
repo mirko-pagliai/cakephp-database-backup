@@ -24,6 +24,7 @@ use DatabaseBackup\Compression;
 use DatabaseBackup\Utility\BackupExport;
 use Exception;
 use Override;
+use TypeError;
 use ValueError;
 use function Cake\I18n\__d;
 
@@ -40,6 +41,9 @@ class ExportCommand extends Command
     #[Override]
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
+        /** @var string $targetDir */
+        $targetDir = Configure::readOrFail('DatabaseBackup.target');
+
         $parser = parent::buildOptionParser($parser);
 
         $parser->setDescription(__d('database_backup', 'Exports a database backup'));
@@ -48,7 +52,7 @@ class ExportCommand extends Command
             'choices' => array_map(callback: 'lcfirst', array: array_column(
                 array: array_filter(
                     array: Compression::cases(),
-                    callback: fn(Compression $Compression): bool => $Compression->isValid(),
+                    callback: static fn(Compression $Compression): bool => $Compression->isValid(),
                 ),
                 column_key: 'name',
             )),
@@ -66,7 +70,7 @@ class ExportCommand extends Command
                     'database_backup',
                     'Filenames can be relative to {0} (root of your app) or {1} (default target directory).',
                     '<comment>' . ROOT . '</comment>',
-                    '<comment>' . Configure::readOrFail('DatabaseBackup.target') . '</comment>',
+                    "<comment>{$targetDir}</comment>",
                 ),
             ]),
             'short' => 'f',
@@ -85,15 +89,18 @@ class ExportCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io): int
     {
         try {
-            $BackupExport = new BackupExport((string)$args->getOption('connection') ?: '');
+            $BackupExport = new BackupExport((string)$args->getOption('connection'));
 
-            if ($args->getOption('timeout')) {
-                $BackupExport->timeout((int)$args->getOption('timeout'));
+            $timeout = $this->getTimeoutOption($args);
+            if ($timeout !== null) {
+                $BackupExport->timeout($timeout);
             }
 
-            if ($args->getOption('filename')) {
-                $BackupExport->filename((string)$args->getOption('filename'));
-            } elseif ($args->getOption('compression')) {
+            $filenameOption = $args->getOption('filename');
+            if ($filenameOption) {
+                $BackupExport->filename((string)$filenameOption);
+            }
+            if (!$filenameOption && $args->getOption('compression')) {
                 $BackupExport->compression((string)$args->getOption('compression'));
             }
 
@@ -111,8 +118,8 @@ class ExportCommand extends Command
                 'Backup `{0}` has been exported',
                 $this->makeRelativePath($filename),
             ));
-        } catch (Exception | ValueError $e) {
-            $io->abort($e->getMessage());
+        } catch (Exception | TypeError | ValueError $e) {
+            $io->abort(get_class($e) . ': ' . lcfirst($e->getMessage()));
         }
 
         return static::CODE_SUCCESS;

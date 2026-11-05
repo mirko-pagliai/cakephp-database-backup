@@ -28,6 +28,9 @@ use ValueError;
 #[CoversClass(Compression::class)]
 class CompressionTest extends TestCase
 {
+    /**
+     * @link \DatabaseBackup\Compression::validCases()
+     */
     #[Test]
     public function testValidCases(): void
     {
@@ -40,6 +43,9 @@ class CompressionTest extends TestCase
         }
     }
 
+    /**
+     * @link \DatabaseBackup\Compression::isValid()
+     */
     #[Test]
     #[TestWith([false, Compression::None])]
     #[TestWith([true, Compression::Gzip])]
@@ -49,6 +55,9 @@ class CompressionTest extends TestCase
         $this->assertSame($expectedIsValid, $Compression->isValid());
     }
 
+    /**
+     * @link \DatabaseBackup\Compression::fromFilename()
+     */
     #[Test]
     #[TestWith([Compression::None, 'filename.sql'])]
     #[TestWith([Compression::None, 'FILENAME.SQL'])]
@@ -61,6 +70,9 @@ class CompressionTest extends TestCase
         $this->assertSame($ExpectedCompression, Compression::fromFilename($filename));
     }
 
+    /**
+     * @link \DatabaseBackup\Compression::fromFilename()
+     */
     #[Test]
     public function testFromFilenameThrowsException(): void
     {
@@ -69,6 +81,9 @@ class CompressionTest extends TestCase
         Compression::fromFilename('filename.txt');
     }
 
+    /**
+     * @link \DatabaseBackup\Compression::tryFromFilename()
+     */
     #[Test]
     #[TestWith([Compression::None, 'filename.sql'])]
     #[TestWith([Compression::None, 'FILENAME.SQL'])]

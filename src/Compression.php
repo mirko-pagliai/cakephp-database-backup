@@ -43,7 +43,7 @@ enum Compression: string
     {
         return array_filter(
             array: Compression::cases(),
-            callback: fn(Compression $Compression): bool => $Compression->isValid(),
+            callback: static fn(Compression $Compression): bool => $Compression->isValid(),
         );
     }
 
@@ -96,9 +96,9 @@ enum Compression: string
 
         return array_find(
             array: self::cases(),
-            callback: fn($Compression) => str_ends_with(
+            callback: static fn($Compression) => str_ends_with(
                 haystack: strtolower($filename),
-                needle: '.' . $Compression->value,
+                needle: ".{$Compression->value}",
             ),
         );
     }

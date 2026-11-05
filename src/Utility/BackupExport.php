@@ -30,6 +30,15 @@ use function Cake\I18n\__d;
  */
 class BackupExport extends Utility
 {
+    /**
+     * The compression of the backup.
+     *
+     * It can be set with a `Compression` case or with its name (for example `gzip`); `null` or an empty string means no
+     * compression. It is used to build the default filename. Setting the filename overrides it, according to the
+     * extension of the filename.
+     *
+     * @since 3.0.0
+     */
     public Compression $compression = Compression::None {
         set (Compression|string|null $compression) {
             if (!$compression instanceof Compression) {
@@ -40,8 +49,24 @@ class BackupExport extends Utility
         }
     }
 
-    public string $filename {
+    /**
+     * The filename of the backup.
+     *
+     * The filename patterns are replaced and the path is made absolute. Setting a filename that already exists, or in
+     * a directory that is not writable, throws an `IOException`. An empty string resets the property, so the next
+     * `export()` call generates a new filename.
+     *
+     * @since 3.0.0
+     */
+    public string $filename = '' {
         set(string $filename) {
+            // An empty filename resets the property so that the next call of `export()` generates a new filename
+            if ($filename === '') {
+                $this->filename = '';
+
+                return;
+            }
+
             $filename = $this->replaceFilenamePatterns($filename);
             $filename = $this->makeAbsolutePath($filename);
 
@@ -73,15 +98,18 @@ class BackupExport extends Utility
      */
     protected function replaceFilenamePatterns(string $filename): string
     {
+        /** @var array{database: string, host?: string|null} $config */
+        $config = $this->Connection->config();
+
         return str_replace(
             search: ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
             replace: [
-                $this->Connection->config()['database'],
+                pathinfo($config['database'], PATHINFO_FILENAME),
                 new DateTime()->format('YmdHis'),
                 str_replace(
                     search: ['127.0.0.1', '::1'],
                     replace: 'localhost',
-                    subject: $this->Connection->config()['host'] ?? 'localhost',
+                    subject: $config['host'] ?? 'localhost',
                 ),
                 (string)time(),
             ],
@@ -112,9 +140,13 @@ class BackupExport extends Utility
      */
     public function export(): string|false
     {
-        if (empty($this->filename)) {
+        if ($this->filename === '') {
             $this->filename = 'backup_{$DATABASE}_{$DATETIME}.' . $this->compression->value;
         }
+
+        // Gets the filename and resets the property, so that the next call of this method will not reuse it
+        $filename = $this->filename;
+        $this->filename = '';
 
         //Dispatches the `Backup.beforeExport` event implemented by the `Executor` class
         $BeforeExport = $this->Executor->dispatchEvent('Backup.beforeExport');
@@ -122,11 +154,11 @@ class BackupExport extends Utility
             return false;
         }
 
-        $this->Executor->runProcess(filename: $this->filename, timeout: $this->timeout);
+        $this->Executor->runProcess(filename: $filename, timeout: $this->timeout);
 
         //Dispatches the `Backup.afterExport` event implemented by the `Executor` class
         $this->Executor->dispatchEvent('Backup.afterExport');
 
-        return $this->filename;
+        return $filename;
     }
 }
