@@ -107,7 +107,6 @@ class BackupImportTest extends TestCase
      * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testImport(): void
     {
         $filename = TMP . 'backup.sql';
