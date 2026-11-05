@@ -173,6 +173,7 @@ abstract class Executor implements EventListenerInterface
     public function runProcess(string $filename, int $timeout = 60): Process
     {
         $Compression = Compression::fromFilename($filename);
+        /** @var array{database: string, host?: string|null, password?: string|null, username?: string|null} $config */
         $config = $this->Connection->config();
         $env = [];
 
