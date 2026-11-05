@@ -19,8 +19,8 @@
     "php": ">=8.4",
     "cakephp/cakephp": "^5.2.10",
     "league/container": "^4.2.3|^5.1",
-    "symfony/filesystem": "^7.2",
-    "symfony/process": "^7.4.5"
+    "symfony/filesystem": "^7.2|^8.0",
+    "symfony/process": "^7.4.5|^8.0"
   },
   "require-dev": {
     "cakedc/cakephp-phpstan": "^4.0",
