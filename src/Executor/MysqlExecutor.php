@@ -146,11 +146,12 @@ class MysqlExecutor extends Executor
      */
     public function writeAuthFile(string $content): bool
     {
-        $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null,];
+        /** @var array{username: string|null, password: string|null, host: string|null} $config */
+        $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null];
 
         // In the file the values are between double quotes, so the characters that are special there are escaped
         $values = array_map(
-            static fn(mixed $value): string => strtr(strval($value), [
+            static fn(?string $value): string => strtr((string)$value, [
                 '\\' => '\\\\',
                 '"' => '\\"',
                 "\n" => '\\n',

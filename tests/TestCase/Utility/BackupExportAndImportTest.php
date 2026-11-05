@@ -55,7 +55,8 @@ class BackupExportAndImportTest extends TestCase
             ->enableHydration(false)
             ->all()
             ->map(static fn(array $record): array => array_map(
-                callback: static fn(mixed $value): string => strval($value),
+                // @phpstan-ignore cast.string
+                callback: static fn(mixed $value): string => (string)$value,
                 array: $record,
             ))
             ->toList();

@@ -102,10 +102,8 @@ abstract class Utility
             $this->timeout = $timeout;
         }
         get {
-            /** @var int $timeout */
-            $timeout = $this->timeout ?? Configure::readOrFail(var: 'DatabaseBackup.processTimeout');
-
-            return $timeout;
+            /** @var int */
+            return $this->timeout ?? Configure::readOrFail(var: 'DatabaseBackup.processTimeout');
         }
     }
 
