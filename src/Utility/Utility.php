@@ -63,10 +63,13 @@ abstract class Utility
         }
         get {
             if (!$this->ExecutorInstance) {
+                /** @var string $driver */
+                $driver = $this->Connection->config()['driver'];
+
                 /**
                  * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
                  */
-                $name = substr((string)strrchr($this->Connection->config()['driver'], '\\'), 1);
+                $name = substr((string)strrchr($driver, '\\'), 1);
 
                 /** @var class-string<\DatabaseBackup\Executor\Executor> $className */
                 $className = App::classname("DatabaseBackup.{$name}Executor", 'Executor');
@@ -98,7 +101,12 @@ abstract class Utility
             }
             $this->timeout = $timeout;
         }
-        get => $this->timeout ?? Configure::readOrFail(var: 'DatabaseBackup.processTimeout');
+        get {
+            /** @var int $timeout */
+            $timeout = $this->timeout ?? Configure::readOrFail(var: 'DatabaseBackup.processTimeout');
+
+            return $timeout;
+        }
     }
 
     /**

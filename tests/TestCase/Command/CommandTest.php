@@ -30,7 +30,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 class CommandTest extends TestCase
 {
     /**
-     * @param array<string, mixed> $options
+     * @param array<string, array<string>|bool|string|null> $options
      * @link \DatabaseBackup\Command\Command::getTimeoutOption()
      */
     #[Test]
@@ -59,7 +59,7 @@ class CommandTest extends TestCase
     #[TestWith(['abc'])]
     #[TestWith(['120s'])]
     #[TestWith([true])]
-    public function testGetTimeoutOptionWithInvalidValue(mixed $timeout): void
+    public function testGetTimeoutOptionWithInvalidValue(bool|string $timeout): void
     {
         $Command = new class extends Command {
         };

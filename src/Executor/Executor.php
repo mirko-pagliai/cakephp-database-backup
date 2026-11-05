@@ -41,8 +41,10 @@ abstract class Executor implements EventListenerInterface
      * @param \Cake\Database\Connection $Connection
      * @param \DatabaseBackup\OperationType $OperationType
      */
-    public function __construct(readonly protected Connection $Connection, readonly protected OperationType $OperationType)
-    {
+    public function __construct(
+        readonly protected Connection $Connection,
+        readonly protected OperationType $OperationType,
+    ) {
         //Attaches the object to the event manager
         $this->getEventManager()->on($this);
     }
@@ -131,14 +133,19 @@ abstract class Executor implements EventListenerInterface
     {
         $isExport = $this->OperationType === OperationType::Export;
 
+        /** @var string $driver */
+        $driver = $this->Connection->config()['driver'];
+
         /**
          * For example, for `Cake\Database\Driver\Mysql` the name will be `MySql`.
          */
-        $name = substr((string)strrchr($this->Connection->config()['driver'], '\\'), 1);
+        $name = substr((string)strrchr($driver, '\\'), 1);
 
         /**
          * This is the base command.
          * It still needs to be properly articulated.
+         *
+         * @var string $command
          */
         $command = Configure::readOrFail("DatabaseBackup.{$name}." . $this->OperationType->value);
 

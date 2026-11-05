@@ -80,15 +80,18 @@ class BackupExport extends Utility
      */
     protected function replaceFilenamePatterns(string $filename): string
     {
+        /** @var array{database: string, host?: string|null} $config */
+        $config = $this->Connection->config();
+
         return str_replace(
             search: ['{$DATABASE}', '{$DATETIME}', '{$HOSTNAME}', '{$TIMESTAMP}'],
             replace: [
-                pathinfo($this->Connection->config()['database'], PATHINFO_FILENAME),
+                pathinfo($config['database'], PATHINFO_FILENAME),
                 new DateTime()->format('YmdHis'),
                 str_replace(
                     search: ['127.0.0.1', '::1'],
                     replace: 'localhost',
-                    subject: $this->Connection->config()['host'] ?? 'localhost',
+                    subject: $config['host'] ?? 'localhost',
                 ),
                 (string)time(),
             ],

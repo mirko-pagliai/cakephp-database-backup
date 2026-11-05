@@ -55,7 +55,7 @@ class BackupExportAndImportTest extends TestCase
             ->enableHydration(false)
             ->all()
             ->map(static fn(array $record): array => array_map(
-                callback: static fn(mixed $value): string => (string)$value,
+                callback: static fn(mixed $value): string => strval($value),
                 array: $record,
             ))
             ->toList();
@@ -98,8 +98,11 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::setUp();
 
+        /** @var string $targetDir */
+        $targetDir = Configure::read('DatabaseBackup.target');
+
         /** @var list<string> $tmpFiles */
-        $tmpFiles = glob(Configure::read('DatabaseBackup.target') . '*');
+        $tmpFiles = glob("{$targetDir}*");
         foreach ($tmpFiles as $file) {
             unlink($file);
         }
@@ -155,6 +158,9 @@ class BackupExportAndImportTest extends TestCase
         $initialArticles = $this->getAllRecords($ArticlesTable);
         $initialComments = $this->getAllRecords($CommentsTable);
 
+        /** @var string $targetDir */
+        $targetDir = Configure::read('DatabaseBackup.target');
+
         /**
          * Exports
          */
@@ -165,7 +171,7 @@ class BackupExportAndImportTest extends TestCase
             ->export();
 
         $this->assertInstanceOf($expectedExecutor, $BackupExport->Executor);
-        $this->assertSame(Configure::read('DatabaseBackup.target') . 'test.sql', $result);
+        $this->assertSame("{$targetDir}test.sql", $result);
         $this->assertFileExists($result);
 
         /**
@@ -188,7 +194,7 @@ class BackupExportAndImportTest extends TestCase
             ->import();
 
         $this->assertInstanceOf($expectedExecutor, $BackupImport->Executor);
-        $this->assertSame(Configure::read('DatabaseBackup.target') . 'test.sql', $result);
+        $this->assertSame("{$targetDir}test.sql", $result);
 
         /**
          * Gets the final data.

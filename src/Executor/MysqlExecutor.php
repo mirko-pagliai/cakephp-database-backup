@@ -150,7 +150,7 @@ class MysqlExecutor extends Executor
 
         // In the file the values are between double quotes, so the characters that are special there are escaped
         $values = array_map(
-            static fn(mixed $value): string => strtr((string)$value, [
+            static fn(mixed $value): string => strtr(strval($value), [
                 '\\' => '\\\\',
                 '"' => '\\"',
                 "\n" => '\\n',
