@@ -77,7 +77,7 @@ class CompressionTest extends TestCase
     public function testFromFilenameThrowsException(): void
     {
         $this->expectException(ValueError::class);
-        $this->expectExceptionMessage('No valid `' . Compression::class . '` value was found for filename `filename.txt`');
+        $this->expectExceptionMessageIs('No valid `' . Compression::class . '` value was found for filename `filename.txt`');
         Compression::fromFilename('filename.txt');
     }
 

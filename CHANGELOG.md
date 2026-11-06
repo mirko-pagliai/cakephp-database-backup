@@ -4,7 +4,7 @@
 * the commands now use `$this->args` and `$this->io` instead of the `execute()` parameters, and
   `Command::getTimeoutOption()` no longer takes the `Arguments` parameter
   ([#230](https://github.com/mirko-pagliai/cakephp-database-backup/issues/230));
-* requires at least CakePHP 5.4.0.
+* requires at least CakePHP 5.4.0 and phpunit 13.2
 
 ## 3.0 branch
 ### 3.0.6

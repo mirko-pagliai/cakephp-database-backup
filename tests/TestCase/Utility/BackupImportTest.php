@@ -79,7 +79,7 @@ class BackupImportTest extends TestCase
     public function testFilenamePropertyNoReadableFile(): void
     {
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File `/noExistingDir/backup.sql` does not exist');
+        $this->expectExceptionMessageIs('File `/noExistingDir/backup.sql` does not exist');
         $this->BackupImport->filename = '/noExistingDir/backup.sql';
     }
 
@@ -229,7 +229,7 @@ class BackupImportTest extends TestCase
             }
         };
 
-        $this->expectExceptionMessage('You must first set the filename');
+        $this->expectExceptionMessageIs('You must first set the filename');
         $this->BackupImport->import();
     }
 
@@ -264,7 +264,7 @@ class BackupImportTest extends TestCase
         };
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Binary for `{$binaryName}` not found");
+        $this->expectExceptionMessageIsOrContains("Binary for `{$binaryName}` not found");
         $BackupImport->import();
     }
 }

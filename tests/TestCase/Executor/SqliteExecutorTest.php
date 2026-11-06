@@ -157,7 +157,7 @@ class SqliteExecutorTest extends TestCase
         };
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Binary for `sqlite3` not found');
+        $this->expectExceptionMessageIsOrContains('Binary for `sqlite3` not found');
         $SqliteExecutor->dispatchEvent('Backup.beforeImport');
     }
 

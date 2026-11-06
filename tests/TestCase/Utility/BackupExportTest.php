@@ -181,7 +181,7 @@ class BackupExportTest extends TestCase
     public function testFilenamePropertyWithNoWritableTarget(): void
     {
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File or directory `/noExistingDir` is not writable');
+        $this->expectExceptionMessageIs('File or directory `/noExistingDir` is not writable');
         $this->BackupExport->filename = '/noExistingDir/backup.sql';
     }
 
@@ -192,7 +192,7 @@ class BackupExportTest extends TestCase
     public function testFilenamePropertyWithFileAlreadyExists(): void
     {
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage('File `' . __FILE__ . '` already exists');
+        $this->expectExceptionMessageIs('File `' . __FILE__ . '` already exists');
         $this->BackupExport->filename = __FILE__;
     }
 
@@ -203,7 +203,7 @@ class BackupExportTest extends TestCase
     public function testFilenamePropertyWithInvalidFilenameAndCompression(): void
     {
         $this->expectException(ValueError::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIs(
             'No valid `' . Compression::class . '` value was found for filename `' . TMP . 'backup.txt`',
         );
         $this->BackupExport->filename = TMP . 'backup.txt';

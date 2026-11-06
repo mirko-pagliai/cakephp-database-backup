@@ -132,7 +132,7 @@ class ExecutorTest extends TestCase
     public function testFindBinaryWithNoExistingBinary(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIs(
             'Binary for `noExisting` not found. Set path manually: `Configure::write(\'DatabaseBackup.binaries.noExisting\', \'/path/to/noExisting\')`',
         );
         new FakeExecutor()->findBinary('noExisting');
@@ -145,7 +145,7 @@ class ExecutorTest extends TestCase
     public function testFindBinaryWithCompressionNone(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to search for binary for "none" Compression');
+        $this->expectExceptionMessageIs('Unable to search for binary for "none" Compression');
         new FakeExecutor()->findBinary(Compression::None);
     }
 
@@ -294,7 +294,7 @@ class ExecutorTest extends TestCase
         };
 
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('The command "exit 1" failed.');
+        $this->expectExceptionMessageIsOrContains('The command "exit 1" failed.');
         $Executor->runProcess('backup.sql');
     }
 }

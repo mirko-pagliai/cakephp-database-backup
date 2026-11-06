@@ -69,7 +69,7 @@ class CommandTest extends TestCase
         $Command->args = new Arguments([], compact('timeout'), []);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The `--timeout` option must be an integer greater than 0');
+        $this->expectExceptionMessageIs('The `--timeout` option must be an integer greater than 0');
         $Command->getTimeoutOption();
     }
 

@@ -125,7 +125,7 @@ class UtilityTest extends TestCase
         $this->Utility->Connection = new FakeConnection(['driver' => 'Cake\Driver\NoExistingDriver']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The Executor class for the `NoExistingDriver` driver does not exist');
+        $this->expectExceptionMessageIs('The Executor class for the `NoExistingDriver` driver does not exist');
         /** @phpstan-ignore-next-line */
         $this->Utility->Executor;
     }
@@ -182,7 +182,7 @@ class UtilityTest extends TestCase
     public function testTimeoutPropertyWithInvalidValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The `timeout` property must be greater than or equal to 0');
+        $this->expectExceptionMessageIs('The `timeout` property must be greater than or equal to 0');
         $this->Utility->timeout = -1;
     }
 
