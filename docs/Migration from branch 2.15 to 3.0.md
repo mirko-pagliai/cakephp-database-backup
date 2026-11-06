@@ -180,6 +180,8 @@ Further changes:
 * the base command no longer has its own `execute()` method: so the `Connection: ...`, `Driver: ...` and
   `Timeout for shell commands: ...` lines are no longer printed before the operation;
 * the protected methods `getBackupExport()` and `getBackupImport()` no longer exist;
+* the `--timeout` option must be an integer greater than `0`, otherwise the command fails. Previously `0` and invalid values
+  were ignored, and the value of `DatabaseBackup.processTimeout` was used;
 * `ImportCommand::makeAbsoluteFilename()` (static) no longer exists. Now there is `Command::makeAbsolutePath()`
   (not static), which is available to both the commands, as `makeRelativePath()` already was.
 

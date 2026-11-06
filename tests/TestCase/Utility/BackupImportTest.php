@@ -20,12 +20,17 @@ use App\Executor\FakeExecutor;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Event\EventList;
+use DatabaseBackup\Executor\SqliteExecutor;
+use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use DatabaseBackup\Utility\BackupImport;
+use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -78,6 +83,9 @@ class BackupImportTest extends TestCase
         $this->BackupImport->filename = '/noExistingDir/backup.sql';
     }
 
+    /**
+     * @link \DatabaseBackup\Utility\BackupImport::__call()
+     */
     #[Test]
     #[RunInSeparateProcess]
     public function testCallMagicMethod(): void
@@ -99,7 +107,6 @@ class BackupImportTest extends TestCase
      * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testImport(): void
     {
         $filename = TMP . 'backup.sql';
@@ -121,40 +128,47 @@ class BackupImportTest extends TestCase
         };
 
         $BackupImport->Executor = $Executor;
-        $BackupImport->Executor->getEventManager()->setEventList(new EventList());
+
+        /** @var \Cake\Event\EventManager $EventManager */
+        $EventManager = $BackupImport->Executor->getEventManager();
+        $EventManager->setEventList(new EventList());
 
         $result = $BackupImport
             ->filename($filename)
             ->import();
 
         $this->assertSame($filename, $result);
-        $this->assertEventFired('Backup.beforeImport', $BackupImport->Executor->getEventManager());
-        $this->assertEventFired('Backup.afterImport', $BackupImport->Executor->getEventManager());
+        $this->assertEventFired('Backup.beforeImport', $EventManager);
+        $this->assertEventFired('Backup.afterImport', $EventManager);
     }
 
     /**
      * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testImportWithTimeoutFromConfiguration(): void
     {
         Configure::write('DatabaseBackup.processTimeout', 45);
 
         $filename = TMP . 'backup.sql';
 
-        /** @var \DatabaseBackup\Executor\Executor&\Mockery\MockInterface $Executor */
-        $Executor = Mockery::mock(FakeExecutor::class)->makePartial();
-        $Executor
-            ->shouldReceive('runProcess')
-            ->with($filename, 45)
-            ->once()
-            ->andReturn(new ReflectionClass(Process::class)->newInstanceWithoutConstructor());
+        $Executor = new class extends FakeExecutor {
+            public string $filename = '';
+
+            public int $timeout = 0;
+
+            public function runProcess(string $filename, int $timeout = 60): Process
+            {
+                $this->filename = $filename;
+                $this->timeout = $timeout;
+
+                return new ReflectionClass(Process::class)->newInstanceWithoutConstructor();
+            }
+        };
 
         $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
             public string $filename {
                 set(string $filename) {
-
                     $this->filename = $filename;
                 }
             }
@@ -165,6 +179,9 @@ class BackupImportTest extends TestCase
         $BackupImport
             ->filename($filename)
             ->import();
+
+        $this->assertSame($filename, $Executor->filename);
+        $this->assertSame(45, $Executor->timeout);
     }
 
     /**
@@ -175,7 +192,16 @@ class BackupImportTest extends TestCase
     #[Test]
     public function testImportStoppedByBeforeImport(): void
     {
-        $this->BackupImport->Executor = new class extends FakeExecutor
+        $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
+            public string $filename {
+                set(string $filename) {
+                    $this->filename = $filename;
+                }
+            }
+        };
+
+        $BackupImport->filename = TMP . 'backup.sql';
+        $BackupImport->Executor = new class extends FakeExecutor
         {
             public function beforeImport(EventInterface $Event): void
             {
@@ -183,19 +209,62 @@ class BackupImportTest extends TestCase
             }
         };
 
-        $result = $this->BackupImport->import();
+        $result = $BackupImport->import();
         $this->assertFalse($result);
     }
 
     /**
+     * If the filename has not been set, `import()` fails before the `Backup.beforeImport` event, so with SQLite the
+     * tables are not dropped.
+     *
      * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
     public function testImportWithFilenamePropertyNotSet(): void
     {
-        $this->BackupImport->Executor = new FakeExecutor();
+        $this->BackupImport->Executor = new class (new FakeConnection(), OperationType::Import) extends SqliteExecutor {
+            public function dropAllTables(): array
+            {
+                Assert::fail('The tables must not be dropped');
+            }
+        };
 
         $this->expectExceptionMessage('You must first set the filename');
         $this->BackupImport->import();
+    }
+
+    /**
+     * If the binary for the compression cannot be found, `import()` fails before the `Backup.beforeImport` event, so
+     * with SQLite the tables are not dropped.
+     *
+     * @link \DatabaseBackup\Utility\BackupImport::import()
+     * @todo Temporary test for the 3.0.x patch (issue #238), to be reviewed or removed when properly fixed in 3.1.x
+     */
+    #[Test]
+    #[TestWith(['gzip', 'backup.sql.gz'])]
+    #[TestWith(['bzip2', 'backup.sql.bz2'])]
+    public function testImportWithCompressionBinaryNotFound(string $binaryName, string $filename): void
+    {
+        Configure::write("DatabaseBackup.binaries.{$binaryName}", '');
+
+        $BackupImport = new class (Connection: new FakeConnection()) extends BackupImport {
+            public string $filename {
+                set(string $filename) {
+                    $this->filename = $filename;
+                }
+            }
+        };
+
+        $BackupImport->filename = TMP . $filename;
+        $BackupImport->Executor = new class (new FakeConnection(), OperationType::Import) extends SqliteExecutor {
+            public function dropAllTables(): array
+            {
+                Assert::fail('The tables must not be dropped');
+            }
+        };
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Binary for `{$binaryName}` not found");
+        $BackupImport->import();
     }
 }

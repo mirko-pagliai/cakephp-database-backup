@@ -49,18 +49,17 @@ class BackupExportAndImportTest extends TestCase
      */
     protected function getAllRecords(Table $Table): array
     {
-        /** @var array<array<array-key, string>> $results */
-        $results = $Table
+        /** @var array<array<array-key, string>> */
+        return $Table
             ->find()
             ->enableHydration(false)
             ->all()
-            ->map(fn(array $record): array => array_map(
-                callback: fn(mixed $value): string => (string)$value,
+            ->map(static fn(array $record): array => array_map(
+                // @phpstan-ignore cast.string
+                callback: static fn(mixed $value): string => (string)$value,
                 array: $record,
             ))
             ->toList();
-
-        return $results;
     }
 
     /**
@@ -71,9 +70,11 @@ class BackupExportAndImportTest extends TestCase
         //If some binaries are missing, sets the old aliases
         $ExecutableFinder = new ExecutableFinder();
         foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
-            if (!$ExecutableFinder->find($binary)) {
-                Configure::write("DatabaseBackup.binaries.$binary", $ExecutableFinder->find($oldAlias));
+            if ($ExecutableFinder->find($binary)) {
+                continue;
             }
+
+            Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($oldAlias));
         }
     }
 
@@ -98,8 +99,11 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::setUp();
 
+        /** @var string $targetDir */
+        $targetDir = Configure::read('DatabaseBackup.target');
+
         /** @var list<string> $tmpFiles */
-        $tmpFiles = glob(Configure::read('DatabaseBackup.target') . '*');
+        $tmpFiles = glob("{$targetDir}*");
         foreach ($tmpFiles as $file) {
             unlink($file);
         }
@@ -119,16 +123,25 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @param string $extension
      * @param class-string $expectedExecutor
+     * @param string $filename The compression is derived from its extension
      * @return void
+     * @link \DatabaseBackup\Utility\BackupExport::export()
+     * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
-    #[TestWith(['mysql', MysqlExecutor::class])]
-    #[TestWith(['pgsql', PostgresExecutor::class])]
-    #[TestWith(['sqlite', SqliteExecutor::class])]
-    public function testExportAndImport(string $extension, string $expectedExecutor): void
+    #[TestWith(['mysql', MysqlExecutor::class, 'test.sql'])]
+    #[TestWith(['mysql', MysqlExecutor::class, 'test.sql.gz'])]
+    #[TestWith(['mysql', MysqlExecutor::class, 'test.sql.bz2'])]
+    #[TestWith(['pgsql', PostgresExecutor::class, 'test.sql'])]
+    #[TestWith(['pgsql', PostgresExecutor::class, 'test.sql.gz'])]
+    #[TestWith(['pgsql', PostgresExecutor::class, 'test.sql.bz2'])]
+    #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql'])]
+    #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql.gz'])]
+    #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql.bz2'])]
+    public function testExportAndImport(string $extension, string $expectedExecutor, string $filename): void
     {
-        if (!extension_loaded('pdo_' . $extension)) {
-            $this->fail('The `pdo_' . $extension . '` extension is not available');
+        if (!extension_loaded("pdo_{$extension}")) {
+            $this->fail("The `pdo_{$extension}` extension is not available");
         }
 
         /**
@@ -139,7 +152,7 @@ class BackupExportAndImportTest extends TestCase
          *
          * @see tests/bootstrap.php
          */
-        ConnectionManager::setConfig('test', ['url' => getenv('db_dsn_' . $extension)]);
+        ConnectionManager::setConfig('test', ['url' => getenv("db_dsn_{$extension}")]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
@@ -154,17 +167,20 @@ class BackupExportAndImportTest extends TestCase
         $initialArticles = $this->getAllRecords($ArticlesTable);
         $initialComments = $this->getAllRecords($CommentsTable);
 
+        /** @var string $targetDir */
+        $targetDir = Configure::read('DatabaseBackup.target');
+
         /**
          * Exports
          */
         $BackupExport = new BackupExport(Connection: ConnectionManager::get('test'));
 
         $result = $BackupExport
-            ->filename('test.sql')
+            ->filename($filename)
             ->export();
 
         $this->assertInstanceOf($expectedExecutor, $BackupExport->Executor);
-        $this->assertSame(Configure::read('DatabaseBackup.target') . 'test.sql', $result);
+        $this->assertSame($targetDir . $filename, $result);
         $this->assertFileExists($result);
 
         /**
@@ -187,7 +203,7 @@ class BackupExportAndImportTest extends TestCase
             ->import();
 
         $this->assertInstanceOf($expectedExecutor, $BackupImport->Executor);
-        $this->assertSame(Configure::read('DatabaseBackup.target') . 'test.sql', $result);
+        $this->assertSame($targetDir . $filename, $result);
 
         /**
          * Gets the final data.

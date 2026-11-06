@@ -19,15 +19,23 @@ use Cake\Event\EventInterface;
 use DatabaseBackup\OperationType;
 use Override;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 
 /**
  * MysqlExecutor to export/import database backups.
  */
 class MysqlExecutor extends Executor
 {
-    protected(set) string $authFile {
+    /**
+     * The path of the temporary file with the database authentication data.
+     *
+     * It is generated in `TMP` at the first access and reset by `deleteAuthFile()`.
+     *
+     * @since 3.0.0
+     */
+    protected(set) string $authFile = '' {
         get {
-            if (empty($this->authFile)) {
+            if ($this->authFile === '') {
                 $this->authFile = TMP . uniqid('auth');
             }
 
@@ -42,6 +50,26 @@ class MysqlExecutor extends Executor
     public function getBinaryName(): string
     {
         return $this->OperationType === OperationType::Export ? 'mariadb-dump' : 'mariadb';
+    }
+
+    /**
+     * Executes a backup process with the given parameters.
+     *
+     * The temporary file with the authentication data is always deleted at the end of the process, even if the process
+     * fails or reaches the timeout.
+     *
+     * @inheritDoc
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException If an error occurs during the execution of the process
+     * @since 3.0.6
+     */
+    #[Override]
+    public function runProcess(string $filename, int $timeout = 60): Process
+    {
+        try {
+            return parent::runProcess(filename: $filename, timeout: $timeout);
+        } finally {
+            $this->deleteAuthFile();
+        }
     }
 
     /**
@@ -85,9 +113,9 @@ class MysqlExecutor extends Executor
     public function beforeExport(EventInterface $Event): void
     {
         $result = $this->writeAuthFile('[mysqldump]' . PHP_EOL .
-            'user={{USER}}' . PHP_EOL .
+            'user="{{USER}}"' . PHP_EOL .
             'password="{{PASSWORD}}"' . PHP_EOL .
-            'host={{HOST}}');
+            'host="{{HOST}}"');
 
         $Event->setResult($result);
     }
@@ -109,9 +137,9 @@ class MysqlExecutor extends Executor
     public function beforeImport(EventInterface $Event): void
     {
         $result = $this->writeAuthFile('[client]' . PHP_EOL .
-            'user={{USER}}' . PHP_EOL .
+            'user="{{USER}}"' . PHP_EOL .
             'password="{{PASSWORD}}"' . PHP_EOL .
-            'host={{HOST}}');
+            'host="{{HOST}}"');
 
         $Event->setResult($result);
     }
@@ -125,15 +153,29 @@ class MysqlExecutor extends Executor
      */
     public function writeAuthFile(string $content): bool
     {
-        $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null,];
+        /** @var array{username: string|null, password: string|null, host: string|null} $config */
+        $config = $this->Connection->config() + ['username' => null, 'password' => null, 'host' => null];
 
-        $content = str_replace(
-            search: ['{{USER}}', '{{PASSWORD}}', '{{HOST}}'],
-            replace: [$config['username'], $config['password'], $config['host']],
-            subject: $content,
+        // In the file the values are between double quotes, so the characters that are special there are escaped
+        $values = array_map(
+            static fn(?string $value): string => strtr((string)$value, [
+                '\\' => '\\\\',
+                '"' => '\\"',
+                "\n" => '\\n',
+                "\r" => '\\r',
+            ]),
+            [
+                '{{USER}}' => $config['username'],
+                '{{PASSWORD}}' => $config['password'],
+                '{{HOST}}' => $config['host'],
+            ],
         );
 
+        $content = strtr($content, $values);
+
         $Filesystem = new Filesystem();
+        $Filesystem->touch($this->authFile);
+        $Filesystem->chmod($this->authFile, 0600);
         $Filesystem->dumpFile($this->authFile, $content);
 
         return $Filesystem->exists($this->authFile);

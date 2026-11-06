@@ -33,10 +33,11 @@ foreach ($defaults as $key => $value) {
 }
 
 //Checks for the target directory
+/** @var string $target */
 $target = Configure::read('DatabaseBackup.target');
 if (!file_exists($target)) {
     mkdir($target, 0777, true);
 }
 if (!is_dir($target) || !is_writeable($target)) {
-    trigger_error(sprintf('The directory `%s` is not writable or is not a directory', $target));
+    trigger_error("The directory `{$target}` is not writable or is not a directory");
 }

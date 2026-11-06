@@ -15,21 +15,19 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Test\TestCase\Executor;
 
+use App\Database\FakeConnection;
 use App\Executor\FakeExecutor;
 use Cake\Core\Configure;
+use Cake\Event\EventInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
-use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 
 /**
  * ExecutorTest.
@@ -46,8 +44,8 @@ class ExecutorTest extends TestCase
         $expected = [
             'Backup.afterExport' => 'afterExport',
             'Backup.afterImport' => 'afterImport',
-            'Backup.beforeExport' => 'beforeExport',
-            'Backup.beforeImport' => 'beforeImport',
+            'Backup.beforeExport' => ['callable' => 'beforeExport', 'priority' => 1000],
+            'Backup.beforeImport' => ['callable' => 'beforeImport', 'priority' => 1000],
         ];
         $result = new FakeExecutor()->implementedEvents();
 
@@ -55,23 +53,58 @@ class ExecutorTest extends TestCase
     }
 
     /**
+     * The `before` events run after any other listener, so that a listener can stop the operation before the
+     * `Executor` acts.
+     *
+     * @link \DatabaseBackup\Executor\Executor::implementedEvents()
+     */
+    #[Test]
+    #[TestWith(['Backup.beforeExport'])]
+    #[TestWith(['Backup.beforeImport'])]
+    public function testBeforeEventsRunAfterOtherListeners(string $eventName): void
+    {
+        $Executor = new class extends FakeExecutor {
+            public bool $beforeCalled = false;
+
+            public function beforeExport(EventInterface $Event): void
+            {
+                $this->beforeCalled = true;
+            }
+
+            public function beforeImport(EventInterface $Event): void
+            {
+                $this->beforeCalled = true;
+            }
+        };
+
+        // This listener is attached after the `Executor`, with the default priority
+        $Executor->getEventManager()->on($eventName, static function (EventInterface $Event): void {
+            $Event->stopPropagation();
+        });
+
+        $Executor->dispatchEvent($eventName);
+
+        $this->assertFalse($Executor->beforeCalled);
+    }
+
+    /**
      * @link \DatabaseBackup\Executor\Executor::findBinary()
      */
     #[Test]
-    #[TestWith(['/usr/bin/mariadb', 'mariadb'])]
-    #[TestWith(['/usr/bin/mysql', 'mysql'])]
-    #[TestWith(['/usr/bin/gzip', Compression::Gzip])]
-    #[RunInSeparateProcess]
-    public function testFindBinary(string $expectedBinary, Compression|string $name): void
+    public function testFindBinary(): void
     {
-        Mockery::spy('overload:Symfony\Component\Process\ExecutableFinder')
-            ->shouldReceive('find')
-            ->once()
-            ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
+        $oldPath = (string)getenv('PATH');
 
-        $result = new FakeExecutor()->findBinary($name);
+        // The `PATH` is restricted to the directory of the PHP binary, so the only binary that can be found is PHP
+        putenv('PATH=' . dirname(PHP_BINARY));
 
-        $this->assertSame($expectedBinary, $result);
+        try {
+            $result = new FakeExecutor()->findBinary(basename(PHP_BINARY));
+        } finally {
+            putenv("PATH={$oldPath}");
+        }
+
+        $this->assertSame(PHP_BINARY, $result);
     }
 
     /**
@@ -83,11 +116,11 @@ class ExecutorTest extends TestCase
     #[TestWith(['/customPath/gzip', Compression::Gzip])]
     public function testFindBinaryFromConfiguration(string $expectedBinary, Compression|string $binaryName): void
     {
-        $binaryName = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
-        Configure::write(config: "DatabaseBackup.binaries.$binaryName", value: "/customPath/$binaryName");
+        $configKey = $binaryName instanceof Compression ? lcfirst($binaryName->name) : $binaryName;
+        Configure::write(config: "DatabaseBackup.binaries.{$configKey}", value: "/customPath/{$configKey}");
 
         $result = new FakeExecutor()->findBinary($binaryName);
-        Configure::delete("DatabaseBackup.binaries.$binaryName");
+        Configure::delete("DatabaseBackup.binaries.{$configKey}");
 
         $this->assertSame($expectedBinary, $result);
     }
@@ -128,121 +161,140 @@ class ExecutorTest extends TestCase
     #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', OperationType::Import, Compression::Bzip2])]
     public function testGetCommand(string $expectedCommand, OperationType $OperationType, Compression $Compression): void
     {
-        $result = new FakeExecutor(OperationType: $OperationType)->getCommand(Compression: $Compression);
+        $result = new FakeExecutor(OperationType: $OperationType)
+            ->getCommand(Compression: $Compression);
 
         $this->assertSame($expectedCommand, $result);
     }
 
     /**
+     * Test for the `runProcess()` method.
+     *
+     * The process is really executed and prints its own environment, which is what the `Executor` has passed to it.
+     *
      * @link \DatabaseBackup\Executor\Executor::runProcess()
      */
     #[Test]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', 'filename.sql', OperationType::Export])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', 'filename.sql.gz', OperationType::Export])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump | "${:COMPRESSION_BINARY}" > "${:FILENAME}"', 'filename.sql.bz2', OperationType::Export])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', 'filename.sql', OperationType::Import])]
-    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', 'filename.sql.gz', OperationType::Import])]
-    #[TestWith(['"${:COMPRESSION_BINARY}" -dc "${:FILENAME}" | "${:BINARY}" "${:DB_NAME}"', 'filename.sql.bz2', OperationType::Import])]
-    #[RunInSeparateProcess]
-    public function testRunProcess(string $expectedCommand, string $filename, OperationType $OperationType): void
+    #[TestWith(['filename.sql', OperationType::Export])]
+    #[TestWith(['filename.sql.gz', OperationType::Export])]
+    #[TestWith(['filename.sql.bz2', OperationType::Export])]
+    #[TestWith(['filename.sql', OperationType::Import])]
+    #[TestWith(['filename.sql.gz', OperationType::Import])]
+    #[TestWith(['filename.sql.bz2', OperationType::Import])]
+    public function testRunProcess(string $filename, OperationType $OperationType): void
     {
         $Compression = Compression::fromFilename($filename);
 
-        $ExecutableFinder = Mockery::mock('overload:' . ExecutableFinder::class);
-
-        /**
-         * `ExecutableFinder::find()` expects `export-binary`/`import-binary` argument and returns
-         *  `/usr/bin/export-binary`/`/usr/bin/import-binary`
-         */
-        $ExecutableFinder
-            ->shouldReceive('find')
-            ->withSomeOfArgs($OperationType->value . '-binary')
-            ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
-
-        /**
-         * With a valid compression, `ExecutableFinder::find()` expects the lowercase name of the compression (e.g.
-         *  `gzip`) and returns and returns that name with the prefix `/usr/bin` (e.g. `/usr/bin/gzip`)
-         */
-        if ($Compression->isValid()) {
-            $ExecutableFinder
-                ->shouldReceive('find')
-                ->withSomeOfArgs(lcfirst($Compression->name))
-                ->andReturnUsing(fn(string $name): string => "/usr/bin/$name");
-        }
-
-        $Process = Mockery::mock('overload:' . Process::class);
-
-        $Process->shouldReceive('isSuccessful')->andReturnTrue();
-
-        /**
-         * `Process::fromShellCommandline()` expects `$expectedCommand` argument.
-         */
-        $Process
-            ->shouldReceive('fromShellCommandline')
-            ->withArgs(function ($command, $timeout) use ($expectedCommand): bool {
-                $this->assertSame($expectedCommand, $command);
-                $this->assertSame(60, $timeout);
-
-                return true;
-            })
-            ->once()
-            ->andReturnSelf();
-
-        /**
-         * `Process::run()` expects an argument built from the previous context variables.
-         *
-         * In particular, the value of `BINARY` is variable based on the type of operation.
-         * Instead, the value of `COMPRESSION_BINARY` is a variable based on the type of compression (in this case
-         *  derived from `$filename`). It is `null` without compression.
-         */
-        $Process
-            ->shouldReceive('run')
-            ->withArgs(function ($env) use ($Compression, $filename, $OperationType): bool {
-                $expectedEnv = [
-                    'AUTH_FILE' => 'path/to/auth_file',
-                    'BINARY' => '/usr/bin/' . $OperationType->value . '-binary',
-                    'DB_HOST' => 'my_hostname',
-                    'DB_NAME' => 'my_database',
-                    'DB_PASSWORD' => 'my_password',
-                    'DB_USERNAME' => 'my_username',
-                    'FILENAME' => $filename,
-                ];
-                if ($Compression->isValid()) {
-                    $expectedEnv['COMPRESSION_BINARY'] = '/usr/bin/' . lcfirst($Compression->name);
-                }
-                $this->assertEquals($expectedEnv, $env);
-
-                return true;
-            })
-            ->once();
-
         $Executor = new class (OperationType: $OperationType) extends FakeExecutor {
             public string $authFile = 'path/to/auth_file';
+
+            public function getCommand(Compression $Compression): string
+            {
+                return '"${:BINARY}" -r "echo json_encode(getenv());"';
+            }
+
+            // The binary of the operation is PHP, so that the process can be really executed
+            public function findBinary(Compression|string $binaryName): string
+            {
+                return $binaryName instanceof Compression ? '/usr/bin/' . lcfirst($binaryName->name) : PHP_BINARY;
+            }
         };
 
-        $result = $Executor->runProcess($filename);
+        $Process = $Executor->runProcess($filename);
 
-        $this->assertSame($Process, $result);
+        $this->assertSame(60.0, $Process->getTimeout());
+
+        $expectedEnv = [
+            'AUTH_FILE' => 'path/to/auth_file',
+            'BINARY' => PHP_BINARY,
+            'DB_HOST' => 'my_hostname',
+            'DB_NAME' => 'my_database',
+            'DB_PASSWORD' => 'my_password',
+            'DB_USERNAME' => 'my_username',
+            'FILENAME' => $filename,
+        ];
+
+        // The value of `COMPRESSION_BINARY` depends on the compression (derived from `$filename`)
+        if ($Compression->isValid()) {
+            $expectedEnv['COMPRESSION_BINARY'] = '/usr/bin/' . lcfirst($Compression->name);
+        }
+
+        /** @var array<string, string> $env */
+        $env = json_decode($Process->getOutput(), true);
+        foreach (array_keys($expectedEnv + ['COMPRESSION_BINARY' => null]) as $key) {
+            // A variable that the `Executor` does not set can still be inherited from the environment
+            $this->assertSame($expectedEnv[$key] ?? (getenv($key) ?: null), $env[$key] ?? null);
+        }
+    }
+
+    /**
+     * Tests that `host`, `password` and `username` of the connection are not passed to the process if they are `null`.
+     *
+     * @link \DatabaseBackup\Executor\Executor::runProcess()
+     */
+    #[Test]
+    #[TestWith(['host', 'DB_HOST'])]
+    #[TestWith(['password', 'DB_PASSWORD'])]
+    #[TestWith(['username', 'DB_USERNAME'])]
+    public function testRunProcessWithNullConnectionConfig(string $configKey, string $envKey): void
+    {
+        $Executor = new class (new FakeConnection([$configKey => null]), OperationType::Export) extends Executor {
+            public function getBinaryName(): string
+            {
+                return 'export-binary';
+            }
+
+            public function getCommand(Compression $Compression): string
+            {
+                return '"${:BINARY}" -r "echo json_encode(getenv());"';
+            }
+
+            public function findBinary(Compression|string $binaryName): string
+            {
+                return PHP_BINARY;
+            }
+        };
+
+        $Process = $Executor->runProcess('filename.sql');
+
+        $expectedEnv = [
+            'BINARY' => PHP_BINARY,
+            'DB_HOST' => 'my_hostname',
+            'DB_NAME' => 'my_database',
+            'DB_PASSWORD' => 'my_password',
+            'DB_USERNAME' => 'my_username',
+            'FILENAME' => 'filename.sql',
+        ];
+        unset($expectedEnv[$envKey]);
+
+        /** @var array<string, string> $env */
+        $env = json_decode($Process->getOutput(), true);
+        foreach (array_keys($expectedEnv + [$envKey => null]) as $key) {
+            // A variable that the `Executor` does not set can still be inherited from the environment
+            $this->assertSame($expectedEnv[$key] ?? (getenv($key) ?: null), $env[$key] ?? null);
+        }
     }
 
     /**
      * @link \DatabaseBackup\Executor\Executor::runProcess()
      */
     #[Test]
-    #[RunInSeparateProcess]
     public function testRunProcessOnFailure(): void
     {
-        Mockery::mock('overload:' . ExecutableFinder::class)
-            ->shouldReceive('find')
-            ->andReturn('/usr/bin/binary');
+        $Executor = new class extends FakeExecutor {
+            public function getCommand(Compression $Compression): string
+            {
+                return 'exit 1';
+            }
 
-        $Process = Mockery::mock('overload:' . Process::class)->shouldIgnoreMissing();
-        $Process->shouldReceive('fromShellCommandline')->andReturnSelf();
-        $Process->shouldReceive('isSuccessful')->andReturnFalse();
-        $Process->shouldReceive('getCommandLine')->andReturn('failureCommand');
+            public function findBinary(Compression|string $binaryName): string
+            {
+                return '/usr/bin/binary';
+            }
+        };
 
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('The command "failureCommand" failed.');
-        new FakeExecutor()->runProcess('backup.sql');
+        $this->expectExceptionMessage('The command "exit 1" failed.');
+        $Executor->runProcess('backup.sql');
     }
 }
