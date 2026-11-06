@@ -67,13 +67,14 @@ class ImportCommandTest extends TestCase
     #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
-        $root = ROOT;
-        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
-
         $this->exec('database_backup.import -h');
         $this->assertExitSuccess();
         $this->assertOutputContains('Imports a database backup');
         $this->assertOutputContains('cake database_backup.import [--connection] [-h] [-q] [-t] [-v] <filename>');
+
+        $root = ROOT;
+        /** @var string $defaultTarget */
+        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
 
         $expected = <<<txt
 Imports a database backup

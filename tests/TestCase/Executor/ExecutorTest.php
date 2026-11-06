@@ -223,7 +223,7 @@ class ExecutorTest extends TestCase
         $env = json_decode($Process->getOutput(), true);
         foreach (array_keys($expectedEnv + ['COMPRESSION_BINARY' => null]) as $key) {
             // A variable that the `Executor` does not set can still be inherited from the environment
-            $this->assertSame($expectedEnv[$key] ?? (getenv($key) ?: null), $env[$key] ?? null);
+            $this->assertSame($expectedEnv[$key] ?? getenv()[$key] ?? null, $env[$key] ?? null);
         }
     }
 
@@ -271,7 +271,7 @@ class ExecutorTest extends TestCase
         $env = json_decode($Process->getOutput(), true);
         foreach (array_keys($expectedEnv + [$envKey => null]) as $key) {
             // A variable that the `Executor` does not set can still be inherited from the environment
-            $this->assertSame($expectedEnv[$key] ?? (getenv($key) ?: null), $env[$key] ?? null);
+            $this->assertSame($expectedEnv[$key] ?? getenv()[$key] ?? null, $env[$key] ?? null);
         }
     }
 
