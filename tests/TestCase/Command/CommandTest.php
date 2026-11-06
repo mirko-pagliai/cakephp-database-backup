@@ -41,9 +41,11 @@ class CommandTest extends TestCase
     public function testGetTimeoutOption(?int $expectedTimeout, array $options): void
     {
         $Command = new class extends Command {
+            public Arguments $args;
         };
+        $Command->args = new Arguments([], $options, []);
 
-        $result = $Command->getTimeoutOption(new Arguments([], $options, []));
+        $result = $Command->getTimeoutOption();
         $this->assertSame($expectedTimeout, $result);
     }
 
@@ -62,11 +64,13 @@ class CommandTest extends TestCase
     public function testGetTimeoutOptionWithInvalidValue(bool|string $timeout): void
     {
         $Command = new class extends Command {
+            public Arguments $args;
         };
+        $Command->args = new Arguments([], compact('timeout'), []);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The `--timeout` option must be an integer greater than 0');
-        $Command->getTimeoutOption(new Arguments([], ['timeout' => $timeout], []));
+        $Command->getTimeoutOption();
     }
 
     /**

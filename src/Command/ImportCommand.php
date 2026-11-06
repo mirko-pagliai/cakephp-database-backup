@@ -73,14 +73,14 @@ class ImportCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io): int
     {
         try {
-            $BackupImport = new BackupImport((string)$args->getOption('connection'));
+            $BackupImport = new BackupImport((string)$this->args->getOption('connection'));
 
-            $timeout = $this->getTimeoutOption($args);
+            $timeout = $this->getTimeoutOption();
             if ($timeout !== null) {
                 $BackupImport->timeout($timeout);
             }
 
-            $BackupImport->filename($this->makeAbsolutePath((string)$args->getArgument('filename')));
+            $BackupImport->filename($this->makeAbsolutePath((string)$this->args->getArgument('filename')));
 
             $filename = $BackupImport->import();
 
@@ -91,13 +91,13 @@ class ImportCommand extends Command
                     'Backup.beforeImport',
                 ));
             }
-            $io->success(__d(
+            $this->io->success(__d(
                 'database_backup',
                 'Backup `{0}` has been imported',
                 $this->makeRelativePath($filename),
             ));
         } catch (Exception | TypeError | ValueError $e) {
-            $io->abort(get_class($e) . ': ' . lcfirst($e->getMessage()));
+            $this->io->abort(get_class($e) . ': ' . lcfirst($e->getMessage()));
         }
 
         return static::CODE_SUCCESS;

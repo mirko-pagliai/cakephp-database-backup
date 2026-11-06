@@ -89,19 +89,19 @@ class ExportCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io): int
     {
         try {
-            $BackupExport = new BackupExport((string)$args->getOption('connection'));
+            $BackupExport = new BackupExport((string)$this->args->getOption('connection'));
 
-            $timeout = $this->getTimeoutOption($args);
+            $timeout = $this->getTimeoutOption();
             if ($timeout !== null) {
                 $BackupExport->timeout($timeout);
             }
 
-            $filenameOption = $args->getOption('filename');
+            $filenameOption = $this->args->getOption('filename');
             if ($filenameOption) {
                 $BackupExport->filename((string)$filenameOption);
             }
-            if (!$filenameOption && $args->getOption('compression')) {
-                $BackupExport->compression((string)$args->getOption('compression'));
+            if (!$filenameOption && $this->args->getOption('compression')) {
+                $BackupExport->compression((string)$this->args->getOption('compression'));
             }
 
             $filename = $BackupExport->export();
@@ -113,13 +113,13 @@ class ExportCommand extends Command
                     'Backup.beforeExport',
                 ));
             }
-            $io->success(__d(
+            $this->io->success(__d(
                 'database_backup',
                 'Backup `{0}` has been exported',
                 $this->makeRelativePath($filename),
             ));
         } catch (Exception | TypeError | ValueError $e) {
-            $io->abort(get_class($e) . ': ' . lcfirst($e->getMessage()));
+            $this->io->abort(get_class($e) . ': ' . lcfirst($e->getMessage()));
         }
 
         return static::CODE_SUCCESS;
