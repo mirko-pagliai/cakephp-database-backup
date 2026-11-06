@@ -21,10 +21,12 @@ use ArgumentCountError;
 use BadMethodCallException;
 use Cake\Core\Configure;
 use Cake\Database\Driver\Mysql;
+use Cake\Database\Driver\Postgres;
+use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
-use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\Executor\MysqlExecutor;
+use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -96,12 +98,14 @@ class UtilityTest extends TestCase
      * @link \DatabaseBackup\Utility\Utility::$Executor
      */
     #[Test]
-    public function testExecutorProperty(): void
+    #[TestWith([Mysql::class, MysqlExecutor::class])]
+    #[TestWith([Postgres::class, PostgresExecutor::class])]
+    #[TestWith([Sqlite::class, SqliteExecutor::class])]
+    public function testExecutorProperty(string $driver, string $expectedExecutor): void
     {
-        $this->Utility->Connection = new FakeConnection();
+        $this->Utility->Connection = new FakeConnection(compact('driver'));
 
-        $result = $this->Utility->Executor;
-        $this->assertInstanceOf(Executor::class, $result);
+        $this->assertInstanceOf($expectedExecutor, $this->Utility->Executor);
     }
 
     /**

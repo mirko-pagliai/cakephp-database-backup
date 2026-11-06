@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Database\Driver\Mysql;
 use Cake\Event\EventInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\MysqlExecutor;
@@ -60,6 +61,22 @@ class MysqlExecutorTest extends TestCase
     {
         $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
         $this->assertSame($expectedBinaryName, $MysqlExecutor->getBinaryName());
+    }
+
+    /**
+     * @link \DatabaseBackup\Executor\Executor::getCommand()
+     */
+    #[Test]
+    #[TestWith(['"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}" > "${:FILENAME}"', OperationType::Export])]
+    #[TestWith(['"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import])]
+    public function testGetCommand(string $expectedCommand, OperationType $OperationType): void
+    {
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(['driver' => Mysql::class]),
+            OperationType: $OperationType,
+        );
+
+        $this->assertSame($expectedCommand, $MysqlExecutor->getCommand(Compression::None));
     }
 
     /**

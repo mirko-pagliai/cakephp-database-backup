@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Database\Driver\Postgres;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -40,5 +42,21 @@ class PostgresExecutorTest extends TestCase
         $PostgresExecutor = new PostgresExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
 
         $this->assertSame($expectedBinaryName, $PostgresExecutor->getBinaryName());
+    }
+
+    /**
+     * @link \DatabaseBackup\Executor\Executor::getCommand()
+     */
+    #[Test]
+    #[TestWith(['"${:BINARY}" --format=c -b --dbname=\'postgresql://"${:DB_USERNAME}":"${:DB_PASSWORD}"@"${:DB_HOST}"/"${:DB_NAME}"\' > "${:FILENAME}"', OperationType::Export])]
+    #[TestWith(['"${:BINARY}" --format=c -c -e --dbname=\'postgresql://"${:DB_USERNAME}":"${:DB_PASSWORD}"@"${:DB_HOST}"/"${:DB_NAME}"\' < "${:FILENAME}"', OperationType::Import])]
+    public function testGetCommand(string $expectedCommand, OperationType $OperationType): void
+    {
+        $PostgresExecutor = new PostgresExecutor(
+            Connection: new FakeConnection(['driver' => Postgres::class]),
+            OperationType: $OperationType,
+        );
+
+        $this->assertSame($expectedCommand, $PostgresExecutor->getCommand(Compression::None));
     }
 }

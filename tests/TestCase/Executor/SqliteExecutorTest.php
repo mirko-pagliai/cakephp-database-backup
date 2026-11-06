@@ -19,7 +19,9 @@ use App\Database\FakeConnection;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
+use Cake\Database\Driver\Sqlite;
 use Cake\Event\EventInterface;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -62,6 +64,22 @@ class SqliteExecutorTest extends TestCase
         $SqliteExecutor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
 
         $this->assertSame($expectedBinaryName, $SqliteExecutor->getBinaryName());
+    }
+
+    /**
+     * @link \DatabaseBackup\Executor\Executor::getCommand()
+     */
+    #[Test]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export])]
+    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import])]
+    public function testGetCommand(string $expectedCommand, OperationType $OperationType): void
+    {
+        $SqliteExecutor = new SqliteExecutor(
+            Connection: new FakeConnection(['driver' => Sqlite::class]),
+            OperationType: $OperationType,
+        );
+
+        $this->assertSame($expectedCommand, $SqliteExecutor->getCommand(Compression::None));
     }
 
     /**
