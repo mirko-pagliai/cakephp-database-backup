@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e00ebeb30785b743927fed2b5b3cbed",
+    "content-hash": "fa69bec615e87a073244328664efb420",
     "packages": [
         {
             "name": "cakephp/cakephp",
-            "version": "5.4.4",
+            "version": "dev-5.next",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/cakephp.git",
-                "reference": "47f15a350fff9ac374172a5c675bca6b4146716f"
+                "reference": "ee66f9f7bacfa47007822d6665eed9f0c0784ca0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/cakephp/zipball/47f15a350fff9ac374172a5c675bca6b4146716f",
-                "reference": "47f15a350fff9ac374172a5c675bca6b4146716f",
+                "url": "https://api.github.com/repos/cakephp/cakephp/zipball/ee66f9f7bacfa47007822d6665eed9f0c0784ca0",
+                "reference": "ee66f9f7bacfa47007822d6665eed9f0c0784ca0",
                 "shasum": ""
             },
             "require": {
@@ -128,8 +128,8 @@
                 "issues": "https://github.com/cakephp/cakephp/issues",
                 "source": "https://github.com/cakephp/cakephp"
             },
-            "time": "2026-11-01T00:47:56+00:00",
-            "published-time": "2026-11-01T00:48:07+00:00"
+            "time": "2026-11-05T04:29:37+00:00",
+            "published-time": "2026-11-05T04:29:44+00:00"
         },
         {
             "name": "cakephp/chronos",
@@ -4127,7 +4127,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "cakephp/cakephp": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
