@@ -238,6 +238,7 @@ class UtilityTest extends TestCase
 
         return [
             ["{$basePath}relative_file_to_target.txt", 'relative_file_to_target.txt'],
+            ["{$basePath}relative_file_to_target.txt", 'subdir/../relative_file_to_target.txt'],
             ["{$basePath}absolute_file_to_target.txt", "{$basePath}absolute_file_to_target.txt"],
             [TMP . 'absolute_tmp_file', TMP . 'absolute_tmp_file'],
         ];

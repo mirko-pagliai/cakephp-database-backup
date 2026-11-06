@@ -78,6 +78,8 @@ class CommandTest extends TestCase
      */
     #[Test]
     #[TestWith([ROOT . 'composer.json', 'composer.json'])]
+    #[TestWith([ROOT . 'composer.json', 'backups/../composer.json'])]
+    #[TestWith([ROOT . 'composer.json', './/composer.json'])]
     #[TestWith([ROOT . 'composer.json', ROOT . 'composer.json'])]
     #[TestWith([TMP . 'absolute_tmp_file.sql', TMP . 'absolute_tmp_file.sql'])]
     public function testMakeAbsolutePath(string $expectedAbsolutePath, string $path): void
@@ -98,6 +100,8 @@ class CommandTest extends TestCase
     #[TestWith(['backups/backup.sql', ROOT . 'backups/backup.sql'])]
     #[TestWith([TMP . 'backup.sql', TMP . 'backup.sql'])]
     #[TestWith(['/anotherDir/backup.sql', '/anotherDir/backup.sql'])]
+    #[TestWith(['backups/backup.sql', ROOT . 'backups/../backups/backup.sql'])]
+    #[TestWith([ROOT . '../backup.sql', ROOT . '../backup.sql'])]
     public function testMakeRelativePath(string $expectedRelativePath, string $path): void
     {
         $Command = new class extends Command {
@@ -105,5 +109,20 @@ class CommandTest extends TestCase
 
         $result = $Command->makeRelativePath($path);
         $this->assertSame($expectedRelativePath, $result);
+    }
+
+    /**
+     * @link \DatabaseBackup\Command\Command::makeRelativePath()
+     */
+    #[Test]
+    public function testMakeRelativePathWithPathStartingLikeRoot(): void
+    {
+        $Command = new class extends Command {
+        };
+
+        $path = rtrim(ROOT, DS) . 'Another' . DS . 'backup.sql';
+
+        $result = $Command->makeRelativePath($path);
+        $this->assertSame($path, $result);
     }
 }

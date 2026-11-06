@@ -17,8 +17,8 @@ namespace DatabaseBackup\Command;
 
 use Cake\Command\Command as CakeCommand;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Utility\Fs\Path;
 use InvalidArgumentException;
-use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
 /**
@@ -110,6 +110,13 @@ abstract class Command extends CakeCommand
      */
     public function makeRelativePath(string $path): string
     {
-        return Path::isBasePath(ROOT, $path) ? Path::makeRelative($path, ROOT) : $path;
+        // Resolves the `.` and `..` segments, so the path is compared with `ROOT` in its canonical form
+        $absolutePath = Path::makeAbsolute($path, ROOT);
+
+        if (!str_starts_with($absolutePath . '/', Path::normalize(ROOT) . '/')) {
+            return $path;
+        }
+
+        return Path::makeRelative($absolutePath, ROOT);
     }
 }

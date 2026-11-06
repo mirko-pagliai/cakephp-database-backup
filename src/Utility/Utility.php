@@ -21,10 +21,10 @@ use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use Cake\Utility\Fs\Path;
 use DatabaseBackup\Executor\Executor;
 use DatabaseBackup\OperationType;
 use InvalidArgumentException;
-use Symfony\Component\Filesystem\Path;
 use function Cake\I18n\__d;
 
 /**
