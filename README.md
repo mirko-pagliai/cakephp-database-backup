@@ -65,6 +65,8 @@ See [our documentation](/docs).
 
 If you are upgrading from the `2.x` branch, see [Migration from branch 2.15 to 3.0](docs/Migration%20from%20branch%202.15%20to%203.0.md).
 
+If you are upgrading from the `3.0.x` branch, see [Migration from branch 3.0 to 3.1](docs/Migration%20from%20branch%203.0%20to%203.1.md).
+
 Before opening an issue, check this list of [common issues](docs/Common%20issues.md).
 
 ## Testing
@@ -78,7 +80,8 @@ does not belong to the testsuite executed by default (it is therefore an optiona
 `#[CoversNothing]`.
 
 This test class, when executed, will test a real database export and import, using the `pdo_mysql`, `pdo_pgsql` and
-`pdo_sqlite` PHP extensions, that is all the drivers and databases supported by the plugin.
+`pdo_sqlite` PHP extensions, that is all the drivers and databases supported by the plugin (for `pdo_mysql`, both a
+*MySQL* and a *MariaDB* server).
 
 You can test the class directly or the configured `real-drivers` testsuite ([see available testsuites](phpunit.xml.dist)):
 ```bash
@@ -108,7 +111,7 @@ docker compose -f docker/docker-compose.yml up -d
 docker compose -f docker/docker-compose.yml exec php vendor/bin/phpunit --testsuite=real-drivers
 ```
 
-This setup runs the real-drivers test suite against real MySQL/MariaDB and PostgreSQL servers, using their corresponding
+This setup runs the real-drivers test suite against real MySQL, MariaDB and PostgreSQL servers, using their corresponding
 dump/restore binaries, in a controlled environment.
 
 ## Versioning

@@ -85,6 +85,18 @@ An example: suppose you want to run the command to export mysql databases with t
 Configure::write('DatabaseBackup.Mysql.export', '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}" --column-statistics=0');
 ```
 
+The `DatabaseBackup.Mysql.*` commands are used with the `Cake\Database\Driver\Mysql` driver. With the
+`Cake\Database\Driver\Mariadb` driver (CakePHP 5.5) the plugin uses the `DatabaseBackup.Mariadb.*` commands instead, which
+have the same defaults but must be customized separately:
+```php
+Configure::write('DatabaseBackup.Mariadb.export', '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}" --single-transaction');
+```
+
+For the time being, if you have customized `DatabaseBackup.Mysql.export` or `DatabaseBackup.Mysql.import` and you have
+not set the corresponding `DatabaseBackup.Mariadb.*` key, the `Mysql` command is used for the `Mariadb` driver as well.
+This only eases the migration, and it will be removed in the `3.2.x` branch: see
+[Migration from branch 3.0 to 3.1](Migration%20from%20branch%203.0%20to%203.1.md).
+
 However, remember that some values should be escaped and that incorrect customization of the commands could make the plugin unusable or otherwise cause unwanted effects.
 
 ### Default options of `mariadb-dump`
