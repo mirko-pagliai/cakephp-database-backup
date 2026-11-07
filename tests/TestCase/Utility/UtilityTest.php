@@ -95,6 +95,9 @@ class UtilityTest extends TestCase
     }
 
     /**
+     * @param string $driver
+     * @param class-string $expectedExecutor
+     * @return void
      * @link \DatabaseBackup\Utility\Utility::$Executor
      */
     #[Test]
