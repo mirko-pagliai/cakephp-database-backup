@@ -16,6 +16,9 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Core\Configure;
+use Cake\Database\Driver\Postgres;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -40,5 +43,25 @@ class PostgresExecutorTest extends TestCase
         $PostgresExecutor = new PostgresExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
 
         $this->assertSame($expectedBinaryName, $PostgresExecutor->getBinaryName());
+    }
+
+    /**
+     * Tests that the command starts with the one configured for the `Postgres` driver.
+     *
+     * @link \DatabaseBackup\Executor\Executor::getCommand()
+     */
+    #[Test]
+    #[TestWith(['DatabaseBackup.Postgres.export', OperationType::Export])]
+    #[TestWith(['DatabaseBackup.Postgres.import', OperationType::Import])]
+    public function testGetCommand(string $configKey, OperationType $OperationType): void
+    {
+        $PostgresExecutor = new PostgresExecutor(
+            Connection: new FakeConnection(['driver' => Postgres::class]),
+            OperationType: $OperationType,
+        );
+        /** @var non-empty-string $expectedCommand */
+        $expectedCommand = Configure::readOrFail($configKey);
+
+        $this->assertStringStartsWith($expectedCommand, $PostgresExecutor->getCommand(Compression::None));
     }
 }

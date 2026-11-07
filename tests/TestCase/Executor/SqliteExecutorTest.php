@@ -19,7 +19,9 @@ use App\Database\FakeConnection;
 use Cake\Core\Configure;
 use Cake\Database\Connection;
 use Cake\Database\Driver;
+use Cake\Database\Driver\Sqlite;
 use Cake\Event\EventInterface;
+use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\SqliteExecutor;
 use DatabaseBackup\OperationType;
 use DatabaseBackup\TestSuite\TestCase;
@@ -62,6 +64,26 @@ class SqliteExecutorTest extends TestCase
         $SqliteExecutor = new SqliteExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
 
         $this->assertSame($expectedBinaryName, $SqliteExecutor->getBinaryName());
+    }
+
+    /**
+     * Tests that the command starts with the one configured for the `Sqlite` driver.
+     *
+     * @link \DatabaseBackup\Executor\Executor::getCommand()
+     */
+    #[Test]
+    #[TestWith(['DatabaseBackup.Sqlite.export', OperationType::Export])]
+    #[TestWith(['DatabaseBackup.Sqlite.import', OperationType::Import])]
+    public function testGetCommand(string $configKey, OperationType $OperationType): void
+    {
+        $SqliteExecutor = new SqliteExecutor(
+            Connection: new FakeConnection(['driver' => Sqlite::class]),
+            OperationType: $OperationType,
+        );
+        /** @var non-empty-string $expectedCommand */
+        $expectedCommand = Configure::readOrFail($configKey);
+
+        $this->assertStringStartsWith($expectedCommand, $SqliteExecutor->getCommand(Compression::None));
     }
 
     /**

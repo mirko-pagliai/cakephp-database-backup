@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Executor;
 
 use App\Database\FakeConnection;
+use Cake\Core\Configure;
+use Cake\Database\Driver\Mysql;
 use Cake\Event\EventInterface;
 use DatabaseBackup\Compression;
 use DatabaseBackup\Executor\MysqlExecutor;
@@ -60,6 +62,26 @@ class MysqlExecutorTest extends TestCase
     {
         $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
         $this->assertSame($expectedBinaryName, $MysqlExecutor->getBinaryName());
+    }
+
+    /**
+     * Tests that the command starts with the one configured for the `Mysql` driver.
+     *
+     * @link \DatabaseBackup\Executor\Executor::getCommand()
+     */
+    #[Test]
+    #[TestWith(['DatabaseBackup.Mysql.export', OperationType::Export])]
+    #[TestWith(['DatabaseBackup.Mysql.import', OperationType::Import])]
+    public function testGetCommand(string $configKey, OperationType $OperationType): void
+    {
+        $MysqlExecutor = new MysqlExecutor(
+            Connection: new FakeConnection(['driver' => Mysql::class]),
+            OperationType: $OperationType,
+        );
+        /** @var non-empty-string $expectedCommand */
+        $expectedCommand = Configure::readOrFail($configKey);
+
+        $this->assertStringStartsWith($expectedCommand, $MysqlExecutor->getCommand(Compression::None));
     }
 
     /**
