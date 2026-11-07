@@ -4,6 +4,8 @@
 * the commands now use `$this->args` and `$this->io` instead of the `execute()` parameters, and
   `Command::getTimeoutOption()` no longer takes the `Arguments` parameter
   ([#230](https://github.com/mirko-pagliai/cakephp-database-backup/issues/230));
+* added support for the `Cake\Database\Driver\Mariadb` driver (CakePHP 5.5), with its own `DatabaseBackup.Mariadb.*`
+  commands. Until `3.2.x`, if they are not set, the customized `DatabaseBackup.Mysql.*` ones are used;
 * requires at least CakePHP 5.5.0 and phpunit 13.2
 
 ## 3.0 branch
