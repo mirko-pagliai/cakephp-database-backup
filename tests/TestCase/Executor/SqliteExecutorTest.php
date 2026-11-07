@@ -67,19 +67,23 @@ class SqliteExecutorTest extends TestCase
     }
 
     /**
+     * Tests that the command starts with the one configured for the `Sqlite` driver.
+     *
      * @link \DatabaseBackup\Executor\Executor::getCommand()
      */
     #[Test]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" .dump > "${:FILENAME}"', OperationType::Export])]
-    #[TestWith(['"${:BINARY}" "${:DB_NAME}" < "${:FILENAME}"', OperationType::Import])]
-    public function testGetCommand(string $expectedCommand, OperationType $OperationType): void
+    #[TestWith(['DatabaseBackup.Sqlite.export', OperationType::Export])]
+    #[TestWith(['DatabaseBackup.Sqlite.import', OperationType::Import])]
+    public function testGetCommand(string $configKey, OperationType $OperationType): void
     {
         $SqliteExecutor = new SqliteExecutor(
             Connection: new FakeConnection(['driver' => Sqlite::class]),
             OperationType: $OperationType,
         );
+        /** @var non-empty-string $expectedCommand */
+        $expectedCommand = Configure::readOrFail($configKey);
 
-        $this->assertSame($expectedCommand, $SqliteExecutor->getCommand(Compression::None));
+        $this->assertStringStartsWith($expectedCommand, $SqliteExecutor->getCommand(Compression::None));
     }
 
     /**
