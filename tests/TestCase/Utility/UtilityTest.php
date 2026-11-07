@@ -20,11 +20,13 @@ use App\Executor\FakeExecutor;
 use ArgumentCountError;
 use BadMethodCallException;
 use Cake\Core\Configure;
+use Cake\Database\Driver\Mariadb;
 use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
 use Cake\Database\Driver\Sqlite;
 use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
+use DatabaseBackup\Executor\MariadbExecutor;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
@@ -101,6 +103,7 @@ class UtilityTest extends TestCase
      * @link \DatabaseBackup\Utility\Utility::$Executor
      */
     #[Test]
+    #[TestWith([Mariadb::class, MariadbExecutor::class])]
     #[TestWith([Mysql::class, MysqlExecutor::class])]
     #[TestWith([Postgres::class, PostgresExecutor::class])]
     #[TestWith([Sqlite::class, SqliteExecutor::class])]

@@ -19,6 +19,7 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
+use DatabaseBackup\Executor\MariadbExecutor;
 use DatabaseBackup\Executor\MysqlExecutor;
 use DatabaseBackup\Executor\PostgresExecutor;
 use DatabaseBackup\Executor\SqliteExecutor;
@@ -121,7 +122,7 @@ class BackupExportAndImportTest extends TestCase
     }
 
     /**
-     * @param string $extension
+     * @param string $driver The name of the driver, which is also the suffix of the `db_dsn_*` variable
      * @param class-string $expectedExecutor
      * @param string $filename The compression is derived from its extension
      * @return void
@@ -129,6 +130,9 @@ class BackupExportAndImportTest extends TestCase
      * @link \DatabaseBackup\Utility\BackupImport::import()
      */
     #[Test]
+    #[TestWith(['mariadb', MariadbExecutor::class, 'test.sql'])]
+    #[TestWith(['mariadb', MariadbExecutor::class, 'test.sql.gz'])]
+    #[TestWith(['mariadb', MariadbExecutor::class, 'test.sql.bz2'])]
     #[TestWith(['mysql', MysqlExecutor::class, 'test.sql'])]
     #[TestWith(['mysql', MysqlExecutor::class, 'test.sql.gz'])]
     #[TestWith(['mysql', MysqlExecutor::class, 'test.sql.bz2'])]
@@ -138,8 +142,10 @@ class BackupExportAndImportTest extends TestCase
     #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql'])]
     #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql.gz'])]
     #[TestWith(['sqlite', SqliteExecutor::class, 'test.sql.bz2'])]
-    public function testExportAndImport(string $extension, string $expectedExecutor, string $filename): void
+    public function testExportAndImport(string $driver, string $expectedExecutor, string $filename): void
     {
+        // MariaDB uses the `pdo_mysql` extension too
+        $extension = $driver === 'mariadb' ? 'mysql' : $driver;
         if (!extension_loaded("pdo_{$extension}")) {
             $this->fail("The `pdo_{$extension}` extension is not available");
         }
@@ -152,7 +158,7 @@ class BackupExportAndImportTest extends TestCase
          *
          * @see tests/bootstrap.php
          */
-        ConnectionManager::setConfig('test', ['url' => getenv("db_dsn_{$extension}")]);
+        ConnectionManager::setConfig('test', ['url' => getenv("db_dsn_{$driver}")]);
         $loader = new SchemaLoader();
         /** @see /tests/schema.php */
         $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
