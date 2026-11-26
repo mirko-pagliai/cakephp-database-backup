@@ -7,6 +7,9 @@
 * requires at least CakePHP 5.5.0 and phpunit 13.2
 
 ## 3.0 branch
+### 3.0.7
+* added support for PHP 8.6, now tested in CI.
+
 ### 3.0.6
 * fixed a several bug in `BackupImport`: with SQLite, if the filename was not set or a binary (`sqlite3`, `gzip` or
   `bzip2`) was not found, the import failed after all the tables had already been dropped. Now these checks are made
