@@ -37,15 +37,15 @@ Configure::write('DatabaseBackup.binaries.mysqldump', '/full/path/to/mariadb-dum
 
 ## Errors about certificate verification
 
-When using MariaDB, you may receive an error (related to certificate verification) like this (see [issue #112](https://github.com/mirko-pagliai/cakephp-database-backup/issues/112) and [issue #110](https://github.com/mirko-pagliai/cakephp-database-backup/issues/110)):
+When using the MariaDB clients, you may receive an error (related to certificate verification) like this (see [issue #112](https://github.com/mirko-pagliai/cakephp-database-backup/issues/112) and [issue #110](https://github.com/mirko-pagliai/cakephp-database-backup/issues/110)):
 
 ```bash
 mysqldump: Got error: 2026: "TLS/SSL error: Certificate verification failure: The certificate is NOT trusted." when trying to connect
 ```
 
-Starting from version `11.4`, the `mariadb` and `mariadb-dump` clients require TLS by default and verify the certificate of the server for TCP connections, while connections through a Unix socket are trusted (refer to [this](https://mariadb.com/docs/server/security/encryption/data-in-transit-encryption/zero-configuration-ssl)).
+Starting from version `11.4`, the MariaDB clients (`mariadb` and `mariadb-dump`, and `mysql` and `mysqldump` when they are links to them) require TLS by default and verify the certificate of the server for TCP connections, while connections through a Unix socket are trusted (refer to [this](https://mariadb.com/docs/server/security/encryption/data-in-transit-encryption/zero-configuration-ssl)).
 
-So, the error depends on the version of the client installed (for example, after a system upgrade) and not only on the version of the server. A certificate is accepted if it is signed by a certification authority trusted by the client or, even if it is self-signed, if the account uses the `mysql_native_password`, `ed25519` or `parsec` authentication plugin and has a non-empty password. With other plugins (for example PAM, GSSAPI or `caching_sha2_password`), a certificate that the client does not trust causes the error.
+So, the error depends on the version of the client installed (for example, after a system upgrade) and not only on the version of the server. A certificate is accepted if it is signed by a certification authority trusted by the client. With a MariaDB server, a self-signed certificate is also accepted if the account uses the `mysql_native_password`, `ed25519` or `parsec` authentication plugin and has a non-empty password; with other plugins (for example PAM, GSSAPI or `caching_sha2_password`), a certificate that the client does not trust causes the error. With a MySQL server, which generates a self-signed certificate by itself, this does not apply: the error occurs even if the account uses `mysql_native_password`.
 
 Note that the plugin runs the export command with the `--defaults-file` option, so the client options set in the global configuration files of MariaDB are ignored when exporting (the import uses `--defaults-extra-file`, which reads them).
 
@@ -60,6 +60,8 @@ For the third way, before the plugin is loaded (`--defaults-file` and `--default
 Configure::write('DatabaseBackup.Mysql.export', '"${:BINARY}" --defaults-file="${:AUTH_FILE}" --skip-ssl-verify-server-cert "${:DB_NAME}"');
 Configure::write('DatabaseBackup.Mysql.import', '"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" --skip-ssl-verify-server-cert "${:DB_NAME}"');
 ```
+
+With the `Mariadb` driver, set the `DatabaseBackup.Mariadb.export` and `DatabaseBackup.Mariadb.import` keys in the same way.
 
 As a last resort, the `--skip-ssl` option disables TLS completely.
 
