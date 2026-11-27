@@ -10,6 +10,8 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+      mysql:
+        condition: service_healthy
       postgres:
         condition: service_healthy
     tty: true
@@ -26,6 +28,22 @@ services:
         interval: 2s
         timeout: 2s
         retries: 20
+
+  mysql:
+    image: mysql:8.4
+    # The MariaDB client (used by the plugin) does not authenticate with `caching_sha2_password` without a trusted
+    #  certificate, so the `mysql_native_password` plugin is enabled and used by default
+    command: --mysql-native-password=ON --authentication-policy=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
 
   postgres:
     image: postgres:17.7

@@ -19,6 +19,7 @@ use Cake\Core\Configure;
 use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * BootstrapTest.
@@ -50,6 +51,10 @@ class BootstrapTest extends TestCase
             'target' => $target,
             'processTimeout' => 60,
             'Mysql' => [
+                'export' => '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}"',
+                'import' => '"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" "${:DB_NAME}"',
+            ],
+            'Mariadb' => [
                 'export' => '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}"',
                 'import' => '"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" "${:DB_NAME}"',
             ],
@@ -85,5 +90,43 @@ class BootstrapTest extends TestCase
 
         $this->assertSame(90, Configure::read('DatabaseBackup.processTimeout'));
         $this->assertSame('custom export', Configure::read('DatabaseBackup.Mysql.export'));
+    }
+
+    /**
+     * Tests that, if the `Mariadb` commands are not set, the customized `Mysql` ones are used for them as well.
+     *
+     * @todo To be removed in the `3.2.x` branch, together with the fallback.
+     */
+    #[Test]
+    #[TestWith(['export'])]
+    #[TestWith(['import'])]
+    public function testMysqlCommandIsUsedForMariadbIfNotSet(string $operation): void
+    {
+        Configure::delete("DatabaseBackup.Mariadb.{$operation}");
+        Configure::write("DatabaseBackup.Mysql.{$operation}", 'custom mysql command');
+
+        $this->loadBootstrap();
+
+        $result = Configure::read("DatabaseBackup.Mariadb.{$operation}");
+        $this->assertSame('custom mysql command', $result);
+    }
+
+    /**
+     * Tests that the `Mariadb` commands already configured are not overwritten by the `Mysql` ones.
+     *
+     * @todo To be removed in the `3.2.x` branch, together with the fallback.
+     */
+    #[Test]
+    #[TestWith(['export'])]
+    #[TestWith(['import'])]
+    public function testMariadbCommandIsNotOverwrittenByMysqlOne(string $operation): void
+    {
+        Configure::write("DatabaseBackup.Mariadb.{$operation}", 'custom mariadb command');
+        Configure::write("DatabaseBackup.Mysql.{$operation}", 'custom mysql command');
+
+        $this->loadBootstrap();
+
+        $result = Configure::read("DatabaseBackup.Mariadb.{$operation}");
+        $this->assertSame('custom mariadb command', $result);
     }
 }

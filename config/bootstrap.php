@@ -15,11 +15,27 @@ declare(strict_types=1);
 
 use Cake\Core\Configure;
 
+/**
+ * Since 3.1.0 the `Cake\Database\Driver\Mariadb` driver has its own commands (`DatabaseBackup.Mariadb.*`).
+ * To ease the migration, if they are not set but the `DatabaseBackup.Mysql.*` ones are, the latter are used for both.
+ * @todo remove this fallback in 3.2.x
+ */
+foreach (['export', 'import'] as $operation) {
+    $mariadbKey = "DatabaseBackup.Mariadb.{$operation}";
+    $mysqlKey = "DatabaseBackup.Mysql.{$operation}";
+
+    if (!Configure::check($mariadbKey) && Configure::check($mysqlKey)) {
+        Configure::write($mariadbKey, Configure::read($mysqlKey));
+    }
+}
+
 $defaults = [
     'DatabaseBackup.target' => rtrim(ROOT, DS) . DS . 'backups',
     'DatabaseBackup.processTimeout' => 60,
     'DatabaseBackup.Mysql.export' => '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}"',
     'DatabaseBackup.Mysql.import' => '"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" "${:DB_NAME}"',
+    'DatabaseBackup.Mariadb.export' => '"${:BINARY}" --defaults-file="${:AUTH_FILE}" "${:DB_NAME}"',
+    'DatabaseBackup.Mariadb.import' => '"${:BINARY}" --defaults-extra-file="${:AUTH_FILE}" "${:DB_NAME}"',
     'DatabaseBackup.Postgres.export' => '"${:BINARY}" --format=c -b --dbname=\'postgresql://"${:DB_USERNAME}":"${:DB_PASSWORD}"@"${:DB_HOST}"/"${:DB_NAME}"\'',
     'DatabaseBackup.Postgres.import' => '"${:BINARY}" --format=c -c -e --dbname=\'postgresql://"${:DB_USERNAME}":"${:DB_PASSWORD}"@"${:DB_HOST}"/"${:DB_NAME}"\'',
     'DatabaseBackup.Sqlite.export' => '"${:BINARY}" "${:DB_NAME}" .dump',

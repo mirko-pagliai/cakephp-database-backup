@@ -51,12 +51,13 @@ require_once ROOT . 'config' . DS . 'bootstrap.php';
  *
  * They can be overridden before running tests by exporting the affected variable. Ex.:
  * ```
- * export db_dsn_mysql='mysql://root:root@127.0.0.1/test?encoding=utf8'; vendor/bin/phpunit
+ * export db_dsn_mariadb='mariadb://root:root@127.0.0.1/test?encoding=utf8'; vendor/bin/phpunit
  * ```
  */
 foreach (
     [
-        'db_dsn_mysql' => 'mysql://test:test@mariadb/test',
+        'db_dsn_mariadb' => 'mariadb://test:test@mariadb/test',
+        'db_dsn_mysql' => 'mysql://test:test@mysql/test',
         'db_dsn_pgsql' => 'postgres://postgres:postgres@postgres/test',
         'db_dsn_sqlite' => 'sqlite:///' . TMP . 'test.sq3',
     ] as $key => $value
