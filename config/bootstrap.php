@@ -14,15 +14,6 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
-use DatabaseBackup\Executor\MysqlExecutor;
-
-/**
- * The `Cake\Database\Driver\Mariadb` driver (CakePHP 5.5) uses the same executor as the `Mysql` one.
- * This file can be loaded more than once, but the alias can be declared only once.
- */
-if (!class_exists('DatabaseBackup\Executor\MariadbExecutor', false)) {
-    class_alias(MysqlExecutor::class, 'DatabaseBackup\Executor\MariadbExecutor');
-}
 
 /**
  * Since 3.1.0 the `Cake\Database\Driver\Mariadb` driver has its own commands (`DatabaseBackup.Mariadb.*`).

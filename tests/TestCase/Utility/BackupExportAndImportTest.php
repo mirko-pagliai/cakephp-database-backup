@@ -185,7 +185,7 @@ class BackupExportAndImportTest extends TestCase
             ->filename($filename)
             ->export();
 
-        $this->assertInstanceOf($expectedExecutor, $BackupExport->Executor);
+        $this->assertSame($expectedExecutor, $BackupExport->Executor::class);
         $this->assertSame($targetDir . $filename, $result);
         $this->assertFileExists($result);
 
@@ -208,7 +208,7 @@ class BackupExportAndImportTest extends TestCase
             ->filename($result)
             ->import();
 
-        $this->assertInstanceOf($expectedExecutor, $BackupImport->Executor);
+        $this->assertSame($expectedExecutor, $BackupImport->Executor::class);
         $this->assertSame($targetDir . $filename, $result);
 
         /**

@@ -111,7 +111,7 @@ class UtilityTest extends TestCase
     {
         $this->Utility->Connection = new FakeConnection(compact('driver'));
 
-        $this->assertInstanceOf($expectedExecutor, $this->Utility->Executor);
+        $this->assertSame($expectedExecutor, $this->Utility->Executor::class);
     }
 
     /**

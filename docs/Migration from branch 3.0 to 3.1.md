@@ -61,10 +61,12 @@ As usual, the configuration must be set before loading the plugin.
 
 ### If you use the executors directly
 
-`DatabaseBackup\Executor\MariadbExecutor` is new, and it is currently an alias of `DatabaseBackup\Executor\MysqlExecutor`
-(declared in `config/bootstrap.php`), so the `MysqlExecutor` class is the one actually instantiated.
-Don't rely on this: with the `Mariadb` driver, use `MariadbExecutor` (or the executor that you get from
-`BackupExport::$Executor` and `BackupImport::$Executor`), since the two classes could become distinct in the future.
+`DatabaseBackup\Executor\MariadbExecutor` is new and it extends `DatabaseBackup\Executor\MysqlExecutor`. With the
+`Mariadb` driver, use `MariadbExecutor` (or the executor that you get from `BackupExport::$Executor` and
+`BackupImport::$Executor`).
+
+Since it extends `MysqlExecutor`, `$Executor instanceof MysqlExecutor` is true for both drivers: to tell them apart,
+check for `MariadbExecutor` first, or compare `$Executor::class`.
 
 ## If you use the commands in your code, or if you have extended them
 

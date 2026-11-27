@@ -37,6 +37,13 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 #[CoversClass(MysqlExecutor::class)]
 class MysqlExecutorTest extends TestCase
 {
+    /**
+     * The executor class under test.
+     *
+     * @var class-string<\DatabaseBackup\Executor\MysqlExecutor>
+     */
+    protected string $executorClass = MysqlExecutor::class;
+
     protected MysqlExecutor $MysqlExecutor;
 
     /**
@@ -46,7 +53,7 @@ class MysqlExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->MysqlExecutor = new MysqlExecutor(
+        $this->MysqlExecutor = new $this->executorClass(
             Connection: new FakeConnection(),
             OperationType: OperationType::Export,
         );
@@ -60,7 +67,7 @@ class MysqlExecutorTest extends TestCase
     #[TestWith(['mariadb', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
-        $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $MysqlExecutor = new $this->executorClass(Connection: new FakeConnection(), OperationType: $OperationType);
         $this->assertSame($expectedBinaryName, $MysqlExecutor->getBinaryName());
     }
 
@@ -74,7 +81,7 @@ class MysqlExecutorTest extends TestCase
     #[TestWith(['DatabaseBackup.Mysql.import', OperationType::Import])]
     public function testGetCommand(string $configKey, OperationType $OperationType): void
     {
-        $MysqlExecutor = new MysqlExecutor(
+        $MysqlExecutor = new $this->executorClass(
             Connection: new FakeConnection(['driver' => Mysql::class]),
             OperationType: $OperationType,
         );
@@ -147,7 +154,7 @@ class MysqlExecutorTest extends TestCase
     #[TestWith([OperationType::Import, 'Backup.afterImport'])]
     public function testAfterEvents(OperationType $OperationType, string $eventName): void
     {
-        $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $MysqlExecutor = new $this->executorClass(Connection: new FakeConnection(), OperationType: $OperationType);
         $authFile = $MysqlExecutor->authFile;
 
         $MysqlExecutor->dispatchEvent($eventName);
@@ -252,7 +259,7 @@ class MysqlExecutorTest extends TestCase
     #[TestWith([OperationType::Import, 'Backup.beforeImport'])]
     public function testAuthFileNotWrittenIfBeforeEventIsStopped(OperationType $OperationType, string $eventName): void
     {
-        $MysqlExecutor = new MysqlExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $MysqlExecutor = new $this->executorClass(Connection: new FakeConnection(), OperationType: $OperationType);
         $MysqlExecutor->getEventManager()->on($eventName, static function (EventInterface $Event): void {
             $Event->stopPropagation();
         });
@@ -269,7 +276,7 @@ class MysqlExecutorTest extends TestCase
     #[RunInSeparateProcess]
     public function testWriteAuthFileWithPlaceholdersInValues(): void
     {
-        $MysqlExecutor = new MysqlExecutor(
+        $MysqlExecutor = new $this->executorClass(
             Connection: new FakeConnection(['password' => 'pass{{HOST}}{{USER}}']),
             OperationType: OperationType::Export,
         );
@@ -299,7 +306,7 @@ class MysqlExecutorTest extends TestCase
     #[TestWith([null, ''])]
     public function testWriteAuthFileWithSpecialCharactersInPassword(?string $password, string $expectedPassword): void
     {
-        $MysqlExecutor = new MysqlExecutor(
+        $MysqlExecutor = new $this->executorClass(
             Connection: new FakeConnection(compact('password')),
             OperationType: OperationType::Export,
         );
@@ -331,7 +338,7 @@ class MysqlExecutorTest extends TestCase
     #[TestWith(['host', 'my\\host', 'my\\\\host'])]
     public function testWriteAuthFileWithSpecialCharactersInUsernameAndHost(string $key, string $value, string $expectedValue): void
     {
-        $MysqlExecutor = new MysqlExecutor(
+        $MysqlExecutor = new $this->executorClass(
             Connection: new FakeConnection([$key => $value]),
             OperationType: OperationType::Export,
         );
