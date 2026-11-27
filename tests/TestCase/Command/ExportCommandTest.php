@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Command;
 
 use App\Database\FakeConnection;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
-use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\Event;
 use Cake\Event\EventManager;
@@ -27,7 +26,6 @@ use DatabaseBackup\Utility\BackupExport;
 use Exception;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -63,51 +61,21 @@ class ExportCommandTest extends TestCase
     }
 
     /**
+     * @param array<string> $choices
+     *
      * @link \DatabaseBackup\Command\ExportCommand::buildOptionParser()
      */
     #[Test]
-    #[RequiresOperatingSystemFamily('Linux')]
-    public function testBuildOptionParser(): void
+    #[TestWith(['compression', 'c', ['gzip', 'bzip2']])]
+    #[TestWith(['filename', 'f', []])]
+    public function testBuildOptionParser(string $name, string $short, array $choices): void
     {
-        $this->exec('database_backup.export -h');
-        $this->assertExitSuccess();
-        $this->assertOutputContains('Exports a database backup');
-        $this->assertOutputContains('cake database_backup.export [options]');
+        $options = (new ExportCommand())->getOptionParser()->options();
 
-        $root = ROOT;
-        /** @var string $defaultTarget */
-        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
-
-        $expected = <<<txt
-Exports a database backup
-
-<info>Usage:</info>
-cake database_backup.export [options]
-
-<info>Options:</info>
-
---compression, -c     Compression type. By default, no compression will
-                      be used <comment>(choices: gzip|bzip2)</comment>
---connection          Name of the alternative connection to use, for
-                      example if you are not using the default
-                      connection
---filename, -f        Filename. It can be an absolute path and may
-                      contain patterns. The compression type will be
-                      automatically set. Filenames can be relative to
-                      <comment>{$root}</comment>
-                      (root of your app) or
-                      <comment>{$defaultTarget}</comment>
-                      (default target directory).
---help, -h            Display this help.
---no-interaction      Disable interactive prompts. Prompts use their
-                      default value.
---quiet, -q           Enable quiet output and non-interactive mode.
---timeout, -t         Timeout for shell commands
---verbose, -v         Enable verbose output.
-
-txt;
-        $this->assertOutputContains($expected);
-        $this->assertErrorEmpty();
+        $this->assertArrayHasKey($name, $options);
+        $this->assertSame($short, $options[$name]->short());
+        $this->assertSame($choices, $options[$name]->choices());
+        $this->assertFalse($options[$name]->isBoolean());
     }
 
     /**

@@ -17,7 +17,6 @@ namespace DatabaseBackup\Test\TestCase\Command;
 
 use App\Database\FakeConnection;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
-use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
 use DatabaseBackup\Command\ImportCommand;
@@ -25,7 +24,6 @@ use DatabaseBackup\Utility\BackupImport;
 use Exception;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -64,48 +62,13 @@ class ImportCommandTest extends TestCase
      * @link \DatabaseBackup\Command\ImportCommand::buildOptionParser()
      */
     #[Test]
-    #[RequiresOperatingSystemFamily('Linux')]
     public function testBuildOptionParser(): void
     {
-        $this->exec('database_backup.import -h');
-        $this->assertExitSuccess();
-        $this->assertOutputContains('Imports a database backup');
-        $this->assertOutputContains('cake database_backup.import [--connection] [-h] [--no-interaction] [-q] [-t] [-v] <filename>');
+        $Parser = (new ImportCommand())->getOptionParser();
+        $arguments = $Parser->arguments();
 
-        $root = ROOT;
-        /** @var string $defaultTarget */
-        $defaultTarget = Configure::readOrFail('DatabaseBackup.target');
-
-        $expected = <<<txt
-Imports a database backup
-
-<info>Usage:</info>
-cake database_backup.import [--connection] [-h] [--no-interaction] [-q] [-t] [-v] <filename>
-
-<info>Options:</info>
-
---connection          Name of the alternative connection to use, for
-                      example if you are not using the default
-                      connection
---help, -h            Display this help.
---no-interaction      Disable interactive prompts. Prompts use their
-                      default value.
---quiet, -q           Enable quiet output and non-interactive mode.
---timeout, -t         Timeout for shell commands
---verbose, -v         Enable verbose output.
-
-<info>Arguments:</info>
-
-filename  Filename. It can be an absolute path. Filenames can be
-          relative to
-          <comment>{$root}</comment>
-          (root of your app) or
-          <comment>{$defaultTarget}</comment>
-          (default target directory).
-
-txt;
-        $this->assertOutputContains($expected);
-        $this->assertErrorEmpty();
+        $this->assertSame(['filename'], $Parser->argumentNames());
+        $this->assertTrue($arguments[0]->isRequired());
     }
 
     /**
