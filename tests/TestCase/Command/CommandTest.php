@@ -30,15 +30,33 @@ use PHPUnit\Framework\Attributes\TestWith;
 class CommandTest extends TestCase
 {
     /**
+     * @link \DatabaseBackup\Command\Command::buildOptionParser()
+     */
+    #[Test]
+    #[TestWith(['connection', ''])]
+    #[TestWith(['timeout', 't'])]
+    public function testBuildOptionParser(string $name, string $short): void
+    {
+        $Command = new class extends Command {
+        };
+
+        $options = $Command->getOptionParser()->options();
+
+        $this->assertArrayHasKey($name, $options);
+        $this->assertSame($short, $options[$name]->short());
+        $this->assertFalse($options[$name]->isBoolean());
+    }
+
+    /**
      * @param array<string, array<string>|bool|string|null> $options
      * @link \DatabaseBackup\Command\Command::getTimeoutOption()
      */
     #[Test]
-    #[TestWith([null, []])]
+    #[TestWith([null])]
     #[TestWith([1, ['timeout' => '1']])]
     #[TestWith([120, ['timeout' => '120']])]
     #[TestWith([120, ['timeout' => '0120']])]
-    public function testGetTimeoutOption(?int $expectedTimeout, array $options): void
+    public function testGetTimeoutOption(?int $expectedTimeout, array $options = []): void
     {
         $Command = new class extends Command {
         };
