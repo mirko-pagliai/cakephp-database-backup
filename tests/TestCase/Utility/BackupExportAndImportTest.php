@@ -280,6 +280,7 @@ class BackupExportAndImportTest extends TestCase
         $ArticlesTable = $this->fetchTable('Articles');
 
         //Gets the initial data
+        /** @var \Cake\Database\Connection $Connection */
         $Connection = ConnectionManager::get('test');
         $initialTables = $Connection->getSchemaCollection()->listTables();
         $initialArticles = $this->getAllRecords($ArticlesTable);
@@ -303,7 +304,7 @@ class BackupExportAndImportTest extends TestCase
         try {
             $BackupImport->import();
         } finally {
-            $this->assertSame($initialTables, ConnectionManager::get('test')->getSchemaCollection()->listTables());
+            $this->assertSame($initialTables, $Connection->getSchemaCollection()->listTables());
             $this->assertSame($initialArticles, $this->getAllRecords($ArticlesTable));
         }
     }
