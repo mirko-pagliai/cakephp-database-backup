@@ -86,21 +86,24 @@ cake database_backup.export [options]
 
 <info>Options:</info>
 
---compression, -c  Compression type. By default, no compression will be
-                   used <comment>(choices: gzip|bzip2)</comment>
---connection       Name of the alternative connection to use, for
-                   example if you are not using the default connection
---filename, -f     Filename. It can be an absolute path and may contain
-                   patterns. The compression type will be automatically
-                   set. Filenames can be relative to
-                   <comment>{$root}</comment>
-                   (root of your app) or
-                   <comment>{$defaultTarget}</comment>
-                   (default target directory).
---help, -h         Display this help.
---quiet, -q        Enable quiet output and non-interactive mode.
---timeout, -t      Timeout for shell commands
---verbose, -v      Enable verbose output.
+--compression, -c     Compression type. By default, no compression will
+                      be used <comment>(choices: gzip|bzip2)</comment>
+--connection          Name of the alternative connection to use, for
+                      example if you are not using the default
+                      connection
+--filename, -f        Filename. It can be an absolute path and may
+                      contain patterns. The compression type will be
+                      automatically set. Filenames can be relative to
+                      <comment>{$root}</comment>
+                      (root of your app) or
+                      <comment>{$defaultTarget}</comment>
+                      (default target directory).
+--help, -h            Display this help.
+--no-interaction      Disable interactive prompts. Prompts use their
+                      default value.
+--quiet, -q           Enable quiet output and non-interactive mode.
+--timeout, -t         Timeout for shell commands
+--verbose, -v         Enable verbose output.
 
 txt;
         $this->assertOutputContains($expected);
