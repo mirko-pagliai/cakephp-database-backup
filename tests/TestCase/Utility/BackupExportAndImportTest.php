@@ -65,27 +65,8 @@ class BackupExportAndImportTest extends TestCase
     /**
      * @inheritDoc
      */
-    public static function setUpBeforeClass(): void
-    {
-        //If some binaries are missing, sets the old aliases
-        $ExecutableFinder = new ExecutableFinder();
-        foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
-            if ($ExecutableFinder->find($binary)) {
-                continue;
-            }
-
-            Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($oldAlias));
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
     public static function tearDownAfterClass(): void
     {
-        //Deletes any custom and previously set binaries by `setUpBeforeClass()`
-        Configure::delete('DatabaseBackup.binaries');
-
         //Removes SQLite database
         if (file_exists(TMP . 'test.sq3')) {
             unlink(TMP . 'test.sq3');
@@ -116,7 +97,7 @@ class BackupExportAndImportTest extends TestCase
     {
         parent::tearDown();
 
-        //Drops the connection set by `setUpBeforeClass()`
+        //Drops the connection set by the test
         ConnectionManager::drop('test');
     }
 
@@ -142,6 +123,18 @@ class BackupExportAndImportTest extends TestCase
     {
         if (!extension_loaded("pdo_{$extension}")) {
             $this->fail("The `pdo_{$extension}` extension is not available");
+        }
+
+        if ($extension === 'mysql') {
+            //If some binaries are missing, sets the old aliases
+            $ExecutableFinder = new ExecutableFinder();
+            foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
+                if ($ExecutableFinder->find($binary)) {
+                    continue;
+                }
+
+                Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($oldAlias));
+            }
         }
 
         /**
