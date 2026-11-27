@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase;
 
 use Cake\Core\Configure;
-use DatabaseBackup\TestSuite\TestCase;
+use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;

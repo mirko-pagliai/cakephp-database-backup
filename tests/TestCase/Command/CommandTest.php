@@ -16,8 +16,8 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Command;
 
 use Cake\Console\Arguments;
+use Cake\TestSuite\TestCase;
 use DatabaseBackup\Command\Command;
-use DatabaseBackup\TestSuite\TestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

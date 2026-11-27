@@ -17,8 +17,8 @@ namespace DatabaseBackup\Test\TestCase;
 
 use App\Application;
 use Cake\Console\CommandCollection;
+use Cake\TestSuite\TestCase;
 use DatabaseBackup\DatabaseBackupPlugin;
-use DatabaseBackup\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 
