@@ -15,6 +15,9 @@ declare(strict_types=1);
 
 namespace DatabaseBackup\Executor;
 
+use DatabaseBackup\OperationType;
+use Override;
+
 /**
  * MariadbExecutor to export/import database backups.
  *
@@ -22,4 +25,12 @@ namespace DatabaseBackup\Executor;
  */
 class MariadbExecutor extends MysqlExecutor
 {
+    /**
+     * @inheritDoc
+     */
+    #[Override]
+    public function getBinaryName(): string
+    {
+        return $this->OperationType === OperationType::Export ? 'mariadb-dump' : 'mariadb';
+    }
 }

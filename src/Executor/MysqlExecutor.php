@@ -49,7 +49,7 @@ class MysqlExecutor extends Executor
     #[Override]
     public function getBinaryName(): string
     {
-        return $this->OperationType === OperationType::Export ? 'mariadb-dump' : 'mariadb';
+        return $this->OperationType === OperationType::Export ? 'mysqldump' : 'mysql';
     }
 
     /**

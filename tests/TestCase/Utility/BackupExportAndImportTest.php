@@ -132,14 +132,19 @@ class BackupExportAndImportTest extends TestCase
         }
 
         if (in_array($driver, ['mariadb', 'mysql'], true)) {
-            //If some binaries are missing, sets the old aliases
+            //If some binaries are missing, sets the aliases of the other client
+            $aliases = match ($driver) {
+                'mariadb' => ['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'],
+                default => ['mysqldump' => 'mariadb-dump', 'mysql' => 'mariadb'],
+            };
+
             $ExecutableFinder = new ExecutableFinder();
-            foreach (['mariadb-dump' => 'mysqldump', 'mariadb' => 'mysql'] as $binary => $oldAlias) {
+            foreach ($aliases as $binary => $alias) {
                 if ($ExecutableFinder->find($binary)) {
                     continue;
                 }
 
-                Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($oldAlias));
+                Configure::write("DatabaseBackup.binaries.{$binary}", $ExecutableFinder->find($alias));
             }
         }
 

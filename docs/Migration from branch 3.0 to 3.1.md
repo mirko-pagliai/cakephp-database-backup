@@ -10,6 +10,7 @@ made.
 - [Requirements](#requirements)
 - [The `Mariadb` driver](#the-mariadb-driver)
   * [Configuring export/import commands](#configuring-exportimport-commands)
+  * [The binaries](#the-binaries)
   * [If you use the executors directly](#if-you-use-the-executors-directly)
 - [If you use the commands in your code, or if you have extended them](#if-you-use-the-commands-in-your-code-or-if-you-have-extended-them)
 
@@ -32,7 +33,8 @@ or in the DSN (`mariadb://` instead of `mysql://`).
 Since the plugin chooses the executor and the commands according to the driver of the connection, from the `3.1.x`
 branch the `Mariadb` driver uses `DatabaseBackup\Executor\MariadbExecutor` and the `DatabaseBackup.Mariadb.*` commands,
 while the `Mysql` driver continues to use `DatabaseBackup\Executor\MysqlExecutor` and the `DatabaseBackup.Mysql.*`
-commands. Nothing changes if you keep using the `Mysql` driver.
+commands. The commands do not change if you keep using the `Mysql` driver, but its binaries do: see
+[the binaries](#the-binaries).
 
 ### Configuring export/import commands
 
@@ -58,6 +60,31 @@ migration and **it will be removed in the `3.2.x` branch**: set the `DatabaseBac
 upgrading to it.
 
 As usual, the configuration must be set before loading the plugin.
+
+### The binaries
+
+In the `3.0.x` branch both drivers used `mariadb-dump` (export) and `mariadb` (import). From the `3.1.x` branch the
+binaries depend on the driver:
+
+| Driver                            | Export         | Import    |
+|-----------------------------------|----------------|-----------|
+| `Cake\Database\Driver\Mysql`      | `mysqldump`    | `mysql`   |
+| `Cake\Database\Driver\Mariadb`    | `mariadb-dump` | `mariadb` |
+
+So, if your connection uses the `Mysql` driver, make sure you have the `mysqldump` and `mysql` executables, or set their
+paths. If you had set the paths of `mariadb-dump` and `mariadb` for a connection that uses the `Mysql` driver, those
+keys are no longer used by it:
+```php
+Configure::write('DatabaseBackup.binaries.mysqldump', '/full/path/to/mysqldump');
+Configure::write('DatabaseBackup.binaries.mysql', '/full/path/to/mysql');
+```
+
+If your connection uses the `Mariadb` driver, nothing changes: `DatabaseBackup.binaries.mariadb-dump` and
+`DatabaseBackup.binaries.mariadb` are still used.
+
+If you only have the executables of the other client (for example, only `mariadb-dump` and `mariadb` with the `Mysql`
+driver), you can set their paths with the keys of the driver in use, as explained
+[here](Common%20issues.md#transition-from-mysql-and-mysqldump-to-mariadb-and-mariadb-dump).
 
 ### If you use the executors directly
 

@@ -50,9 +50,15 @@ The plugin uses several binary files:
 * `gzip`
 * `mariadb`
 * `mariadb-dump`
+* `mysql`
+* `mysqldump`
 * `pg_dump`
 * `pg_restore`
 * `sqlite3`
+
+The binaries for MySQL and MariaDB depend on the driver of the connection: the `Cake\Database\Driver\Mysql` driver uses
+`mysqldump` (export) and `mysql` (import), while the `Cake\Database\Driver\Mariadb` driver uses `mariadb-dump` (export)
+and `mariadb` (import).
 
 By default, all binaries will be detected automatically.
 If a binary is not found or if you want to set a different path for the binary, you can use these configuration values.
@@ -99,9 +105,9 @@ This only eases the migration, and it will be removed in the `3.2.x` branch: see
 
 However, remember that some values should be escaped and that incorrect customization of the commands could make the plugin unusable or otherwise cause unwanted effects.
 
-### Default options of `mariadb-dump`
-The default export command for *MariaDB*/*MySql* databases does not add any option to `mariadb-dump`, so the defaults of
-`mariadb-dump` apply. Among them:
+### Default options of `mysqldump` and `mariadb-dump`
+The default export command for *MySQL* and *MariaDB* databases does not add any option to `mysqldump` and
+`mariadb-dump`, so their defaults apply. Among them:
 * `--opt` is enabled, which includes `--lock-tables` (the user needs the `LOCK TABLES` permission, see
   [this](Common%20issues.md#lock-tables-permission)): tables are locked while they are exported;
 * stored routines (`--routines`) and events (`--events`) are **not** exported, so they will not be in the backup.
