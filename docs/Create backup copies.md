@@ -1,8 +1,8 @@
 # Create backup copies
 
 - [Introduction](#introduction)
-- [Create a command to export (`ExportBackupCommand`)](#create-a-command-to-export---exportbackupcommand--)
-- [Create a command to rotate backups (`RotateBackupCommand`)](#create-a-command-to-rotate-backups---rotatebackupcommand--)
+- [Create a command to export (`ExportBackupCommand`)](#create-a-command-to-export-exportbackupcommand)
+- [Create a command to rotate backups (`RotateBackupCommand`)](#create-a-command-to-rotate-backups-rotatebackupcommand)
 
 ## Introduction
 

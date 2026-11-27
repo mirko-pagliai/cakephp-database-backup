@@ -2,11 +2,11 @@
 
 - [Basic operation](#basic-operation)
 - [Optional methods](#optional-methods)
-    * [compression()](#compression--)
-    * [filename()](#filename--)
-    * [timeout()](#timeout--)
+    * [compression()](#compression)
+    * [filename()](#filename)
+    * [timeout()](#timeout)
 - [Export the database](#export-the-database)
-    * [export()](#export--)
+    * [export()](#export)
 
 ## Basic operation
 To export a database, you have to follow three steps:
@@ -102,4 +102,4 @@ This is useful when working with very large databases that take a long time to e
 export()
 ```
 Exports the database and returns its filename path on success or `false` if the `Backup.beforeExport` event is stopped.  
-After the export, the filename is reset: to export again with a custom filename, set it again with [`filename()`](#filename--).
+After the export, the filename is reset: to export again with a custom filename, set it again with [`filename()`](#filename).

@@ -8,8 +8,8 @@ If you want to send backup files by email, remember to set up your application c
 For more information on how to configure your application, see the [CakePHP documentation](https://book.cakephp.org/5/en/core-libraries/email.html#configuring-transports).
 
 - [Configuration values](#configuration-values)
-    * [`DatabaseBackup.processTimeout`](#-databasebackupprocesstimeout-)
-    * [`DatabaseBackup.target`](#-databasebackuptarget-)
+    * [`DatabaseBackup.processTimeout`](#databasebackupprocesstimeout)
+    * [`DatabaseBackup.target`](#databasebackuptarget)
     * [Permissions of backup files](#permissions-of-backup-files)
 - [Binaries](#binaries)
 - [Customize export and import commands](#customize-export-and-import-commands)
