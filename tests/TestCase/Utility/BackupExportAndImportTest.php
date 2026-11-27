@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
+use Cake\Core\Exception\CakeException;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Table;
@@ -30,6 +31,8 @@ use DatabaseBackup\Utility\BackupImport;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\ExecutableFinder;
 use Stringable;
 
@@ -232,5 +235,76 @@ class BackupExportAndImportTest extends TestCase
 
         $this->assertSame($initialArticles, $finalArticles);
         $this->assertSame($initialComments, $finalComments);
+    }
+
+    /**
+     * Tests that a failed import leaves the SQLite database untouched.
+     *
+     * Whatever the reason of the failure, the tables and the records that existed before the import must still be
+     *  there after the exception.
+     *
+     * @param string $filename The name of the backup, in `tests/test_app/backups`
+     * @param array<string, string|null> $config The configuration to set before the import (`null` deletes the key)
+     * @param int $timeout
+     * @param class-string<\Throwable> $expectedException
+     * @return void
+     * @link \DatabaseBackup\Utility\BackupImport::import()
+     */
+    #[Test]
+    #[TestWith(['invalid-statement.sql', [], 60, ProcessFailedException::class])]
+    #[TestWith(['invalid-statement.sql', ['DatabaseBackup.Sqlite.import' => null], 60, CakeException::class])]
+    #[TestWith([
+        'invalid-statement.sql',
+        ['DatabaseBackup.Sqlite.import' => 'sleep 5 && "${:BINARY}" "${:DB_NAME}"'],
+        1,
+        ProcessTimedOutException::class,
+    ])]
+    public function testImportFailureLeavesSqliteDatabaseUntouched(
+        string $filename,
+        array $config,
+        int $timeout,
+        string $expectedException,
+    ): void {
+        if (!extension_loaded('pdo_sqlite')) {
+            $this->fail('The `pdo_sqlite` extension is not available');
+        }
+
+        ConnectionManager::setConfig('test', ['url' => getenv('db_dsn_sqlite')]);
+        $loader = new SchemaLoader();
+        /** @see /tests/schema.php */
+        $loader->loadInternalFile(ROOT . 'tests' . DS . 'schema.php');
+
+        //Sets the fixtures and fetches tables
+        $this->fixtures = ['core.Articles', 'core.Comments'];
+        $this->setupFixtures();
+        $ArticlesTable = $this->fetchTable('Articles');
+
+        //Gets the initial data
+        $Connection = ConnectionManager::get('test');
+        $initialTables = $Connection->getSchemaCollection()->listTables();
+        $initialArticles = $this->getAllRecords($ArticlesTable);
+
+        foreach ($config as $key => $value) {
+            if ($value === null) {
+                Configure::delete($key);
+
+                continue;
+            }
+
+            Configure::write($key, $value);
+        }
+
+        $BackupImport = new BackupImport(Connection: $Connection);
+        $BackupImport->timeout = $timeout;
+        $BackupImport->filename = ROOT . 'tests' . DS . 'test_app' . DS . 'backups' . DS . $filename;
+
+        $this->expectException($expectedException);
+
+        try {
+            $BackupImport->import();
+        } finally {
+            $this->assertSame($initialTables, ConnectionManager::get('test')->getSchemaCollection()->listTables());
+            $this->assertSame($initialArticles, $this->getAllRecords($ArticlesTable));
+        }
     }
 }
