@@ -41,6 +41,18 @@ class MariadbExecutorTest extends MysqlExecutorTest
     protected string $executorClass = MariadbExecutor::class;
 
     /**
+     * @link \DatabaseBackup\Executor\MariadbExecutor::getBinaryName()
+     */
+    #[Test]
+    #[TestWith(['mariadb-dump', OperationType::Export])]
+    #[TestWith(['mariadb', OperationType::Import])]
+    public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
+    {
+        $MariadbExecutor = new MariadbExecutor(Connection: new FakeConnection(), OperationType: $OperationType);
+        $this->assertSame($expectedBinaryName, $MariadbExecutor->getBinaryName());
+    }
+
+    /**
      * Tests that the command starts with the one configured for the `Mariadb` driver.
      *
      * The default commands of the `Mysql` and `Mariadb` drivers are the same, so a custom command is set to tell them

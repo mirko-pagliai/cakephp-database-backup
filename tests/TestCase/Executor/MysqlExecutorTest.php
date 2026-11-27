@@ -63,8 +63,8 @@ class MysqlExecutorTest extends TestCase
      * @link \DatabaseBackup\Executor\MysqlExecutor::getBinaryName()
      */
     #[Test]
-    #[TestWith(['mariadb-dump', OperationType::Export])]
-    #[TestWith(['mariadb', OperationType::Import])]
+    #[TestWith(['mysqldump', OperationType::Export])]
+    #[TestWith(['mysql', OperationType::Import])]
     public function testGetBinaryName(string $expectedBinaryName, OperationType $OperationType): void
     {
         $MysqlExecutor = new $this->executorClass(Connection: new FakeConnection(), OperationType: $OperationType);

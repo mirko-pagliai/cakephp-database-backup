@@ -14,13 +14,25 @@ Note that on many systems `mysql` and `mysqldump` are still present, but they ar
 
 So, starting with version `2.13.4`, the plugin prefers to use `mariadb` and `mariadb-dump`, but it also recognizes (as aliases) `mysql` and `mysqldump`.
 
-Starting with the `3.0.x` branch, however, the plugin directly and exclusively uses `mariadb` and `mariadb-dump`.
+Starting with the `3.0.x` branch, however, the plugin directly and exclusively uses `mariadb` and `mariadb-dump`, for both
+MySQL and MariaDB databases.
 
-However, if for some reason you are using the newer version of the plugin, but still have only the old executables available, you should configure the plugin like this:
+Starting with the `3.1.x` branch, the binaries depend on the driver of the connection, which CakePHP 5.5 now distinguishes:
+the `Mysql` driver uses `mysqldump` and `mysql` again, while the `Mariadb` driver uses `mariadb-dump` and `mariadb`
+(see [Migration from branch 3.0 to 3.1](Migration%20from%20branch%203.0%20to%203.1.md#the-binaries)).
+
+If for some reason you have only the executables of the other client available, you can set their paths. For example,
+with the `Mariadb` driver and only the old executables:
 
 ```php
 Configure::write('DatabaseBackup.binaries.mariadb', '/full/path/to/mysql');
 Configure::write('DatabaseBackup.binaries.mariadb-dump', '/full/path/to/mysqldump');
+```
+or, with the `Mysql` driver and only the MariaDB executables:
+
+```php
+Configure::write('DatabaseBackup.binaries.mysql', '/full/path/to/mariadb');
+Configure::write('DatabaseBackup.binaries.mysqldump', '/full/path/to/mariadb-dump');
 ```
 
 ## Errors about certificate verification

@@ -7,6 +7,9 @@
 * added support for the `Cake\Database\Driver\Mariadb` driver (CakePHP 5.5), with its own `MariadbExecutor` (which
   extends `MysqlExecutor`) and its own `DatabaseBackup.Mariadb.*` commands. Until `3.2.x`, if they are not set, the
   customized `DatabaseBackup.Mysql.*` ones are used;
+* the binaries now depend on the driver: `mysqldump` and `mysql` for `Mysql`, `mariadb-dump` and `mariadb` (as in
+  `3.0.x`) for `Mariadb`. For a `Mysql` connection, the `DatabaseBackup.binaries.mariadb-dump` and
+  `DatabaseBackup.binaries.mariadb` keys are no longer used;
 * removed the `DatabaseBackup\TestSuite\TestCase` class, which only added the _Mockery_ integration already
   provided by `Cake\TestSuite\TestCase`: tests that extended it must now extend the CakePHP one;
 * requires at least CakePHP 5.5.0 and phpunit 13.2
