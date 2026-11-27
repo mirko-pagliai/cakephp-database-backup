@@ -1,7 +1,8 @@
 # 3.x branch
 ## 3.0 branch
 ### 3.0.7
-* added support for PHP 8.6, now tested in CI.
+* added support for PHP 8.6, now tested in CI;
+* fixed some broken links in the documentation.
 
 ### 3.0.6
 * fixed a several bug in `BackupImport`: with SQLite, if the filename was not set or a binary (`sqlite3`, `gzip` or

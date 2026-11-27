@@ -34,7 +34,7 @@ public function sendBackupWithMail(): void
 
     /**
      * Now I create a `Mailer` instance, which will take care of sending the email.
-     * @see https://book.cakephp.org/5/en/core-libraries/email.html#namespace-Cake\Mailer
+     * @see https://book.cakephp.org/5/en/core-libraries/email.html
      */
     $Mailer = new Mailer();
     $Mailer
@@ -90,7 +90,7 @@ class ExportAndSendBackupCommand extends Command
 
         /**
          * Now I create a `Mailer` instance, which will take care of sending the email.
-         * @see https://book.cakephp.org/5/en/core-libraries/email.html#namespace-Cake\Mailer
+         * @see https://book.cakephp.org/5/en/core-libraries/email.html
          */
         $recipient = 'recipient@example.com';
         try {

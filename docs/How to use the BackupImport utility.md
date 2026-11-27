@@ -2,10 +2,10 @@
 
 - [Basic operation](#basic-operation)
 - [Methods](#methods)
-    * [filename()](#filename--)
-    * [timeout()](#timeout--)
+    * [filename()](#filename)
+    * [timeout()](#timeout)
 - [Import the database](#import-the-database)
-    * [import()](#import--)
+    * [import()](#import)
 
 ## Basic operation
 To import a database, you have to follow three steps:
