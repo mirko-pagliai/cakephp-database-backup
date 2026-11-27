@@ -17,6 +17,7 @@ namespace DatabaseBackup\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\EntityInterface;
 use Cake\ORM\Table;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use DatabaseBackup\Executor\MysqlExecutor;
@@ -29,6 +30,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Process\ExecutableFinder;
+use Stringable;
 
 /**
  * BackupExportAndImportTest.
@@ -52,12 +54,10 @@ class BackupExportAndImportTest extends TestCase
         /** @var array<array<array-key, string>> */
         return $Table
             ->find()
-            ->enableHydration(false)
             ->all()
-            ->map(static fn(array $record): array => array_map(
-                // @phpstan-ignore cast.string
-                callback: static fn(mixed $value): string => (string)$value,
-                array: $record,
+            ->map(static fn(EntityInterface $record): array => array_map(
+                callback: static fn(mixed $value): mixed => $value instanceof Stringable ? (string)$value : $value,
+                array: $record->toArray(),
             ))
             ->toList();
     }
