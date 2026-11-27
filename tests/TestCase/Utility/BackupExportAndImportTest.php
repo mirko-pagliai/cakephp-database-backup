@@ -244,7 +244,7 @@ class BackupExportAndImportTest extends TestCase
      *  there after the exception.
      *
      * @param string $filename The name of the backup, in `tests/test_app/backups`
-     * @param array<string, string|null> $config The configuration to set before the import (`null` deletes the key)
+     * @param array<string, string|null> $config The configuration to set before the import (`null` unsets the key)
      * @param int $timeout
      * @param class-string<\Throwable> $expectedException
      * @return void
@@ -285,15 +285,7 @@ class BackupExportAndImportTest extends TestCase
         $initialTables = $Connection->getSchemaCollection()->listTables();
         $initialArticles = $this->getAllRecords($ArticlesTable);
 
-        foreach ($config as $key => $value) {
-            if ($value === null) {
-                Configure::delete($key);
-
-                continue;
-            }
-
-            Configure::write($key, $value);
-        }
+        Configure::write($config);
 
         $BackupImport = new BackupImport(Connection: $Connection);
         $BackupImport->timeout = $timeout;
